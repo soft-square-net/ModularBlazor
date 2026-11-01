@@ -22,7 +22,7 @@
     <Project Path="modules/host/Auth/Auth.csproj" />
     <Project Path="modules/host/Catalog/Catalog.csproj" />
   </Folder>
-  <Folder Name="/modules/">
+  <Folder Name="/modules/client/">
     <Project Path="modules/client/Layouts.Default/Layouts.Default.csproj" />
     <Project Path="modules/client/Layouts.Admin/Layouts.Admin.csproj" />
     <Project Path="modules/client/Module.Auth/Module.Auth.csproj" />
