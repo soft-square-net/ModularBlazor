@@ -11,7 +11,7 @@ $dllModules = "Layouts.Default", "Layouts.Admin", "Module.Auth", "Module.Dashboa
 foreach ($m in $dllModules) {
     dotnet build "modules/client/$m/$m.csproj" -c $Config -o "artifacts/$m" --nologo -v q
     if ($LASTEXITCODE -ne 0) { throw "Build failed: $m" }
-    Copy-Item "artifacts/$m/$m.dll" $out
+    Copy-Item "artifacts/$m/soft.square.net.$m.dll" $out
 }
 
 $nupkgModules = "Module.Reports"

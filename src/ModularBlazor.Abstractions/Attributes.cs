@@ -1,4 +1,4 @@
-namespace ModularBlazor.Abstractions;
+namespace soft.square.net.ModularBlazor.Abstractions;
 
 /// <summary>
 /// Put on a LayoutComponentBase in any module to register it under a key.

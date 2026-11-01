@@ -2,8 +2,8 @@
 
   <!-- Domain contracts for the API. No infrastructure or web dependencies. -->
   <PropertyGroup>
-    <AssemblyName>ModularBlazor.Core</AssemblyName>
-    <RootNamespace>ModularBlazor.Core</RootNamespace>
+    <AssemblyName>$(SoftSquarePrefix).ModularBlazor.Core</AssemblyName>
+    <RootNamespace>$(SoftSquarePrefix).ModularBlazor.Core</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

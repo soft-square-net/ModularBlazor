@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <AssemblyName>ModularBlazor.AppHost</AssemblyName>
-    <RootNamespace>ModularBlazor.AppHost</RootNamespace>
+    <AssemblyName>$(SoftSquarePrefix).ModularBlazor.AppHost</AssemblyName>
+    <RootNamespace>$(SoftSquarePrefix).ModularBlazor.AppHost</RootNamespace>
     <UserSecretsId>modularblazor-apphost</UserSecretsId>
   </PropertyGroup>
 

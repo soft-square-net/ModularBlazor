@@ -2,8 +2,8 @@
 
   <!-- Implementations of the Core contracts (storage, external services). -->
   <PropertyGroup>
-    <AssemblyName>ModularBlazor.Infrastructure</AssemblyName>
-    <RootNamespace>ModularBlazor.Infrastructure</RootNamespace>
+    <AssemblyName>$(SoftSquarePrefix).ModularBlazor.Infrastructure</AssemblyName>
+    <RootNamespace>$(SoftSquarePrefix).ModularBlazor.Infrastructure</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

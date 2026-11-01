@@ -5,7 +5,7 @@
       "name": "Default layout",
       "version": "1.0.0",
       "kind": "dll",
-      "url": "modules/Layouts.Default.dll",
+      "url": "modules/soft.square.net.Layouts.Default.dll",
       "loadOnStartup": true,
       "hidden": true
     },
@@ -14,7 +14,7 @@
       "name": "Authentication (login page + auth layout)",
       "version": "1.0.0",
       "kind": "dll",
-      "url": "modules/Module.Auth.dll",
+      "url": "modules/soft.square.net.Module.Auth.dll",
       "loadOnStartup": true,
       "hidden": true,
       "routePrefixes": [ "login" ],

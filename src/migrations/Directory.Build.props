@@ -4,8 +4,8 @@
   <!-- One migrations project per database provider. The assembly name must match
        DatabaseProviders.MigrationsAssembly(...) in the Infrastructure project. -->
   <PropertyGroup>
-    <AssemblyName>ModularBlazor.Migrations.$(MSBuildProjectName)</AssemblyName>
-    <RootNamespace>ModularBlazor.Migrations.$(MSBuildProjectName)</RootNamespace>
+    <AssemblyName>$(SoftSquarePrefix).ModularBlazor.Migrations.$(MSBuildProjectName)</AssemblyName>
+    <RootNamespace>$(SoftSquarePrefix).ModularBlazor.Migrations.$(MSBuildProjectName)</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

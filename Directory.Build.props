@@ -2,6 +2,10 @@
   <PropertyGroup>
     <!-- Change both if you are on a different .NET version. -->
     <TargetFramework>net10.0</TargetFramework>
+    <!-- Every assembly and root namespace is prefixed; projects with their own naming override these. -->
+    <SoftSquarePrefix>soft.square.net</SoftSquarePrefix>
+    <AssemblyName>$(SoftSquarePrefix).$(MSBuildProjectName)</AssemblyName>
+    <RootNamespace>$(SoftSquarePrefix).$(MSBuildProjectName)</RootNamespace>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latest</LangVersion>

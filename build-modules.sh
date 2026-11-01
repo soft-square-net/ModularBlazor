@@ -12,7 +12,7 @@ rm -f "$OUT"/*.dll "$OUT"/*.nupkg
 DLL_MODULES=(Layouts.Default Layouts.Admin Module.Auth Module.Dashboard Module.Admin)
 for m in "${DLL_MODULES[@]}"; do
   dotnet build "modules/client/$m/$m.csproj" -c "$CONFIG" -o "artifacts/$m" --nologo -v q
-  cp "artifacts/$m/$m.dll" "$OUT/"
+  cp "artifacts/$m/soft.square.net.$m.dll" "$OUT/"
 done
 
 NUPKG_MODULES=(Module.Reports)

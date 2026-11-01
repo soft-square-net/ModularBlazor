@@ -1,4 +1,4 @@
-namespace ModularBlazor.Abstractions;
+namespace soft.square.net.ModularBlazor.Abstractions;
 
 public enum ModuleKind
 {

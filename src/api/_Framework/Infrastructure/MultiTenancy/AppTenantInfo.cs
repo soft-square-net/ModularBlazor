@@ -1,7 +1,7 @@
 using Finbuckle.MultiTenant.Abstractions;
-using ModularBlazor.Core;
+using soft.square.net.ModularBlazor.Core;
 
-namespace ModularBlazor.Infrastructure.MultiTenancy;
+namespace soft.square.net.ModularBlazor.Infrastructure.MultiTenancy;
 
 /// <summary>
 /// A tenant. Each tenant owns a database: its engine and connection string are stored with the tenant

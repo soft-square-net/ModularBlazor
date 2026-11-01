@@ -20,7 +20,7 @@ var redis = builder
 
 // ---------------------------------------------------------------- applications (built from Dockerfiles)
 
-// ModularBlazor.Host (the API). The Docker build context is the repository root.
+// soft.square.net.ModularBlazor.Host (the API). The Docker build context is the repository root.
 var api = builder
     .AddDockerfile("host-api", "../../..", "src/api/ModularBlazor.Host/Dockerfile")
     .WithHttpEndpoint(port: 5100, targetPort: 8080, name: "http")
@@ -35,7 +35,7 @@ var api = builder
     .WaitFor(tenantStore)
     .WaitFor(redis);
 
-// ModularBlazor.Client (Blazor WebAssembly served by nginx).
+// soft.square.net.ModularBlazor.Client (Blazor WebAssembly served by nginx).
 builder
     .AddDockerfile("client", "../../..", "src/ModularBlazor.Client/Dockerfile")
     .WithHttpEndpoint(port: 5000, targetPort: 80, name: "http")

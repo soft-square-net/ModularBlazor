@@ -1,10 +1,10 @@
 using System.Text.Json.Serialization;
 using Carter;
 using Finbuckle.MultiTenant;
-using ModularBlazor.Host;
+using soft.square.net.ModularBlazor.Host;
 using Microsoft.EntityFrameworkCore;
-using ModularBlazor.Infrastructure;
-using ModularBlazor.Infrastructure.MultiTenancy;
+using soft.square.net.ModularBlazor.Infrastructure;
+using soft.square.net.ModularBlazor.Infrastructure.MultiTenancy;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);

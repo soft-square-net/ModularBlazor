@@ -3,7 +3,7 @@
   <!-- Shipped as a NuGet package: dotnet pack -> Module.Reports.1.0.0.nupkg.
        The loader reads lib/<tfm>/*.dll and staticwebassets/*.css from the package. -->
   <PropertyGroup>
-    <PackageId>Module.Reports</PackageId>
+    <PackageId>$(SoftSquarePrefix).Module.Reports</PackageId>
     <Version>1.0.0</Version>
     <Description>Reports module for Modular Blazor.</Description>
   </PropertyGroup>

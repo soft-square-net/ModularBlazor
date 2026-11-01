@@ -1,4 +1,4 @@
-namespace ModularBlazor.Client.Services;
+namespace soft.square.net.ModularBlazor.Client.Services;
 
 public sealed class ModuleOptions
 {

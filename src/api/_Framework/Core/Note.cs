@@ -1,4 +1,4 @@
-namespace ModularBlazor.Core;
+namespace soft.square.net.ModularBlazor.Core;
 
 /// <summary>Sample tenant-owned entity so the per-tenant database has something to migrate. Replace with your own.</summary>
 public sealed class Note

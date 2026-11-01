@@ -3,10 +3,10 @@ using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using ModularBlazor.Core;
-using ModularBlazor.Infrastructure.Persistence;
+using soft.square.net.ModularBlazor.Core;
+using soft.square.net.ModularBlazor.Infrastructure.Persistence;
 
-namespace ModularBlazor.Infrastructure.MultiTenancy;
+namespace soft.square.net.ModularBlazor.Infrastructure.MultiTenancy;
 
 public static class MultiTenancyExtensions
 {

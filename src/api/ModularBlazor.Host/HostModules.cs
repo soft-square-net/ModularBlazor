@@ -1,9 +1,9 @@
 using System.Reflection;
 using Carter;
-using ModularBlazor.Host.Modules.Auth;
-using ModularBlazor.Host.Modules.Catalog;
+using soft.square.net.ModularBlazor.Host.Modules.Auth;
+using soft.square.net.ModularBlazor.Host.Modules.Catalog;
 
-namespace ModularBlazor.Host;
+namespace soft.square.net.ModularBlazor.Host;
 
 /// <summary>
 /// The host modules that extend this API. To add one: create a project under modules/host, reference it

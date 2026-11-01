@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using ModularBlazor.Abstractions;
-using ModularBlazor.Client;
-using ModularBlazor.Client.Services;
+using soft.square.net.ModularBlazor.Abstractions;
+using soft.square.net.ModularBlazor.Client;
+using soft.square.net.ModularBlazor.Client.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");

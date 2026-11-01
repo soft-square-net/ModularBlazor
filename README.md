@@ -178,3 +178,11 @@ API is a separate step.
 > **EF Core:** all EF Core packages are on 10.x. MySQL uses Oracle's `MySql.EntityFrameworkCore`; the Pomelo provider had no
 > EF Core 10 release yet (newest on nuget.org was 9.0.0, which requires EF Core 9). To switch to Pomelo later, replace the
 > package and the `UseMySQL` call in `DatabaseProviders.cs` with `UseMySql(connectionString, serverVersion, ...)`.
+
+### Naming
+
+All assemblies, root namespaces and namespaces are prefixed with `soft.square.net` (e.g. `soft.square.net.ModularBlazor.Core`,
+`soft.square.net.Module.Dashboard`). The prefix is the `SoftSquarePrefix` property in the root `Directory.Build.props`, which also sets
+`AssemblyName` and `RootNamespace` for every project. Module **ids** in the manifests (`Module.Dashboard`, ...) stay short and
+logical; only the served files carry the prefix (`modules/soft.square.net.Module.Dashboard.dll`,
+`soft.square.net.Module.Reports.1.0.0.nupkg`).

@@ -1,7 +1,7 @@
-using ModularBlazor.Abstractions;
-using ModularBlazor.Core;
+using soft.square.net.ModularBlazor.Abstractions;
+using soft.square.net.ModularBlazor.Core;
 
-namespace ModularBlazor.Host.Modules.Catalog.Features.GetCoreModules;
+namespace soft.square.net.ModularBlazor.Host.Modules.Catalog.Features.GetCoreModules;
 
 /// <summary>Vertical slice: GET /api/modules/core - modules loaded at startup (public).</summary>
 public sealed class GetCoreModulesEndpoint : ICarterModule

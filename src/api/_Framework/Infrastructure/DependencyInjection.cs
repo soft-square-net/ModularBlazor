@@ -1,9 +1,9 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using ModularBlazor.Core;
-using ModularBlazor.Infrastructure.MultiTenancy;
+using soft.square.net.ModularBlazor.Core;
+using soft.square.net.ModularBlazor.Infrastructure.MultiTenancy;
 
-namespace ModularBlazor.Infrastructure;
+namespace soft.square.net.ModularBlazor.Infrastructure;
 
 public static class DependencyInjection
 {

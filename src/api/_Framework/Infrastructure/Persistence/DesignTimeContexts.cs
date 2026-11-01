@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using ModularBlazor.Core;
-using ModularBlazor.Infrastructure.MultiTenancy;
+using soft.square.net.ModularBlazor.Core;
+using soft.square.net.ModularBlazor.Infrastructure.MultiTenancy;
 
-namespace ModularBlazor.Infrastructure.Persistence;
+namespace soft.square.net.ModularBlazor.Infrastructure.Persistence;
 
 /// <summary>
 /// Builds the DbContexts for `dotnet ef`. Used by the design-time factories in src/migrations/*.

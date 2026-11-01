@@ -1,6 +1,6 @@
-using ModularBlazor.Core;
+using soft.square.net.ModularBlazor.Core;
 
-namespace ModularBlazor.Host.Modules.Auth.Features.Login;
+namespace soft.square.net.ModularBlazor.Host.Modules.Auth.Features.Login;
 
 public sealed record LoginRequest(string UserName, string Password);
 

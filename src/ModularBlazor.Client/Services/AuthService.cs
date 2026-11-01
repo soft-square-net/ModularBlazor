@@ -1,6 +1,6 @@
-using ModularBlazor.Abstractions;
+using soft.square.net.ModularBlazor.Abstractions;
 
-namespace ModularBlazor.Client.Services;
+namespace soft.square.net.ModularBlazor.Client.Services;
 
 /// <summary>
 /// Demo authentication: any non-empty user name and password signs in; the user name "admin" gets

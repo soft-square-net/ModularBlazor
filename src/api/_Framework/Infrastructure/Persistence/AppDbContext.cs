@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using ModularBlazor.Core;
+using soft.square.net.ModularBlazor.Core;
 
-namespace ModularBlazor.Infrastructure.Persistence;
+namespace soft.square.net.ModularBlazor.Infrastructure.Persistence;
 
 /// <summary>
 /// The per-tenant database. It is created per request with the resolved tenant's provider and connection

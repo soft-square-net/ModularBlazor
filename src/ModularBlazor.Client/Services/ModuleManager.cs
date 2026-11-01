@@ -9,9 +9,9 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using ModularBlazor.Abstractions;
+using soft.square.net.ModularBlazor.Abstractions;
 
-namespace ModularBlazor.Client.Services;
+namespace soft.square.net.ModularBlazor.Client.Services;
 
 /// <summary>
 /// Owns the module catalog and loads modules (.dll or .nupkg) into the running app.

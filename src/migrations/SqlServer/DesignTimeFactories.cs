@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore.Design;
-using ModularBlazor.Core;
-using ModularBlazor.Infrastructure.MultiTenancy;
-using ModularBlazor.Infrastructure.Persistence;
+using soft.square.net.ModularBlazor.Core;
+using soft.square.net.ModularBlazor.Infrastructure.MultiTenancy;
+using soft.square.net.ModularBlazor.Infrastructure.Persistence;
 
-namespace ModularBlazor.Migrations.SqlServer;
+namespace soft.square.net.ModularBlazor.Migrations.SqlServer;
 
 // Lets `dotnet ef` create the contexts without running the API. Generated migrations go to
 // Migrations/App and Migrations/TenantStore (see scripts/add-migration.*).

@@ -1,6 +1,6 @@
 using System.IO.Compression;
 
-namespace ModularBlazor.Client.Services;
+namespace soft.square.net.ModularBlazor.Client.Services;
 
 internal sealed record NuPkgContent(
     IReadOnlyList<byte[]> Assemblies,

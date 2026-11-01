@@ -1,6 +1,6 @@
-using ModularBlazor.Abstractions;
+using soft.square.net.ModularBlazor.Abstractions;
 
-namespace ModularBlazor.Core;
+namespace soft.square.net.ModularBlazor.Core;
 
 /// <summary>Source of module metadata served to the Blazor client.</summary>
 public interface IModuleCatalog

@@ -1,4 +1,4 @@
-namespace ModularBlazor.Core;
+namespace soft.square.net.ModularBlazor.Core;
 
 /// <summary>
 /// DEMO ONLY: a token that is just "demo-" + role. Replace with JWT/OIDC issued and validated by

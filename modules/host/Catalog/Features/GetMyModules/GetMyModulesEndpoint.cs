@@ -1,7 +1,7 @@
-using ModularBlazor.Abstractions;
-using ModularBlazor.Core;
+using soft.square.net.ModularBlazor.Abstractions;
+using soft.square.net.ModularBlazor.Core;
 
-namespace ModularBlazor.Host.Modules.Catalog.Features.GetMyModules;
+namespace soft.square.net.ModularBlazor.Host.Modules.Catalog.Features.GetMyModules;
 
 /// <summary>Vertical slice: GET /api/me/modules - metadata for the signed-in user.</summary>
 public sealed class GetMyModulesEndpoint : ICarterModule
