@@ -1,0 +1,22 @@
+.reports-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+.reports-grid .report-card {
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
+    padding: 1rem;
+    background: #fff;
+    border: 1px solid #e3e6ec;
+    border-left: 4px solid #2f6fed;
+    border-radius: 8px;
+    text-decoration: none;
+    color: inherit;
+}
+
+.reports-grid .report-card:hover {
+    box-shadow: 0 4px 14px rgba(20, 30, 60, .1);
+}

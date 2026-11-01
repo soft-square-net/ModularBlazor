@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <!-- NSwag generates the OpenAPI document and serves ReDoc; Scalar renders the same document. -->
+    <PackageReference Include="NSwag.AspNetCore" Version="14.*" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.*" />
+    <PackageReference Include="Carter" Version="*" />
+    <!-- Startup project for `dotnet ef` (see scripts/add-migration.*). -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.*" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\_Framework\Infrastructure\Infrastructure.csproj" />
+    <!-- Migrations: referenced so the assemblies ship with the API; Infrastructure selects one by name per tenant. -->
+    <ProjectReference Include="..\..\migrations\SqlServer\SqlServer.csproj" />
+    <ProjectReference Include="..\..\migrations\PostgreSql\PostgreSql.csproj" />
+    <ProjectReference Include="..\..\migrations\MySql\MySql.csproj" />
+    <!-- Host modules (vertical slices) -->
+    <ProjectReference Include="..\..\..\modules\host\Auth\Auth.csproj" />
+    <ProjectReference Include="..\..\..\modules\host\Catalog\Catalog.csproj" />
+    <ProjectReference Include="..\..\ModularBlazor.Abstractions\ModularBlazor.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>

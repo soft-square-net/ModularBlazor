@@ -1,0 +1,6 @@
+bin/
+obj/
+artifacts/
+.vs/
+src/ModularBlazor.Client/wwwroot/modules/*.dll
+src/ModularBlazor.Client/wwwroot/modules/*.nupkg

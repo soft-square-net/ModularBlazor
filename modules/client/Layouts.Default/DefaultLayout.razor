@@ -1,0 +1,56 @@
+@inherits LayoutComponentBase
+@attribute [LayoutKey("default")]
+@implements IDisposable
+@inject IModuleNavigation Navigation
+@inject IAuthService Auth
+@inject NavigationManager Nav
+
+<div class="shell-default">
+    <aside class="shell-sidebar">
+        <a class="brand" href="">Modular Blazor</a>
+
+        <nav>
+            <NavLink href="" Match="NavLinkMatch.All">Home</NavLink>
+            @foreach (var item in Navigation.Items)
+            {
+                <NavLink href="@item.Href">@item.Title</NavLink>
+            }
+        </nav>
+
+        <div class="shell-user">
+            @if (Auth.IsAuthenticated)
+            {
+                <div>@Auth.UserName <small>(@Auth.Role)</small></div>
+                <a href="login" @onclick="SignOutAsync" @onclick:preventDefault>Sign out</a>
+            }
+            else
+            {
+                <a href="login">Sign in</a>
+            }
+        </div>
+    </aside>
+
+    <main class="shell-main">@Body</main>
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        Navigation.Changed += OnChanged;
+        Auth.Changed += OnChanged;
+    }
+
+    private void OnChanged() => InvokeAsync(StateHasChanged);
+
+    private async Task SignOutAsync()
+    {
+        await Auth.LogoutAsync();
+        Nav.NavigateTo("login");
+    }
+
+    public void Dispose()
+    {
+        Navigation.Changed -= OnChanged;
+        Auth.Changed -= OnChanged;
+    }
+}

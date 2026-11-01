@@ -1,0 +1,27 @@
+@page "/reports"
+
+<PageTitle>Reports</PageTitle>
+
+<h1>Reports</h1>
+<p>This module was installed from a <code>.nupkg</code>; its stylesheet came out of the package too.</p>
+
+<div class="reports-grid">
+    @foreach (var report in _reports)
+    {
+        <a class="report-card" href="reports/@report.Id">
+            <strong>@report.Title</strong>
+            <small>@report.Summary</small>
+        </a>
+    }
+</div>
+
+@code {
+    private sealed record Report(int Id, string Title, string Summary);
+
+    private readonly Report[] _reports =
+    [
+        new(1, "Monthly revenue", "Totals by region"),
+        new(2, "Support load", "Tickets per agent"),
+        new(3, "Release health", "Deploys and rollbacks")
+    ];
+}

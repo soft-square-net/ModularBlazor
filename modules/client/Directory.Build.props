@@ -1,0 +1,11 @@
+<Project>
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+
+  <!-- Every module is a Razor class library that compiles against the host's contracts.
+       None of these assemblies are copied into the module: the host already provides them. -->
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.*" PrivateAssets="all" />
+    <ProjectReference Include="$(MSBuildThisFileDirectory)../../src/ModularBlazor.Abstractions/ModularBlazor.Abstractions.csproj" PrivateAssets="all" />
+  </ItemGroup>
+</Project>

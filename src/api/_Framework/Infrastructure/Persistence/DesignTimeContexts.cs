@@ -1,0 +1,36 @@
+using Microsoft.EntityFrameworkCore;
+using ModularBlazor.Core;
+using ModularBlazor.Infrastructure.MultiTenancy;
+
+namespace ModularBlazor.Infrastructure.Persistence;
+
+/// <summary>
+/// Builds the DbContexts for `dotnet ef`. Used by the design-time factories in src/migrations/*.
+/// Set MIGRATIONS_CONNECTION to point the tooling at a specific database; migrations generation
+/// does not need the database to exist.
+/// </summary>
+public static class DesignTimeContexts
+{
+    public static AppDbContext CreateApp(DatabaseProvider provider)
+    {
+        var builder = new DbContextOptionsBuilder<AppDbContext>();
+        DatabaseProviders.Configure(builder, provider, ConnectionString(provider));
+        return new AppDbContext(builder.Options);
+    }
+
+    public static TenantStoreDbContext CreateTenantStore(DatabaseProvider provider)
+    {
+        var builder = new DbContextOptionsBuilder<TenantStoreDbContext>();
+        DatabaseProviders.Configure(builder, provider, ConnectionString(provider));
+        return new TenantStoreDbContext(builder.Options);
+    }
+
+    private static string ConnectionString(DatabaseProvider provider)
+        => Environment.GetEnvironmentVariable("MIGRATIONS_CONNECTION") ?? provider switch
+        {
+            DatabaseProvider.SqlServer => "Server=(localdb)\\mssqllocaldb;Database=ModularBlazor;Trusted_Connection=True;",
+            DatabaseProvider.PostgreSql => "Host=localhost;Database=modularblazor;Username=postgres;Password=postgres",
+            DatabaseProvider.MySql => "Server=localhost;Database=modularblazor;User=root;Password=root",
+            _ => throw new ArgumentOutOfRangeException(nameof(provider), provider, null)
+        };
+}

@@ -1,0 +1,19 @@
+@page "/dashboard"
+@inject IAuthService Auth
+
+<PageTitle>Dashboard</PageTitle>
+
+<h1>Dashboard</h1>
+<p>Hello <strong>@Auth.UserName</strong>. This page comes from <code>Module.Dashboard.dll</code>, downloaded the first time you opened it.</p>
+
+<div class="cards">
+    <div class="card-tile"><small>Open tickets</small><div class="value">@_tickets</div></div>
+    <div class="card-tile"><small>Deploys this week</small><div class="value">12</div></div>
+    <div class="card-tile"><small>Uptime</small><div class="value">99.98%</div></div>
+</div>
+
+<p><button @onclick="() => _tickets++">Add ticket</button></p>
+
+@code {
+    private int _tickets = 7;
+}

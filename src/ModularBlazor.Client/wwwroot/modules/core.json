@@ -1,0 +1,24 @@
+{
+  "modules": [
+    {
+      "id": "Layouts.Default",
+      "name": "Default layout",
+      "version": "1.0.0",
+      "kind": "dll",
+      "url": "modules/Layouts.Default.dll",
+      "loadOnStartup": true,
+      "hidden": true
+    },
+    {
+      "id": "Module.Auth",
+      "name": "Authentication (login page + auth layout)",
+      "version": "1.0.0",
+      "kind": "dll",
+      "url": "modules/Module.Auth.dll",
+      "loadOnStartup": true,
+      "hidden": true,
+      "routePrefixes": [ "login" ],
+      "layout": "auth"
+    }
+  ]
+}

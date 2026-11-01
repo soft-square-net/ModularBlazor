@@ -1,0 +1,11 @@
+@page "/reports/{Id:int}"
+
+<PageTitle>Report @Id</PageTitle>
+
+<h1>Report #@Id</h1>
+<p>A nested route in the same module (<code>/reports/{id}</code>).</p>
+<p><a href="reports">&larr; All reports</a></p>
+
+@code {
+    [Parameter] public int Id { get; set; }
+}

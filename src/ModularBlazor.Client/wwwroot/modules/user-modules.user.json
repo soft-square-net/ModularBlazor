@@ -1,0 +1,27 @@
+{
+  "modules": [
+    {
+      "id": "Module.Dashboard",
+      "name": "Dashboard",
+      "version": "1.0.0",
+      "kind": "dll",
+      "url": "modules/Module.Dashboard.dll",
+      "requiresAuth": true,
+      "routePrefixes": [ "dashboard" ],
+      "layout": "default",
+      "nav": [ { "title": "Dashboard", "href": "dashboard", "order": 10 } ]
+    },
+    {
+      "id": "Module.Reports",
+      "name": "Reports",
+      "version": "1.0.0",
+      "kind": "nupkg",
+      "url": "modules/Module.Reports.1.0.0.nupkg",
+      "requiresAuth": true,
+      "routePrefixes": [ "reports" ],
+      "layout": "default",
+      "styles": [ "reports.css" ],
+      "nav": [ { "title": "Reports", "href": "reports", "order": 20 } ]
+    }
+  ]
+}

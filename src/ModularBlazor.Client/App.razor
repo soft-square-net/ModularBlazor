@@ -1,0 +1,74 @@
+@inject ModuleManager Modules
+@inject IAuthService Auth
+@inject NavigationManager Nav
+
+<Router AppAssembly="@typeof(App).Assembly"
+        AdditionalAssemblies="Modules.RouterAssemblies"
+        OnNavigateAsync="OnNavigateAsync">
+    <Navigating>
+        <div class="route-loading" role="status"><span class="spinner"></span> Loading module…</div>
+    </Navigating>
+    <Found Context="routeData">
+        <ModuleRouteView RouteData="routeData" />
+    </Found>
+    <NotFound>
+        <ModuleLayoutHost>
+            <PageTitle>Not found</PageTitle>
+            <h1>404</h1>
+            <p>There is nothing at this address.</p>
+        </ModuleLayoutHost>
+    </NotFound>
+</Router>
+
+@code {
+    // Pages that never need a module download or a signed-in user.
+    private static readonly HashSet<string> PublicPaths = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "", "login", "module-error"
+    };
+
+    /// <summary>
+    /// Phase 3. Runs before the Router resolves a URL: if the URL belongs to a module that is not
+    /// loaded yet, download it now so its pages exist by the time routing happens.
+    /// </summary>
+    private async Task OnNavigateAsync(NavigationContext context)
+    {
+        var path = ModuleManager.NormalizePath(context.Path);
+        if (PublicPaths.Contains(path)) return;
+
+        var module = Modules.FindByPath(path);
+
+        if (module is null)
+        {
+            // Signed out and the address is unknown: it may be a deep link into a module the
+            // user will be given after login, so sign in first and come back.
+            if (!Auth.IsAuthenticated) RedirectToLogin(path);
+            return;
+        }
+
+        if (module.RequiresAuth && !Auth.IsAuthenticated)
+        {
+            RedirectToLogin(path);
+            return;
+        }
+
+        try
+        {
+            await Modules.EnsureLoadedAsync(module.Id, context.CancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            // The user navigated elsewhere; the download keeps going and caches the module.
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Module '{module.Id}' failed to load: {ex}");
+            Nav.NavigateTo(
+                $"module-error?module={Uri.EscapeDataString(module.Id)}&message={Uri.EscapeDataString(ex.Message)}",
+                replace: true);
+        }
+    }
+
+    private void RedirectToLogin(string returnPath)
+        => Nav.NavigateTo($"login?returnUrl={Uri.EscapeDataString(returnPath)}", replace: true);
+}

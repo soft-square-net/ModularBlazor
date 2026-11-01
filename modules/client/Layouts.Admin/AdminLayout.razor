@@ -1,0 +1,17 @@
+@inherits LayoutComponentBase
+@attribute [LayoutKey("admin")]
+@inject IAuthService Auth
+
+<div class="shell-admin">
+    <header class="topbar">
+        <span class="brand">Admin console</span>
+        <nav>
+            <NavLink href="admin" Match="NavLinkMatch.All">Overview</NavLink>
+            <NavLink href="admin/users">Users</NavLink>
+        </nav>
+        <a href="">&larr; Back to app</a>
+        <small>@Auth.UserName</small>
+    </header>
+
+    <main class="shell-main">@Body</main>
+</div>

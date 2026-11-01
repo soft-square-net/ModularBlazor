@@ -1,0 +1,25 @@
+<Project>
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+
+  <!-- Host modules extend ModularBlazor.Host. Each is a class library of vertical slices:
+       one folder per feature under Features/, each holding its request, response and Carter endpoint. -->
+  <PropertyGroup>
+    <AssemblyName>ModularBlazor.Host.Modules.$(MSBuildProjectName)</AssemblyName>
+    <RootNamespace>ModularBlazor.Host.Modules.$(MSBuildProjectName)</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <!-- Floating on purpose: pin to the Carter version you want to ship. -->
+    <PackageReference Include="Carter" Version="*" />
+    <ProjectReference Include="$(MSBuildThisFileDirectory)../../src/api/_Framework/Core/Core.csproj" />
+    <ProjectReference Include="$(MSBuildThisFileDirectory)../../src/ModularBlazor.Abstractions/ModularBlazor.Abstractions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Carter" />
+    <Using Include="Microsoft.AspNetCore.Builder" />
+    <Using Include="Microsoft.AspNetCore.Http" />
+    <Using Include="Microsoft.AspNetCore.Routing" />
+  </ItemGroup>
+</Project>

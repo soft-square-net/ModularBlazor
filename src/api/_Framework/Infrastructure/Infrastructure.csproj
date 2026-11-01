@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Implementations of the Core contracts (storage, external services). -->
+  <PropertyGroup>
+    <AssemblyName>ModularBlazor.Infrastructure</AssemblyName>
+    <RootNamespace>ModularBlazor.Infrastructure</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Multi-tenancy (Finbuckle). Bump to 10.x when you move to it; the code targets the 9.x API. -->
+    <PackageReference Include="Finbuckle.MultiTenant" Version="9.*" />
+    <PackageReference Include="Finbuckle.MultiTenant.AspNetCore" Version="9.*" />
+    <PackageReference Include="Finbuckle.MultiTenant.EntityFrameworkCore" Version="9.*" />
+
+    <!-- EF Core 10 providers. Migrations live in src/migrations/*, one project per provider. -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.*" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.*" />
+    <!-- MySQL via Oracle's provider. Pomelo (the other common MySQL/MariaDB provider) had no EF Core 10 release
+         when this was written; to switch, replace this package and the UseMySQL call in DatabaseProviders. -->
+    <PackageReference Include="MySql.EntityFrameworkCore" Version="10.*" />
+
+    <!-- Distributed cache (Redis). -->
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="10.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj" />
+  </ItemGroup>
+
+</Project>

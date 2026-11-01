@@ -1,0 +1,43 @@
+@page "/"
+@implements IDisposable
+@inject ModuleManager Modules
+@inject IAuthService Auth
+
+<PageTitle>Home</PageTitle>
+
+<h1>Modular Blazor</h1>
+
+@if (Auth.IsAuthenticated)
+{
+    <p>Signed in as <strong>@Auth.UserName</strong> (@Auth.Role). Open a module from the menu and watch its state change below.</p>
+}
+else
+{
+    <p>Core modules were loaded at startup. <a href="login">Sign in</a> to receive your module list; the code itself downloads when you first open a module.</p>
+}
+
+<table class="modules">
+    <thead>
+        <tr><th>Module</th><th>Kind</th><th>Strategy</th><th>State</th></tr>
+    </thead>
+    <tbody>
+        @foreach (var m in Modules.Catalog)
+        {
+            var loaded = Modules.IsLoaded(m.Id);
+            <tr>
+                <td>@m.Id <small>@m.Version</small></td>
+                <td>@m.Kind</td>
+                <td>@(m.LoadOnStartup ? "startup" : "on navigation")</td>
+                <td><span class="badge @(loaded ? "badge-on" : "badge-off")">@(loaded ? "loaded" : "not loaded")</span></td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    protected override void OnInitialized() => Modules.Changed += OnChanged;
+
+    private void OnChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => Modules.Changed -= OnChanged;
+}

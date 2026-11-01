@@ -1,0 +1,56 @@
+@using System.Reflection
+@inject ModuleManager Modules
+@inject IAuthService Auth
+@inject NavigationManager Nav
+
+@if (_redirecting)
+{
+    <!-- navigating to the login page -->
+}
+else if (_forbidden)
+{
+    <LayoutView Layout="_layout">
+        <PageTitle>Access denied</PageTitle>
+        <h1>Access denied</h1>
+        <p>Your account does not have access to this module.</p>
+    </LayoutView>
+}
+else
+{
+    <LayoutView Layout="_layout">
+        <DynamicComponent Type="RouteData.PageType" Parameters="_parameters" />
+    </LayoutView>
+}
+
+@code {
+    [Parameter, EditorRequired] public RouteData RouteData { get; set; } = default!;
+
+    private Type? _layout;
+    private IDictionary<string, object?>? _parameters;
+    private bool _redirecting;
+    private bool _forbidden;
+
+    protected override void OnParametersSet()
+    {
+        var pageType = RouteData.PageType;
+        var owner = Modules.GetOwner(pageType.Assembly);
+
+        // Assemblies cannot be unloaded, so a page can outlive the user's access to it.
+        // Check on every render rather than trusting that the catalog was cleared.
+        _redirecting = owner is { RequiresAuth: true } && !Auth.IsAuthenticated;
+        if (_redirecting)
+        {
+            var returnUrl = Uri.EscapeDataString(ModuleManager.NormalizePath(Nav.ToBaseRelativePath(Nav.Uri)));
+            Nav.NavigateTo($"login?returnUrl={returnUrl}", replace: true);
+            return;
+        }
+
+        _forbidden = owner?.RequiredRole is { } role && !string.Equals(role, Auth.Role, StringComparison.OrdinalIgnoreCase);
+
+        // Layout precedence: @layout on the page > [UseLayout] on the page > module's layout > default.
+        _layout = pageType.GetCustomAttribute<LayoutAttribute>()?.LayoutType
+                  ?? Modules.ResolveLayout(pageType.GetCustomAttribute<UseLayoutAttribute>()?.Key ?? owner?.Layout);
+
+        _parameters = RouteData.RouteValues.ToDictionary(kv => kv.Key, kv => kv.Value);
+    }
+}

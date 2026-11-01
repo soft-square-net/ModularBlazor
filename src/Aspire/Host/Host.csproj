@@ -1,0 +1,16 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.0.0">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>ModularBlazor.AppHost</AssemblyName>
+    <RootNamespace>ModularBlazor.AppHost</RootNamespace>
+    <UserSecretsId>modularblazor-apphost</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Keep these in step with the Aspire SDK version above. -->
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.0.0" />
+    <PackageReference Include="Aspire.Hosting.Redis" Version="13.0.0" />
+  </ItemGroup>
+
+</Project>

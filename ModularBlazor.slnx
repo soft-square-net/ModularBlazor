@@ -1,0 +1,33 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ModularBlazor.Abstractions/ModularBlazor.Abstractions.csproj" />
+    <Project Path="src/ModularBlazor.Client/ModularBlazor.Client.csproj" />
+  </Folder>
+  <Folder Name="/src/api/">
+    <Project Path="src/api/ModularBlazor.Host/ModularBlazor.Host.csproj" />
+  </Folder>
+  <Folder Name="/src/api/_Framework/">
+    <Project Path="src/api/_Framework/Core/Core.csproj" />
+    <Project Path="src/api/_Framework/Infrastructure/Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Aspire/">
+    <Project Path="src/Aspire/Host/Host.csproj" />
+  </Folder>
+  <Folder Name="/src/migrations/">
+    <Project Path="src/migrations/SqlServer/SqlServer.csproj" />
+    <Project Path="src/migrations/PostgreSql/PostgreSql.csproj" />
+    <Project Path="src/migrations/MySql/MySql.csproj" />
+  </Folder>
+  <Folder Name="/modules/host/">
+    <Project Path="modules/host/Auth/Auth.csproj" />
+    <Project Path="modules/host/Catalog/Catalog.csproj" />
+  </Folder>
+  <Folder Name="/modules/">
+    <Project Path="modules/client/Layouts.Default/Layouts.Default.csproj" />
+    <Project Path="modules/client/Layouts.Admin/Layouts.Admin.csproj" />
+    <Project Path="modules/client/Module.Auth/Module.Auth.csproj" />
+    <Project Path="modules/client/Module.Dashboard/Module.Dashboard.csproj" />
+    <Project Path="modules/client/Module.Reports/Module.Reports.csproj" />
+    <Project Path="modules/client/Module.Admin/Module.Admin.csproj" />
+  </Folder>
+</Solution>

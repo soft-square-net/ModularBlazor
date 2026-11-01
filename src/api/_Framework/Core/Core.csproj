@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Domain contracts for the API. No infrastructure or web dependencies. -->
+  <PropertyGroup>
+    <AssemblyName>ModularBlazor.Core</AssemblyName>
+    <RootNamespace>ModularBlazor.Core</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\ModularBlazor.Abstractions\ModularBlazor.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>
