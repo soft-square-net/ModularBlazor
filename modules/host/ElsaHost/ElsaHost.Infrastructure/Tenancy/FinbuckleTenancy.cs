@@ -25,8 +25,8 @@ namespace soft.square.net.ModularBlazor.Host.Modules.ElsaHost.Infrastructure.Ten
 /// <summary>Tells Elsa the tenant that Finbuckle resolved for the current request.</summary>
 internal sealed class FinbuckleTenantResolver(ICurrentTenant currentTenant) : ITenantResolver
 {
-    public ValueTask<TenantResolverResult> ResolveAsync(TenantResolverContext context)
-        => ValueTask.FromResult(TenantResolverResult.Resolved(currentTenant.Id));
+    public Task<TenantResolverResult> ResolveAsync(TenantResolverContext context)
+        => Task.FromResult(TenantResolverResult.Resolved(currentTenant.Id));
 }
 
 /// <summary>Elsa's list of tenants, read from the Finbuckle tenant store.</summary>
