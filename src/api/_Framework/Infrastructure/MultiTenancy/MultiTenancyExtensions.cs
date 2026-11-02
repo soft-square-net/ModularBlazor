@@ -35,17 +35,13 @@ public static class MultiTenancyExtensions
         services.AddSingleton(new DatabaseConnection(storeProvider, storeConnection));
         services.AddScoped<ITenantDatabaseResolver, TenantDatabaseResolver>();
 
-        // The tenant's own data: provider and connection string come from the resolved tenant.
+        // The tenant's own data. Same rule as the module contexts: the resolved tenant's database, or the default one
+        // when there is no tenant (also what `dotnet ef` sees when it builds the host to find the DbContexts).
         services.AddDbContext<AppDbContext>((serviceProvider, options) =>
         {
-            var tenant = serviceProvider.GetRequiredService<IMultiTenantContextAccessor<AppTenantInfo>>()
-                .MultiTenantContext?.TenantInfo
-                ?? throw new InvalidOperationException("No tenant was resolved for this request. Send the X-Tenant header.");
-
-            if (string.IsNullOrWhiteSpace(tenant.ConnectionString))
-                throw new InvalidOperationException($"Tenant '{tenant.Identifier}' has no connection string.");
-
-            DatabaseProviders.Configure(options, tenant.Provider, tenant.ConnectionString);
+            var database = serviceProvider.GetRequiredService<ITenantDatabaseResolver>().Resolve();
+            DatabaseProviders.Configure(options, database.Provider, database.ConnectionString,
+                ModuleDbContextRegistration.HistoryTable("App"));
         });
 
         return services;

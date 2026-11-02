@@ -14,7 +14,8 @@ public static class DesignTimeContexts
     public static AppDbContext CreateApp(DatabaseProvider provider)
     {
         var builder = new DbContextOptionsBuilder<AppDbContext>();
-        DatabaseProviders.Configure(builder, provider, ConnectionString(provider));
+        DatabaseProviders.Configure(builder, provider, ConnectionString(provider),
+            ModuleDbContextRegistration.HistoryTable("App"));
         return new AppDbContext(builder.Options);
     }
 
