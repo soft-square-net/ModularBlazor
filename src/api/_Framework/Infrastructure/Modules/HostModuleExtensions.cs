@@ -32,6 +32,7 @@ public static class HostModuleExtensions
         // Validation failures thrown by the pipeline become 400 problem+json responses (see UseExceptionHandler in the host).
         services.AddProblemDetails();
         services.AddExceptionHandler<ValidationExceptionHandler>();
+        services.AddExceptionHandler<CustomExceptionHandler>();
 
         return services;
     }

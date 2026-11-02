@@ -144,19 +144,40 @@ with `AddModuleRepository`, the initializer as `IDbInitializer`), reference the 
 `ModularBlazor.Host.csproj` and the migrations projects, and add the module to `HostModules.cs`. Assembly names are
 `soft.square.net.ModularBlazor.Host.Modules.<Module>.<Layer>`.
 
+### Domain model, persistence and tenants (modelled on FullStackHero .NET v10, with Ardalis.Specification)
+
+**Core (`src/api/_Framework/Core`)**: `BaseEntity<TId>` (with domain events), `AggregateRoot<TId>`, `AuditableAggregateRoot<TId>`
+(audit fields + soft delete), `ValueObject`, `DomainEvent`, `IRepository<T>` / `IReadRepository<T>` (Ardalis),
+`PaginationFilter` / `PagedResponse<T>`, and the specifications `EntitiesByBaseFilterSpec<T>`,
+`EntitiesByPaginationFilterSpec<T>` and their projecting `<T, TResult>` versions (keyword search over text properties,
+`OrderBy` like `["Name", "CreatedOnUtc desc"]`, skip/take; use `repository.PaginatedListAsync(spec, filter)`).
+
+**Infrastructure**: `BaseDbContext` (soft-delete query filter, column conventions), `AuditingInterceptor` (CreatedOnUtc/By,
+LastModifiedOnUtc/By, delete -> soft delete), `DomainEventsInterceptor` (publishes events through MediatR after a save),
+`ModuleDbContext`, `EfRepository<TContext, T>`, `DbInitializer<TContext>`. Unlike FullStackHero's shared-database mode there is no
+row-level `TenantId`: every tenant has its own database.
+
+**Tenants**: `AppTenantInfo` (Id, Identifier, Name, Provider, ConnectionString, AdminEmail, IsActive, ValidUpto, Issuer) in the
+tenant store (`TenantStoreDbContext`); `ITenantService` (create, get, search, activate, deactivate, renew) and
+`ITenantDatabaseInitializer` (migrate + seed the tenant store, the root tenant `root`, platform data, then every tenant's
+database). `UseTenantStatus()` answers 403 for a deactivated tenant or one whose `ValidUpto` has passed. The root tenant owns the
+default database (`ConnectionStrings:TenantStore`), also used when a request has no `X-Tenant`.
+
+**Multitenancy host module** (`modules/host/Multitenancy`, admin only: `Authorization: Bearer demo-admin`):
+
+| Endpoint | Purpose |
+|---|---|
+| `POST /api/tenants` | create a tenant, then provision its database (migrate + seed); recorded in `TenantProvisioning` |
+| `GET /api/tenants?keyword=&orderBy=&pageNumber=&pageSize=` | page through tenants |
+| `GET /api/tenants/{id}` | one tenant |
+| `POST /api/tenants/{id}/activate`, `/deactivate`, `/upgrade` (`{"months": 12}`) | status and subscription |
+| `GET /api/tenants/provisioning`, `POST /api/tenants/{id}/provisioning/retry` | provisioning log and retry |
+
 ### Multi-tenancy and migrations
-
-**Finbuckle.MultiTenant** lives in `Infrastructure/MultiTenancy`:
-
-* Tenants are stored in a tenant database (`TenantStoreDbContext`, Finbuckle's EF Core store). Configure it with
-  `ConnectionStrings:TenantStore` and `TenantStore:Provider` (`SqlServer` | `PostgreSql` | `MySql`).
-* The tenant is resolved from the **`X-Tenant`** request header (`app.UseMultiTenant()` in the host).
-* Each tenant has its own database: `AppTenantInfo` carries `Provider` and `ConnectionString`, and `AppDbContext` is
-  configured per request from the resolved tenant, so tenants can run on different engines.
 
 `src/migrations/{SqlServer,PostgreSql,MySql}` hold the migrations, one project per provider (`MySql` uses Oracle's `MySql.EntityFrameworkCore`)
 (assemblies `ModularBlazor.Migrations.*`, selected by name in `DatabaseProviders`). Each provider project has a migration set per
-context: `Migrations/App` (per-tenant `AppDbContext`), `Migrations/TenantStore`, `Migrations/Auth` and `Migrations/Catalog`.
+context: `Migrations/App` (per-tenant `AppDbContext`), `Migrations/TenantStore`, `Migrations/Auth`, `Migrations/Catalog` and `Migrations/Multitenancy`.
 
 ```bash
 dotnet tool install --global dotnet-ef

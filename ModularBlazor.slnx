@@ -25,6 +25,9 @@
     <Project Path="modules/host/Catalog/Catalog.Domain/Catalog.Domain.csproj" />
     <Project Path="modules/host/Catalog/Catalog.Application/Catalog.Application.csproj" />
     <Project Path="modules/host/Catalog/Catalog.Infrastructure/Catalog.Infrastructure.csproj" />
+    <Project Path="modules/host/Multitenancy/Multitenancy.Domain/Multitenancy.Domain.csproj" />
+    <Project Path="modules/host/Multitenancy/Multitenancy.Application/Multitenancy.Application.csproj" />
+    <Project Path="modules/host/Multitenancy/Multitenancy.Infrastructure/Multitenancy.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/modules/client/">
     <Project Path="modules/client/Layouts.Default/Layouts.Default.csproj" />

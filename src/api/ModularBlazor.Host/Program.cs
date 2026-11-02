@@ -41,27 +41,13 @@ builder.Services.AddOpenApiDocument(settings =>
 
 var app = builder.Build();
 
-// Creates/updates the tenant store schema and each module's tables, then seeds them (used by the Aspire
-// containers). Needs the migrations to have been generated first: scripts/add-migration.*
-// Modules run against the default database (ConnectionStrings:TenantStore); tenant databases are not touched.
+// Creates/updates the databases and seeds them (used by the Aspire containers): the tenant store (with the
+// root tenant), the platform data, and every tenant's business data. Needs the migrations to have been
+// generated first: scripts/add-migration.*
 if (app.Configuration.GetValue<bool>("Database:MigrateOnStartup"))
 {
     using var scope = app.Services.CreateScope();
-    await scope.ServiceProvider.GetRequiredService<TenantStoreDbContext>().Database.MigrateAsync();
-
-    var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("DbInitializer");
-    foreach (var initializer in scope.ServiceProvider.GetServices<IDbInitializer>())
-    {
-        try
-        {
-            await initializer.InitializeAsync();
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "{Initializer} failed. Have the migrations been generated (scripts/add-migration.*)?",
-                initializer.GetType().Name);
-        }
-    }
+    await scope.ServiceProvider.GetRequiredService<ITenantDatabaseInitializer>().InitializeAsync();
 }
 
 // Validation failures from the CQRS pipeline become 400 problem responses.
@@ -71,6 +57,9 @@ app.UseCors("client");
 
 // Resolves the tenant from the X-Tenant header (Finbuckle). Requests without one simply have no tenant.
 app.UseMultiTenant();
+
+// Refuses tenants that are deactivated or whose subscription ended.
+app.UseTenantStatus();
 
 // API documentation (on in Development, or anywhere with Documentation:Enabled=true).
 if (app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("Documentation:Enabled"))

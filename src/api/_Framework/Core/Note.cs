@@ -1,9 +1,17 @@
+using soft.square.net.ModularBlazor.Core.Domain;
+
 namespace soft.square.net.ModularBlazor.Core;
 
-/// <summary>Sample tenant-owned entity so the per-tenant database has something to migrate. Replace with your own.</summary>
-public sealed class Note
+/// <summary>Sample tenant-owned aggregate so the per-tenant database has something to migrate. Replace with your own.</summary>
+public sealed class Note : AuditableAggregateRoot<Guid>
 {
-    public int Id { get; set; }
-    public string Title { get; set; } = "";
-    public DateTime CreatedUtc { get; set; } = DateTime.UtcNow;
+    private Note() { } // EF Core
+
+    public string Title { get; private set; } = "";
+
+    public static Note Create(string title)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(title);
+        return new Note { Id = Guid.NewGuid(), Title = title.Trim() };
+    }
 }

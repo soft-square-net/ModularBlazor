@@ -13,7 +13,7 @@ foreach ($provider in "SqlServer", "PostgreSql", "MySql") {
     dotnet ef migrations add $Name --project $project --startup-project $startup --context TenantStoreDbContext --output-dir Migrations/TenantStore
     if ($LASTEXITCODE -ne 0) { throw "$provider TenantStoreDbContext failed" }
     # Host modules (modules/host/*): one DbContext each, kept in its own Migrations/<Module> folder.
-    foreach ($module in "Auth", "Catalog") {
+    foreach ($module in "Auth", "Catalog", "Multitenancy") {
         dotnet ef migrations add $Name --project $project --startup-project $startup --context "${module}DbContext" --output-dir "Migrations/$module"
         if ($LASTEXITCODE -ne 0) { throw "$provider ${module}DbContext failed" }
     }

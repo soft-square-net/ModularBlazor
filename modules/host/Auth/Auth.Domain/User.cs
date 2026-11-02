@@ -9,7 +9,7 @@ public static class Roles
 }
 
 /// <summary>A person who can sign in. Aggregate root of the Auth module.</summary>
-public sealed class User : BaseEntity<Guid>, IAggregateRoot
+public sealed class User : AuditableAggregateRoot<Guid>
 {
     private User() { } // EF Core
 
@@ -19,12 +19,11 @@ public sealed class User : BaseEntity<Guid>, IAggregateRoot
     public string NormalizedUserName { get; private set; } = "";
 
     public string Role { get; private set; } = Roles.User;
-    public DateTimeOffset CreatedUtc { get; private set; }
-    public DateTimeOffset? LastLoginUtc { get; private set; }
+    public DateTime? LastLoginUtc { get; private set; }
 
     public static string Normalize(string userName) => userName.Trim().ToUpperInvariant();
 
-    public static User Register(string userName, string role, DateTimeOffset now)
+    public static User Register(string userName, string role)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(userName);
         ArgumentException.ThrowIfNullOrWhiteSpace(role);
@@ -34,8 +33,7 @@ public sealed class User : BaseEntity<Guid>, IAggregateRoot
             Id = Guid.NewGuid(),
             UserName = userName.Trim(),
             NormalizedUserName = Normalize(userName),
-            Role = role,
-            CreatedUtc = now
+            Role = role
         };
     }
 
@@ -43,5 +41,5 @@ public sealed class User : BaseEntity<Guid>, IAggregateRoot
     public static string RoleFor(string userName)
         => Normalize(userName) == Normalize("admin") ? Roles.Admin : Roles.User;
 
-    public void RecordLogin(DateTimeOffset now) => LastLoginUtc = now;
+    public void RecordLogin(DateTime utcNow) => LastLoginUtc = utcNow;
 }

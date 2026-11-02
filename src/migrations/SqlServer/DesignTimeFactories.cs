@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore.Design;
 using soft.square.net.ModularBlazor.Core;
 using soft.square.net.ModularBlazor.Host.Modules.Auth.Infrastructure.Persistence;
 using soft.square.net.ModularBlazor.Host.Modules.Catalog.Infrastructure.Persistence;
+using soft.square.net.ModularBlazor.Host.Modules.Multitenancy.Infrastructure.Persistence;
 using soft.square.net.ModularBlazor.Infrastructure.MultiTenancy;
 using soft.square.net.ModularBlazor.Infrastructure.Persistence;
 
@@ -30,4 +31,10 @@ public sealed class CatalogDbContextFactory : IDesignTimeDbContextFactory<Catalo
 {
     public CatalogDbContext CreateDbContext(string[] args)
         => new(DesignTimeContexts.ModuleOptions<CatalogDbContext>(DatabaseProvider.SqlServer, "Catalog"));
+}
+
+public sealed class MultitenancyDbContextFactory : IDesignTimeDbContextFactory<MultitenancyDbContext>
+{
+    public MultitenancyDbContext CreateDbContext(string[] args)
+        => new(DesignTimeContexts.ModuleOptions<MultitenancyDbContext>(DatabaseProvider.SqlServer, "Multitenancy"));
 }

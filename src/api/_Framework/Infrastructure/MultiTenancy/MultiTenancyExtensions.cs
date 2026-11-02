@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using soft.square.net.ModularBlazor.Core;
+using soft.square.net.ModularBlazor.Core.Tenancy;
 using soft.square.net.ModularBlazor.Infrastructure.Persistence;
 
 namespace soft.square.net.ModularBlazor.Infrastructure.MultiTenancy;
@@ -33,7 +34,12 @@ public static class MultiTenancyExtensions
 
         // Where module DbContexts connect: the tenant's database, or this default one when no tenant was resolved.
         services.AddSingleton(new DatabaseConnection(storeProvider, storeConnection));
-        services.AddScoped<ITenantDatabaseResolver, TenantDatabaseResolver>();
+        services.AddScoped<TenantDatabaseResolver>();
+        services.AddScoped<ITenantDatabaseResolver>(sp => sp.GetRequiredService<TenantDatabaseResolver>());
+        services.AddScoped<ITenantDatabaseOverride>(sp => sp.GetRequiredService<TenantDatabaseResolver>());
+
+        services.AddScoped<ITenantDatabaseInitializer, TenantDatabaseInitializer>();
+        services.AddScoped<ITenantService, TenantService>();
 
         // The tenant's own data. Same rule as the module contexts: the resolved tenant's database, or the default one
         // when there is no tenant (also what `dotnet ef` sees when it builds the host to find the DbContexts).
@@ -42,6 +48,7 @@ public static class MultiTenancyExtensions
             var database = serviceProvider.GetRequiredService<ITenantDatabaseResolver>().Resolve();
             DatabaseProviders.Configure(options, database.Provider, database.ConnectionString,
                 ModuleDbContextRegistration.HistoryTable("App"));
+            options.AddSaveChangesInterceptors(serviceProvider);
         });
 
         return services;

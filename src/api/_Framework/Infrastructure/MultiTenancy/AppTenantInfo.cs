@@ -19,4 +19,26 @@ public sealed class AppTenantInfo : ITenantInfo
     public DatabaseProvider Provider { get; set; } = DatabaseProvider.SqlServer;
 
     public string? ConnectionString { get; set; }
+
+    public string? AdminEmail { get; set; }
+
+    public bool IsActive { get; set; } = true;
+
+    /// <summary>The subscription's end (UTC). After it the tenant's requests are refused.</summary>
+    public DateTime ValidUpto { get; set; } = DateTime.UtcNow.AddYears(1);
+
+    public string? Issuer { get; set; }
+
+    public bool IsValid(DateTime utcNow) => IsActive && ValidUpto >= utcNow;
+
+    public void Activate() => IsActive = true;
+
+    public void Deactivate() => IsActive = false;
+
+    /// <summary>Adds whole months to the subscription: from the current end when still valid, else from now.</summary>
+    public void Renew(int months, DateTime utcNow)
+    {
+        var start = ValidUpto > utcNow ? ValidUpto : utcNow;
+        ValidUpto = start.AddMonths(months);
+    }
 }

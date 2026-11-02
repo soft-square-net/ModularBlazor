@@ -7,7 +7,7 @@ namespace soft.square.net.ModularBlazor.Host.Modules.Catalog.Domain;
 /// A client module (.dll / .nupkg) the Blazor client may download, with what it needs to know before
 /// loading it. Aggregate root of the Catalog module.
 /// </summary>
-public sealed class ModuleRegistration : BaseEntity<string>, IAggregateRoot
+public sealed class ModuleRegistration : AuditableAggregateRoot<string>
 {
     private ModuleRegistration() { } // EF Core
 

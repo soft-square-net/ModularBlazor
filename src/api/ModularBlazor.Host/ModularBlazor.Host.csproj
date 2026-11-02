@@ -18,6 +18,7 @@
     <!-- Host modules: only their Infrastructure project is referenced; Domain and Application flow in transitively. -->
     <ProjectReference Include="..\..\..\modules\host\Auth\Auth.Infrastructure\Auth.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\modules\host\Catalog\Catalog.Infrastructure\Catalog.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\modules\host\Multitenancy\Multitenancy.Infrastructure\Multitenancy.Infrastructure.csproj" />
     <ProjectReference Include="..\..\ModularBlazor.Abstractions\ModularBlazor.Abstractions.csproj" />
   </ItemGroup>
 

@@ -29,12 +29,12 @@ public sealed class LoginCommandHandler(IRepository<User> users, ITokenService t
 {
     public async Task<LoginResult> Handle(LoginCommand command, CancellationToken cancellationToken)
     {
-        var now = clock.GetUtcNow();
+        var now = clock.GetUtcNow().UtcDateTime;
         var user = await users.FirstOrDefaultAsync(new UserByNameSpec(command.UserName), cancellationToken);
 
         if (user is null)
         {
-            user = User.Register(command.UserName, User.RoleFor(command.UserName), now);
+            user = User.Register(command.UserName, User.RoleFor(command.UserName));
             await users.AddAsync(user, cancellationToken);
         }
 

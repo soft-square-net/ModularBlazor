@@ -12,16 +12,29 @@ public interface ITenantDatabaseResolver
     DatabaseConnection Resolve();
 }
 
+/// <summary>Points the current scope at a specific database (provisioning a tenant outside of a request).</summary>
+public interface ITenantDatabaseOverride
+{
+    void Use(DatabaseConnection database);
+}
+
 /// <summary>
-/// The resolved tenant's database; when the request has no tenant (no X-Tenant header), the default database
-/// (the one configured as ConnectionStrings:TenantStore), so the API also works single-tenant in development.
+/// The override, else the resolved tenant's database; when the request has no tenant (no X-Tenant header), the
+/// default database (the one configured as ConnectionStrings:TenantStore), so the API also works single-tenant
+/// in development.
 /// </summary>
 internal sealed class TenantDatabaseResolver(
     IMultiTenantContextAccessor<AppTenantInfo> tenantAccessor,
-    DatabaseConnection defaultDatabase) : ITenantDatabaseResolver
+    DatabaseConnection defaultDatabase) : ITenantDatabaseResolver, ITenantDatabaseOverride
 {
+    private DatabaseConnection? _override;
+
+    public void Use(DatabaseConnection database) => _override = database;
+
     public DatabaseConnection Resolve()
     {
+        if (_override is not null) return _override;
+
         var tenant = tenantAccessor.MultiTenantContext?.TenantInfo;
         if (tenant is null) return defaultDatabase;
 

@@ -2,6 +2,7 @@ using System.Reflection;
 using Carter;
 using soft.square.net.ModularBlazor.Host.Modules.Auth.Infrastructure;
 using soft.square.net.ModularBlazor.Host.Modules.Catalog.Infrastructure;
+using soft.square.net.ModularBlazor.Host.Modules.Multitenancy.Infrastructure;
 using soft.square.net.ModularBlazor.Infrastructure.Modules;
 
 namespace soft.square.net.ModularBlazor.Host;
@@ -16,7 +17,8 @@ internal static class HostModules
     public static readonly IHostModule[] All =
     [
         new AuthModule(),
-        new CatalogModule()
+        new CatalogModule(),
+        new MultitenancyModule()
     ];
 
     public static Type[] CarterModuleTypes() => All
