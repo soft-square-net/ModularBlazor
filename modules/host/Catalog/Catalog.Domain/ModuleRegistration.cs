@@ -51,7 +51,8 @@ public sealed class ModuleRegistration : AuditableAggregateRoot<string>
     /// <summary>Position in the manifest (menu order follows Nav.Order).</summary>
     public int SortOrder { get; set; }
 
-    public bool IsAvailableTo(string role)
+    /// <summary>Unrestricted modules are open to everyone; otherwise any one matching role is enough.</summary>
+    public bool IsAvailableTo(IEnumerable<string> roles)
         => AvailableToRoles.Length == 0
-           || AvailableToRoles.Contains(role, StringComparer.OrdinalIgnoreCase);
+           || roles.Any(r => AvailableToRoles.Contains(r, StringComparer.OrdinalIgnoreCase));
 }

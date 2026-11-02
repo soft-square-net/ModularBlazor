@@ -21,6 +21,29 @@ public class PaginationFilter : BaseFilter
 
     /// <summary>Property names, each optionally followed by "asc" or "desc", e.g. ["Name", "CreatedOnUtc desc"].</summary>
     public string[]? OrderBy { get; set; }
+
+    /// <summary>
+    /// A copy that can only search and order by the given properties (plus Id). Use it before building a spec for
+    /// an entity with sensitive columns (password hashes, connection strings).
+    /// </summary>
+    public PaginationFilter RestrictTo(params string[] fields)
+    {
+        bool Allowed(string name) => fields.Contains(name, StringComparer.OrdinalIgnoreCase);
+
+        var search = SearchFields?.Where(Allowed).ToArray();
+        return new PaginationFilter
+        {
+            Keyword = Keyword,
+            SearchFields = search is { Length: > 0 } ? search : fields,
+            PageNumber = PageNumber,
+            PageSize = PageSize,
+            OrderBy = OrderBy?.Where(clause =>
+            {
+                var name = clause.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).FirstOrDefault();
+                return name is not null && (name.Equals("Id", StringComparison.OrdinalIgnoreCase) || Allowed(name));
+            }).ToArray()
+        };
+    }
 }
 
 /// <summary>One page of results.</summary>

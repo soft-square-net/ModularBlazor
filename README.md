@@ -88,14 +88,14 @@ A module is a Razor class library that references `ModularBlazor.Abstractions`. 
 
 ## API (`src/api/ModularBlazor.Host`)
 
-A minimal API that serves the module catalog and a demo login. Run it with `dotnet run --project src/api/ModularBlazor.Host`
+A minimal API that serves the module catalog, identity (users, roles, API keys) and tenant management. Run it with `dotnet run --project src/api/ModularBlazor.Host`
 (http://localhost:5100).
 
 | Endpoint | Purpose |
 |---|---|
-| `POST /api/auth/login` | Demo sign-in, returns role + demo token |
+| `POST /api/v1/identity/tokens` | Sign in (`userName`/`email` + `password`), returns access + refresh token |
 | `GET /api/modules/core` | Startup modules (public) |
-| `GET /api/me/modules` | Modules for the signed-in user (`Authorization: Bearer <token>`) |
+| `GET /api/me/modules` | Modules for the signed-in user (JWT or API key) |
 
 API documentation (on in Development, or set `Documentation:Enabled=true`):
 
@@ -163,15 +163,36 @@ tenant store (`TenantStoreDbContext`); `ITenantService` (create, get, search, ac
 database). `UseTenantStatus()` answers 403 for a deactivated tenant or one whose `ValidUpto` has passed. The root tenant owns the
 default database (`ConnectionStrings:TenantStore`), also used when a request has no `X-Tenant`.
 
-**Multitenancy host module** (`modules/host/Multitenancy`, admin only: `Authorization: Bearer demo-admin`):
+**Multitenancy host module** (`modules/host/Multitenancy`, needs the `Permissions.Multitenancy.Tenants.*` permissions):
 
 | Endpoint | Purpose |
 |---|---|
-| `POST /api/tenants` | create a tenant, then provision its database (migrate + seed); recorded in `TenantProvisioning` |
-| `GET /api/tenants?keyword=&orderBy=&pageNumber=&pageSize=` | page through tenants |
-| `GET /api/tenants/{id}` | one tenant |
-| `POST /api/tenants/{id}/activate`, `/deactivate`, `/upgrade` (`{"months": 12}`) | status and subscription |
-| `GET /api/tenants/provisioning`, `POST /api/tenants/{id}/provisioning/retry` | provisioning log and retry |
+| `POST /api/v1/tenants` | create a tenant, then provision its database (migrate + seed); recorded in `TenantProvisioning` |
+| `GET /api/v1/tenants?keyword=&orderBy=&pageNumber=&pageSize=` | page through tenants |
+| `GET /api/v1/tenants/{id}` | one tenant |
+| `POST /api/v1/tenants/{id}/activate`, `/deactivate`, `/upgrade` (`{"months": 12}`) | status and subscription |
+| `GET /api/v1/tenants/provisioning`, `POST /api/v1/tenants/{id}/provisioning/retry` | provisioning log and retry |
+
+### Identity, JWT and API keys (Auth host module)
+
+Modelled on FullStackHero .NET v10. Two schemes, chosen per request: `Authorization: Bearer <jwt>` or `X-API-Key: mbk_...`
+(both documented as security schemes in Scalar/ReDoc/OpenAPI). A JWT is valid only for the tenant it was issued for
+(send the same `X-Tenant`). Endpoints are protected by permissions (`Permissions.Identity.Users|Roles|ApiKeys.*`,
+`Permissions.Multitenancy.Tenants.*`); roles are `admin` (all permissions, kept in sync at startup) and `basic`.
+
+| Endpoint (`/api/v1/identity`) | Purpose |
+|---|---|
+| `POST /tokens`, `/tokens/refresh`, `/tokens/revoke` | sign in, rotate refresh token, revoke (anonymous) |
+| `POST /users/register`, `GET /users`, `GET/PUT/DELETE /users/{id}` | manage users (soft delete) |
+| `GET /users/me`, `POST /users/me/change-password` | current user |
+| `POST /users/{id}/toggle-status`, `/reset-password`; `GET/POST /users/{id}/roles`; `GET /users/{id}/permissions` | status, password, roles |
+| `GET/POST /roles`, `GET/PUT/DELETE /roles/{id}`, `GET/PUT /roles/{id}/permissions`, `GET /permissions` | manage roles |
+| `POST/GET /api-keys`, `DELETE /api-keys/{id}` | API keys (the secret is shown once; only its hash is stored) |
+
+The first admin is seeded from `Auth:Seed` (default `admin` / `admin@root.com` / `123Pa$$word!`). **`Jwt:SigningKey` and the seed
+password in `appsettings.json` are development values: override them (user secrets / environment) elsewhere.** Role or
+permission changes reach a user's JWT when the token is refreshed. The Auth context gained tables, so re-run
+`scripts/add-migration` for Auth.
 
 ### Multi-tenancy and migrations
 

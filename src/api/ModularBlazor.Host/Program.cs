@@ -6,6 +6,9 @@ using Microsoft.EntityFrameworkCore;
 using soft.square.net.ModularBlazor.Infrastructure;
 using soft.square.net.ModularBlazor.Core.Persistence;
 using soft.square.net.ModularBlazor.Infrastructure.Modules;
+using soft.square.net.ModularBlazor.Infrastructure.Security;
+using NSwag;
+using NSwag.Generation.Processors.Security;
 using soft.square.net.ModularBlazor.Infrastructure.MultiTenancy;
 using Scalar.AspNetCore;
 
@@ -15,6 +18,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.ConfigureHttpJsonOptions(o => o.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 builder.Services.AddInfrastructure(builder.Configuration);
+
+// JWT bearer + API key authentication and permission-based authorization.
+builder.Services.AddSecurity(builder.Configuration);
 
 // Host modules (modules/host/*): each one's DbContext, repositories and initializer, plus MediatR handlers and
 // FluentValidation validators from its Application project.
@@ -36,7 +42,24 @@ builder.Services.AddOpenApiDocument(settings =>
     settings.DocumentName = "v1";
     settings.Title = "Modular Blazor API";
     settings.Version = "v1";
-    settings.Description = "Authentication and module catalog for the Modular Blazor WebAssembly client.";
+    settings.Description = "Identity (users, roles, API keys), tenants and module catalog for the Modular Blazor WebAssembly client.";
+
+    settings.AddSecurity("JWT", new OpenApiSecurityScheme
+    {
+        Type = OpenApiSecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        Description = "Token from POST /api/v1/identity/tokens."
+    });
+    settings.AddSecurity("ApiKey", new OpenApiSecurityScheme
+    {
+        Type = OpenApiSecuritySchemeType.ApiKey,
+        In = OpenApiSecurityApiKeyLocation.Header,
+        Name = "X-API-Key",
+        Description = "Key from POST /api/v1/identity/api-keys."
+    });
+    settings.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("JWT"));
+    settings.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("ApiKey"));
 });
 
 var app = builder.Build();
@@ -60,6 +83,9 @@ app.UseMultiTenant();
 
 // Refuses tenants that are deactivated or whose subscription ended.
 app.UseTenantStatus();
+
+// Authentication (JWT / API key) and authorization.
+app.UseSecurity();
 
 // API documentation (on in Development, or anywhere with Documentation:Enabled=true).
 if (app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("Documentation:Enabled"))

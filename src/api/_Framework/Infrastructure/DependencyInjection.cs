@@ -17,6 +17,7 @@ public static class DependencyInjection
         services.TryAddSingleton(TimeProvider.System);
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUser, HttpContextCurrentUser>();
+        services.AddScoped<ICurrentTenant, CurrentTenant>();
         services.AddPersistence();
         services.AddScoped<IDbInitializer, AppDbInitializer>();
         services.AddMultiTenancy(configuration);
