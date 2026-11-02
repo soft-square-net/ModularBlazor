@@ -36,6 +36,9 @@ public static class DesignTimeContexts
         return builder.Options;
     }
 
+    /// <summary>MIGRATIONS_CONNECTION, else a local default for the provider. Generating migrations does not connect.</summary>
+    public static string DefaultConnectionString(DatabaseProvider provider) => ConnectionString(provider);
+
     private static string ConnectionString(DatabaseProvider provider)
         => Environment.GetEnvironmentVariable("MIGRATIONS_CONNECTION") ?? provider switch
         {

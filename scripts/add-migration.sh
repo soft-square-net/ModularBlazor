@@ -5,10 +5,14 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-NAME="${1:?Usage: add-migration.sh <MigrationName>}"
+NAME="${1:?Usage: add-migration.sh <MigrationName> [\"Provider ...\"]}"
+# Providers to generate for (default: all). E.g. scripts/add-migration.sh Initial PostgreSql
+PROVIDERS="${2:-SqlServer PostgreSql MySql}"
 STARTUP="src/api/ModularBlazor.Host"
 
-for provider in SqlServer PostgreSql MySql; do
+for provider in $PROVIDERS; do
+  # dotnet ef takes the options from the host; this makes it build them for the provider being generated.
+  export MIGRATIONS_PROVIDER="$provider"
   project="src/migrations/$provider"
   dotnet ef migrations add "$NAME" --project "$project" --startup-project "$STARTUP" \
     --context AppDbContext --output-dir Migrations/App

@@ -182,6 +182,7 @@ context: `Migrations/App` (per-tenant `AppDbContext`), `Migrations/TenantStore`,
 ```bash
 dotnet tool install --global dotnet-ef
 scripts/add-migration.sh AddNotes        # or .\scripts\add-migration.ps1 AddNotes
+.\scripts\add-migration.ps1 Initial -Providers PostgreSql   # only one provider (sh: add-migration.sh Initial PostgreSql)
 ```
 
 No migrations are generated yet; run the script once to create the initial ones. Set `MIGRATIONS_CONNECTION` to point

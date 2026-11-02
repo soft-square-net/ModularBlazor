@@ -21,6 +21,14 @@ public static class DatabaseProviders
     public static void Configure(DbContextOptionsBuilder options, DatabaseProvider provider, string connectionString,
         string? migrationsHistoryTable = null)
     {
+        // `dotnet ef` builds the host and takes the DbContext options from it, i.e. the configured (PostgreSql) provider.
+        // scripts/add-migration.* set MIGRATIONS_PROVIDER so each migrations project is generated for its own provider.
+        if (Enum.TryParse<DatabaseProvider>(Environment.GetEnvironmentVariable("MIGRATIONS_PROVIDER"), ignoreCase: true, out var designProvider))
+        {
+            provider = designProvider;
+            connectionString = DesignTimeContexts.DefaultConnectionString(provider);
+        }
+
         var migrations = MigrationsAssembly(provider);
 
         switch (provider)
