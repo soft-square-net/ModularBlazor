@@ -1,5 +1,7 @@
 using System.Reflection;
+using Elsa.Common.Multitenancy;
 using Elsa.Extensions;
+using Elsa.Tenants.Extensions;
 using Elsa.EntityFrameworkCore;
 using Elsa.EntityFrameworkCore.Extensions;
 using Elsa.EntityFrameworkCore.Modules.Management;
@@ -66,16 +68,16 @@ public sealed class ElsaHostModule : IHostModule
                 }
             }));
 
-            // One tenant model: Finbuckle decides who the tenant is and which tenants exist.
+            // One tenant model: Finbuckle decides who the tenant is (resolver in the pipeline) ...
             elsa.UseTenants(tenants =>
-            {
-                tenants.ConfigureMultitenancy(o => o.TenantResolverPipelineBuilder.Append<FinbuckleTenantResolver>());
-                tenants.UseTenantsProvider<FinbuckleTenantsProvider>();
-            });
+                tenants.ConfigureMultitenancy(o => o.TenantResolverPipelineBuilder.Append<FinbuckleTenantResolver>()));
 
             elsa.UseWorkflowsApi();
             elsa.UseHttp();   // HTTP-triggered workflows
         });
+
+        // ... and which tenants exist (provider). Registered after AddElsa so it replaces the default provider.
+        services.AddSingleton<ITenantsProvider, FinbuckleTenantsProvider>();
 
         // Elsa's endpoints are FastEndpoints; their authorization runs on this host's schemes (JWT / API key).
     }
