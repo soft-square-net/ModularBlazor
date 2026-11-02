@@ -211,6 +211,10 @@ Application + Infrastructure projects only (Elsa owns the workflow entities, so 
   API path and current tenant.
 - Modules can now add middleware through `IHostModule.Configure(WebApplication)`.
 
+**API documentation of Elsa.** Elsa's endpoints are kept out of the main OpenAPI document (`v1`), which they could break, and
+published as their own document `elsa` (`/openapi/elsa.json`, ReDoc `/redoc/elsa`). Scalar lists both in its document selector.
+The Elsa document uses full-type-name schema ids to avoid Elsa's duplicate short names. See `OpenApiDocuments.cs`.
+
 ### Multi-tenancy and migrations
 
 `src/migrations/{SqlServer,PostgreSql,MySql}` hold the migrations, one project per provider (`MySql` uses Oracle's `MySql.EntityFrameworkCore`)
