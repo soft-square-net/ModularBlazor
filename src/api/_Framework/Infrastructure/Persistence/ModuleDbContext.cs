@@ -7,20 +7,42 @@ namespace soft.square.net.ModularBlazor.Infrastructure.Persistence;
 /// <summary>
 /// Base for a module's DbContext. Every IEntityTypeConfiguration in the module's assembly is applied
 /// automatically (put them under Persistence/Configurations), then the BaseDbContext conventions.
-/// Name tables with the module as a prefix (e.g. "Auth_Users"): all modules share the tenant's database,
-/// and MySQL has no schemas.
+/// Each module owns a schema named after it (<see cref="SchemaNames"/>): Auth.Users, Catalog.Modules, ... Name
+/// tables plainly in the configurations. MySQL has no schemas, so there the schema name is prefixed to the
+/// table names (Auth_Users) instead.
 /// </summary>
 public abstract class ModuleDbContext(DbContextOptions options) : BaseDbContext(options)
 {
+    /// <summary>The module's schema, one of <see cref="SchemaNames"/>.</summary>
+    protected abstract string Schema { get; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        ArgumentNullException.ThrowIfNull(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
         base.OnModelCreating(modelBuilder);
+
+        if (ModuleDbContextRegistration.SupportsSchemas(Database.ProviderName))
+        {
+            modelBuilder.HasDefaultSchema(Schema);
+        }
+        else
+        {
+            foreach (var entity in modelBuilder.Model.GetEntityTypes().Where(e => e.BaseType is null))
+            {
+                var table = entity.GetTableName();
+                if (table is not null) entity.SetTableName($"{Schema}_{table}");
+            }
+        }
     }
 }
 
 public static class ModuleDbContextRegistration
 {
+    /// <summary>MySQL (Oracle's provider) has no schemas.</summary>
+    public static bool SupportsSchemas(string? providerName)
+        => providerName is null || !providerName.Contains("MySql", StringComparison.OrdinalIgnoreCase);
+
     /// <summary>The history table that keeps one module's migrations apart from the other modules' in the same database.</summary>
     public static string HistoryTable(string moduleName) => $"__EFMigrationsHistory_{moduleName}";
 
@@ -34,7 +56,7 @@ public static class ModuleDbContextRegistration
         services.AddDbContext<TContext>((serviceProvider, options) =>
         {
             var database = serviceProvider.GetRequiredService<ITenantDatabaseResolver>().Resolve();
-            DatabaseProviders.Configure(options, database.Provider, database.ConnectionString, HistoryTable(moduleName));
+            DatabaseProviders.Configure(options, database.Provider, database.ConnectionString, HistoryTable(moduleName), schema: moduleName);
             options.AddSaveChangesInterceptors(serviceProvider);
         });
         return services;
@@ -50,7 +72,7 @@ public static class ModuleDbContextRegistration
         services.AddDbContext<TContext>((serviceProvider, options) =>
         {
             var database = serviceProvider.GetRequiredService<DatabaseConnection>();
-            DatabaseProviders.Configure(options, database.Provider, database.ConnectionString, HistoryTable(moduleName));
+            DatabaseProviders.Configure(options, database.Provider, database.ConnectionString, HistoryTable(moduleName), schema: moduleName);
             options.AddSaveChangesInterceptors(serviceProvider);
         });
         return services;

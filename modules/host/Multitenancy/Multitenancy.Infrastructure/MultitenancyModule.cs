@@ -13,7 +13,7 @@ namespace soft.square.net.ModularBlazor.Host.Modules.Multitenancy.Infrastructure
 /// <summary>Tenant management API. The tenant store and tenant service themselves live in the framework Infrastructure.</summary>
 public sealed class MultitenancyModule : IHostModule
 {
-    public string Name => "Multitenancy";
+    public string Name => SchemaNames.Multitenancy;
 
     public Assembly ApplicationAssembly => typeof(TenantProvisioningRunner).Assembly;
 

@@ -132,11 +132,11 @@ Application projects must compile against them without depending on Infrastructu
 reference. MediatR is pinned to 12.x (Apache-2.0); 13+ requires a license key.
 
 **Data.** Each module has its own `DbContext` deriving from `ModuleDbContext` (entity configurations in the assembly are applied
-automatically), its own tables (`Auth_Users`, `Catalog_Modules`) and its own migrations history table
+automatically), its own schema (`Auth.Users`, `Catalog.Modules`, `Multitenancy.Provisionings`; MySQL has no schemas, so it gets prefixed tables `Auth_Users`) and its own migrations history table
 (`__EFMigrationsHistory_<Module>`). The context connects to the resolved tenant's database, or to the default database
 (`ConnectionStrings:TenantStore`) when the request has no `X-Tenant`. With `Database:MigrateOnStartup=true` each module's
 `IDbInitializer` migrates and seeds the default database (tenant databases are not touched). The module catalog is now stored
-in `Catalog_Modules` and seeded with the demo modules; sign-in registers unknown users in `Auth_Users` on first login.
+in `Catalog_Modules` and seeded with the demo modules; sign-in registers unknown users in `Auth.Users` on first login.
 
 **Adding a module:** create the three projects under `modules/host/<Name>` (the folder's `Directory.Build.props` sets names and
 references), implement `IHostModule` in the Infrastructure project (register the DbContext with `AddModuleDbContext`, repositories

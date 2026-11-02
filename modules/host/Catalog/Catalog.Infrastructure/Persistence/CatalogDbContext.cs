@@ -6,5 +6,7 @@ namespace soft.square.net.ModularBlazor.Host.Modules.Catalog.Infrastructure.Pers
 
 public sealed class CatalogDbContext(DbContextOptions<CatalogDbContext> options) : ModuleDbContext(options)
 {
+    protected override string Schema => SchemaNames.Catalog;
+
     public DbSet<ModuleRegistration> Modules => Set<ModuleRegistration>();
 }

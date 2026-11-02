@@ -8,6 +8,8 @@ namespace soft.square.net.ModularBlazor.Host.Modules.Multitenancy.Infrastructure
 /// <summary>Platform data: lives in the default database and is shared by all tenants.</summary>
 public sealed class MultitenancyDbContext(DbContextOptions<MultitenancyDbContext> options) : ModuleDbContext(options)
 {
+    protected override string Schema => SchemaNames.Multitenancy;
+
     public DbSet<TenantProvisioning> Provisionings => Set<TenantProvisioning>();
 }
 

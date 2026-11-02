@@ -32,7 +32,7 @@ public static class DesignTimeContexts
     {
         var builder = new DbContextOptionsBuilder<TContext>();
         DatabaseProviders.Configure(builder, provider, ConnectionString(provider),
-            ModuleDbContextRegistration.HistoryTable(moduleName));
+            ModuleDbContextRegistration.HistoryTable(moduleName), schema: moduleName);
         return builder.Options;
     }
 

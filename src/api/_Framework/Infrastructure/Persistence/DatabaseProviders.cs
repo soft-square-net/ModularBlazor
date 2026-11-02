@@ -19,7 +19,7 @@ public static class DatabaseProviders
     /// Set when several DbContexts share one database (the module contexts), so each keeps its own history.
     /// </param>
     public static void Configure(DbContextOptionsBuilder options, DatabaseProvider provider, string connectionString,
-        string? migrationsHistoryTable = null)
+        string? migrationsHistoryTable = null, string? schema = null)
     {
         // `dotnet ef` builds the host and takes the DbContext options from it, i.e. the configured (PostgreSql) provider.
         // scripts/add-migration.* set MIGRATIONS_PROVIDER so each migrations project is generated for its own provider.
@@ -37,7 +37,7 @@ public static class DatabaseProviders
                 options.UseSqlServer(connectionString, b =>
                 {
                     b.MigrationsAssembly(migrations);
-                    if (migrationsHistoryTable is not null) b.MigrationsHistoryTable(migrationsHistoryTable);
+                    if (migrationsHistoryTable is not null) b.MigrationsHistoryTable(migrationsHistoryTable, schema);
                 });
                 break;
 
@@ -45,7 +45,7 @@ public static class DatabaseProviders
                 options.UseNpgsql(connectionString, b =>
                 {
                     b.MigrationsAssembly(migrations);
-                    if (migrationsHistoryTable is not null) b.MigrationsHistoryTable(migrationsHistoryTable);
+                    if (migrationsHistoryTable is not null) b.MigrationsHistoryTable(migrationsHistoryTable, schema);
                 });
                 break;
 

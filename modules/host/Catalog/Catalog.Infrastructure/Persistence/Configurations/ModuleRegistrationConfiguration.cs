@@ -9,7 +9,7 @@ public sealed class ModuleRegistrationConfiguration : IEntityTypeConfiguration<M
 {
     public void Configure(EntityTypeBuilder<ModuleRegistration> builder)
     {
-        builder.ToTable("Catalog_Modules");
+        builder.ToTable("Modules");
         builder.HasKey(m => m.Id);
         builder.Property(m => m.Id).HasMaxLength(100);
         builder.Property(m => m.Name).HasMaxLength(200).IsRequired();

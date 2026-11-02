@@ -16,7 +16,7 @@ namespace soft.square.net.ModularBlazor.Host.Modules.Auth.Infrastructure;
 /// <summary>Users, roles, permissions, JWT tokens (with refresh) and API keys, per tenant.</summary>
 public sealed class AuthModule : IHostModule
 {
-    public string Name => "Auth";
+    public string Name => SchemaNames.Auth;
 
     public Assembly ApplicationAssembly => typeof(TokenIssuer).Assembly;
 

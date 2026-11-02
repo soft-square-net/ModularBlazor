@@ -12,7 +12,7 @@ namespace soft.square.net.ModularBlazor.Host.Modules.Catalog.Infrastructure;
 
 public sealed class CatalogModule : IHostModule
 {
-    public string Name => "Catalog";
+    public string Name => SchemaNames.Catalog;
 
     public Assembly ApplicationAssembly => typeof(GetCoreModulesQuery).Assembly;
 
