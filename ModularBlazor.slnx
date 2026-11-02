@@ -18,13 +18,17 @@
     <Project Path="src/migrations/PostgreSql/PostgreSql.csproj" />
     <Project Path="src/migrations/MySql/MySql.csproj" />
   </Folder>
-  <Folder Name="/modules/host/">
+  <Folder Name="/modules/host/Auth/">
     <Project Path="modules/host/Auth/Auth.Domain/Auth.Domain.csproj" />
     <Project Path="modules/host/Auth/Auth.Application/Auth.Application.csproj" />
     <Project Path="modules/host/Auth/Auth.Infrastructure/Auth.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/modules/host/Catalog/">
     <Project Path="modules/host/Catalog/Catalog.Domain/Catalog.Domain.csproj" />
     <Project Path="modules/host/Catalog/Catalog.Application/Catalog.Application.csproj" />
     <Project Path="modules/host/Catalog/Catalog.Infrastructure/Catalog.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/modules/host/Multitenancy/">
     <Project Path="modules/host/Multitenancy/Multitenancy.Domain/Multitenancy.Domain.csproj" />
     <Project Path="modules/host/Multitenancy/Multitenancy.Application/Multitenancy.Application.csproj" />
     <Project Path="modules/host/Multitenancy/Multitenancy.Infrastructure/Multitenancy.Infrastructure.csproj" />
