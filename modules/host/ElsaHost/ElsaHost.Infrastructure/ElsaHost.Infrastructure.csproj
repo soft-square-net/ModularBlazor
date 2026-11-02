@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\ElsaHost.Application\ElsaHost.Application.csproj" />
+  </ItemGroup>
+
+  <!-- Elsa 3 packages (floating on purpose: pin the version you ship). Elsa targets an older EF Core than the
+       rest of this solution; if NuGet reports a downgrade, align the EF Core packages (see README, "ElsaHost").
+       The MySQL persistence package is left out: Elsa's MySQL provider is Pomelo, this solution uses Oracle's. -->
+  <ItemGroup>
+    <PackageReference Include="Elsa" Version="3.*" />
+    <PackageReference Include="Elsa.Workflows.Api" Version="3.*" />
+    <PackageReference Include="Elsa.Workflows.Runtime" Version="3.*" />
+    <PackageReference Include="Elsa.Http" Version="3.*" />
+    <PackageReference Include="Elsa.Tenants" Version="3.*" />
+    <PackageReference Include="Elsa.EntityFrameworkCore" Version="3.*" />
+    <PackageReference Include="Elsa.EntityFrameworkCore.PostgreSql" Version="3.*" />
+    <PackageReference Include="Elsa.EntityFrameworkCore.SqlServer" Version="3.*" />
+  </ItemGroup>
+</Project>

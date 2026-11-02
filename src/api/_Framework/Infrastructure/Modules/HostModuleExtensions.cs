@@ -1,4 +1,5 @@
 using FluentValidation;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -35,5 +36,13 @@ public static class HostModuleExtensions
         services.AddExceptionHandler<CustomExceptionHandler>();
 
         return services;
+    }
+
+    /// <summary>Lets each module add its middleware (see <see cref="IHostModule.Configure"/>).</summary>
+    public static WebApplication UseHostModules(this WebApplication app, IEnumerable<IHostModule> modules)
+    {
+        foreach (var module in modules)
+            module.Configure(app);
+        return app;
     }
 }

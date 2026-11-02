@@ -1,4 +1,5 @@
 using System.Reflection;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,4 +18,10 @@ public interface IHostModule
 
     /// <summary>Registers the module's DbContext, repositories, initializer and other infrastructure services.</summary>
     void AddServices(IServiceCollection services, IConfiguration configuration);
+
+    /// <summary>
+    /// Adds the module's middleware / endpoints to the pipeline (after authentication and authorization,
+    /// before Carter). Most modules have none: their Carter endpoints are enough.
+    /// </summary>
+    void Configure(WebApplication app) { }
 }

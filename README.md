@@ -194,6 +194,23 @@ password in `appsettings.json` are development values: override them (user secre
 permission changes reach a user's JWT when the token is refreshed. The Auth context gained tables, so re-run
 `scripts/add-migration` for Auth.
 
+### ElsaHost (Elsa 3 workflow engine, `modules/host/ElsaHost`)
+
+Elsa is hosted inside the API (following Elsa's "Hosting Elsa in an existing app" guide): workflow management and runtime
+persisted with EF Core, the workflows REST API (`/elsa/api`, see `ElsaHost:ApiBasePath`) and HTTP activities. The module has
+Application + Infrastructure projects only (Elsa owns the workflow entities, so there is no Domain project).
+
+- **One tenant model.** Finbuckle's tenant store is the single source of truth. `FinbuckleTenantResolver` answers Elsa's "which
+  tenant?" with the tenant Finbuckle resolved (`X-Tenant`, `root` when absent) and `FinbuckleTenantsProvider` answers "which
+  tenants exist?" from the tenant store (active, non-expired). The Elsa tenant id is the Finbuckle tenant id.
+- **Data.** Elsa's tables live in the default database in schema `Elsa`, tenants separated by Elsa's `TenantId` column (not one
+  database per tenant). Elsa owns its migrations: `ElsaHost:RunMigrations=true` applies them at startup (development); in
+  production disable it and run Elsa's EF migrations. SqlServer and PostgreSql only (Elsa's MySQL provider is Pomelo).
+- **Security.** Elsa's API uses this host's JWT / API key. `ElsaApiPermissionMiddleware`: `GET` needs
+  `Permissions.Workflows.View` or `Manage`, anything else `Manage` (the `admin` role has both). `GET /api/v1/elsa/info` shows the
+  API path and current tenant.
+- Modules can now add middleware through `IHostModule.Configure(WebApplication)`.
+
 ### Multi-tenancy and migrations
 
 `src/migrations/{SqlServer,PostgreSql,MySql}` hold the migrations, one project per provider (`MySql` uses Oracle's `MySql.EntityFrameworkCore`)

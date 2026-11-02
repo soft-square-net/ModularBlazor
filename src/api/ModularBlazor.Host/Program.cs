@@ -87,6 +87,9 @@ app.UseTenantStatus();
 // Authentication (JWT / API key) and authorization.
 app.UseSecurity();
 
+// Module middleware (ElsaHost mounts the Elsa workflows API here).
+app.UseHostModules(HostModules.All);
+
 // API documentation (on in Development, or anywhere with Documentation:Enabled=true).
 if (app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("Documentation:Enabled"))
 {

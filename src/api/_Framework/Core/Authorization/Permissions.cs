@@ -46,6 +46,14 @@ public static class Permissions
         public const string Update = "Permissions.Multitenancy.Tenants.Update";
     }
 
+    public static class Workflows
+    {
+        /// <summary>Read workflows through the embedded Elsa API (GET).</summary>
+        public const string View = "Permissions.Workflows.View";
+        /// <summary>Create, change, publish and run workflows through the embedded Elsa API.</summary>
+        public const string Manage = "Permissions.Workflows.Manage";
+    }
+
     /// <summary>Every permission above.</summary>
     public static IReadOnlyList<string> All { get; } = typeof(Permissions)
         .GetNestedTypes(BindingFlags.Public)
