@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <ProjectReference Include="..\ElsaHost.Application\ElsaHost.Application.csproj" />
   </ItemGroup>
@@ -7,13 +7,15 @@
        rest of this solution; if NuGet reports a downgrade, align the EF Core packages (see README, "ElsaHost").
        The MySQL persistence package is left out: Elsa's MySQL provider is Pomelo, this solution uses Oracle's. -->
   <ItemGroup>
-    <PackageReference Include="Elsa" Version="3.*" />
-    <PackageReference Include="Elsa.Workflows.Api" Version="3.*" />
-    <PackageReference Include="Elsa.Workflows.Runtime" Version="3.*" />
-    <PackageReference Include="Elsa.Http" Version="3.*" />
-    <PackageReference Include="Elsa.Tenants" Version="3.*" />
-    <PackageReference Include="Elsa.EntityFrameworkCore" Version="3.*" />
-    <PackageReference Include="Elsa.EntityFrameworkCore.PostgreSql" Version="3.*" />
-    <PackageReference Include="Elsa.EntityFrameworkCore.SqlServer" Version="3.*" />
+    <PackageReference Include="Elsa" Version="3.9.0" />
+    <PackageReference Include="Elsa.Persistence.EFCore" Version="3.9.0" />
+    <PackageReference Include="Elsa.Persistence.EFCore.Common" Version="3.9.0" />
+    <PackageReference Include="Elsa.Persistence.EFCore.PostgreSql" Version="3.9.0" />
+    <PackageReference Include="Elsa.Persistence.EFCore.Sqlite" Version="3.9.0" />
+    <PackageReference Include="Elsa.Persistence.EFCore.SqlServer" Version="3.9.0" />
+    <PackageReference Include="Elsa.Workflows.Api" Version="3.9.0" />
+    <PackageReference Include="Elsa.Workflows.Runtime" Version="3.9.0" />
+    <PackageReference Include="Elsa.Http" Version="3.9.0" />
+    <PackageReference Include="Elsa.Tenants" Version="3.9.0" />
   </ItemGroup>
 </Project>

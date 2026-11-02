@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <!-- Shared kernel for the API: contracts and the abstractions every module layer compiles against.
        No infrastructure or web dependencies. -->
@@ -11,7 +11,7 @@
     <!-- Compile-time abstractions for the module Domain/Application projects, which reference only Core.
          The runtime wiring (MediatR registration, validators, pipeline, EF repositories) lives in Infrastructure.
          MediatR 12.x is Apache-2.0; 13+ needs a commercial license key. -->
-    <PackageReference Include="MediatR" Version="12.*" />
+    <PackageReference Include="MediatR" Version="14.2.0" />
     <PackageReference Include="FluentValidation" Version="12.*" />
     <PackageReference Include="Ardalis.Specification" Version="9.*" />
   </ItemGroup>

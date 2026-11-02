@@ -9,7 +9,7 @@
     <Project Path="modules/host/Catalog/Catalog.Domain/Catalog.Domain.csproj" />
     <Project Path="modules/host/Catalog/Catalog.Infrastructure/Catalog.Infrastructure.csproj" />
   </Folder>
-  <Folder Name="/modules/host/ElsaHost/">
+  <Folder Name="/modules/host/ElsaHost/" Id="976c69f9-0244-bc31-9237-45b7c599b5bc">
     <Project Path="modules/host/ElsaHost/ElsaHost.Application/ElsaHost.Application.csproj" />
     <Project Path="modules/host/ElsaHost/ElsaHost.Infrastructure/ElsaHost.Infrastructure.csproj" />
   </Folder>

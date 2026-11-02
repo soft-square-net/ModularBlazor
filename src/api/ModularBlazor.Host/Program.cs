@@ -8,9 +8,13 @@ using soft.square.net.ModularBlazor.Core.Persistence;
 using soft.square.net.ModularBlazor.Infrastructure.Modules;
 using soft.square.net.ModularBlazor.Infrastructure.Security;
 using NSwag;
+using NSwag.Generation.Processors;
+using NSwag.Generation.Processors.Contexts;
 using NSwag.Generation.Processors.Security;
 using soft.square.net.ModularBlazor.Infrastructure.MultiTenancy;
 using Scalar.AspNetCore;
+using NSwag.Generation.AspNetCore;
+using Finbuckle.MultiTenant.AspNetCore.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -60,6 +64,7 @@ builder.Services.AddOpenApiDocument(settings =>
     });
     settings.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("JWT"));
     settings.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("ApiKey"));
+    settings.OperationProcessors.Add(new ExcludeElsaApiFromOpenApiProcessor());
 });
 
 var app = builder.Build();
@@ -114,3 +119,16 @@ if (app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("Documen
 app.MapCarter();
 
 app.Run();
+
+/// <summary>Elsa publishes its own API and contains route descriptions that collide in NSwag's document.</summary>
+internal sealed class ExcludeElsaApiFromOpenApiProcessor : IOperationProcessor
+{
+    public bool Process(OperationProcessorContext context)
+    {
+        if (context is not AspNetCoreOperationProcessorContext aspNetCoreContext)
+            return true;
+
+        var route = aspNetCoreContext.ApiDescription.RelativePath?.TrimStart('/');
+        return route is null || !route.StartsWith("elsa/api/", StringComparison.OrdinalIgnoreCase);
+    }
+}

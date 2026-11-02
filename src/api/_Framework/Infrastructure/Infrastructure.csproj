@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <!-- Implementations of the Core contracts (storage, external services). -->
   <PropertyGroup>
@@ -12,9 +12,9 @@
 
   <ItemGroup>
     <!-- Multi-tenancy (Finbuckle). Bump to 10.x when you move to it; the code targets the 9.x API. -->
-    <PackageReference Include="Finbuckle.MultiTenant" Version="9.*" />
-    <PackageReference Include="Finbuckle.MultiTenant.AspNetCore" Version="9.*" />
-    <PackageReference Include="Finbuckle.MultiTenant.EntityFrameworkCore" Version="9.*" />
+    <PackageReference Include="Finbuckle.MultiTenant" Version="10.1.6" />
+    <PackageReference Include="Finbuckle.MultiTenant.AspNetCore" Version="10.1.6" />
+    <PackageReference Include="Finbuckle.MultiTenant.EntityFrameworkCore" Version="10.1.6" />
 
     <!-- EF Core 10 providers. Migrations live in src/migrations/*, one project per provider. -->
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.*" />
@@ -35,6 +35,7 @@
 
     <!-- Distributed cache (Redis). -->
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="10.*" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.14" />
   </ItemGroup>
 
   <ItemGroup>
