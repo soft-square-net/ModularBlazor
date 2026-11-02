@@ -31,6 +31,10 @@ public static class MultiTenancyExtensions
             .WithHeaderStrategy(TenantHeader)
             .WithEFCoreStore<TenantStoreDbContext, AppTenantInfo>();
 
+        // Where module DbContexts connect: the tenant's database, or this default one when no tenant was resolved.
+        services.AddSingleton(new DatabaseConnection(storeProvider, storeConnection));
+        services.AddScoped<ITenantDatabaseResolver, TenantDatabaseResolver>();
+
         // The tenant's own data: provider and connection string come from the resolved tenant.
         services.AddDbContext<AppDbContext>((serviceProvider, options) =>
         {

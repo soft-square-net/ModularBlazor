@@ -4,6 +4,8 @@ using Finbuckle.MultiTenant;
 using soft.square.net.ModularBlazor.Host;
 using Microsoft.EntityFrameworkCore;
 using soft.square.net.ModularBlazor.Infrastructure;
+using soft.square.net.ModularBlazor.Core.Persistence;
+using soft.square.net.ModularBlazor.Infrastructure.Modules;
 using soft.square.net.ModularBlazor.Infrastructure.MultiTenancy;
 using Scalar.AspNetCore;
 
@@ -14,7 +16,11 @@ builder.Services.ConfigureHttpJsonOptions(o => o.SerializerOptions.Converters.Ad
 
 builder.Services.AddInfrastructure(builder.Configuration);
 
-// Vertical slices: every ICarterModule found in the host modules (modules/host/*) becomes endpoints.
+// Host modules (modules/host/*): each one's DbContext, repositories and initializer, plus MediatR handlers and
+// FluentValidation validators from its Application project.
+builder.Services.AddHostModules(builder.Configuration, HostModules.All);
+
+// Every ICarterModule found in the modules' Infrastructure assemblies becomes endpoints.
 builder.Services.AddCarter(configurator: c => c.WithModules(HostModules.CarterModuleTypes()));
 
 builder.Services.AddCors(options => options.AddPolicy("client", policy =>
@@ -35,13 +41,31 @@ builder.Services.AddOpenApiDocument(settings =>
 
 var app = builder.Build();
 
-// Creates/updates the tenant store schema (used by the Aspire containers). Needs the TenantStore
-// migrations to have been generated first: scripts/add-migration.*
+// Creates/updates the tenant store schema and each module's tables, then seeds them (used by the Aspire
+// containers). Needs the migrations to have been generated first: scripts/add-migration.*
+// Modules run against the default database (ConnectionStrings:TenantStore); tenant databases are not touched.
 if (app.Configuration.GetValue<bool>("Database:MigrateOnStartup"))
 {
     using var scope = app.Services.CreateScope();
     await scope.ServiceProvider.GetRequiredService<TenantStoreDbContext>().Database.MigrateAsync();
+
+    var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("DbInitializer");
+    foreach (var initializer in scope.ServiceProvider.GetServices<IDbInitializer>())
+    {
+        try
+        {
+            await initializer.InitializeAsync();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "{Initializer} failed. Have the migrations been generated (scripts/add-migration.*)?",
+                initializer.GetType().Name);
+        }
+    }
 }
+
+// Validation failures from the CQRS pipeline become 400 problem responses.
+app.UseExceptionHandler();
 
 app.UseCors("client");
 

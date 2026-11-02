@@ -29,9 +29,9 @@ src/ModularBlazor.Abstractions   contracts: ModuleDescriptor, [LayoutKey], [UseL
 src/ModularBlazor.Client         host: ModuleManager, NuPkgReader, App.razor (Router), ModuleRouteView
 src/Aspire/Host                  Aspire AppHost: runs API, client, Postgres and Redis in containers
 src/api/ModularBlazor.Host       minimal API: login + module catalog, documented with NSwag, ReDoc and Scalar
-src/api/_Framework/Core          API contracts (IModuleCatalog, DatabaseProvider, Note); assembly ModularBlazor.Core
-src/api/_Framework/Infrastructure  implementations (InMemoryModuleCatalog, AddInfrastructure); assembly ModularBlazor.Infrastructure
-modules/host/Auth, Catalog       API host modules: Carter vertical slices (see below)
+src/api/_Framework/Core          shared kernel (BaseEntity, IAggregateRoot, IRepository, IDbInitializer, DatabaseProvider); carries the MediatR, FluentValidation and Ardalis.Specification packages
+src/api/_Framework/Infrastructure  multi-tenancy, EF Core providers, ModuleDbContext, Ardalis repository, MediatR/validation wiring (AddHostModules)
+modules/host/Auth, Catalog       API host modules, each as Domain / Application / Infrastructure projects (see below)
 modules/client/Layouts.Default          dll, startup   - sidebar layout            [LayoutKey("default")]
 modules/client/Layouts.Admin            dll, lazy      - top-bar layout (dependency of Module.Admin) [LayoutKey("admin")]
 modules/client/Module.Auth              dll, startup   - /login + auth layout      [LayoutKey("auth")]
@@ -106,24 +106,43 @@ API documentation (on in Development, or set `Documentation:Enabled=true`):
 To make the client use the API, set `ModuleOptions.CoreManifestUrl` / `UserModulesUrl` to the API URLs and send the
 bearer token when fetching `/api/me/modules`. The login and token handling in the API are demo-only.
 
-The API host references only `Infrastructure` (which references `Core`). Endpoints depend on `IModuleCatalog`; `AddInfrastructure()` in `Program.cs` binds it to `InMemoryModuleCatalog`.
+The API host references the framework `Infrastructure` and each host module's `Infrastructure` project.
 
-### Host modules (`modules/host`, Carter vertical slices)
+### Host modules (`modules/host`, clean architecture)
 
-Features of the API live in `modules/host/*` class libraries, not in `ModularBlazor.Host`. Each feature is a
-**slice**: a folder under `Features/` holding its request/response records, route and handler in one Carter
-`ICarterModule`.
+Features of the API live in `modules/host/<Module>/`, each module being three projects:
+
+| Project | Holds | References |
+|---|---|---|
+| `<Module>.Domain` | entities and aggregate roots (`BaseEntity<TId>`, `IAggregateRoot`) | Core |
+| `<Module>.Application` | CQRS: MediatR commands/queries + handlers, FluentValidation validators, Ardalis specifications, ports such as `ITokenService` | Core, Domain |
+| `<Module>.Infrastructure` | Carter endpoints, the module `DbContext` + entity configurations, `DbInitializer`, the `IHostModule` entry point | Application, Domain, framework `Infrastructure` |
 
 ```
-modules/host/Auth/Features/Login/LoginEndpoint.cs                  POST /api/auth/login
-modules/host/Catalog/Features/GetCoreModules/...Endpoint.cs        GET  /api/modules/core
-modules/host/Catalog/Features/GetMyModules/...Endpoint.cs          GET  /api/me/modules
+modules/host/Auth/    Auth.Domain (User) | Auth.Application (LoginCommand) | Auth.Infrastructure (AuthDbContext, LoginEndpoint, AuthModule)
+modules/host/Catalog/ Catalog.Domain (ModuleRegistration) | Catalog.Application (GetCoreModules/GetModulesForRole queries) | Catalog.Infrastructure
 ```
 
-The host calls `AddCarter(...)` and `MapCarter()`; `HostModules.cs` lists the module assemblies and every
-`ICarterModule` inside them is registered. To add a module: create a project under `modules/host` (the folder's
-`Directory.Build.props` adds Carter, Core and Abstractions), reference it from `ModularBlazor.Host.csproj`, and add its
-`*ModuleInfo.Assembly` to `HostModules.cs`. Assembly names are `ModularBlazor.Host.Modules.<Project>`.
+Request flow: Carter endpoint -> `ISender.Send(command)` -> validation behavior (FluentValidation, failures become a 400
+problem response) -> handler -> `IRepository<T>` / `IReadRepository<T>` (Ardalis.Specification over the module's DbContext).
+
+**Packages.** `Ardalis.Specification.EntityFrameworkCore` and `FluentValidation.DependencyInjectionExtensions` are in the framework
+`Infrastructure`. MediatR, FluentValidation and `Ardalis.Specification` (abstractions only) are referenced by `Core`, because the
+Application projects must compile against them without depending on Infrastructure; they reach Application through its Core
+reference. MediatR is pinned to 12.x (Apache-2.0); 13+ requires a license key.
+
+**Data.** Each module has its own `DbContext` deriving from `ModuleDbContext` (entity configurations in the assembly are applied
+automatically), its own tables (`Auth_Users`, `Catalog_Modules`) and its own migrations history table
+(`__EFMigrationsHistory_<Module>`). The context connects to the resolved tenant's database, or to the default database
+(`ConnectionStrings:TenantStore`) when the request has no `X-Tenant`. With `Database:MigrateOnStartup=true` each module's
+`IDbInitializer` migrates and seeds the default database (tenant databases are not touched). The module catalog is now stored
+in `Catalog_Modules` and seeded with the demo modules; sign-in registers unknown users in `Auth_Users` on first login.
+
+**Adding a module:** create the three projects under `modules/host/<Name>` (the folder's `Directory.Build.props` sets names and
+references), implement `IHostModule` in the Infrastructure project (register the DbContext with `AddModuleDbContext`, repositories
+with `AddModuleRepository`, the initializer as `IDbInitializer`), reference the Infrastructure project from
+`ModularBlazor.Host.csproj` and the migrations projects, and add the module to `HostModules.cs`. Assembly names are
+`soft.square.net.ModularBlazor.Host.Modules.<Module>.<Layer>`.
 
 ### Multi-tenancy and migrations
 
@@ -136,8 +155,8 @@ The host calls `AddCarter(...)` and `MapCarter()`; `HostModules.cs` lists the mo
   configured per request from the resolved tenant, so tenants can run on different engines.
 
 `src/migrations/{SqlServer,PostgreSql,MySql}` hold the migrations, one project per provider (`MySql` uses Oracle's `MySql.EntityFrameworkCore`)
-(assemblies `ModularBlazor.Migrations.*`, selected by name in `DatabaseProviders`). Each provider project has two
-migration sets: `Migrations/App` (per-tenant `AppDbContext`) and `Migrations/TenantStore`.
+(assemblies `ModularBlazor.Migrations.*`, selected by name in `DatabaseProviders`). Each provider project has a migration set per
+context: `Migrations/App` (per-tenant `AppDbContext`), `Migrations/TenantStore`, `Migrations/Auth` and `Migrations/Catalog`.
 
 ```bash
 dotnet tool install --global dotnet-ef

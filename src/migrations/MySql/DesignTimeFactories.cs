@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore.Design;
 using soft.square.net.ModularBlazor.Core;
+using soft.square.net.ModularBlazor.Host.Modules.Auth.Infrastructure.Persistence;
+using soft.square.net.ModularBlazor.Host.Modules.Catalog.Infrastructure.Persistence;
 using soft.square.net.ModularBlazor.Infrastructure.MultiTenancy;
 using soft.square.net.ModularBlazor.Infrastructure.Persistence;
 
@@ -16,4 +18,16 @@ public sealed class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbConte
 public sealed class TenantStoreDbContextFactory : IDesignTimeDbContextFactory<TenantStoreDbContext>
 {
     public TenantStoreDbContext CreateDbContext(string[] args) => DesignTimeContexts.CreateTenantStore(DatabaseProvider.MySql);
+}
+
+public sealed class AuthDbContextFactory : IDesignTimeDbContextFactory<AuthDbContext>
+{
+    public AuthDbContext CreateDbContext(string[] args)
+        => new(DesignTimeContexts.ModuleOptions<AuthDbContext>(DatabaseProvider.MySql, "Auth"));
+}
+
+public sealed class CatalogDbContextFactory : IDesignTimeDbContextFactory<CatalogDbContext>
+{
+    public CatalogDbContext CreateDbContext(string[] args)
+        => new(DesignTimeContexts.ModuleOptions<CatalogDbContext>(DatabaseProvider.MySql, "Catalog"));
 }

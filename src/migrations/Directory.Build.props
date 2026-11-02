@@ -11,5 +11,8 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.*" PrivateAssets="all" />
     <ProjectReference Include="$(MSBuildThisFileDirectory)../api/_Framework/Infrastructure/Infrastructure.csproj" />
+    <!-- The module DbContexts whose migrations live here (one set of Migrations/<Module> folders per provider). -->
+    <ProjectReference Include="$(MSBuildThisFileDirectory)../../modules/host/Auth/Auth.Infrastructure/Auth.Infrastructure.csproj" />
+    <ProjectReference Include="$(MSBuildThisFileDirectory)../../modules/host/Catalog/Catalog.Infrastructure/Catalog.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

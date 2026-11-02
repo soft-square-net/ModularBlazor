@@ -15,9 +15,9 @@
     <ProjectReference Include="..\..\migrations\SqlServer\SqlServer.csproj" />
     <ProjectReference Include="..\..\migrations\PostgreSql\PostgreSql.csproj" />
     <ProjectReference Include="..\..\migrations\MySql\MySql.csproj" />
-    <!-- Host modules (vertical slices) -->
-    <ProjectReference Include="..\..\..\modules\host\Auth\Auth.csproj" />
-    <ProjectReference Include="..\..\..\modules\host\Catalog\Catalog.csproj" />
+    <!-- Host modules: only their Infrastructure project is referenced; Domain and Application flow in transitively. -->
+    <ProjectReference Include="..\..\..\modules\host\Auth\Auth.Infrastructure\Auth.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\modules\host\Catalog\Catalog.Infrastructure\Catalog.Infrastructure.csproj" />
     <ProjectReference Include="..\..\ModularBlazor.Abstractions\ModularBlazor.Abstractions.csproj" />
   </ItemGroup>
 

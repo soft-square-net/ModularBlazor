@@ -19,8 +19,12 @@
     <Project Path="src/migrations/MySql/MySql.csproj" />
   </Folder>
   <Folder Name="/modules/host/">
-    <Project Path="modules/host/Auth/Auth.csproj" />
-    <Project Path="modules/host/Catalog/Catalog.csproj" />
+    <Project Path="modules/host/Auth/Auth.Domain/Auth.Domain.csproj" />
+    <Project Path="modules/host/Auth/Auth.Application/Auth.Application.csproj" />
+    <Project Path="modules/host/Auth/Auth.Infrastructure/Auth.Infrastructure.csproj" />
+    <Project Path="modules/host/Catalog/Catalog.Domain/Catalog.Domain.csproj" />
+    <Project Path="modules/host/Catalog/Catalog.Application/Catalog.Application.csproj" />
+    <Project Path="modules/host/Catalog/Catalog.Infrastructure/Catalog.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/modules/client/">
     <Project Path="modules/client/Layouts.Default/Layouts.Default.csproj" />

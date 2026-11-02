@@ -1,9 +1,11 @@
+using MediatR;
 using soft.square.net.ModularBlazor.Abstractions;
 using soft.square.net.ModularBlazor.Core;
+using soft.square.net.ModularBlazor.Host.Modules.Catalog.Application.Queries.GetModulesForRole;
 
-namespace soft.square.net.ModularBlazor.Host.Modules.Catalog.Features.GetMyModules;
+namespace soft.square.net.ModularBlazor.Host.Modules.Catalog.Infrastructure.Endpoints;
 
-/// <summary>Vertical slice: GET /api/me/modules - metadata for the signed-in user.</summary>
+/// <summary>GET /api/me/modules - metadata for the signed-in user.</summary>
 public sealed class GetMyModulesEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
@@ -17,8 +19,8 @@ public sealed class GetMyModulesEndpoint : ICarterModule
             .Produces(StatusCodes.Status401Unauthorized);
     }
 
-    private static IResult Handle(HttpRequest request, IModuleCatalog catalog)
+    private static async Task<IResult> Handle(HttpRequest request, ISender sender, CancellationToken cancellationToken)
         => DemoToken.TryGetRole(request.Headers.Authorization.ToString(), out var role)
-            ? Results.Ok(catalog.GetModulesForRole(role))
+            ? Results.Ok(await sender.Send(new GetModulesForRoleQuery(role), cancellationToken))
             : Results.Unauthorized();
 }

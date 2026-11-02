@@ -1,0 +1,25 @@
+using System.Reflection;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using soft.square.net.ModularBlazor.Core.Persistence;
+using soft.square.net.ModularBlazor.Host.Modules.Catalog.Application.Queries.GetCoreModules;
+using soft.square.net.ModularBlazor.Host.Modules.Catalog.Domain;
+using soft.square.net.ModularBlazor.Host.Modules.Catalog.Infrastructure.Persistence;
+using soft.square.net.ModularBlazor.Infrastructure.Modules;
+using soft.square.net.ModularBlazor.Infrastructure.Persistence;
+
+namespace soft.square.net.ModularBlazor.Host.Modules.Catalog.Infrastructure;
+
+public sealed class CatalogModule : IHostModule
+{
+    public string Name => "Catalog";
+
+    public Assembly ApplicationAssembly => typeof(GetCoreModulesQuery).Assembly;
+
+    public void AddServices(IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddModuleDbContext<CatalogDbContext>(Name);
+        services.AddModuleRepository<CatalogDbContext, ModuleRegistration>();
+        services.AddScoped<IDbInitializer, CatalogDbInitializer>();
+    }
+}

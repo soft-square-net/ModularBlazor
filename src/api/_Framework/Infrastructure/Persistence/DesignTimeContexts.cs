@@ -25,6 +25,16 @@ public static class DesignTimeContexts
         return new TenantStoreDbContext(builder.Options);
     }
 
+    /// <summary>Options for a module DbContext (same history table as at runtime). Usage: new AuthDbContext(ModuleOptions&lt;AuthDbContext&gt;(provider, "Auth")).</summary>
+    public static DbContextOptions<TContext> ModuleOptions<TContext>(DatabaseProvider provider, string moduleName)
+        where TContext : DbContext
+    {
+        var builder = new DbContextOptionsBuilder<TContext>();
+        DatabaseProviders.Configure(builder, provider, ConnectionString(provider),
+            ModuleDbContextRegistration.HistoryTable(moduleName));
+        return builder.Options;
+    }
+
     private static string ConnectionString(DatabaseProvider provider)
         => Environment.GetEnvironmentVariable("MIGRATIONS_CONNECTION") ?? provider switch
         {

@@ -1,16 +1,14 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using soft.square.net.ModularBlazor.Core;
 using soft.square.net.ModularBlazor.Infrastructure.MultiTenancy;
 
 namespace soft.square.net.ModularBlazor.Infrastructure;
 
 public static class DependencyInjection
 {
-    /// <summary>Registers every Core contract with its Infrastructure implementation, plus multi-tenancy.</summary>
+    /// <summary>Registers multi-tenancy and the cache. Host modules are added separately with AddHostModules.</summary>
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddSingleton<IModuleCatalog, InMemoryModuleCatalog>();
         services.AddMultiTenancy(configuration);
 
         // Redis when ConnectionStrings:redis is set (the Aspire container), otherwise an in-memory cache.

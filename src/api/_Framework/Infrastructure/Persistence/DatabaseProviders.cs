@@ -15,22 +15,38 @@ public static class DatabaseProviders
         _ => throw new ArgumentOutOfRangeException(nameof(provider), provider, null)
     };
 
-    public static void Configure(DbContextOptionsBuilder options, DatabaseProvider provider, string connectionString)
+    /// <param name="migrationsHistoryTable">
+    /// Set when several DbContexts share one database (the module contexts), so each keeps its own history.
+    /// </param>
+    public static void Configure(DbContextOptionsBuilder options, DatabaseProvider provider, string connectionString,
+        string? migrationsHistoryTable = null)
     {
         var migrations = MigrationsAssembly(provider);
 
         switch (provider)
         {
             case DatabaseProvider.SqlServer:
-                options.UseSqlServer(connectionString, b => b.MigrationsAssembly(migrations));
+                options.UseSqlServer(connectionString, b =>
+                {
+                    b.MigrationsAssembly(migrations);
+                    if (migrationsHistoryTable is not null) b.MigrationsHistoryTable(migrationsHistoryTable);
+                });
                 break;
 
             case DatabaseProvider.PostgreSql:
-                options.UseNpgsql(connectionString, b => b.MigrationsAssembly(migrations));
+                options.UseNpgsql(connectionString, b =>
+                {
+                    b.MigrationsAssembly(migrations);
+                    if (migrationsHistoryTable is not null) b.MigrationsHistoryTable(migrationsHistoryTable);
+                });
                 break;
 
             case DatabaseProvider.MySql:
-                options.UseMySQL(connectionString, b => b.MigrationsAssembly(migrations));
+                options.UseMySQL(connectionString, b =>
+                {
+                    b.MigrationsAssembly(migrations);
+                    if (migrationsHistoryTable is not null) b.MigrationsHistoryTable(migrationsHistoryTable);
+                });
                 break;
 
             default:

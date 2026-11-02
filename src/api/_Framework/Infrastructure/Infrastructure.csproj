@@ -23,6 +23,13 @@
          when this was written; to switch, replace this package and the UseMySQL call in DatabaseProviders. -->
     <PackageReference Include="MySql.EntityFrameworkCore" Version="10.*" />
 
+    <!-- Repositories: Ardalis.Specification over EF Core (the abstractions are in Core). Built for EF Core 9;
+         its dependency is a minimum (>= 9.0.8), so it resolves against EF Core 10. -->
+    <PackageReference Include="Ardalis.Specification.EntityFrameworkCore" Version="9.*" />
+
+    <!-- CQRS wiring: MediatR registration and validators (MediatR and FluentValidation come from Core). -->
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.*" />
+
     <!-- Distributed cache (Redis). -->
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="10.*" />
   </ItemGroup>
