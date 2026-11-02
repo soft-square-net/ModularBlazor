@@ -1,4 +1,19 @@
 <Solution>
+  <Folder Name="/modules/host/Auth/" Id="5f9762b2-47be-43ae-4cd9-fb4b7c284d3a">
+    <Project Path="modules/host/Auth/Auth.Application/Auth.Application.csproj" />
+    <Project Path="modules/host/Auth/Auth.Domain/Auth.Domain.csproj" />
+    <Project Path="modules/host/Auth/Auth.Infrastructure/Auth.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/modules/host/Catalog/" Id="7c94cc4e-11bd-e0b7-667c-539523ee67bd">
+    <Project Path="modules/host/Catalog/Catalog.Application/Catalog.Application.csproj" />
+    <Project Path="modules/host/Catalog/Catalog.Domain/Catalog.Domain.csproj" />
+    <Project Path="modules/host/Catalog/Catalog.Infrastructure/Catalog.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/modules/host/Multitenancy/" Id="f6b71384-2cfd-036a-59ba-1aab4633cd41">
+    <Project Path="modules/host/Multitenancy/Multitenancy.Application/Multitenancy.Application.csproj" />
+    <Project Path="modules/host/Multitenancy/Multitenancy.Domain/Multitenancy.Domain.csproj" />
+    <Project Path="modules/host/Multitenancy/Multitenancy.Infrastructure/Multitenancy.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/ModularBlazor.Abstractions/ModularBlazor.Abstractions.csproj" />
     <Project Path="src/ModularBlazor.Client/ModularBlazor.Client.csproj" />
@@ -14,31 +29,18 @@
     <Project Path="src/Aspire/Host/Host.csproj" />
   </Folder>
   <Folder Name="/src/migrations/">
-    <Project Path="src/migrations/SqlServer/SqlServer.csproj" />
-    <Project Path="src/migrations/PostgreSql/PostgreSql.csproj" />
     <Project Path="src/migrations/MySql/MySql.csproj" />
+    <Project Path="src/migrations/PostgreSql/PostgreSql.csproj" />
+    <Project Path="src/migrations/SqlServer/SqlServer.csproj" />
   </Folder>
-  <Folder Name="/modules/host/Auth/">
-    <Project Path="modules/host/Auth/Auth.Domain/Auth.Domain.csproj" />
-    <Project Path="modules/host/Auth/Auth.Application/Auth.Application.csproj" />
-    <Project Path="modules/host/Auth/Auth.Infrastructure/Auth.Infrastructure.csproj" />
-  </Folder>
-  <Folder Name="/modules/host/Catalog/">
-    <Project Path="modules/host/Catalog/Catalog.Domain/Catalog.Domain.csproj" />
-    <Project Path="modules/host/Catalog/Catalog.Application/Catalog.Application.csproj" />
-    <Project Path="modules/host/Catalog/Catalog.Infrastructure/Catalog.Infrastructure.csproj" />
-  </Folder>
-  <Folder Name="/modules/host/Multitenancy/">
-    <Project Path="modules/host/Multitenancy/Multitenancy.Domain/Multitenancy.Domain.csproj" />
-    <Project Path="modules/host/Multitenancy/Multitenancy.Application/Multitenancy.Application.csproj" />
-    <Project Path="modules/host/Multitenancy/Multitenancy.Infrastructure/Multitenancy.Infrastructure.csproj" />
-  </Folder>
+  <Folder Name="/modules/host/" />
+  <Folder Name="/modules/" />
   <Folder Name="/modules/client/">
-    <Project Path="modules/client/Layouts.Default/Layouts.Default.csproj" />
     <Project Path="modules/client/Layouts.Admin/Layouts.Admin.csproj" />
+    <Project Path="modules/client/Layouts.Default/Layouts.Default.csproj" />
+    <Project Path="modules/client/Module.Admin/Module.Admin.csproj" />
     <Project Path="modules/client/Module.Auth/Module.Auth.csproj" />
     <Project Path="modules/client/Module.Dashboard/Module.Dashboard.csproj" />
     <Project Path="modules/client/Module.Reports/Module.Reports.csproj" />
-    <Project Path="modules/client/Module.Admin/Module.Admin.csproj" />
   </Folder>
 </Solution>

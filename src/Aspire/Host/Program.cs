@@ -1,3 +1,6 @@
+using StackExchange.Redis;
+
+bool loadPgreAdmin = true;
 var builder = DistributedApplication.CreateBuilder(args);
 
 // ---------------------------------------------------------------- data services (containers)
@@ -7,8 +10,9 @@ var builder = DistributedApplication.CreateBuilder(args);
 var postgresPassword = builder.AddParameter("postgres-password", secret: true);
 
 var postgres = builder
-    .AddPostgres("postgres", password: postgresPassword, port: 5432)
-    .WithDataVolume("modularblazor-postgres-data");
+    .AddPostgres("postgres", password: postgresPassword, port: 5432);
+    if (loadPgreAdmin) postgres.WithPgAdmin();
+    postgres.WithDataVolume("modularblazor-postgres-data");
 
 // Created on the server at startup; the resource name becomes ConnectionStrings:TenantStore in the API.
 var tenantStore = postgres.AddDatabase("TenantStore", databaseName: "ModularBlazorTenants");
