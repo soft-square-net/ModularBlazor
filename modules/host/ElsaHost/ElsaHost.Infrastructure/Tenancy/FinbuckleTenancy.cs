@@ -1,8 +1,10 @@
 using Elsa.Common.Multitenancy;
-using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using soft.square.net.ModularBlazor.Core.Abstractions;
 using soft.square.net.ModularBlazor.Infrastructure.MultiTenancy;
+
+// Finbuckle and Elsa both define ITenantResolver (and similar names): import only what is needed from Finbuckle.
+using IMultiTenantStore = Finbuckle.MultiTenant.Abstractions.IMultiTenantStore<soft.square.net.ModularBlazor.Infrastructure.MultiTenancy.AppTenantInfo>;
 
 namespace soft.square.net.ModularBlazor.Host.Modules.ElsaHost.Infrastructure.Tenancy;
 
@@ -33,7 +35,7 @@ internal sealed class FinbuckleTenantsProvider(IServiceScopeFactory scopeFactory
     public async Task<IEnumerable<Tenant>> ListAsync(CancellationToken cancellationToken = default)
     {
         using var scope = scopeFactory.CreateScope();
-        var store = scope.ServiceProvider.GetRequiredService<IMultiTenantStore<AppTenantInfo>>();
+        var store = scope.ServiceProvider.GetRequiredService<IMultiTenantStore>();
         var now = clock.GetUtcNow().UtcDateTime;
 
         return (await store.GetAllAsync())
