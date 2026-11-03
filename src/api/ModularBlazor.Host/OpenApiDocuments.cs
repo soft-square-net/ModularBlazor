@@ -208,29 +208,40 @@ internal sealed class ElsaApiOperationProcessor(string elsaBasePath, bool includ
 {
   public bool Process(OperationProcessorContext context)
   {
-    // Use ApiExplorer's route template: Elsa FastEndpoints can expose a normalized NSwag path that drops
-    // route parameters, making distinct journal operations collide in the generated document.
-    var relativePath = (context as AspNetCoreOperationProcessorContext)?.ApiDescription.RelativePath;
-    var path = (relativePath ?? context.OperationDescription.Path).TrimStart('/');
-    var basePath = elsaBasePath.Trim('/');
-    var isElsa = path.Equals(basePath, StringComparison.OrdinalIgnoreCase)
-        || path.StartsWith(basePath + "/", StringComparison.OrdinalIgnoreCase);
-
-    if (isElsa && relativePath is not null)
-      context.OperationDescription.Path = "/" + path;
-
-    if (isElsa && includeElsa
-        && context.Document.Paths.TryGetValue(context.OperationDescription.Path, out var existingPath)
-        && existingPath.ContainsKey(context.OperationDescription.Method))
-    {
-      // Elsa 3.9 has distinct FastEndpoints routes that collapse to the same NSwag path. Retain the first
-      // operation for each method/path so a collision cannot make the full document return HTTP 500.
-      return false;
-    }
-
+    // var isElsa = context.OperationDescription.Path.StartsWith(elsaBasePath, StringComparison.OrdinalIgnoreCase);
+    var isElsa = context.OperationDescription.Path.Contains("elsa/", StringComparison.OrdinalIgnoreCase);
     return isElsa == includeElsa;
   }
 }
+
+
+//internal sealed class ElsaApiOperationProcessor(string elsaBasePath, bool includeElsa) : IOperationProcessor
+//{
+//  public bool Process(OperationProcessorContext context)
+//  {
+//    // Use ApiExplorer's route template: Elsa FastEndpoints can expose a normalized NSwag path that drops
+//    // route parameters, making distinct journal operations collide in the generated document.
+//    var relativePath = (context as AspNetCoreOperationProcessorContext)?.ApiDescription.RelativePath;
+//    var path = (relativePath ?? context.OperationDescription.Path).TrimStart('/');
+//    var basePath = elsaBasePath.Trim('/');
+//    var isElsa = path.Equals(basePath, StringComparison.OrdinalIgnoreCase)
+//        || path.StartsWith(basePath + "/", StringComparison.OrdinalIgnoreCase);
+
+//    if (isElsa && relativePath is not null)
+//      context.OperationDescription.Path = "/" + path;
+
+//    if (isElsa && includeElsa
+//        && context.Document.Paths.TryGetValue(context.OperationDescription.Path, out var existingPath)
+//        && existingPath.ContainsKey(context.OperationDescription.Method))
+//    {
+//      // Elsa 3.9 has distinct FastEndpoints routes that collapse to the same NSwag path. Retain the first
+//      // operation for each method/path so a collision cannot make the full document return HTTP 500.
+//      return false;
+//    }
+
+//    return isElsa == includeElsa;
+//  }
+//}
 ///// <summary>
 ///// Keeps Elsa's endpoints in their own OpenAPI document ("elsa") so they cannot break the main one ("v1") that
 ///// Scalar and ReDoc render: the main document leaves them out, the Elsa document contains nothing else.

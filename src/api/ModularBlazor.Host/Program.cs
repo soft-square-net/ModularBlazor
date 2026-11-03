@@ -1,4 +1,5 @@
 using Carter;
+using FastEndpoints.Swagger;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -36,9 +37,13 @@ builder.Services.AddCarter(configurator: c => c.WithModules(HostModules.CarterMo
 
 builder.Services.AddCors(options => options.AddPolicy("client", policy =>
 {
-  var origins = builder.Configuration.GetSection("Cors:Origins").Get<string[]>() ?? [];
-  policy.WithOrigins(origins).AllowAnyHeader().AllowAnyMethod();
+  //var origins = builder.Configuration.GetSection("Cors:Origins").Get<string[]>() ?? [];
+  //policy.WithOrigins(origins).AllowAnyHeader().AllowAnyMethod().WithExposedHeaders("x-elsa-workflow-instance-id");
+
+  // var origins = builder.Configuration.GetSection("Cors:Origins").Get<string[]>() ?? [];
+  policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().WithExposedHeaders("x-elsa-workflow-instance-id");
 }));
+
 
 // NSwag builds the OpenAPI document from the minimal API endpoints.
 builder.Services.AddEndpointsApiExplorer();
@@ -65,16 +70,6 @@ void AddSecuritySchemes(NSwag.Generation.AspNetCore.AspNetCoreOpenApiDocumentGen
   settings.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("ApiKey"));
 }
 
-builder.Services.AddOpenApiDocument(settings =>
-{
-  settings.DocumentName = "v1";
-  settings.Title = "Modular Blazor API";
-  settings.Version = "v1";
-  settings.Description = "Identity (users, roles, API keys), tenants and module catalog for the Modular Blazor WebAssembly client.";
-  AddSecuritySchemes(settings);
-  settings.OperationProcessors.Insert(0, new ElsaApiOperationProcessor(elsaBasePath, includeElsa: false));
-});
-
 //// 1. Register the filtered document in Program.cs
 builder.Services.AddOpenApiDocument(settings =>
 {
@@ -85,13 +80,27 @@ builder.Services.AddOpenApiDocument(settings =>
 
   AddSecuritySchemes(settings);
 
+  // This extension tells NSwag to include FastEndpoints routes
+  // settings.EnableFastEndpoints(options => { }, builder.Services.BuildServiceProvider());
   // Skip heavy activity model reflection
+
   // settings.SchemaSettings.SchemaProcessors.Add(new SafeElsaSchemaProcessor());
+
   // Elsa registers FastEndpoints rather than MVC controllers, so filter by the
   // mounted API route instead of ControllerType.Namespace.
   settings.OperationProcessors.Insert(0, new ElsaApiOperationProcessor(elsaBasePath, includeElsa: true));
 
 });
+builder.Services.AddOpenApiDocument(settings =>
+{
+  settings.DocumentName = "v1";
+  settings.Title = "Modular Blazor API";
+  settings.Version = "v1";
+  settings.Description = "Identity (users, roles, API keys), tenants and module catalog for the Modular Blazor WebAssembly client.";
+  AddSecuritySchemes(settings);
+  settings.OperationProcessors.Insert(0, new ElsaApiOperationProcessor(elsaBasePath, includeElsa: false));
+});
+
 
 
 var app = builder.Build();
@@ -128,20 +137,22 @@ if (app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("Documen
   // 1. Serve only the NSwag v1 document here. The Elsa document is generated
   // by the custom endpoint below and must not be intercepted by NSwag.
   app.UseOpenApi(settings => settings.Path = "/openapi/v1.json");
+  app.UseOpenApi(settings => settings.Path = "/swagger/v3/swagger.json");
 
-  //// 2. ReDoc at /redoc and /redoc/elsa (NSwag).
-  app.UseReDoc(settings =>
-  {
-    settings.Path = "/redoc";
-    settings.DocumentPath = "/openapi/v1.json";
-    settings.UseModuleTypeForCustomJavaScript = true;
-  });
-  app.UseReDoc(settings =>
-  {
-    settings.Path = "/redoc/elsa";
-    settings.DocumentPath = "/openapi/elsa.json";
-    settings.UseModuleTypeForCustomJavaScript = true;
-  });
+
+  ////// 2. ReDoc at /redoc and /redoc/elsa (NSwag).
+  //app.UseReDoc(settings =>
+  //{
+  //  settings.Path = "/redoc";
+  //  settings.DocumentPath = "/openapi/v1.json";
+  //  settings.UseModuleTypeForCustomJavaScript = true;
+  //});
+  //app.UseReDoc(settings =>
+  //{
+  //  settings.Path = "/redoc/elsa";
+  //  settings.DocumentPath = "/openapi/elsa.json";
+  //  settings.UseModuleTypeForCustomJavaScript = true;
+  //});
 
   // Elsa FastEndpoints are mounted by Elsa middleware and their route
   // normalization can make NSwag fail. Generate this document from the

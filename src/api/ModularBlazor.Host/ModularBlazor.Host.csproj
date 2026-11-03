@@ -1,6 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
+    <None Remove="redoc.standalone.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="redoc.standalone.js" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- NSwag generates the OpenAPI document and serves ReDoc; Scalar renders the same document. -->
     <PackageReference Include="NSwag.AspNetCore" Version="14.*" />
     <PackageReference Include="Scalar.AspNetCore" Version="2.*" />
