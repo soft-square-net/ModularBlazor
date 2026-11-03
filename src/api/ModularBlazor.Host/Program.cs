@@ -20,6 +20,12 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Module store: the enabled host modules' configuration (Modules:<Name>) is injected here, and the modules
+// themselves are found by HostModules.All (they are referenced by the build through host-modules.props).
+HostModules.StorePath = builder.Configuration["ModuleStore:Path"] ?? "modules-store";
+builder.Configuration.AddJsonFile(Path.Combine(Path.GetFullPath(HostModules.StorePath), "host-modules.config.json"),
+    optional: true, reloadOnChange: false);
+
 // ModuleKind travels as "dll" / "nupkg", exactly what the Blazor client expects.
 builder.Services.ConfigureHttpJsonOptions(o => o.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
@@ -233,7 +239,11 @@ if (app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("Documen
   app.MapScalarApiReference(options => options
       .WithTitle("Modular Blazor API")
       .AddDocument("v1", "Modular V1 Blazor API", "/openapi/v1.json", isDefault: true)
-      .AddDocument("elsa", "Elsa V3 Workflows API", "/openapi/elsa.json"));
+      .AddDocument("elsa", "Elsa V3 Workflows API", "/openapi/elsa.json")
+      // Both documents declare the JWT (Bearer) and ApiKey (X-API-Key) schemes; Scalar's Authentication panel
+      // offers both, and keeps what you entered across reloads and when switching documents.
+      .AddPreferredSecuritySchemes("JWT", "ApiKey")
+      .WithPersistentAuthentication());
 
 
   app.MapGet("/", () => Results.Redirect("/scalar")).ExcludeFromDescription();

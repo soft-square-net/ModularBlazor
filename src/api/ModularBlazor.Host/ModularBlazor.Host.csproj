@@ -31,4 +31,7 @@
     <ProjectReference Include="..\..\ModularBlazor.Abstractions\ModularBlazor.Abstractions.csproj" />
   </ItemGroup>
 
+  <!-- Host modules enabled in the module store (generated; see Catalog/Packages). Empty or absent until a module is enabled. -->
+  <Import Project="modules-store\host-modules.props" Condition="Exists('modules-store\host-modules.props')" />
+
 </Project>

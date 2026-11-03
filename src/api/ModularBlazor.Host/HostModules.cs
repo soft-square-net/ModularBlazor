@@ -2,6 +2,7 @@ using System.Reflection;
 using Carter;
 using soft.square.net.ModularBlazor.Host.Modules.Auth.Infrastructure;
 using soft.square.net.ModularBlazor.Host.Modules.Catalog.Infrastructure;
+using soft.square.net.ModularBlazor.Host.Modules.Catalog.Infrastructure.Packages;
 using soft.square.net.ModularBlazor.Host.Modules.ElsaHost.Infrastructure;
 using soft.square.net.ModularBlazor.Host.Modules.Multitenancy.Infrastructure;
 using soft.square.net.ModularBlazor.Infrastructure.Modules;
@@ -15,7 +16,19 @@ namespace soft.square.net.ModularBlazor.Host;
 /// </summary>
 internal static class HostModules
 {
-    public static readonly IHostModule[] All =
+    /// <summary>Folder of the module store (ModuleStore:Path). Set before <see cref="All"/> is first used.</summary>
+    public static string StorePath { get; set; } = "modules-store";
+
+    private static IHostModule[]? _all;
+
+    /// <summary>The built-in modules plus the host modules enabled in the module store and built into this app.</summary>
+    public static IHostModule[] All => _all ??= BuiltIn()
+        .Concat(ExternalHostModules.Load(StorePath, message => Console.WriteLine($"[module store] {message}")))
+        .GroupBy(m => m.GetType())
+        .Select(g => g.First())
+        .ToArray();
+
+    private static IHostModule[] BuiltIn() =>
     [
         new AuthModule(),
         new CatalogModule(),
