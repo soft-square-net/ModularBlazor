@@ -222,7 +222,11 @@ if (app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("Documen
   app.MapScalarApiReference(options => options
       .WithTitle("Modular Blazor API")
       .AddDocument("v1", "Modular V1 Blazor API", "/openapi/v1.json", isDefault: true)
-      .AddDocument("elsa", "Elsa V3 Workflows API", "/openapi/elsa.json"));
+      .AddDocument("elsa", "Elsa V3 Workflows API", "/openapi/elsa.json")
+      // Both documents declare the JWT (Bearer) and ApiKey (X-API-Key) schemes; Scalar's Authentication panel
+      // offers both, and keeps what you entered across reloads and when switching documents.
+      .AddPreferredSecuritySchemes("JWT", "ApiKey")
+      .WithPersistentAuthentication());
 
 
   app.MapGet("/", () => Results.Redirect("/scalar")).ExcludeFromDescription();
