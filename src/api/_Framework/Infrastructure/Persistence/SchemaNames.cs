@@ -10,4 +10,5 @@ public static class SchemaNames
     public const string Auth = "Auth";
     public const string Catalog = "Catalog";
     public const string Multitenancy = "Multitenancy";
+    public const string ElsaHost = "ElsaHost";
 }

@@ -1,8 +1,5 @@
+
 using Finbuckle.MultiTenant;
-using Finbuckle.MultiTenant.Abstractions;
-using Finbuckle.MultiTenant.AspNetCore.Extensions;
-using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
-using Finbuckle.MultiTenant.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

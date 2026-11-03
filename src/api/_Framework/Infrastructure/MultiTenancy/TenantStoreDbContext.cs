@@ -1,4 +1,4 @@
-using Finbuckle.MultiTenant.EntityFrameworkCore.Stores;
+using Finbuckle.MultiTenant.EntityFrameworkCore.Stores.EFCoreStore;
 using Microsoft.EntityFrameworkCore;
 
 namespace soft.square.net.ModularBlazor.Infrastructure.MultiTenancy;

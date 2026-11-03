@@ -5,13 +5,14 @@ using Elsa.Persistence.EFCore.Extensions;
 using Elsa.Persistence.EFCore.Modules.Management;
 using Elsa.Persistence.EFCore.Modules.Runtime;
 using Elsa.Tenants.Extensions;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Parlot.Fluent;
 using soft.square.net.ModularBlazor.Core;
 using soft.square.net.ModularBlazor.Host.Modules.ElsaHost.Application.Queries;
 using soft.square.net.ModularBlazor.Host.Modules.ElsaHost.Infrastructure.Tenancy;
 using soft.square.net.ModularBlazor.Infrastructure.Modules;
+using soft.square.net.ModularBlazor.Infrastructure.Persistence;
 using System.Reflection;
 
 namespace soft.square.net.ModularBlazor.Host.Modules.ElsaHost.Infrastructure;
@@ -26,9 +27,9 @@ namespace soft.square.net.ModularBlazor.Host.Modules.ElsaHost.Infrastructure;
 /// </summary>
 public sealed class ElsaHostModule : IHostModule
 {
-  public string Name => "ElsaHost";
+  public string Name => SchemaNames.ElsaHost;
 
-  public Assembly ApplicationAssembly => typeof(GetElsaInfoQuery).Assembly;
+  public Assembly ApplicationAssembly => typeof(ElsaHostModule).Assembly;
 
   public void AddServices(IServiceCollection services, IConfiguration configuration)
   {
@@ -77,7 +78,8 @@ public sealed class ElsaHostModule : IHostModule
       // Manually register your custom provider into Elsa's dependency injection container
       elsa.Services.AddSingleton<ITenantsProvider, FinbuckleTenantsProvider>();
       elsa.UseWorkflowsApi();
-      elsa.UseHttp();   // HTTP-triggered workflows
+      elsa.UseHttp(options => options.ConfigureHttpOptions = httpOptions => httpOptions.BaseUrl = new("https://localhost:5100"));   // HTTP-triggered workflows
+
     });
 
     // Elsa's endpoints are FastEndpoints; their authorization runs on this host's schemes (JWT / API key).
@@ -90,7 +92,14 @@ public sealed class ElsaHostModule : IHostModule
     if (options.RequirePermissions)
       app.UseMiddleware<ElsaApiPermissionMiddleware>(options.ApiBasePath);
 
+    // Expose Elsa API endpoints.
+
+
     app.UseWorkflowsApi(options.ApiBasePath.Trim('/'));
     app.UseWorkflows();   // HTTP workflow triggers
+    // app.UseWorkflows(); // Use Elsa middleware to handle HTTP requests mapped to HTTP Endpoint activities.
+    // app.UseRouting();
+    // app.UseWorkflowsSignalRHubs(); // Optional SignalR integration. Elsa Studio uses SignalR to receive real-time updates from the server. 
+
   }
 }
