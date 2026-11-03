@@ -46,6 +46,14 @@ public static class Permissions
         public const string Update = "Permissions.Multitenancy.Tenants.Update";
     }
 
+    public static class Modules
+    {
+        /// <summary>List module packages and download them.</summary>
+        public const string View = "Permissions.Modules.View";
+        /// <summary>Upload, enable, configure and delete packages; restart the app. Uploading code is as powerful as it gets: grant sparingly.</summary>
+        public const string Manage = "Permissions.Modules.Manage";
+    }
+
     public static class Workflows
     {
         /// <summary>Read workflows through the embedded Elsa API (GET).</summary>

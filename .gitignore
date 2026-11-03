@@ -8,3 +8,6 @@ src/ModularBlazor.Client/wwwroot/modules/*.nupkg
 /src/migrations/PostgreSql/Migrations
 /src/migrations/SqlServer/Migrations
 /.playwright-mcp
+
+# Module store (uploaded packages, generated build inputs)
+/src/api/ModularBlazor.Host/modules-store/

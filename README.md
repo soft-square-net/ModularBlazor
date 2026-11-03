@@ -215,6 +215,34 @@ Application + Infrastructure projects only (Elsa owns the workflow entities, so 
 published as their own document `elsa` (`/openapi/elsa.json`, ReDoc `/redoc/elsa`). Scalar lists both in its document selector.
 The Elsa document uses full-type-name schema ids to avoid Elsa's duplicate short names. See `OpenApiDocuments.cs`.
 
+### Module store: download, configure, enable, rebuild (Catalog module)
+
+Host and client modules (`.dll` / `.nupkg`) are kept in a module store (`ModuleStore:Path`, default `modules-store` under the Host
+project, git-ignored): `files/<id>/<file>` plus a `modules.json` manifest. Endpoints under `/api/v1/modules`
+(`Permissions.Modules.View|Manage`, both held by `admin`):
+
+| Endpoint | Purpose |
+|---|---|
+| `POST /packages` (multipart: `file`, `target` = Host\|Client, `name`) | upload; starts disabled; needs `ModuleStore:AllowUpload=true` |
+| `GET /packages?target=`, `GET /packages/{id}`, `GET /packages/{id}/download` | list, details, download the file |
+| `PUT /packages/{id}/enabled` (`{"enabled":true}`) | enable or disable |
+| `PUT /packages/{id}/configuration` (`{"configuration":"{...}"}`) | JSON object, injected as `Modules:<Name>` |
+| `DELETE /packages/{id}`, `POST /restart` | remove; stop the app so the supervisor rebuilds |
+
+**Host modules** extend the API, so they are compiled in: every change regenerates `modules-store/host-modules.props` (a
+`Reference` per enabled dll, a `PackageReference` plus a local feed `modules-store/nuget` per nupkg), which the Host project
+imports, and `host-modules.config.json`, loaded as configuration at startup. At startup `HostModules.All` adds the public
+`IHostModule` types of the enabled packages that are part of the build. `rebuildRequired` in the package list says when an
+enable/disable has not reached the running app yet. To apply it: `POST /restart`, with the app started by
+`scripts/run-host.ps1` (or `.sh`), which rebuilds and starts it again. A dll module must bring its own dependencies (use a nupkg
+for that). Docker/Aspire: the image build copies the store, so rebuild the image after enabling a module.
+
+**Client modules** are stored and downloadable; to make the Blazor client load one, add a `ModuleRegistration` whose `Url` is its
+download endpoint (they are not auto-registered).
+
+**Security.** An enabled host module runs with full trust inside the API. Upload is off by default
+(`ModuleStore:AllowUpload`), `Permissions.Modules.Manage` should be given to few, and every package's SHA-256 is recorded.
+
 ### Multi-tenancy and migrations
 
 `src/migrations/{SqlServer,PostgreSql,MySql}` hold the migrations, one project per provider (`MySql` uses Oracle's `MySql.EntityFrameworkCore`)
