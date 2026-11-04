@@ -50,6 +50,7 @@ if (!Directory.Exists(clientModules))
 builder
     .AddDockerfile("client", "../../..", "src/apps/blazor/ModularBlazor.Client/Dockerfile")
     .WithHttpEndpoint(port: 5000, targetPort: 80, name: "http")
+    .WithEnvironment("BUILD_MODULES", "true")
     .WithExternalHttpEndpoints()
     .WithBindMount(clientModules, "/usr/share/nginx/html/modules", isReadOnly: true)
     .WaitFor(api);
