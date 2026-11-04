@@ -7,13 +7,9 @@
     <RunAOTCompilation>false</RunAOTCompilation>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Content Remove="wwwroot\moduleHost.js" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="wwwroot\moduleHost.js" />
-  </ItemGroup>
+  <!-- wwwroot/moduleHost.js must stay a normal static file: index.html loads it with <script src="moduleHost.js">.
+       (Removing it from Content / embedding it keeps it out of the published site, and the stylesheets of
+       .nupkg modules then fail with "Could not find 'moduleHost.setStyleText'".) -->
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.*" />
