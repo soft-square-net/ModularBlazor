@@ -56,7 +56,7 @@ internal sealed class TenantDatabaseInitializer(
 
         using var scope = scopeFactory.CreateScope();
         scope.ServiceProvider.GetRequiredService<ITenantDatabaseOverride>()
-            .Use(new DatabaseConnection(tenant.Provider, tenant.ConnectionString));
+            .Use(new DatabaseConnection(tenant.Provider, tenant.ConnectionString), tenant.Id);
 
         foreach (var initializer in scope.ServiceProvider.GetServices<IDbInitializer>().Where(i => i is not IControlPlaneDbInitializer))
             await initializer.InitializeAsync(cancellationToken);

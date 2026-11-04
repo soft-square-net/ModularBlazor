@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using soft.square.net.ModularBlazor.Core;
+using soft.square.net.ModularBlazor.Core.Abstractions;
 using soft.square.net.ModularBlazor.Infrastructure.MultiTenancy;
 
 namespace soft.square.net.ModularBlazor.Infrastructure.Persistence;
@@ -11,12 +12,20 @@ namespace soft.square.net.ModularBlazor.Infrastructure.Persistence;
 /// </summary>
 public static class DesignTimeContexts
 {
+    /// <summary>The tenant while generating migrations (the model does not depend on its value).</summary>
+    public static ICurrentTenant Tenant { get; } = new DesignTimeTenant();
+
+    private sealed class DesignTimeTenant : ICurrentTenant
+    {
+        public string Id => "root";
+    }
+
     public static AppDbContext CreateApp(DatabaseProvider provider)
     {
         var builder = new DbContextOptionsBuilder<AppDbContext>();
         DatabaseProviders.Configure(builder, provider, ConnectionString(provider),
             ModuleDbContextRegistration.HistoryTable("App"));
-        return new AppDbContext(builder.Options);
+        return new AppDbContext(builder.Options, Tenant);
     }
 
     public static TenantStoreDbContext CreateTenantStore(DatabaseProvider provider)

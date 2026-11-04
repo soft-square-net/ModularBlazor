@@ -1,10 +1,12 @@
 using Microsoft.EntityFrameworkCore;
+using soft.square.net.ModularBlazor.Core.Abstractions;
 using soft.square.net.ModularBlazor.Host.Modules.Catalog.Domain;
 using soft.square.net.ModularBlazor.Infrastructure.Persistence;
 
 namespace soft.square.net.ModularBlazor.Host.Modules.Catalog.Infrastructure.Persistence;
 
-public sealed class CatalogDbContext(DbContextOptions<CatalogDbContext> options) : ModuleDbContext(options)
+public sealed class CatalogDbContext(DbContextOptions<CatalogDbContext> options, ICurrentTenant currentTenant)
+    : ModuleDbContext(options, currentTenant)
 {
     protected override string Schema => SchemaNames.Catalog;
 

@@ -243,6 +243,24 @@ download endpoint (they are not auto-registered).
 **Security.** An enabled host module runs with full trust inside the API. Upload is off by default
 (`ModuleStore:AllowUpload`), `Permissions.Modules.Manage` should be given to few, and every package's SHA-256 is recorded.
 
+### One tenant model in the data layer: DbContextTenantBase
+
+Every DbContext that holds business data (the Host's `AppDbContext` and the Auth, Catalog and Multitenancy contexts, through
+`ModuleDbContext`) derives from `DbContextTenantBase`. It does what Finbuckle's `MultiTenantDbContext` does, against
+`ICurrentTenant`: a `TenantId` column on every entity, stamped on insert, a global query filter on it (together with the
+soft-delete filter), and an error when a row of another tenant is changed or deleted. The tenant is the one Finbuckle resolved
+from `X-Tenant`, or **root** when the header is absent; an `X-Tenant` that matches no tenant is a 404 (it no longer falls back to
+root). While a tenant's database is provisioned, `ITenantDatabaseOverride.Use(connection, tenantId)` also sets the tenant.
+The Multitenancy context (platform data shared by all tenants) opts out with `IsTenantScoped => false`; Finbuckle's own
+tenant store keeps its own context.
+
+**Tokens are per tenant.** `POST /api/v1/identity/tokens` signs the user in to the tenant of `X-Tenant` (root by default),
+looks the user up in that tenant's data and issues a JWT with that `tenant` claim; the token is refused for any other tenant.
+The OpenAPI documents show `X-Tenant` on every operation.
+
+**Elsa** gets its tenant from the same place (`FinbuckleTenantResolver` uses `ICurrentTenant`) and lists the tenants of the
+tenant store, root included, so Elsa's tenant id is always the Finbuckle tenant id.
+
 ### Multi-tenancy and migrations
 
 `src/migrations/{SqlServer,PostgreSql,MySql}` hold the migrations, one project per provider (`MySql` uses Oracle's `MySql.EntityFrameworkCore`)

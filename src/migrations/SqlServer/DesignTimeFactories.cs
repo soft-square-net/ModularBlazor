@@ -24,17 +24,17 @@ public sealed class TenantStoreDbContextFactory : IDesignTimeDbContextFactory<Te
 public sealed class AuthDbContextFactory : IDesignTimeDbContextFactory<AuthDbContext>
 {
     public AuthDbContext CreateDbContext(string[] args)
-        => new(DesignTimeContexts.ModuleOptions<AuthDbContext>(DatabaseProvider.SqlServer, "Auth"));
+        => new(DesignTimeContexts.ModuleOptions<AuthDbContext>(DatabaseProvider.SqlServer, "Auth"), DesignTimeContexts.Tenant);
 }
 
 public sealed class CatalogDbContextFactory : IDesignTimeDbContextFactory<CatalogDbContext>
 {
     public CatalogDbContext CreateDbContext(string[] args)
-        => new(DesignTimeContexts.ModuleOptions<CatalogDbContext>(DatabaseProvider.SqlServer, "Catalog"));
+        => new(DesignTimeContexts.ModuleOptions<CatalogDbContext>(DatabaseProvider.SqlServer, "Catalog"), DesignTimeContexts.Tenant);
 }
 
 public sealed class MultitenancyDbContextFactory : IDesignTimeDbContextFactory<MultitenancyDbContext>
 {
     public MultitenancyDbContext CreateDbContext(string[] args)
-        => new(DesignTimeContexts.ModuleOptions<MultitenancyDbContext>(DatabaseProvider.SqlServer, "Multitenancy"));
+        => new(DesignTimeContexts.ModuleOptions<MultitenancyDbContext>(DatabaseProvider.SqlServer, "Multitenancy"), DesignTimeContexts.Tenant);
 }

@@ -3,6 +3,7 @@ using FastEndpoints.Swagger;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using Microsoft.EntityFrameworkCore;
+using NJsonSchema;
 using NJsonSchema.Generation;
 using NSwag;
 using NSwag.Generation.AspNetCore;
@@ -74,6 +75,20 @@ void AddSecuritySchemes(NSwag.Generation.AspNetCore.AspNetCoreOpenApiDocumentGen
   });
   settings.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("JWT"));
   settings.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("ApiKey"));
+
+  // Every operation, including POST /api/v1/identity/tokens, runs for one tenant: the X-Tenant header (default: root).
+  settings.OperationProcessors.Add(new OperationProcessor(context =>
+  {
+    context.OperationDescription.Operation.Parameters.Add(new OpenApiParameter
+    {
+      Name = "X-Tenant",
+      Kind = OpenApiParameterKind.Header,
+      Type = JsonObjectType.String,
+      IsRequired = false,
+      Description = "Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for."
+    });
+    return true;
+  }));
 }
 
 //// 1. Register the filtered document in Program.cs

@@ -1,10 +1,12 @@
 using Microsoft.EntityFrameworkCore;
+using soft.square.net.ModularBlazor.Core.Abstractions;
 using soft.square.net.ModularBlazor.Host.Modules.Auth.Domain;
 using soft.square.net.ModularBlazor.Infrastructure.Persistence;
 
 namespace soft.square.net.ModularBlazor.Host.Modules.Auth.Infrastructure.Persistence;
 
-public sealed class AuthDbContext(DbContextOptions<AuthDbContext> options) : ModuleDbContext(options)
+public sealed class AuthDbContext(DbContextOptions<AuthDbContext> options, ICurrentTenant currentTenant)
+    : ModuleDbContext(options, currentTenant)
 {
     protected override string Schema => SchemaNames.Auth;
 

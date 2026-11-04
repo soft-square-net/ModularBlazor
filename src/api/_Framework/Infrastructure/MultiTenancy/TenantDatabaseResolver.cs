@@ -15,7 +15,11 @@ public interface ITenantDatabaseResolver
 /// <summary>Points the current scope at a specific database (provisioning a tenant outside of a request).</summary>
 public interface ITenantDatabaseOverride
 {
-    void Use(DatabaseConnection database);
+    /// <summary>Also makes <paramref name="tenantId"/> the current tenant of the scope, so rows are stamped with it.</summary>
+    void Use(DatabaseConnection database, string? tenantId = null);
+
+    /// <summary>The tenant set with <see cref="Use"/>, if any.</summary>
+    string? TenantId { get; }
 }
 
 /// <summary>
@@ -29,7 +33,13 @@ internal sealed class TenantDatabaseResolver(
 {
     private DatabaseConnection? _override;
 
-    public void Use(DatabaseConnection database) => _override = database;
+    public string? TenantId { get; private set; }
+
+    public void Use(DatabaseConnection database, string? tenantId = null)
+    {
+        _override = database;
+        TenantId = tenantId;
+    }
 
     public DatabaseConnection Resolve()
     {

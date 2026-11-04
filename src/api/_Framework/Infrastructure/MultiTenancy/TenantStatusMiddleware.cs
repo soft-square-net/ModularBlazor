@@ -14,6 +14,16 @@ public static class TenantStatusMiddleware
             var tenant = context.RequestServices.GetService<IMultiTenantContextAccessor<AppTenantInfo>>()
                 ?.MultiTenantContext?.TenantInfo;
 
+            // An X-Tenant that matches no tenant is an error, not "the root tenant".
+            if (tenant is null
+                && context.Request.Headers.TryGetValue(MultiTenancyExtensions.TenantHeader, out var requested)
+                && !string.IsNullOrWhiteSpace(requested.ToString()))
+            {
+                await Results.Problem($"Tenant '{requested}' was not found.", statusCode: StatusCodes.Status404NotFound)
+                    .ExecuteAsync(context);
+                return;
+            }
+
             if (tenant is not null)
             {
                 var now = context.RequestServices.GetRequiredService<TimeProvider>().GetUtcNow().UtcDateTime;

@@ -1,17 +1,19 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using soft.square.net.ModularBlazor.Core.Abstractions;
 using soft.square.net.ModularBlazor.Infrastructure.MultiTenancy;
 
 namespace soft.square.net.ModularBlazor.Infrastructure.Persistence;
 
 /// <summary>
 /// Base for a module's DbContext. Every IEntityTypeConfiguration in the module's assembly is applied
-/// automatically (put them under Persistence/Configurations), then the BaseDbContext conventions.
+/// automatically (put them under Persistence/Configurations), then the DbContextTenantBase conventions (tenant column and filter, soft delete, audit).
 /// Each module owns a schema named after it (<see cref="SchemaNames"/>): Auth.Users, Catalog.Modules, ... Name
 /// tables plainly in the configurations. MySQL has no schemas, so there the schema name is prefixed to the
 /// table names (Auth_Users) instead.
 /// </summary>
-public abstract class ModuleDbContext(DbContextOptions options) : BaseDbContext(options)
+public abstract class ModuleDbContext(DbContextOptions options, ICurrentTenant currentTenant)
+    : DbContextTenantBase(options, currentTenant)
 {
     /// <summary>The module's schema, one of <see cref="SchemaNames"/>.</summary>
     protected abstract string Schema { get; }
