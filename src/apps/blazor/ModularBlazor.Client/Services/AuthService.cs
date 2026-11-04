@@ -1,4 +1,5 @@
 using soft.square.net.ModularBlazor.Abstractions;
+using soft.square.net.ModularBlazor.Abstractions.Api;
 
 namespace soft.square.net.ModularBlazor.Client.Services;
 
@@ -6,7 +7,7 @@ namespace soft.square.net.ModularBlazor.Client.Services;
 /// Demo authentication: any non-empty user name and password signs in; the user name "admin" gets
 /// the admin role. Replace LoginAsync with a call to your identity provider.
 /// </summary>
-public sealed class AuthService(ModuleManager modules) : IAuthService
+public sealed class AuthService(ModuleManager modules, IApiClient apiClient) : IAuthService
 {
     public bool IsAuthenticated => UserName is not null;
     public string? UserName { get; private set; }
@@ -19,6 +20,8 @@ public sealed class AuthService(ModuleManager modules) : IAuthService
         if (string.IsNullOrWhiteSpace(userName) || string.IsNullOrEmpty(password)) return false;
 
         var role = userName.Trim().Equals("admin", StringComparison.OrdinalIgnoreCase) ? "admin" : "user";
+
+        var token = apiClient.IssueTokenAsync(new() { UserName = userName, Password = password });
 
         // Phase 2: only now does the app learn which modules this user has (metadata only).
         await modules.LoadUserModulesAsync(role);

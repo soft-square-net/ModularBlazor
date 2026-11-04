@@ -16,7 +16,11 @@
   <input id="password" type="password" @bind="_password" autocomplete="current-password" />
 
   <label for="tenant">Tenant</label>
-  <input id="tenant" type="password" @bind="_tenant" autocomplete="current-password" />
+  <select id="tenant" type="password" @bind="_tenant" autocomplete="current-tenent">
+      <optgroup>
+          <option value="root" selected>root</option>
+      </optgroup>
+  </select>
 
   @if (_error is not null)
   {
@@ -29,8 +33,8 @@
 @code {
   [Parameter, SupplyParameterFromQuery] public string? ReturnUrl { get; set; }
 
-  private string _userName = "";
-  private string _password = "";
+  private string _userName = "admin";
+  private string _password = "123Pa$$word!";
   private string _tenant = "root";
   private string? _error;
   private bool _busy;

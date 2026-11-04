@@ -12,13 +12,13 @@ namespace soft.square.net.ModularBlazor.Infrastructure.MultiTenancy;
 public static class MultiTenancyExtensions
 {
     /// <summary>The request header that names the tenant, e.g. "X-Tenant: acme".</summary>
-    public const string TenantHeader = "X-Tenant";
+    public const string TenantHeader = "X-Tenant"; 
 
-    /// <summary>
-    /// Finbuckle multi-tenancy with an EF Core tenant store and one database per tenant.
-    /// Configuration: ConnectionStrings:TenantStore and TenantStore:Provider (SqlServer | PostgreSql | MySql).
-    /// </summary>
-    public static IServiceCollection AddMultiTenancy(this IServiceCollection services, IConfiguration configuration)
+  /// <summary>
+  /// Finbuckle multi-tenancy with an EF Core tenant store and one database per tenant.
+  /// Configuration: ConnectionStrings:TenantStore and TenantStore:Provider (SqlServer | PostgreSql | MySql).
+  /// </summary>
+  public static IServiceCollection AddMultiTenancy(this IServiceCollection services, IConfiguration configuration)
     {
         var storeProvider = configuration.GetValue("TenantStore:Provider", DatabaseProvider.SqlServer);
         var storeConnection = configuration.GetConnectionString("TenantStore")

@@ -44,8 +44,8 @@ builder.Services.AddCarter(configurator: c => c.WithModules(HostModules.CarterMo
 
 builder.Services.AddCors(options => options.AddPolicy("client", policy =>
 {
-  //var origins = builder.Configuration.GetSection("Cors:Origins").Get<string[]>() ?? [];
-  //policy.WithOrigins(origins).AllowAnyHeader().AllowAnyMethod().WithExposedHeaders("x-elsa-workflow-instance-id");
+  var origins = builder.Configuration.GetSection("Cors:Origins").Get<string[]>() ?? [];
+  policy.WithOrigins(origins).AllowAnyHeader().AllowAnyMethod().WithExposedHeaders("x-elsa-workflow-instance-id");
 
   // var origins = builder.Configuration.GetSection("Cors:Origins").Get<string[]>() ?? [];
   policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().WithExposedHeaders("x-elsa-workflow-instance-id");
@@ -123,7 +123,6 @@ builder.Services.AddOpenApiDocument(settings =>
 });
 
 
-
 var app = builder.Build();
 
 // Creates/updates the databases and seeds them (used by the Aspire containers): the tenant store (with the
@@ -138,6 +137,7 @@ if (app.Configuration.GetValue<bool>("Database:MigrateOnStartup"))
 // Validation failures from the CQRS pipeline become 400 problem responses.
 app.UseExceptionHandler();
 
+// Enable CORS for the client application
 app.UseCors("client");
 
 // Resolves the tenant from the X-Tenant header (Finbuckle). Requests without one simply have no tenant.

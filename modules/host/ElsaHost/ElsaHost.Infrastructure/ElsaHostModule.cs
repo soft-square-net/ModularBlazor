@@ -8,6 +8,7 @@ using Elsa.Persistence.EFCore.Modules.Runtime;
 using Elsa.Tenants.Extensions;
 using FastEndpoints.Swagger; // <-- Make sure to include this namespace
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -109,13 +110,18 @@ public sealed class ElsaHostModule : IHostModule
       elsa.UseTenants(tenants =>
           {
             tenants.ConfigureMultitenancy(o => o.TenantResolverPipelineBuilder.Append<FinbuckleTenantResolver>());
+
+
+            // CRITICAL: Tells Elsa how to get the list of all tenants for background workers
             // tenants.UseTenantsProvider<FinbuckleTenantsProvider>();
           });
       // Manually register your custom provider into Elsa's dependency injection container
+      services.AddSingleton<ITenantsProvider, FinbuckleTenantsProvider>();
+
       elsa.Services.AddSingleton<ITenantsProvider, FinbuckleTenantsProvider>();
       elsa.UseWorkflowsApi();
       elsa.UseHttp(options => options.ConfigureHttpOptions = httpOptions => httpOptions.BaseUrl = new("https://localhost:5100"));   // HTTP-triggered workflows
-
+                                                                                                                                    // CRITICAL: Force Elsa to use a dedicated DbContext scope that configures 
     });
 
     // Elsa's endpoints are FastEndpoints; their authorization runs on this host's schemes (JWT / API key).

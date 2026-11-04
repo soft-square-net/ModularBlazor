@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using soft.square.net.ModularBlazor.Abstractions;
+using soft.square.net.ModularBlazor.Abstractions.Api;
 using soft.square.net.ModularBlazor.Client;
 using soft.square.net.ModularBlazor.Client.Services;
 
@@ -14,7 +15,7 @@ builder.Services.AddSingleton<ModuleManager>();
 builder.Services.AddSingleton<IModuleNavigation>(sp => sp.GetRequiredService<ModuleManager>());
 builder.Services.AddSingleton<AuthService>();
 builder.Services.AddSingleton<IAuthService>(sp => sp.GetRequiredService<AuthService>());
-
+builder.Services.AddScoped<IApiClient, ApiClient>();
 var host = builder.Build();
 
 // Phase 1: the main modules (layouts, login) are downloaded before the first render.
