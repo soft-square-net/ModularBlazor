@@ -27,56 +27,65 @@ var redis = builder
     .WithDataVolume("modularblazor-redis-data");
 
 // ---------------------------------------------------------------- applications (built from Dockerfiles)
-// var hostCertFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".aspnet", "https");
+
+// HTTPS: both containers serve https with the development certificate in a password-protected .pfx that is
+// bind-mounted at /https/aspnetapp.pfx. Create it once (use the same password for the "cert-password" parameter):
+//   dotnet dev-certs https -ep src/api/ModularBlazor.Host/aspnetapp.pfx -p <password>
+//   (copy it to src/apps/blazor/ModularBlazor.Client/aspnetapp.pfx) and: dotnet dev-certs https --trust
+// In PowerShell put the password in single quotes: '123Pa$$word!' (double quotes expand "$$").
 var certPassword = builder.AddParameter("cert-password", secret: true);
 
-    // Mount the host certificate folder into the container's expected path
-    // .WithBindMount(hostCertFolder, "/root/.aspnet/https")
+string Existing(params string[] parts)
+{
+    var path = Path.GetFullPath(Path.Combine([builder.AppHostDirectory, .. parts]));
+    return File.Exists(path) || Directory.Exists(path)
+        ? path
+        : throw new FileNotFoundException($"Not found: {path}");
+}
 
+var apiCert = Existing("..", "..", "api", "ModularBlazor.Host", "aspnetapp.pfx");
+var clientCert = Existing("..", "..", "apps", "blazor", "ModularBlazor.Client", "aspnetapp.pfx");
 
-
-
+// soft.square.net.ModularBlazor.Host (the API). The Docker build context is the repository root. The ports are the
+// ones the Dockerfile sets (ASPNETCORE_HTTP_PORTS / ASPNETCORE_HTTPS_PORTS).
 var api = builder
     .AddDockerfile("host-api", "../../..", "src/api/ModularBlazor.Host/Dockerfile")
-    .WithImage("host-api") // Sets a fixed repository name
-    .WithImageTag("latest") // Fixes the tag so it reuses the image instead of generating a new hash
+    .WithImage("host-api")
+    .WithImageTag("latest")
     .WithHttpEndpoint(port: 5100, targetPort: 5100, name: "http")
     .WithHttpsEndpoint(port: 5101, targetPort: 5101, name: "https")
-    //  .WithEnvironment("ASPNETCORE_URLS", "http://+:5100;https://+:5101")
-    .WithDeveloperCertificateTrust(trust:true)
+    .WithExternalHttpEndpoints()
+    .WithBindMount(apiCert, "/https/aspnetapp.pfx", isReadOnly: true)
+    .WithEnvironment("Kestrel__Certificates__Default__Path", "/https/aspnetapp.pfx")
+    .WithEnvironment("Kestrel__Certificates__Default__Password", certPassword)
     .WithEnvironment("ASPNETCORE_ENVIRONMENT", "Development")
     .WithEnvironment("Documentation__Enabled", "true")
     .WithEnvironment("TenantStore__Provider", "PostgreSql")
     .WithEnvironment("Database__MigrateOnStartup", "true")
-    .WithEnvironment("Cors__AllowedOrigins__0", "http://*:5000")
-    .WithEnvironment("Cors__AllowedOrigins__1", "https://*:5001")
+    // Cors:Origins is what the API reads; browsers send the exact origin of the page (no wildcards).
+    .WithEnvironment("Cors__Origins__0", "http://localhost:5000")
+    .WithEnvironment("Cors__Origins__1", "https://localhost:5001")
     .WithReference(tenantStore)
     .WithReference(redis)
     .WaitFor(tenantStore)
     .WaitFor(redis);
 
-// soft.square.net.ModularBlazor.Client (Blazor WebAssembly served by nginx). The project lives in src/apps/blazor.
+// soft.square.net.ModularBlazor.Client (Blazor WebAssembly served by nginx on 5000 http / 5001 https).
 // The modules folder is bind-mounted over the image's copy, so modules rebuilt locally (build-modules.*) show up
-// without rebuilding the image. The path is resolved from the AppHost's own folder and checked: a wrong path would
-// otherwise make Docker create an empty folder and the client would start without its modules.
-var clientModules = Path.GetFullPath(Path.Combine(builder.AppHostDirectory, "..", "..", "apps", "blazor", "ModularBlazor.Client", "wwwroot", "modules"));
-if (!Directory.Exists(clientModules))
-  throw new DirectoryNotFoundException($"Client modules folder not found: {clientModules}");
+// without rebuilding the image.
+var clientModules = Existing("..", "..", "apps", "blazor", "ModularBlazor.Client", "wwwroot", "modules");
 
 builder
     .AddDockerfile("client", "../../..", "src/apps/blazor/ModularBlazor.Client/Dockerfile")
-    .WithImage("client") // Sets a fixed repository name
-    .WithImageTag("latest") // Fixes the tag
+    .WithImage("client")
+    .WithImageTag("latest")
     .WithHttpEndpoint(port: 5000, targetPort: 5000, name: "http")
     .WithHttpsEndpoint(port: 5001, targetPort: 5001, name: "https")
-   //  .WithEnvironment("ASPNETCORE_URLS", "http://+:5000;https://+:5001")
-    .WithEnvironment("BUILD_MODULES", "false")
-    .WithDeveloperCertificateTrust(trust: true)
     .WithExternalHttpEndpoints()
+    .WithBuildArg("BUILD_MODULES", "false")
     .WithBindMount(clientModules, "/usr/share/nginx/html/modules", isReadOnly: true)
+    .WithBindMount(clientCert, "/https/aspnetapp.pfx", isReadOnly: true)
+    .WithEnvironment("CERT_PASSWORD", certPassword)
     .WaitFor(api);
 
 builder.Build().Run();
-
-// dotnet dev-certs https -ep %USERPROFILE%\.aspnet\https\aspnetapp.pfx -p 123Pa$$word!
-

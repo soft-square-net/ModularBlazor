@@ -15,7 +15,14 @@ builder.Services.AddSingleton<ModuleManager>();
 builder.Services.AddSingleton<IModuleNavigation>(sp => sp.GetRequiredService<ModuleManager>());
 builder.Services.AddSingleton<AuthService>();
 builder.Services.AddSingleton<IAuthService>(sp => sp.GetRequiredService<AuthService>());
-builder.Services.AddScoped<IApiClient, ApiClient>();
+
+// The API is another origin than the page. ApiBaseUrl (wwwroot/appsettings.json) wins; otherwise the API port that
+// matches the page's scheme (an https page may not call an http API: browsers block it as mixed content).
+var apiBase = builder.Configuration["ApiBaseUrl"];
+if (string.IsNullOrWhiteSpace(apiBase))
+    apiBase = new Uri(builder.HostEnvironment.BaseAddress).Scheme == "https" ? "https://localhost:5101" : "http://localhost:5100";
+builder.Services.AddScoped<IApiClient>(_ => new ApiClient(new HttpClient { BaseAddress = new Uri(apiBase) }));
+
 var host = builder.Build();
 
 // Phase 1: the main modules (layouts, login) are downloaded before the first render.
