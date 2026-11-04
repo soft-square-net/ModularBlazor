@@ -152,7 +152,7 @@ with `AddModuleRepository`, the initializer as `IDbInitializer`), reference the 
 `EntitiesByPaginationFilterSpec<T>` and their projecting `<T, TResult>` versions (keyword search over text properties,
 `OrderBy` like `["Name", "CreatedOnUtc desc"]`, skip/take; use `repository.PaginatedListAsync(spec, filter)`).
 
-**Infrastructure**: `BaseDbContext` (soft-delete query filter, column conventions), `AuditingInterceptor` (CreatedOnUtc/By,
+**Infrastructure**: `DbContextTenantBase` (tenant column and filter, soft-delete query filter, column conventions), `AuditingInterceptor` (CreatedOnUtc/By,
 LastModifiedOnUtc/By, delete -> soft delete), `DomainEventsInterceptor` (publishes events through MediatR after a save),
 `ModuleDbContext`, `EfRepository<TContext, T>`, `DbInitializer<TContext>`. Unlike FullStackHero's shared-database mode there is no
 row-level `TenantId`: every tenant has its own database.
