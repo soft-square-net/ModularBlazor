@@ -1,10 +1,13 @@
 # Build context: the repository root (see src/Aspire/Host/Program.cs).
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
-WORKDIR ../../src
+WORKDIR /src
 COPY . .
-# Build the client modules (.dll / .nupkg) into wwwroot/modules, then publish the WebAssembly app.
-# RUN sed -i 's/\r$//' build-modules.sh && bash build-modules.sh Release
 
+# The client modules (.dll / .nupkg) in wwwroot/modules come with the sources. Set BUILD_MODULES=true to rebuild
+# them from modules/client/* inside the image (slower). Under Aspire the folder is also bind-mounted over the image's copy,
+# so the modules you build locally with build-modules.* win either way.
+ARG BUILD_MODULES=false
+RUN if [ "$BUILD_MODULES" = "true" ]; then sed -i 's/\r$//' build-modules.sh && bash build-modules.sh Release; fi
 
 # Force HTTP/1.1 to fix transport stream termination drops
 ENV DOTNET_SYSTEM_NET_HTTP_SOCKETSHTTPHANDLER_HTTP2SUPPORT=false
@@ -15,7 +18,7 @@ ENV DOTNET_HTTP_TIMEOUT=300
 # Instruct NuGet to automatically retry on network drops
 ENV NUGET_ENABLE_RETRY_ON_FAILURE=true
 
-RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages \ 
+RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages \
 	dotnet publish src/apps/blazor/ModularBlazor.Client/ModularBlazor.Client.csproj -c Release -o /out
 
 FROM nginx:alpine AS final

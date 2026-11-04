@@ -3,5 +3,3 @@
 **/.vs
 **/.git
 artifacts
-src/ModularBlazor.Client/wwwroot/modules/*.dll
-src/ModularBlazor.Client/wwwroot/modules/*.nupkg

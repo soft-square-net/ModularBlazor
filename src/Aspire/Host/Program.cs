@@ -39,17 +39,19 @@ var api = builder
     .WaitFor(tenantStore)
     .WaitFor(redis);
 
-// soft.square.net.ModularBlazor.Client (Blazor WebAssembly served by nginx).
-//builder
-//    .AddDockerfile("client", "../../..", "src/apps/blazor/ModularBlazor.Client/Dockerfile")
-//    .WithHttpEndpoint(port: 5000, targetPort: 80, name: "http")
-//    .WithExternalHttpEndpoints()
-//    .WaitFor(api);
+// soft.square.net.ModularBlazor.Client (Blazor WebAssembly served by nginx). The project lives in src/apps/blazor.
+// The modules folder is bind-mounted over the image's copy, so modules rebuilt locally (build-modules.*) show up
+// without rebuilding the image. The path is resolved from the AppHost's own folder and checked: a wrong path would
+// otherwise make Docker create an empty folder and the client would start without its modules.
+var clientModules = Path.GetFullPath(Path.Combine(builder.AppHostDirectory, "..", "..", "apps", "blazor", "ModularBlazor.Client", "wwwroot", "modules"));
+if (!Directory.Exists(clientModules))
+    throw new DirectoryNotFoundException($"Client modules folder not found: {clientModules}");
+
 builder
     .AddDockerfile("client", "../../..", "src/apps/blazor/ModularBlazor.Client/Dockerfile")
     .WithHttpEndpoint(port: 5000, targetPort: 80, name: "http")
     .WithExternalHttpEndpoints()
-    .WithBindMount("../../apps/blazor/ModularBlazor.Client/wwwroot/modules", "/usr/share/nginx/html/modules")
+    .WithBindMount(clientModules, "/usr/share/nginx/html/modules", isReadOnly: true)
     .WaitFor(api);
 
 builder.Build().Run();
