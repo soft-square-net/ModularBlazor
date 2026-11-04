@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace soft.square.net.ModularBlazor.Abstractions;
 
 public enum ModuleKind
@@ -10,11 +12,12 @@ public enum ModuleKind
 }
 
 /// <summary>A menu entry contributed by a module. Href is relative to the app base.</summary>
-public sealed record ModuleNavItem(string Title, string Href, int Order = 100);
+public sealed record ModuleNavItem( string Title, string Href, int Order = 100);
 
 /// <summary>Metadata the host needs to know about a module before its code is downloaded.</summary>
 public sealed class ModuleDescriptor
 {
+    [Key]
     public string Id { get; set; } = "";
     public string Name { get; set; } = "";
     public string Version { get; set; } = "1.0.0";

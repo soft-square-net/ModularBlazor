@@ -3,7 +3,7 @@ param([string]$Config = "Release")
 $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
 
-$out = "src/ModularBlazor.Client/wwwroot/modules"
+$out = "src/apps/blazor/ModularBlazor.Client/wwwroot/modules"
 New-Item -ItemType Directory -Force -Path $out | Out-Null
 Remove-Item "$out/*.dll", "$out/*.nupkg" -ErrorAction SilentlyContinue
 

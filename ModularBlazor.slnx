@@ -18,9 +18,16 @@
     <Project Path="modules/host/Multitenancy/Multitenancy.Domain/Multitenancy.Domain.csproj" />
     <Project Path="modules/host/Multitenancy/Multitenancy.Infrastructure/Multitenancy.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/Solution/">
+    <File Path=".dockerignore" />
+    <File Path=".gitignore" />
+    <File Path="build-modules.ps1" />
+    <File Path="build-modules.sh" />
+    <File Path="Directory.Build.props" />
+    <File Path="README.md" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/ModularBlazor.Abstractions/ModularBlazor.Abstractions.csproj" />
-    <Project Path="src/ModularBlazor.Client/ModularBlazor.Client.csproj" />
     <Project Path="src/Share.All/Share.All.csproj" Id="1e77fb8d-d73a-4160-b58a-b98df7a9e673" />
   </Folder>
   <Folder Name="/src/api/">
@@ -29,6 +36,10 @@
   <Folder Name="/src/api/_Framework/">
     <Project Path="src/api/_Framework/Core/Core.csproj" />
     <Project Path="src/api/_Framework/Infrastructure/Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/apps/" />
+  <Folder Name="/src/apps/blazor/">
+    <Project Path="src/apps/blazor/ModularBlazor.Client/ModularBlazor.Client.csproj" />
   </Folder>
   <Folder Name="/src/Aspire/">
     <Project Path="src/Aspire/Host/Host.csproj" />

@@ -40,10 +40,16 @@ var api = builder
     .WaitFor(redis);
 
 // soft.square.net.ModularBlazor.Client (Blazor WebAssembly served by nginx).
+//builder
+//    .AddDockerfile("client", "../../..", "src/apps/blazor/ModularBlazor.Client/Dockerfile")
+//    .WithHttpEndpoint(port: 5000, targetPort: 80, name: "http")
+//    .WithExternalHttpEndpoints()
+//    .WaitFor(api);
 builder
-    .AddDockerfile("client", "../../..", "src/ModularBlazor.Client/Dockerfile")
+    .AddDockerfile("client", "../../..", "src/apps/blazor/ModularBlazor.Client/Dockerfile")
     .WithHttpEndpoint(port: 5000, targetPort: 80, name: "http")
     .WithExternalHttpEndpoints()
+    .WithBindMount("../../apps/blazor/ModularBlazor.Client/wwwroot/modules", "/usr/share/nginx/html/modules")
     .WaitFor(api);
 
 builder.Build().Run();

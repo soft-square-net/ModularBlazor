@@ -5,7 +5,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 CONFIG="${1:-Release}"
-OUT="src/ModularBlazor.Client/wwwroot/modules"
+OUT="src/apps/blazor/ModularBlazor.Client/wwwroot/modules"
 mkdir -p "$OUT"
 rm -f "$OUT"/*.dll "$OUT"/*.nupkg
 

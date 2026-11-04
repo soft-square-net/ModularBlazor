@@ -1,9 +1,9 @@
 # Build context: the repository root (see src/Aspire/Host/Program.cs).
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
-WORKDIR /src
+WORKDIR ../../src
 COPY . .
 # Build the client modules (.dll / .nupkg) into wwwroot/modules, then publish the WebAssembly app.
-RUN sed -i 's/\r$//' build-modules.sh && bash build-modules.sh Release
+# RUN sed -i 's/\r$//' build-modules.sh && bash build-modules.sh Release
 
 
 # Force HTTP/1.1 to fix transport stream termination drops
@@ -16,9 +16,9 @@ ENV DOTNET_HTTP_TIMEOUT=300
 ENV NUGET_ENABLE_RETRY_ON_FAILURE=true
 
 RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages \ 
-	dotnet publish src/ModularBlazor.Client/ModularBlazor.Client.csproj -c Release -o /out
+	dotnet publish src/apps/blazor/ModularBlazor.Client/ModularBlazor.Client.csproj -c Release -o /out
 
 FROM nginx:alpine AS final
-COPY src/ModularBlazor.Client/nginx.conf /etc/nginx/conf.d/default.conf
+COPY src/apps/blazor/ModularBlazor.Client/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /out/wwwroot /usr/share/nginx/html
 EXPOSE 80
