@@ -33,7 +33,7 @@ var redis = builder
 //   dotnet dev-certs https -ep src/api/ModularBlazor.Host/aspnetapp.pfx -p <password>
 //   (copy it to src/apps/blazor/ModularBlazor.Client/aspnetapp.pfx) and: dotnet dev-certs https --trust
 // In PowerShell put the password in single quotes: '123Pa$$word!' (double quotes expand "$$").
-var certPassword = builder.AddParameter("cert-password", secret: true);
+var certPassword = builder.AddParameter("my-cert-password", secret: true);
 
 string Existing(params string[] parts)
 {
