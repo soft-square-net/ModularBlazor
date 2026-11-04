@@ -1,3 +1,4 @@
+# ───── client ───── 
 # Build context: the repository root (see src/Aspire/Host/Program.cs).
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src

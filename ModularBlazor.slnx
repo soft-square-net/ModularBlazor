@@ -24,6 +24,7 @@
     <File Path="build-modules.ps1" />
     <File Path="build-modules.sh" />
     <File Path="Directory.Build.props" />
+    <File Path="extract-solution.ps1" />
     <File Path="README.md" />
   </Folder>
   <Folder Name="/src/">

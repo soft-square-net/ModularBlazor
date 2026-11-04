@@ -1,3 +1,4 @@
+# ───── host-api ───── 
 # Build context: the repository root (see src/Aspire/Host/Program.cs).
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
@@ -21,3 +22,6 @@ COPY --from=build /out .
 ENV ASPNETCORE_HTTP_PORTS=8080
 EXPOSE 8080
 ENTRYPOINT ["dotnet", "soft.square.net.ModularBlazor.Host.dll"]
+
+
+

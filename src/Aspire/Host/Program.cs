@@ -1,5 +1,9 @@
 using StackExchange.Redis;
 
+
+// Force Docker Desktop to group all spun-up containers under this project name
+Environment.SetEnvironmentVariable("COMPOSE_PROJECT_NAME", "Modular_Blazor_App");
+
 bool loadPgreAdmin = true;
 var builder = DistributedApplication.CreateBuilder(args);
 
@@ -27,6 +31,8 @@ var redis = builder
 // soft.square.net.ModularBlazor.Host (the API). The Docker build context is the repository root.
 var api = builder
     .AddDockerfile("host-api", "../../..", "src/api/ModularBlazor.Host/Dockerfile")
+    .WithImage("host-api") // Sets a fixed repository name
+    .WithImageTag("latest") // Fixes the tag so it reuses the image instead of generating a new hash
     .WithHttpEndpoint(port: 5100, targetPort: 8080, name: "http")
     .WithExternalHttpEndpoints()
     .WithEnvironment("ASPNETCORE_ENVIRONMENT", "Development")
@@ -49,6 +55,8 @@ if (!Directory.Exists(clientModules))
 
 builder
     .AddDockerfile("client", "../../..", "src/apps/blazor/ModularBlazor.Client/Dockerfile")
+    .WithImage("client") // Sets a fixed repository name
+    .WithImageTag("latest") // Fixes the tag
     .WithHttpEndpoint(port: 5000, targetPort: 80, name: "http")
     .WithEnvironment("BUILD_MODULES", "true")
     .WithExternalHttpEndpoints()

@@ -9,52 +9,56 @@
 <p class="hint">Demo: any user name and password works. Sign in as <code>admin</code> to receive the admin modules.</p>
 
 <form @onsubmit="SignInAsync" @onsubmit:preventDefault>
-    <label for="user">User name</label>
-    <input id="user" @bind="_userName" autocomplete="username" />
+  <label for="user">User name</label>
+  <input id="user" @bind="_userName" autocomplete="username" />
 
-    <label for="password">Password</label>
-    <input id="password" type="password" @bind="_password" autocomplete="current-password" />
+  <label for="password">Password</label>
+  <input id="password" type="password" @bind="_password" autocomplete="current-password" />
 
-    @if (_error is not null)
-    {
-        <p class="error-text">@_error</p>
-    }
+  <label for="tenant">Tenant</label>
+  <input id="tenant" type="password" @bind="_tenant" autocomplete="current-password" />
 
-    <button type="submit" disabled="@_busy">@(_busy ? "Loading your modules…" : "Sign in")</button>
+  @if (_error is not null)
+  {
+    <p class="error-text">@_error</p>
+  }
+
+  <button type="submit" disabled="@_busy">@(_busy ? "Loading your modules…" : "Sign in")</button>
 </form>
 
 @code {
-    [Parameter, SupplyParameterFromQuery] public string? ReturnUrl { get; set; }
+  [Parameter, SupplyParameterFromQuery] public string? ReturnUrl { get; set; }
 
-    private string _userName = "";
-    private string _password = "";
-    private string? _error;
-    private bool _busy;
+  private string _userName = "";
+  private string _password = "";
+  private string _tenant = "root";
+  private string? _error;
+  private bool _busy;
 
-    private async Task SignInAsync()
+  private async Task SignInAsync()
+  {
+    _error = null;
+    _busy = true;
+    try
     {
-        _error = null;
-        _busy = true;
-        try
-        {
-            if (await Auth.LoginAsync(_userName, _password))
-                Nav.NavigateTo(SafeReturnUrl(), replace: true);
-            else
-                _error = "Enter a user name and a password.";
-        }
-        catch (Exception ex)
-        {
-            _error = $"Could not load your modules: {ex.Message}";
-        }
-        finally
-        {
-            _busy = false;
-        }
+      if (await Auth.LoginAsync(_userName, _password))
+        Nav.NavigateTo(SafeReturnUrl(), replace: true);
+      else
+        _error = "Enter a user name and a password.";
     }
+    catch (Exception ex)
+    {
+      _error = $"Could not load your modules: {ex.Message}";
+    }
+    finally
+    {
+      _busy = false;
+    }
+  }
 
-    // Only base-relative paths are accepted, so the query string can't redirect off-site.
-    private string SafeReturnUrl()
-        => ReturnUrl is { Length: > 0 } r && !r.StartsWith('/') && !r.StartsWith('\\') && !r.Contains(':')
-            ? r
-            : "";
+  // Only base-relative paths are accepted, so the query string can't redirect off-site.
+  private string SafeReturnUrl()
+      => ReturnUrl is { Length: > 0 } r && !r.StartsWith('/') && !r.StartsWith('\\') && !r.Contains(':')
+          ? r
+          : "";
 }
