@@ -197,7 +197,7 @@ public sealed class ModuleManager : IModuleNavigation
             foreach (var dependency in d.Dependencies)
                 await EnsureLoadedAsync(dependency, next, CancellationToken.None);
 
-            var bytes = await _http.GetByteArrayAsync(d.Url);
+            var bytes = await DownloadAsync(d.Url, d.Kind == ModuleKind.NuPkg ? "PK" : "MZ");
             VerifyHash(d, bytes);
 
             var images = new List<byte[]>();
@@ -213,7 +213,7 @@ public sealed class ModuleManager : IModuleNavigation
             {
                 images.Add(bytes);
                 foreach (var extra in d.ExtraAssemblies)
-                    images.Add(await _http.GetByteArrayAsync(extra));
+                    images.Add(await DownloadAsync(extra, "MZ"));
             }
 
             var assemblies = new List<Assembly>();
@@ -248,6 +248,28 @@ public sealed class ModuleManager : IModuleNavigation
     }
 
     // ---------------------------------------------------------------- helpers
+
+    /// <summary>
+    /// Downloads a module file and checks its first bytes ("MZ" for an assembly, "PK" for a package). A server that
+    /// answers a missing or mis-served file with its index.html (or a compressed body) would otherwise surface much
+    /// later as an unreadable "UnknownFileFormat" with no hint of which file it was.
+    /// </summary>
+    private async Task<byte[]> DownloadAsync(string url, string magic)
+    {
+        using var response = await _http.GetAsync(url);
+        response.EnsureSuccessStatusCode();
+        var bytes = await response.Content.ReadAsByteArrayAsync();
+
+        if (bytes.Length < 2 || bytes[0] != magic[0] || bytes[1] != magic[1])
+        {
+            var preview = new string(bytes.Take(40).Select(b => b is >= 32 and < 127 ? (char)b : '.').ToArray());
+            throw new InvalidOperationException(
+                $"'{url}' is not a valid module file: {bytes.Length} bytes, content-type '{response.Content.Headers.ContentType}', " +
+                $"content-encoding '{string.Join(",", response.Content.Headers.ContentEncoding)}', starts with \"{preview}\".");
+        }
+
+        return bytes;
+    }
 
     private static void VerifyHash(ModuleDescriptor d, byte[] bytes)
     {
