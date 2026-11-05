@@ -1,6 +1,6 @@
 using MediatR;
 using System.Security.Claims;
-using soft.square.net.ModularBlazor.Abstractions;
+using soft.square.net.Share.All;
 using soft.square.net.ModularBlazor.Core.Authorization;
 using soft.square.net.ModularBlazor.Host.Modules.Catalog.Application.Queries.GetModulesForRole;
 

@@ -36,10 +36,19 @@
     <!-- Distributed cache (Redis). -->
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="10.*" />
     <PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.22" />
+
+    <!-- NSwag generates the OpenAPI document and serves ReDoc; Scalar renders the same document. -->
+    <PackageReference Include="NSwag.AspNetCore" Version="14.*" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.*" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Identity\Users\" />
+    <Folder Include="Theming\" />
   </ItemGroup>
 
 </Project>

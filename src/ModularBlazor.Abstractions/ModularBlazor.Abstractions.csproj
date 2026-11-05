@@ -1,6 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk"><!-- Contracts shared by the host and every module. Keep it dependency-free. -->
 
-
+  <PropertyGroup>
+    <AssemblyName>$(SoftSquarePrefix).ModularBlazor.Abstractions</AssemblyName>
+    <RootNamespace>$(SoftSquarePrefix).ModularBlazor.Abstractions</RootNamespace>
+  </PropertyGroup>
 
 
   <ItemGroup>

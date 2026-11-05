@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Xml.Linq;
-using soft.square.net.ModularBlazor.Abstractions;
+using soft.square.net.Share.All;
 using soft.square.net.ModularBlazor.Core.Exceptions;
 using soft.square.net.ModularBlazor.Host.Modules.Catalog.Application.Packages;
 using soft.square.net.ModularBlazor.Host.Modules.Catalog.Domain;

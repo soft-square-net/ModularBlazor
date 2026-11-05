@@ -17,7 +17,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\ModularBlazor.Abstractions\ModularBlazor.Abstractions.csproj" />
+    <Folder Include="OpenApi\" />
+    <Folder Include="Theming\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Share.All\Share.All.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,5 @@
-using soft.square.net.ModularBlazor.Abstractions;
 using soft.square.net.ModularBlazor.Host.Modules.Catalog.Domain;
+using soft.square.net.Share.All;
 
 namespace soft.square.net.ModularBlazor.Host.Modules.Catalog.Application;
 

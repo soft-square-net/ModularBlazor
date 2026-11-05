@@ -1,8 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using soft.square.net.ModularBlazor.Abstractions;
-using soft.square.net.ModularBlazor.Host.Modules.Catalog.Domain;
-using soft.square.net.ModularBlazor.Infrastructure.Persistence;
+using soft.square.net.Share.All;
 
 namespace soft.square.net.ModularBlazor.Host.Modules.Catalog.Infrastructure.Persistence.Configurations;
 

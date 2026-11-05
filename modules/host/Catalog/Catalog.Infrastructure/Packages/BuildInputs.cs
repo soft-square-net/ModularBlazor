@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Xml.Linq;
-using soft.square.net.ModularBlazor.Abstractions;
+using soft.square.net.Share.All;
 using soft.square.net.ModularBlazor.Host.Modules.Catalog.Domain;
 
 namespace soft.square.net.ModularBlazor.Host.Modules.Catalog.Infrastructure.Packages;

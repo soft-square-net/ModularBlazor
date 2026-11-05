@@ -48,49 +48,13 @@ builder.Services.AddCors(options => options.AddPolicy("client", policy =>
   policy.WithOrigins(origins).AllowAnyHeader().AllowAnyMethod().WithExposedHeaders("x-elsa-workflow-instance-id");
 
   // var origins = builder.Configuration.GetSection("Cors:Origins").Get<string[]>() ?? [];
-  policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().WithExposedHeaders("x-elsa-workflow-instance-id");
+  // policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().WithExposedHeaders("x-elsa-workflow-instance-id");
 }));
 
 
-// NSwag builds the OpenAPI document from the minimal API endpoints.
-builder.Services.AddEndpointsApiExplorer();
-// Elsa's endpoints live in their own document ("elsa"); see OpenApiDocuments.cs.
-var elsaBasePath = builder.Configuration["ElsaHost:ApiBasePath"] ?? "/elsa/api";
 
-void AddSecuritySchemes(NSwag.Generation.AspNetCore.AspNetCoreOpenApiDocumentGeneratorSettings settings)
-{
-  settings.AddSecurity("JWT", new OpenApiSecurityScheme
-  {
-    Type = OpenApiSecuritySchemeType.Http,
-    Scheme = "bearer",
-    BearerFormat = "JWT",
-    Description = "Token from POST /api/v1/identity/tokens."
-  });
-  settings.AddSecurity("ApiKey", new OpenApiSecurityScheme
-  {
-    Type = OpenApiSecuritySchemeType.ApiKey,
-    In = OpenApiSecurityApiKeyLocation.Header,
-    Name = "X-API-Key",
-    Description = "Key from POST /api/v1/identity/api-keys."
-  });
-  settings.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("JWT"));
-  settings.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("ApiKey"));
-
-  // Every operation, including POST /api/v1/identity/tokens, runs for one tenant: the X-Tenant header (default: root).
-  settings.OperationProcessors.Add(new OperationProcessor(context =>
-  {
-    context.OperationDescription.Operation.Parameters.Add(new OpenApiParameter
-    {
-      Name = "X-Tenant",
-      Kind = OpenApiParameterKind.Header,
-      Type = JsonObjectType.String,
-      IsRequired = false,
-      Description = "Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for."
-    });
-    return true;
-  }));
-}
-
+builder.Services.ConfigureCore(builder.Configuration);
+/*
 //// 1. Register the filtered document in Program.cs
 builder.Services.AddOpenApiDocument(settings =>
 {
@@ -99,7 +63,7 @@ builder.Services.AddOpenApiDocument(settings =>
   settings.Version = "v3";
   settings.Description = "The embedded Elsa workflow engine API.";
 
-  AddSecuritySchemes(settings);
+  settings.AddSecuritySchemes();
 
   // This extension tells NSwag to include FastEndpoints routes
   // settings.EnableFastEndpoints(options => { }, builder.Services.BuildServiceProvider());
@@ -118,10 +82,10 @@ builder.Services.AddOpenApiDocument(settings =>
   settings.Title = "Modular Blazor API";
   settings.Version = "v1";
   settings.Description = "Identity (users, roles, API keys), tenants and module catalog for the Modular Blazor WebAssembly client.";
-  AddSecuritySchemes(settings);
+  settings.AddSecuritySchemes();
   settings.OperationProcessors.Insert(0, new ElsaApiOperationProcessor(elsaBasePath, includeElsa: false));
 });
-
+*/
 
 var app = builder.Build();
 
@@ -152,37 +116,47 @@ app.UseSecurity();
 // Module middleware (ElsaHost mounts the Elsa workflows API here).
 app.UseHostModules(HostModules.All);
 
-// API documentation (on in Development, or anywhere with Documentation:Enabled=true).
-if (app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("Documentation:Enabled"))
-{
-  // 1. Serve only the NSwag v1 document here. The Elsa document is generated
-  // by the custom endpoint below and must not be intercepted by NSwag.
-  app.UseOpenApi(settings => settings.Path = "/openapi/v1.json");
-  app.UseOpenApi(settings => settings.Path = "/swagger/v3/swagger.json");
+app.UseCore();
+
+app.MapCarter();
+
+app.Run();
 
 
-  ////// 2. ReDoc at /redoc and /redoc/elsa (NSwag).
-  //app.UseReDoc(settings =>
-  //{
-  //  settings.Path = "/redoc";
-  //  settings.DocumentPath = "/openapi/v1.json";
-  //  settings.UseModuleTypeForCustomJavaScript = true;
-  //});
-  //app.UseReDoc(settings =>
-  //{
-  //  settings.Path = "/redoc/elsa";
-  //  settings.DocumentPath = "/openapi/elsa.json";
-  //  settings.UseModuleTypeForCustomJavaScript = true;
-  //});
 
-  // Elsa FastEndpoints are mounted by Elsa middleware and their route
-  // normalization can make NSwag fail. Generate this document from the
-  // registered ASP.NET Core endpoint metadata instead.
-  app.MapGet("/openapi/elsa.json", (IEnumerable<EndpointDataSource> endpointSources) =>
-      Results.Json(ElsaOpenApiDocumentGenerator.Generate(elsaBasePath, endpointSources)))
-      .ExcludeFromDescription();
+////// 2. ReDoc at /redoc and /redoc/elsa (NSwag).
+//app.UseReDoc(settings =>
+//{
+//  settings.Path = "/redoc";
+//  settings.DocumentPath = "/openapi/v1.json";
+//  settings.UseModuleTypeForCustomJavaScript = true;
+//});
+//app.UseReDoc(settings =>
+//{
+//  settings.Path = "/redoc/elsa";
+//  settings.DocumentPath = "/openapi/elsa.json";
+//  settings.UseModuleTypeForCustomJavaScript = true;
+//});
 
-  /*
+// Elsa FastEndpoints are mounted by Elsa middleware and their route
+// normalization can make NSwag fail. Generate this document from the
+// registered ASP.NET Core endpoint metadata instead.
+
+///// <summary>Elsa publishes its own API and contains route descriptions that collide in NSwag's document.</summary>
+//internal sealed class ExcludeElsaApiFromOpenApiProcessor : IOperationProcessor
+//{
+//    public bool Process(OperationProcessorContext context)
+//    {
+//        if (context is not AspNetCoreOperationProcessorContext aspNetCoreContext)
+//            return true;
+
+//        var route = aspNetCoreContext.ApiDescription.RelativePath?.TrimStart('/');
+//        return route is null || !route.StartsWith("elsa/api/", StringComparison.OrdinalIgnoreCase);
+//    }
+//}
+
+
+/*
     The previous hand-maintained fallback is intentionally removed. The
     custom generator above derives its paths from registered endpoint metadata.
     {
@@ -249,36 +223,3 @@ if (app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("Documen
     }
     }
   */
-
-  // 3. Scalar at /scalar, with both NSwag documents in its selector. A failure in the Elsa document cannot affect v1.
-  app.MapScalarApiReference(options => options
-      .WithTitle("Modular Blazor API")
-      .AddDocument("v1", "Modular V1 Blazor API", "/openapi/v1.json", isDefault: true)
-      .AddDocument("elsa", "Elsa V3 Workflows API", "/openapi/elsa.json")
-      // Both documents declare the JWT (Bearer) and ApiKey (X-API-Key) schemes; Scalar's Authentication panel
-      // offers both, and keeps what you entered across reloads and when switching documents.
-      .AddPreferredSecuritySchemes("JWT", "ApiKey")
-      .WithPersistentAuthentication());
-
-
-  app.MapGet("/", () => Results.Redirect("/scalar")).ExcludeFromDescription();
-}
-
-app.MapCarter();
-
-app.Run();
-
-
-
-///// <summary>Elsa publishes its own API and contains route descriptions that collide in NSwag's document.</summary>
-//internal sealed class ExcludeElsaApiFromOpenApiProcessor : IOperationProcessor
-//{
-//    public bool Process(OperationProcessorContext context)
-//    {
-//        if (context is not AspNetCoreOperationProcessorContext aspNetCoreContext)
-//            return true;
-
-//        var route = aspNetCoreContext.ApiDescription.RelativePath?.TrimStart('/');
-//        return route is null || !route.StartsWith("elsa/api/", StringComparison.OrdinalIgnoreCase);
-//    }
-//}

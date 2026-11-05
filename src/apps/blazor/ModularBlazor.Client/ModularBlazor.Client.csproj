@@ -5,6 +5,8 @@
          trim the framework. Keep these off, otherwise modules can hit MissingMethodException. -->
     <PublishTrimmed>false</PublishTrimmed>
     <RunAOTCompilation>false</RunAOTCompilation>
+    <AssemblyName>$(SoftSquarePrefix).ModularBlazor.Client</AssemblyName>
+    <RootNamespace>$(SoftSquarePrefix).ModularBlazor.Client</RootNamespace>
   </PropertyGroup>
 
   <!-- wwwroot/moduleHost.js must stay a normal static file: index.html loads it with <script src="moduleHost.js">.

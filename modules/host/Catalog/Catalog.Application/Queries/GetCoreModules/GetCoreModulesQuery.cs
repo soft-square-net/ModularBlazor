@@ -1,8 +1,8 @@
 using MediatR;
-using soft.square.net.ModularBlazor.Abstractions;
 using soft.square.net.ModularBlazor.Core.Persistence;
 using soft.square.net.ModularBlazor.Host.Modules.Catalog.Application.Specifications;
 using soft.square.net.ModularBlazor.Host.Modules.Catalog.Domain;
+using soft.square.net.Share.All;
 
 namespace soft.square.net.ModularBlazor.Host.Modules.Catalog.Application.Queries.GetCoreModules;
 

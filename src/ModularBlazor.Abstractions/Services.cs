@@ -1,3 +1,5 @@
+using soft.square.net.Share.All;
+
 namespace soft.square.net.ModularBlazor.Abstractions;
 
 /// <summary>Registered by the host; modules inject it (login page, layouts).</summary>

@@ -1,6 +1,6 @@
 using FluentValidation;
 using MediatR;
-using soft.square.net.ModularBlazor.Abstractions;
+using soft.square.net.Share.All;
 using soft.square.net.ModularBlazor.Core.Persistence;
 using soft.square.net.ModularBlazor.Host.Modules.Catalog.Application.Specifications;
 using soft.square.net.ModularBlazor.Host.Modules.Catalog.Domain;

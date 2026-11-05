@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace soft.square.net.ModularBlazor.Abstractions;
+namespace soft.square.net.Share.All;
 
 public enum ModuleKind
 {

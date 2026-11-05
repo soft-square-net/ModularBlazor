@@ -1,7 +1,7 @@
 using System.Text.Json;
 using FluentValidation;
 using MediatR;
-using soft.square.net.ModularBlazor.Abstractions;
+using soft.square.net.Share.All;
 using soft.square.net.ModularBlazor.Core.Abstractions;
 using soft.square.net.ModularBlazor.Core.Exceptions;
 using soft.square.net.ModularBlazor.Host.Modules.Catalog.Domain;

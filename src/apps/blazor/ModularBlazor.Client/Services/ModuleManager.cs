@@ -10,6 +10,7 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using soft.square.net.ModularBlazor.Abstractions;
+using soft.square.net.Share.All;
 
 namespace soft.square.net.ModularBlazor.Client.Services;
 
