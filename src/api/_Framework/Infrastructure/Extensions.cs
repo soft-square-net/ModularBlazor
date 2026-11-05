@@ -9,7 +9,7 @@ namespace soft.square.net.ModularBlazor.Infrastructure;
 
 public static class Extensions
 {
-  public static IServiceCollection ConfigureCore(this IServiceCollection services, IConfiguration configuration)
+  public static IServiceCollection AddCore(this IServiceCollection services, IConfiguration configuration)
   {
     services.ConfigureOpenApi(configuration);
     return services;

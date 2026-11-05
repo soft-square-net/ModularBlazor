@@ -7,7 +7,7 @@ namespace soft.square.net.ModularBlazor.Abstractions;
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
 public sealed class LayoutKeyAttribute(string key) : Attribute
 {
-    public string Key { get; } = key;
+  public string Key { get; } = key;
 }
 
 /// <summary>
@@ -17,5 +17,5 @@ public sealed class LayoutKeyAttribute(string key) : Attribute
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
 public sealed class UseLayoutAttribute(string key) : Attribute
 {
-    public string Key { get; } = key;
+  public string Key { get; } = key;
 }

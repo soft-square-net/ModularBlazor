@@ -53,7 +53,7 @@ builder.Services.AddCors(options => options.AddPolicy("client", policy =>
 
 
 
-builder.Services.ConfigureCore(builder.Configuration);
+builder.Services.AddCore(builder.Configuration);
 /*
 //// 1. Register the filtered document in Program.cs
 builder.Services.AddOpenApiDocument(settings =>
