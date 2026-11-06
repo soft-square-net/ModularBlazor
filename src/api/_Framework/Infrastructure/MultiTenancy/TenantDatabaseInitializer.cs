@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using soft.square.net.ModularBlazor.Core.Persistence;
-using soft.square.net.ModularBlazor.Core.Tenancy;
+using soft.square.net.ModularBlazor.Core.Tenancy.Abstractions;
 
 namespace soft.square.net.ModularBlazor.Infrastructure.MultiTenancy;
 

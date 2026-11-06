@@ -1,6 +1,6 @@
 using Finbuckle.MultiTenant.Abstractions;
 using soft.square.net.ModularBlazor.Core.Abstractions;
-using soft.square.net.ModularBlazor.Core.Tenancy;
+using soft.square.net.ModularBlazor.Core.Tenancy.Abstractions;
 using soft.square.net.ModularBlazor.Infrastructure.MultiTenancy;
 
 namespace soft.square.net.ModularBlazor.Infrastructure.Identity;

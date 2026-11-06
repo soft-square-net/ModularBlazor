@@ -1,5 +1,5 @@
 using soft.square.net.ModularBlazor.Core.Persistence;
-using soft.square.net.ModularBlazor.Core.Tenancy;
+using soft.square.net.ModularBlazor.Core.Tenancy.Abstractions;
 using soft.square.net.ModularBlazor.Host.Modules.Multitenancy.Domain;
 
 namespace soft.square.net.ModularBlazor.Host.Modules.Multitenancy.Application;

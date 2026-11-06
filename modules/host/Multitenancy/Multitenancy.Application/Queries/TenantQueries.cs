@@ -2,7 +2,7 @@ using MediatR;
 using soft.square.net.ModularBlazor.Core.Pagination;
 using soft.square.net.ModularBlazor.Core.Persistence;
 using soft.square.net.ModularBlazor.Core.Specifications;
-using soft.square.net.ModularBlazor.Core.Tenancy;
+using soft.square.net.ModularBlazor.Core.Tenancy.Abstractions;
 using soft.square.net.ModularBlazor.Host.Modules.Multitenancy.Application.Specifications;
 using soft.square.net.ModularBlazor.Host.Modules.Multitenancy.Domain;
 

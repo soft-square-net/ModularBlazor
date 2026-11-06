@@ -1,11 +1,11 @@
 using MediatR;
 using soft.square.net.ModularBlazor.Core.Pagination;
-using soft.square.net.ModularBlazor.Core.Tenancy;
 using soft.square.net.ModularBlazor.Host.Modules.Multitenancy.Application;
 using soft.square.net.ModularBlazor.Host.Modules.Multitenancy.Application.Commands;
 using soft.square.net.ModularBlazor.Host.Modules.Multitenancy.Application.Queries;
 using soft.square.net.ModularBlazor.Core.Authorization;
 using soft.square.net.ModularBlazor.Infrastructure.Security;
+using soft.square.net.ModularBlazor.Core.Tenancy.Abstractions;
 
 namespace soft.square.net.ModularBlazor.Host.Modules.Multitenancy.Infrastructure.Endpoints;
 

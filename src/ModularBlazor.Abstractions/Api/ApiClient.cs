@@ -921,18 +921,18 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
         System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetPermissionsAsync(System.Threading.CancellationToken cancellationToken);
 
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorAbstractionsModuleManifest> GetCoreModulesAsync();
+        System.Threading.Tasks.Task<SoftsquarenetShareAllModuleManifest> GetCoreModulesAsync();
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorAbstractionsModuleManifest> GetCoreModulesAsync(System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<SoftsquarenetShareAllModuleManifest> GetCoreModulesAsync(System.Threading.CancellationToken cancellationToken);
 
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorAbstractionsModuleManifest> GetMyModulesAsync();
+        System.Threading.Tasks.Task<SoftsquarenetShareAllModuleManifest> GetMyModulesAsync();
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorAbstractionsModuleManifest> GetMyModulesAsync(System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<SoftsquarenetShareAllModuleManifest> GetMyModulesAsync(System.Threading.CancellationToken cancellationToken);
 
         /// <exception cref="ApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesElsaHostApplicationQueriesElsaInfoDto> GetElsaInfoAsync();
@@ -1194,32 +1194,32 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
         System.Threading.Tasks.Task<SoftsquarenetModularBlazorCorePaginationPagedResponseOfTenantProvisioningDto> SearchProvisioningsAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields, System.Threading.CancellationToken cancellationToken);
 
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyTenantDto> GetTenantAsync(string id);
+        System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto> GetTenantAsync(string id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyTenantDto> GetTenantAsync(string id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto> GetTenantAsync(string id, System.Threading.CancellationToken cancellationToken);
 
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyTenantDto> ActivateTenantAsync(string id);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyTenantDto> ActivateTenantAsync(string id, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyTenantDto> DeactivateTenantAsync(string id);
+        System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto> ActivateTenantAsync(string id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyTenantDto> DeactivateTenantAsync(string id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto> ActivateTenantAsync(string id, System.Threading.CancellationToken cancellationToken);
 
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyTenantDto> UpgradeTenantAsync(string id, SoftsquarenetModularBlazorHostModulesMultitenancyInfrastructureEndpointsRenewTenantRequest request);
+        System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto> DeactivateTenantAsync(string id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyTenantDto> UpgradeTenantAsync(string id, SoftsquarenetModularBlazorHostModulesMultitenancyInfrastructureEndpointsRenewTenantRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto> DeactivateTenantAsync(string id, System.Threading.CancellationToken cancellationToken);
+
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto> UpgradeTenantAsync(string id, SoftsquarenetModularBlazorHostModulesMultitenancyInfrastructureEndpointsRenewTenantRequest request);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto> UpgradeTenantAsync(string id, SoftsquarenetModularBlazorHostModulesMultitenancyInfrastructureEndpointsRenewTenantRequest request, System.Threading.CancellationToken cancellationToken);
 
         /// <exception cref="ApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesMultitenancyApplicationTenantProvisioningDto> RetryTenantProvisioningAsync(string id);
@@ -10213,14 +10213,14 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
         }
 
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorAbstractionsModuleManifest> GetCoreModulesAsync()
+        public virtual System.Threading.Tasks.Task<SoftsquarenetShareAllModuleManifest> GetCoreModulesAsync()
         {
             return GetCoreModulesAsync(System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorAbstractionsModuleManifest> GetCoreModulesAsync(System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<SoftsquarenetShareAllModuleManifest> GetCoreModulesAsync(System.Threading.CancellationToken cancellationToken)
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -10261,7 +10261,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorAbstractionsModuleManifest>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetShareAllModuleManifest>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -10289,14 +10289,14 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
         }
 
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorAbstractionsModuleManifest> GetMyModulesAsync()
+        public virtual System.Threading.Tasks.Task<SoftsquarenetShareAllModuleManifest> GetMyModulesAsync()
         {
             return GetMyModulesAsync(System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorAbstractionsModuleManifest> GetMyModulesAsync(System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<SoftsquarenetShareAllModuleManifest> GetMyModulesAsync(System.Threading.CancellationToken cancellationToken)
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -10337,7 +10337,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorAbstractionsModuleManifest>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetShareAllModuleManifest>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -13633,14 +13633,14 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
         }
 
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyTenantDto> GetTenantAsync(string id)
+        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto> GetTenantAsync(string id)
         {
             return GetTenantAsync(id, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyTenantDto> GetTenantAsync(string id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto> GetTenantAsync(string id, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -13685,7 +13685,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorCoreTenancyTenantDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -13723,14 +13723,14 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
         }
 
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyTenantDto> ActivateTenantAsync(string id)
+        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto> ActivateTenantAsync(string id)
         {
             return ActivateTenantAsync(id, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyTenantDto> ActivateTenantAsync(string id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto> ActivateTenantAsync(string id, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -13777,7 +13777,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorCoreTenancyTenantDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -13805,14 +13805,14 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
         }
 
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyTenantDto> DeactivateTenantAsync(string id)
+        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto> DeactivateTenantAsync(string id)
         {
             return DeactivateTenantAsync(id, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyTenantDto> DeactivateTenantAsync(string id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto> DeactivateTenantAsync(string id, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -13859,7 +13859,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorCoreTenancyTenantDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -13887,14 +13887,14 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
         }
 
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyTenantDto> UpgradeTenantAsync(string id, SoftsquarenetModularBlazorHostModulesMultitenancyInfrastructureEndpointsRenewTenantRequest request)
+        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto> UpgradeTenantAsync(string id, SoftsquarenetModularBlazorHostModulesMultitenancyInfrastructureEndpointsRenewTenantRequest request)
         {
             return UpgradeTenantAsync(id, request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyTenantDto> UpgradeTenantAsync(string id, SoftsquarenetModularBlazorHostModulesMultitenancyInfrastructureEndpointsRenewTenantRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto> UpgradeTenantAsync(string id, SoftsquarenetModularBlazorHostModulesMultitenancyInfrastructureEndpointsRenewTenantRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -13947,7 +13947,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorCoreTenancyTenantDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -16825,16 +16825,16 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorAbstractionsModuleManifest
+    public partial class SoftsquarenetShareAllModuleManifest
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("modules")]
-        public System.Collections.Generic.ICollection<SoftsquarenetModularBlazorAbstractionsModuleDescriptor> Modules { get; set; } = default!;
+        public System.Collections.Generic.ICollection<SoftsquarenetShareAllModuleDescriptor> Modules { get; set; } = default!;
 
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorAbstractionsModuleDescriptor
+    public partial class SoftsquarenetShareAllModuleDescriptor
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("id")]
@@ -16847,8 +16847,8 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
         public string Version { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("kind")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<SoftsquarenetModularBlazorAbstractionsModuleKind>))]
-        public SoftsquarenetModularBlazorAbstractionsModuleKind Kind { get; set; } = default!;
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<SoftsquarenetShareAllModuleKind>))]
+        public SoftsquarenetShareAllModuleKind Kind { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("url")]
         public string Url { get; set; } = default!;
@@ -16884,12 +16884,12 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
         public System.Collections.Generic.ICollection<string> Styles { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("nav")]
-        public System.Collections.Generic.ICollection<SoftsquarenetModularBlazorAbstractionsModuleNavItem> Nav { get; set; } = default!;
+        public System.Collections.Generic.ICollection<SoftsquarenetShareAllModuleNavItem> Nav { get; set; } = default!;
 
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum SoftsquarenetModularBlazorAbstractionsModuleKind
+    public enum SoftsquarenetShareAllModuleKind
     {
 
         [System.Runtime.Serialization.EnumMember(Value = @"Dll")]
@@ -16901,7 +16901,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorAbstractionsModuleNavItem
+    public partial class SoftsquarenetShareAllModuleNavItem
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("title")]
@@ -17353,8 +17353,8 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
         public SoftsquarenetModularBlazorHostModulesCatalogDomainModuleTarget Target { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("kind")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<SoftsquarenetModularBlazorAbstractionsModuleKind>))]
-        public SoftsquarenetModularBlazorAbstractionsModuleKind Kind { get; set; } = default!;
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<SoftsquarenetShareAllModuleKind>))]
+        public SoftsquarenetShareAllModuleKind Kind { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("fileName")]
         public string FileName { get; set; } = default!;
@@ -17436,7 +17436,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("tenant")]
-        public SoftsquarenetModularBlazorCoreTenancyTenantDto Tenant { get; set; } = default!;
+        public SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto Tenant { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("provisioning")]
         public SoftsquarenetModularBlazorHostModulesMultitenancyApplicationTenantProvisioningDto? Provisioning { get; set; } = default!;
@@ -17444,7 +17444,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorCoreTenancyTenantDto
+    public partial class SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("id")]
@@ -17549,7 +17549,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("items")]
-        public System.Collections.Generic.ICollection<SoftsquarenetModularBlazorCoreTenancyTenantDto> Items { get; set; } = default!;
+        public System.Collections.Generic.ICollection<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto> Items { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("totalCount")]
         public int TotalCount { get; set; } = default!;

@@ -5,10 +5,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using NSwag.Generation.Processors;
+using NSwag.Generation.Processors.Contexts;
 using Scalar.AspNetCore;
 using soft.square.net.ModularBlazor.Infrastructure.Authorization;
-namespace soft.square.net.ModularBlazor.Infrastructure.OpenApi;
 
+namespace soft.square.net.ModularBlazor.Infrastructure.OpenApi;
 internal static class Extension
 {
   private static string elsaBasePath = "/elsa/api";
@@ -26,7 +29,8 @@ internal static class Extension
       settings.Title = "Elsa V3 Workflows API";
       settings.Version = "v3";
       settings.Description = "The embedded Elsa workflow engine API.";
-
+      // Forces the generator to use the clean type name without any namespace prefixes
+      settings.SchemaSettings.SchemaNameGenerator = new NJsonSchema.Generation.DefaultSchemaNameGenerator();
       settings.AddSecuritySchemes();
 
       // This extension tells NSwag to include FastEndpoints routes
@@ -39,6 +43,9 @@ internal static class Extension
       // mounted API route instead of ControllerType.Namespace.
       settings.OperationProcessors.Insert(0, new ElsaApiOperationProcessor(elsaBasePath, includeElsa: true));
 
+      // 2. Fixes endpoint path, query, and route variables named like "*id" to "id" 
+      settings.OperationProcessors.Add(new ElsaCustomParameterIdProcessor());
+
     });
     services.AddOpenApiDocument(settings =>
     {
@@ -48,6 +55,9 @@ internal static class Extension
       settings.Description = "Identity (users, roles, API keys), tenants and module catalog for the Modular Blazor WebAssembly client.";
       settings.AddSecuritySchemes();
       settings.OperationProcessors.Insert(0, new ElsaApiOperationProcessor(elsaBasePath, includeElsa: false));
+      // Forces the generator to use the clean type name without any namespace prefixes
+      settings.SchemaSettings.SchemaNameGenerator = new NJsonSchema.Generation.DefaultSchemaNameGenerator();
+
     });
     return services;
   }

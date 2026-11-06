@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using soft.square.net.ModularBlazor.Core;
 using soft.square.net.ModularBlazor.Host.Modules.ElsaHost.Application.Queries;
+//using soft.square.net.ModularBlazor.Host.Modules.ElsaHost.Infrastructure.OpenApi;
 using soft.square.net.ModularBlazor.Host.Modules.ElsaHost.Infrastructure.Tenancy;
 using soft.square.net.ModularBlazor.Infrastructure.Modules;
 using soft.square.net.ModularBlazor.Infrastructure.Persistence;
@@ -54,34 +55,33 @@ public sealed class ElsaHostModule : IHostModule
     var jwtSection = configuration.GetSection("Jwt");
     services.AddElsa(elsa =>
     {
-      elsa.AddSwagger();
-    //  elsa.UseIdentity(identity =>
-    //{
-    //  // Bind your specific fields to Elsa's internal TokenOptions
-    //  identity.TokenOptions = options =>
-    //  {
-    //    options.SigningKey = jwtSection["SigningKey"] ?? throw new InvalidOperationException("Signing key is missing.");
-    //    options.Issuer = jwtSection["Issuer"];
-    //    options.Audience = jwtSection["Audience"];
+      //  elsa.UseIdentity(identity =>
+      //{
+      //  // Bind your specific fields to Elsa's internal TokenOptions
+      //  identity.TokenOptions = options =>
+      //  {
+      //    options.SigningKey = jwtSection["SigningKey"] ?? throw new InvalidOperationException("Signing key is missing.");
+      //    options.Issuer = jwtSection["Issuer"];
+      //    options.Audience = jwtSection["Audience"];
 
-    //    // Map the token lifetimes (Convert minutes/days to TimeSpan)
-    //    if (double.TryParse(jwtSection["AccessTokenMinutes"], out var minutes))
-    //    {
-    //      options.AccessTokenLifetime = TimeSpan.FromMinutes(minutes);
-    //    }
+      //    // Map the token lifetimes (Convert minutes/days to TimeSpan)
+      //    if (double.TryParse(jwtSection["AccessTokenMinutes"], out var minutes))
+      //    {
+      //      options.AccessTokenLifetime = TimeSpan.FromMinutes(minutes);
+      //    }
 
-    //    if (double.TryParse(jwtSection["RefreshTokenDays"], out var days))
-    //    {
-    //      options.RefreshTokenLifetime = TimeSpan.FromDays(days);
-    //    }
-    //  };
-    //  // 3. Configure the Identity Stores (e.g., config-based or database-backed)
-    //  // If you are loading users/roles from the same appsettings config block:
-    //  var identitySection = configuration.GetSection("Identity");
-    //  identity.UseConfigurationBasedUserProvider(options => identitySection.Bind(options));
-    //  identity.UseConfigurationBasedApplicationProvider(options => identitySection.Bind(options));
-    //  identity.UseConfigurationBasedRoleProvider(options => identitySection.Bind(options));
-    //}) .UseDefaultAuthentication();
+      //    if (double.TryParse(jwtSection["RefreshTokenDays"], out var days))
+      //    {
+      //      options.RefreshTokenLifetime = TimeSpan.FromDays(days);
+      //    }
+      //  };
+      //  // 3. Configure the Identity Stores (e.g., config-based or database-backed)
+      //  // If you are loading users/roles from the same appsettings config block:
+      //  var identitySection = configuration.GetSection("Identity");
+      //  identity.UseConfigurationBasedUserProvider(options => identitySection.Bind(options));
+      //  identity.UseConfigurationBasedApplicationProvider(options => identitySection.Bind(options));
+      //  identity.UseConfigurationBasedRoleProvider(options => identitySection.Bind(options));
+      //}) .UseDefaultAuthentication();
       elsa.UseWorkflowManagement(management => management.UseEntityFrameworkCore(ef =>
           {
             ef.RunMigrations = options.RunMigrations;
@@ -121,12 +121,22 @@ public sealed class ElsaHostModule : IHostModule
       elsa.Services.AddSingleton<ITenantsProvider, FinbuckleTenantsProvider>();
       elsa.UseWorkflowsApi();
       elsa.UseHttp(options => options.ConfigureHttpOptions = httpOptions => httpOptions.BaseUrl = new("https://localhost:5100"));   // HTTP-triggered workflows
-                                                                                                                                    // CRITICAL: Force Elsa to use a dedicated DbContext scope that configures 
+
+      elsa.AddSwagger();
+      // CRITICAL: Force Elsa to use a dedicated DbContext scope that configures 
     });
 
     // Elsa's endpoints are FastEndpoints; their authorization runs on this host's schemes (JWT / API key).
 
     services.AddTransient<IClaimsTransformation, ElsaPermissionTransformation>();
+    //services.AddSwaggerDocument(settings =>
+    //{
+    //   Clean up high-level class DTO type naming structures
+    //  settings.SchemaSettings.SchemaNameGenerator = new NJsonSchema.Generation.DefaultSchemaNameGenerator();
+
+    //   Clean up all parameter strings ending with "*id" down to "id"
+    //  settings.OperationProcessors.Add(new ElsaCustomParameterIdProcessor());
+    //});
   }
 
   public void Configure(WebApplication app)

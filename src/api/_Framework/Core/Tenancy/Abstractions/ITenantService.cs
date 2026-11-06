@@ -1,6 +1,6 @@
 using soft.square.net.ModularBlazor.Core.Pagination;
 
-namespace soft.square.net.ModularBlazor.Core.Tenancy;
+namespace soft.square.net.ModularBlazor.Core.Tenancy.Abstractions;
 
 /// <summary>A tenant as the API shows it (never the connection string).</summary>
 public sealed record TenantDto(

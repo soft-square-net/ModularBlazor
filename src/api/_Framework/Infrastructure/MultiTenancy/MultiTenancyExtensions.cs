@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using soft.square.net.ModularBlazor.Core;
-using soft.square.net.ModularBlazor.Core.Tenancy;
+using soft.square.net.ModularBlazor.Core.Tenancy.Abstractions;
 using soft.square.net.ModularBlazor.Infrastructure.Persistence;
 
 namespace soft.square.net.ModularBlazor.Infrastructure.MultiTenancy;

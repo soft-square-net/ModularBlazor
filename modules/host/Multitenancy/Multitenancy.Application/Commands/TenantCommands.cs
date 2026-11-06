@@ -3,7 +3,7 @@ using MediatR;
 using soft.square.net.ModularBlazor.Core;
 using soft.square.net.ModularBlazor.Core.Exceptions;
 using soft.square.net.ModularBlazor.Core.Persistence;
-using soft.square.net.ModularBlazor.Core.Tenancy;
+using soft.square.net.ModularBlazor.Core.Tenancy.Abstractions;
 using soft.square.net.ModularBlazor.Host.Modules.Multitenancy.Application.Specifications;
 using soft.square.net.ModularBlazor.Host.Modules.Multitenancy.Domain;
 
