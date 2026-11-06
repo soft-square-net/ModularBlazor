@@ -29,8 +29,8 @@ internal static class Extension
       settings.Title = "Elsa V3 Workflows API";
       settings.Version = "v3";
       settings.Description = "The embedded Elsa workflow engine API.";
-      // Forces the generator to use the clean type name without any namespace prefixes
-      settings.SchemaSettings.SchemaNameGenerator = new NJsonSchema.Generation.DefaultSchemaNameGenerator();
+      // Schema names without namespaces (LoginCommand, not Softsquarenet...LoginCommand): they become the client's class names.
+      settings.SchemaSettings.SchemaNameGenerator = new ShortNameSchemaNameGenerator();
       settings.AddSecuritySchemes();
 
       // This extension tells NSwag to include FastEndpoints routes
@@ -55,8 +55,8 @@ internal static class Extension
       settings.Description = "Identity (users, roles, API keys), tenants and module catalog for the Modular Blazor WebAssembly client.";
       settings.AddSecuritySchemes();
       settings.OperationProcessors.Insert(0, new ElsaApiOperationProcessor(elsaBasePath, includeElsa: false));
-      // Forces the generator to use the clean type name without any namespace prefixes
-      settings.SchemaSettings.SchemaNameGenerator = new NJsonSchema.Generation.DefaultSchemaNameGenerator();
+      // Schema names without namespaces (LoginCommand, not Softsquarenet...LoginCommand): they become the client's class names.
+      settings.SchemaSettings.SchemaNameGenerator = new ShortNameSchemaNameGenerator();
 
     });
     return services;
