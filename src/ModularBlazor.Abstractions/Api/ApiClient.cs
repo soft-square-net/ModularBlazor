@@ -31,1202 +31,401 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial interface IApiClient
     {
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaModelsListResponseOfResolvedVariableModel> ElsaWorkflowsApiEndpointsWorkflowInstancesVariablesPostListAsync(string id, ElsaWorkflowsApiEndpointsWorkflowInstancesVariablesPostRequest request);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetPermissionsAsync(string? x_Tenant);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaModelsListResponseOfResolvedVariableModel> ElsaWorkflowsApiEndpointsWorkflowInstancesVariablesPostListAsync(string id, ElsaWorkflowsApiEndpointsWorkflowInstancesVariablesPostRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetPermissionsAsync(string? x_Tenant, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaModelsListResponseOfResolvedVariableModel2> ElsaWorkflowsApiEndpointsWorkflowInstancesVariablesListListAsync(string id);
+        System.Threading.Tasks.Task<ModuleManifest> GetCoreModulesAsync(string? x_Tenant);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaModelsListResponseOfResolvedVariableModel2> ElsaWorkflowsApiEndpointsWorkflowInstancesVariablesListListAsync(string id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<ModuleManifest> GetCoreModulesAsync(string? x_Tenant, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesListResponse> GetElsaWorkflowsApiEndpointsWorkflowInstancesListListAsync(int? page, int? pageSize, string? searchTerm, string? definitionId, System.Collections.Generic.IEnumerable<string>? definitionIds, string? correlationId, string? name, int? version, bool? hasIncidents, bool? isSystem, ElsaWorkflowsWorkflowStatus? status, System.Collections.Generic.IEnumerable<string>? statuses, ElsaWorkflowsWorkflowSubStatus? subStatus, System.Collections.Generic.IEnumerable<string>? subStatuses, ElsaWorkflowsApiModelsOrderByWorkflowInstance? orderBy, ElsaCommonEntitiesOrderDirection? orderDirection, System.Collections.Generic.IEnumerable<ElsaWorkflowsManagementModelsTimestampFilter>? timestampFilters);
+        System.Threading.Tasks.Task<ModuleManifest> GetMyModulesAsync(string? x_Tenant);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesListResponse> GetElsaWorkflowsApiEndpointsWorkflowInstancesListListAsync(int? page, int? pageSize, string? searchTerm, string? definitionId, System.Collections.Generic.IEnumerable<string>? definitionIds, string? correlationId, string? name, int? version, bool? hasIncidents, bool? isSystem, ElsaWorkflowsWorkflowStatus? status, System.Collections.Generic.IEnumerable<string>? statuses, ElsaWorkflowsWorkflowSubStatus? subStatus, System.Collections.Generic.IEnumerable<string>? subStatuses, ElsaWorkflowsApiModelsOrderByWorkflowInstance? orderBy, ElsaCommonEntitiesOrderDirection? orderDirection, System.Collections.Generic.IEnumerable<ElsaWorkflowsManagementModelsTimestampFilter>? timestampFilters, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<ModuleManifest> GetMyModulesAsync(string? x_Tenant, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesListResponse> PostElsaWorkflowsApiEndpointsWorkflowInstancesListListAsync();
+        System.Threading.Tasks.Task<CreatedApiKeyDto> CreateApiKeyAsync(string? x_Tenant, CreateApiKeyCommand command);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesListResponse> PostElsaWorkflowsApiEndpointsWorkflowInstancesListListAsync(System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<CreatedApiKeyDto> CreateApiKeyAsync(string? x_Tenant, CreateApiKeyCommand command, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesJournalListResponse> ElsaWorkflowsApiEndpointsWorkflowInstancesJournalListGetAsync(string id, int? page, int? pageSize, int? skip, int? take);
+        System.Threading.Tasks.Task<PagedResponseOfApiKeyDto> SearchApiKeysAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields, string? x_Tenant);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesJournalListResponse> ElsaWorkflowsApiEndpointsWorkflowInstancesJournalListGetAsync(string id, int? page, int? pageSize, int? skip, int? take, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<PagedResponseOfApiKeyDto> SearchApiKeysAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields, string? x_Tenant, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesJournalFilteredListResponse> ElsaWorkflowsApiEndpointsWorkflowInstancesJournalFilteredListGetAsync(string id, ElsaWorkflowsApiEndpointsWorkflowInstancesJournalFilteredListRequest request);
+        System.Threading.Tasks.Task RevokeApiKeyAsync(System.Guid id, string? x_Tenant);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesJournalFilteredListResponse> ElsaWorkflowsApiEndpointsWorkflowInstancesJournalFilteredListGetAsync(string id, ElsaWorkflowsApiEndpointsWorkflowInstancesJournalFilteredListRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task RevokeApiKeyAsync(System.Guid id, string? x_Tenant, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsRuntimeEntitiesWorkflowExecutionLogRecord> ElsaWorkflowsApiEndpointsWorkflowInstancesJournalGetLastEntryGetAsync(string workflowInstanceId, string activityId);
+        System.Threading.Tasks.Task<PagedResponseOfRoleDto> SearchRolesAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields, string? x_Tenant);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsRuntimeEntitiesWorkflowExecutionLogRecord> ElsaWorkflowsApiEndpointsWorkflowInstancesJournalGetLastEntryGetAsync(string workflowInstanceId, string activityId, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<PagedResponseOfRoleDto> SearchRolesAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields, string? x_Tenant, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesImportResponse> ElsaWorkflowsApiEndpointsWorkflowInstancesImportImportAsync();
+        System.Threading.Tasks.Task<RoleDetailDto> CreateRoleAsync(string? x_Tenant, CreateRoleCommand command);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesImportResponse> ElsaWorkflowsApiEndpointsWorkflowInstancesImportImportAsync(System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<RoleDetailDto> CreateRoleAsync(string? x_Tenant, CreateRoleCommand command, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiModelsWorkflowInstanceModel> ElsaWorkflowsApiEndpointsWorkflowInstancesGetGetAsync(string id);
+        System.Threading.Tasks.Task<RoleDetailDto> GetRoleAsync(System.Guid id, string? x_Tenant);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiModelsWorkflowInstanceModel> ElsaWorkflowsApiEndpointsWorkflowInstancesGetGetAsync(string id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<RoleDetailDto> GetRoleAsync(System.Guid id, string? x_Tenant, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowInstancesDeleteDeleteAsync(string id);
+        System.Threading.Tasks.Task<RoleDetailDto> UpdateRoleAsync(System.Guid id, string? x_Tenant, UpdateRoleRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowInstancesDeleteDeleteAsync(string id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<RoleDetailDto> UpdateRoleAsync(System.Guid id, string? x_Tenant, UpdateRoleRequest request, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task GetElsaWorkflowsApiEndpointsWorkflowInstancesExportExport1Async(string? id, System.Collections.Generic.IEnumerable<string> ids, bool includeBookmarks, bool includeActivityExecutionLog, bool includeWorkflowExecutionLog);
+        System.Threading.Tasks.Task DeleteRoleAsync(System.Guid id, string? x_Tenant);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task GetElsaWorkflowsApiEndpointsWorkflowInstancesExportExport1Async(string? id, System.Collections.Generic.IEnumerable<string> ids, bool includeBookmarks, bool includeActivityExecutionLog, bool includeWorkflowExecutionLog, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task DeleteRoleAsync(System.Guid id, string? x_Tenant, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PostElsaWorkflowsApiEndpointsWorkflowInstancesExportExport1Async();
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetRolePermissionsAsync(System.Guid id, string? x_Tenant);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PostElsaWorkflowsApiEndpointsWorkflowInstancesExportExport1Async(System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetRolePermissionsAsync(System.Guid id, string? x_Tenant, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task GetElsaWorkflowsApiEndpointsWorkflowInstancesExportExport2Async(string id, System.Collections.Generic.IEnumerable<string> ids, bool includeBookmarks, bool includeActivityExecutionLog, bool includeWorkflowExecutionLog);
+        System.Threading.Tasks.Task<RoleDetailDto> SetRolePermissionsAsync(System.Guid id, string? x_Tenant, SetPermissionsRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task GetElsaWorkflowsApiEndpointsWorkflowInstancesExportExport2Async(string id, System.Collections.Generic.IEnumerable<string> ids, bool includeBookmarks, bool includeActivityExecutionLog, bool includeWorkflowExecutionLog, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<RoleDetailDto> SetRolePermissionsAsync(System.Guid id, string? x_Tenant, SetPermissionsRequest request, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PostElsaWorkflowsApiEndpointsWorkflowInstancesExportExport2Async(string id);
+        System.Threading.Tasks.Task<TokenResult> IssueTokenAsync(string? x_Tenant, LoginCommand command);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PostElsaWorkflowsApiEndpointsWorkflowInstancesExportExport2Async(string id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<TokenResult> IssueTokenAsync(string? x_Tenant, LoginCommand command, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesExecutionStateResponse> ElsaWorkflowsApiEndpointsWorkflowInstancesExecutionStateExecutionStateAsync(string id);
+        System.Threading.Tasks.Task<TokenResult> RefreshTokenAsync(string? x_Tenant, RefreshTokenCommand command);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesExecutionStateResponse> ElsaWorkflowsApiEndpointsWorkflowInstancesExecutionStateExecutionStateAsync(string id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<TokenResult> RefreshTokenAsync(string? x_Tenant, RefreshTokenCommand command, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowInstancesCancelCancelAsync(string id);
+        System.Threading.Tasks.Task RevokeTokenAsync(string? x_Tenant, RevokeRefreshTokenCommand command);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowInstancesCancelCancelAsync(string id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task RevokeTokenAsync(string? x_Tenant, RevokeRefreshTokenCommand command, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesBulkDeleteResponse> ElsaWorkflowsApiEndpointsWorkflowInstancesBulkDeleteBulkDelete1Async(ElsaWorkflowsApiEndpointsWorkflowInstancesBulkDeleteRequest request);
+        System.Threading.Tasks.Task<UserDetailDto> RegisterUserAsync(string? x_Tenant, CreateUserCommand command);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesBulkDeleteResponse> ElsaWorkflowsApiEndpointsWorkflowInstancesBulkDeleteBulkDelete1Async(ElsaWorkflowsApiEndpointsWorkflowInstancesBulkDeleteRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<UserDetailDto> RegisterUserAsync(string? x_Tenant, CreateUserCommand command, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesBulkDeleteResponse> ElsaWorkflowsApiEndpointsWorkflowInstancesBulkDeleteBulkDelete2Async(ElsaWorkflowsApiEndpointsWorkflowInstancesBulkDeleteRequest request);
+        System.Threading.Tasks.Task<PagedResponseOfUserDto> SearchUsersAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields, string? x_Tenant);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesBulkDeleteResponse> ElsaWorkflowsApiEndpointsWorkflowInstancesBulkDeleteBulkDelete2Async(ElsaWorkflowsApiEndpointsWorkflowInstancesBulkDeleteRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<PagedResponseOfUserDto> SearchUsersAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields, string? x_Tenant, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesBulkCancelResponse> ElsaWorkflowsApiEndpointsWorkflowInstancesBulkCancelBulkCancelAsync(ElsaWorkflowsApiEndpointsWorkflowInstancesBulkCancelRequest request);
+        System.Threading.Tasks.Task<UserDetailDto> GetMyProfileAsync(string? x_Tenant);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesBulkCancelResponse> ElsaWorkflowsApiEndpointsWorkflowInstancesBulkCancelBulkCancelAsync(ElsaWorkflowsApiEndpointsWorkflowInstancesBulkCancelRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<UserDetailDto> GetMyProfileAsync(string? x_Tenant, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsVersionDeleteVersionAsync(string definitionId, string version);
+        System.Threading.Tasks.Task ChangeMyPasswordAsync(string? x_Tenant, ChangePasswordCommand command);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsVersionDeleteVersionAsync(string definitionId, string version, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task ChangeMyPasswordAsync(string? x_Tenant, ChangePasswordCommand command, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsVersionListVersionsAsync(string definitionId);
+        System.Threading.Tasks.Task<UserDetailDto> GetUserAsync(System.Guid id, string? x_Tenant);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsVersionListVersionsAsync(string definitionId, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<UserDetailDto> GetUserAsync(System.Guid id, string? x_Tenant, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsVersionRevertVersionAsync(string definitionId, string version);
+        System.Threading.Tasks.Task<UserDetailDto> UpdateUserAsync(System.Guid id, string? x_Tenant, UpdateUserRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsVersionRevertVersionAsync(string definitionId, string version, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<UserDetailDto> UpdateUserAsync(System.Guid id, string? x_Tenant, UpdateUserRequest request, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsUpdateReferencesResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsUpdateReferencesUpdateReferencesAsync(string definitionId);
+        System.Threading.Tasks.Task DeleteUserAsync(System.Guid id, string? x_Tenant);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsUpdateReferencesResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsUpdateReferencesUpdateReferencesAsync(string definitionId, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task DeleteUserAsync(System.Guid id, string? x_Tenant, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiModelsLinkedWorkflowDefinitionModel> ElsaWorkflowsApiEndpointsWorkflowDefinitionsRetractRetractAsync(string definitionId);
+        System.Threading.Tasks.Task<UserDto> ToggleUserStatusAsync(System.Guid id, string? x_Tenant, ToggleStatusRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiModelsLinkedWorkflowDefinitionModel> ElsaWorkflowsApiEndpointsWorkflowDefinitionsRetractRetractAsync(string definitionId, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<UserDto> ToggleUserStatusAsync(System.Guid id, string? x_Tenant, ToggleStatusRequest request, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsReloadReloadAsync();
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetUserRolesAsync(System.Guid id, string? x_Tenant);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsReloadReloadAsync(System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetUserRolesAsync(System.Guid id, string? x_Tenant, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsRefreshRefreshAsync(ElsaWorkflowsApiEndpointsWorkflowDefinitionsRefreshRequest request);
+        System.Threading.Tasks.Task<UserDetailDto> AssignUserRolesAsync(System.Guid id, string? x_Tenant, AssignRolesRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsRefreshRefreshAsync(ElsaWorkflowsApiEndpointsWorkflowDefinitionsRefreshRequest request, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<UserDetailDto> AssignUserRolesAsync(System.Guid id, string? x_Tenant, AssignRolesRequest request, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsPublishResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsPublishPublishAsync(string definitionId);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetUserPermissionsAsync(System.Guid id, string? x_Tenant);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsPublishResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsPublishPublishAsync(string definitionId, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetUserPermissionsAsync(System.Guid id, string? x_Tenant, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiModelsLinkedWorkflowDefinitionModel> ElsaWorkflowsApiEndpointsWorkflowDefinitionsPostPostAsync(ElsaWorkflowsManagementModelsSaveWorkflowDefinitionRequest saveWorkflowDefinitionRequest);
+        System.Threading.Tasks.Task ResetUserPasswordAsync(System.Guid id, string? x_Tenant, ResetPasswordRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiModelsLinkedWorkflowDefinitionModel> ElsaWorkflowsApiEndpointsWorkflowDefinitionsPostPostAsync(ElsaWorkflowsManagementModelsSaveWorkflowDefinitionRequest saveWorkflowDefinitionRequest, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task ResetUserPasswordAsync(System.Guid id, string? x_Tenant, ResetPasswordRequest request, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaModelsPagedListResponseOfLinkedWorkflowDefinitionSummary> ElsaWorkflowsApiEndpointsWorkflowDefinitionsListListAsync(string? versionOptions, System.Collections.Generic.IEnumerable<string>? definitionIds, System.Collections.Generic.IEnumerable<string>? ids, string? materializer, System.Collections.Generic.IEnumerable<string>? label, int? page, int? pageSize, ElsaWorkflowsApiModelsOrderByWorkflowDefinition? orderBy, ElsaCommonEntitiesOrderDirection? orderDirection, string? searchTerm, bool? isSystem);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ModulePackageDto>> ListModulePackagesAsync(ModuleTarget? target, string? x_Tenant);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaModelsPagedListResponseOfLinkedWorkflowDefinitionSummary> ElsaWorkflowsApiEndpointsWorkflowDefinitionsListListAsync(string? versionOptions, System.Collections.Generic.IEnumerable<string>? definitionIds, System.Collections.Generic.IEnumerable<string>? ids, string? materializer, System.Collections.Generic.IEnumerable<string>? label, int? page, int? pageSize, ElsaWorkflowsApiModelsOrderByWorkflowDefinition? orderBy, ElsaCommonEntitiesOrderDirection? orderDirection, string? searchTerm, bool? isSystem, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ModulePackageDto>> ListModulePackagesAsync(ModuleTarget? target, string? x_Tenant, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsIsNameUniqueIsNameUniqueAsync(string name, string? definitionId);
+        System.Threading.Tasks.Task<ModulePackageDto> UploadModulePackageAsync(UploadModulePackageForm form, string? x_Tenant);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsIsNameUniqueIsNameUniqueAsync(string name, string? definitionId, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<ModulePackageDto> UploadModulePackageAsync(UploadModulePackageForm form, string? x_Tenant, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsImportFilesImportFilesAsync(string? id, string? tenantId, string? name, string? description, System.DateTime? createdAt, int? version, string? toolVersion, System.Collections.Generic.IEnumerable<ElsaWorkflowsModelsVariableDefinition>? variables, System.Collections.Generic.IEnumerable<ElsaWorkflowsModelsInputDefinition>? inputs, System.Collections.Generic.IEnumerable<ElsaWorkflowsModelsOutputDefinition>? outputs, System.Collections.Generic.IEnumerable<string>? outcomes, System.Collections.Generic.IDictionary<string, object>? customProperties, bool? isReadonly, bool? isSystem, bool? isLatest, bool? isPublished, ElsaWorkflowsModelsWorkflowOptions? options, bool? usableAsActivity, ElsaWorkflowsIActivity? root);
+        System.Threading.Tasks.Task<ModulePackageDto> GetModulePackageAsync(string id, string? x_Tenant);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsImportFilesImportFilesAsync(string? id, string? tenantId, string? name, string? description, System.DateTime? createdAt, int? version, string? toolVersion, System.Collections.Generic.IEnumerable<ElsaWorkflowsModelsVariableDefinition>? variables, System.Collections.Generic.IEnumerable<ElsaWorkflowsModelsInputDefinition>? inputs, System.Collections.Generic.IEnumerable<ElsaWorkflowsModelsOutputDefinition>? outputs, System.Collections.Generic.IEnumerable<string>? outcomes, System.Collections.Generic.IDictionary<string, object>? customProperties, bool? isReadonly, bool? isSystem, bool? isLatest, bool? isPublished, ElsaWorkflowsModelsWorkflowOptions? options, bool? usableAsActivity, ElsaWorkflowsIActivity? root, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<ModulePackageDto> GetModulePackageAsync(string id, string? x_Tenant, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PostElsaWorkflowsApiEndpointsWorkflowDefinitionsImportImport1Async(ElsaWorkflowsManagementModelsWorkflowDefinitionModel workflowDefinitionModel);
+        System.Threading.Tasks.Task DeleteModulePackageAsync(string id, string? x_Tenant);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PostElsaWorkflowsApiEndpointsWorkflowDefinitionsImportImport1Async(ElsaWorkflowsManagementModelsWorkflowDefinitionModel workflowDefinitionModel, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task DeleteModulePackageAsync(string id, string? x_Tenant, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PutElsaWorkflowsApiEndpointsWorkflowDefinitionsImportImport1Async(ElsaWorkflowsManagementModelsWorkflowDefinitionModel workflowDefinitionModel);
+        System.Threading.Tasks.Task DownloadModulePackageAsync(string id, string? x_Tenant);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PutElsaWorkflowsApiEndpointsWorkflowDefinitionsImportImport1Async(ElsaWorkflowsManagementModelsWorkflowDefinitionModel workflowDefinitionModel, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task DownloadModulePackageAsync(string id, string? x_Tenant, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PostElsaWorkflowsApiEndpointsWorkflowDefinitionsImportImport2Async(string definitionId, ElsaWorkflowsManagementModelsWorkflowDefinitionModel workflowDefinitionModel);
+        System.Threading.Tasks.Task<ModulePackageDto> SetModulePackageEnabledAsync(string id, string? x_Tenant, SetEnabledRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PostElsaWorkflowsApiEndpointsWorkflowDefinitionsImportImport2Async(string definitionId, ElsaWorkflowsManagementModelsWorkflowDefinitionModel workflowDefinitionModel, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<ModulePackageDto> SetModulePackageEnabledAsync(string id, string? x_Tenant, SetEnabledRequest request, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PutElsaWorkflowsApiEndpointsWorkflowDefinitionsImportImport2Async(string definitionId, ElsaWorkflowsManagementModelsWorkflowDefinitionModel workflowDefinitionModel);
+        System.Threading.Tasks.Task<ModulePackageDto> SetModulePackageConfigurationAsync(string id, string? x_Tenant, SetConfigurationRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PutElsaWorkflowsApiEndpointsWorkflowDefinitionsImportImport2Async(string definitionId, ElsaWorkflowsManagementModelsWorkflowDefinitionModel workflowDefinitionModel, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<ModulePackageDto> SetModulePackageConfigurationAsync(string id, string? x_Tenant, SetConfigurationRequest request, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsGraphGraphAsync(string id, string parentNodeId);
+        System.Threading.Tasks.Task RestartHostAsync(string? x_Tenant);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsGraphGraphAsync(string id, string parentNodeId, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task RestartHostAsync(string? x_Tenant, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsGraphSegmentsNodesAsync(string id, string childNodeId);
+        System.Threading.Tasks.Task<TenantResult> CreateTenantAsync(string? x_Tenant, CreateTenantCommand command);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsGraphSegmentsNodesAsync(string id, string childNodeId, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<TenantResult> CreateTenantAsync(string? x_Tenant, CreateTenantCommand command, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsGetManyByIdGetManyByIdAsync(System.Collections.Generic.IEnumerable<string> ids);
+        System.Threading.Tasks.Task<PagedResponseOfTenantDto> SearchTenantsAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields, string? x_Tenant);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsGetManyByIdGetManyByIdAsync(System.Collections.Generic.IEnumerable<string> ids, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<PagedResponseOfTenantDto> SearchTenantsAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields, string? x_Tenant, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task GetWorkflowDefinitionByIdAsync(string id);
+        System.Threading.Tasks.Task<PagedResponseOfTenantProvisioningDto> SearchProvisioningsAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields, string? x_Tenant);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task GetWorkflowDefinitionByIdAsync(string id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<PagedResponseOfTenantProvisioningDto> SearchProvisioningsAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields, string? x_Tenant, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsGetByDefinitionIdGetByDefinitionId1Async(string definitionId, string? versionOptions);
+        System.Threading.Tasks.Task<TenantDto> GetTenantAsync(string id, string? x_Tenant);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsGetByDefinitionIdGetByDefinitionId1Async(string definitionId, string? versionOptions, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<TenantDto> GetTenantAsync(string id, string? x_Tenant, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsGetByDefinitionIdGetByDefinitionId2Async(string definitionId, string? versionOptions);
+        System.Threading.Tasks.Task<TenantDto> ActivateTenantAsync(string id, string? x_Tenant);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsGetByDefinitionIdGetByDefinitionId2Async(string definitionId, string? versionOptions, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<TenantDto> ActivateTenantAsync(string id, string? x_Tenant, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsDeleteDeleteAsync(string definitionId);
+        System.Threading.Tasks.Task<TenantDto> DeactivateTenantAsync(string id, string? x_Tenant);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsDeleteDeleteAsync(string definitionId, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<TenantDto> DeactivateTenantAsync(string id, string? x_Tenant, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task GetElsaWorkflowsApiEndpointsWorkflowDefinitionsExportExport1Async(string? definitionId, string? versionOptions, System.Collections.Generic.IEnumerable<string>? ids, bool includeConsumingWorkflows);
+        System.Threading.Tasks.Task<TenantDto> UpgradeTenantAsync(string id, string? x_Tenant, RenewTenantRequest request);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task GetElsaWorkflowsApiEndpointsWorkflowDefinitionsExportExport1Async(string? definitionId, string? versionOptions, System.Collections.Generic.IEnumerable<string>? ids, bool includeConsumingWorkflows, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<TenantDto> UpgradeTenantAsync(string id, string? x_Tenant, RenewTenantRequest request, System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PostElsaWorkflowsApiEndpointsWorkflowDefinitionsExportExport1Async();
+        System.Threading.Tasks.Task<TenantProvisioningDto> RetryTenantProvisioningAsync(string id, string? x_Tenant);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PostElsaWorkflowsApiEndpointsWorkflowDefinitionsExportExport1Async(System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task GetElsaWorkflowsApiEndpointsWorkflowDefinitionsExportExport2Async(string definitionId, string? versionOptions, System.Collections.Generic.IEnumerable<string>? ids, bool includeConsumingWorkflows);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task GetElsaWorkflowsApiEndpointsWorkflowDefinitionsExportExport2Async(string definitionId, string? versionOptions, System.Collections.Generic.IEnumerable<string>? ids, bool includeConsumingWorkflows, System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PostElsaWorkflowsApiEndpointsWorkflowDefinitionsExportExport2Async(string definitionId);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PostElsaWorkflowsApiEndpointsWorkflowDefinitionsExportExport2Async(string definitionId, System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsExecuteGetEndpointAsync(string definitionId, string? correlationId, string? name, string? triggerActivityId, ElsaWorkflowsModelsActivityHandle? activityHandle, string? versionOptions, string? input, string? variables);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsExecuteGetEndpointAsync(string definitionId, string? correlationId, string? name, string? triggerActivityId, ElsaWorkflowsModelsActivityHandle? activityHandle, string? versionOptions, string? input, string? variables, System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsExecuteResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsExecutePostEndpointAsync(string definitionId);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsExecuteResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsExecutePostEndpointAsync(string definitionId, System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsDispatchResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsDispatchEndpointAsync(string definitionId, ElsaWorkflowsApiEndpointsWorkflowDefinitionsDispatchRequest request);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsDispatchResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsDispatchEndpointAsync(string definitionId, ElsaWorkflowsApiEndpointsWorkflowDefinitionsDispatchRequest request, System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsDeleteVersionDeleteVersionAsync(string id);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsDeleteVersionDeleteVersionAsync(string id, System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsCountResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsCountCountAsync();
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsCountResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsCountCountAsync(System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsConsumersResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsConsumersConsumersAsync(string definitionId);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsConsumersResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsConsumersConsumersAsync(string definitionId, System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkRetractResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkRetractBulkRetractAsync(ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkRetractRequest request);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkRetractResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkRetractBulkRetractAsync(ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkRetractRequest request, System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkPublishResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkPublishBulkPublishAsync(ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkPublishRequest request);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkPublishResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkPublishBulkPublishAsync(ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkPublishRequest request, System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDispatchResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDispatchEndpointAsync(string definitionId, ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDispatchRequest request);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDispatchResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDispatchEndpointAsync(string definitionId, ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDispatchRequest request, System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDeleteVersionsResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDeleteVersionsBulkDeleteVersionsAsync(ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDeleteVersionsRequest request);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDeleteVersionsResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDeleteVersionsBulkDeleteVersionsAsync(ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDeleteVersionsRequest request, System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDeleteResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDeleteBulkDeleteAsync(ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDeleteRequest request);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDeleteResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDeleteBulkDeleteAsync(ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDeleteRequest request, System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaModelsListResponseOfWorkflowActivationStrategyDescriptor> ElsaWorkflowsApiEndpointsWorkflowActivationStrategiesListListAsync();
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaModelsListResponseOfWorkflowActivationStrategyDescriptor> ElsaWorkflowsApiEndpointsWorkflowActivationStrategiesListListAsync(System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsVariableTypesListResponse> ElsaWorkflowsApiEndpointsVariableTypesListListAsync();
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsVariableTypesListResponse> ElsaWorkflowsApiEndpointsVariableTypesListListAsync(System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsTestsActivitiesEndpointAsync(ElsaWorkflowsApiEndpointsTestsActivitiesRequest request);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsTestsActivitiesEndpointAsync(ElsaWorkflowsApiEndpointsTestsActivitiesRequest request, System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsTasksCompleteResponse> ElsaWorkflowsApiEndpointsTasksCompleteCompleteAsync(string taskId, ElsaWorkflowsApiEndpointsTasksCompleteRequest request);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsTasksCompleteResponse> ElsaWorkflowsApiEndpointsTasksCompleteCompleteAsync(string taskId, ElsaWorkflowsApiEndpointsTasksCompleteRequest request, System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsStorageDriversListResponse> ElsaWorkflowsApiEndpointsStorageDriversListListAsync();
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsStorageDriversListResponse> ElsaWorkflowsApiEndpointsStorageDriversListListAsync(System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaModelsListResponseOfExpressionDescriptorModel> ElsaWorkflowsApiEndpointsScriptingExpressionDescriptorsListListAsync();
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaModelsListResponseOfExpressionDescriptorModel> ElsaWorkflowsApiEndpointsScriptingExpressionDescriptorsListListAsync(System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsRuntimeAdminStatusResponse> ElsaWorkflowsApiEndpointsRuntimeAdminStatusStatusEndpointAsync();
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsRuntimeAdminStatusResponse> ElsaWorkflowsApiEndpointsRuntimeAdminStatusStatusEndpointAsync(System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsRuntimeAdminStatusResponse> ElsaWorkflowsApiEndpointsRuntimeAdminResumeResumeEndpointAsync();
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsRuntimeAdminStatusResponse> ElsaWorkflowsApiEndpointsRuntimeAdminResumeResumeEndpointAsync(System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsRuntimeAdminStatusResponse> ElsaWorkflowsApiEndpointsRuntimeAdminPausePauseEndpointAsync(ElsaWorkflowsApiEndpointsRuntimeAdminPauseRequest pauseRequest);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsRuntimeAdminStatusResponse> ElsaWorkflowsApiEndpointsRuntimeAdminPausePauseEndpointAsync(ElsaWorkflowsApiEndpointsRuntimeAdminPauseRequest pauseRequest, System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsRuntimeAdminForceDrainResponse> ElsaWorkflowsApiEndpointsRuntimeAdminForceDrainForceDrainEndpointAsync(ElsaWorkflowsApiEndpointsRuntimeAdminForceDrainRequest forceDrainRequest);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsRuntimeAdminForceDrainResponse> ElsaWorkflowsApiEndpointsRuntimeAdminForceDrainForceDrainEndpointAsync(ElsaWorkflowsApiEndpointsRuntimeAdminForceDrainRequest forceDrainRequest, System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsPackageResponse> ElsaWorkflowsApiEndpointsPackageVersionAsync();
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsPackageResponse> ElsaWorkflowsApiEndpointsPackageVersionAsync(System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaModelsListResponseOfOutputConverterDescriptorModel> ElsaWorkflowsApiEndpointsOutputConvertersListListAsync();
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaModelsListResponseOfOutputConverterDescriptorModel> ElsaWorkflowsApiEndpointsOutputConvertersListListAsync(System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaModelsListResponseOfLogPersistenceStrategyDescriptor> ElsaWorkflowsApiEndpointsLogPersistenceStrategiesListEndpointAsync();
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaModelsListResponseOfLogPersistenceStrategyDescriptor> ElsaWorkflowsApiEndpointsLogPersistenceStrategiesListEndpointAsync(System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaModelsListResponseOfIncidentStrategyDescriptor> ElsaWorkflowsApiEndpointsIncidentStrategiesListListAsync();
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaModelsListResponseOfIncidentStrategyDescriptor> ElsaWorkflowsApiEndpointsIncidentStrategiesListListAsync(System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaModelsListResponseOfFeatureDescriptor> ElsaWorkflowsApiEndpointsFeaturesListListAsync();
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaModelsListResponseOfFeatureDescriptor> ElsaWorkflowsApiEndpointsFeaturesListListAsync(System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaFeaturesModelsFeatureDescriptor> ElsaWorkflowsApiEndpointsFeaturesGetGetAsync(string fullName);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaFeaturesModelsFeatureDescriptor> ElsaWorkflowsApiEndpointsFeaturesGetGetAsync(string fullName, System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsEventsTriggerPublicTriggerAsync();
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsEventsTriggerPublicTriggerAsync(System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsEventsTriggerAuthenticatedTriggerAsync(string eventName, ElsaWorkflowsApiEndpointsEventsTriggerAuthenticatedRequest request);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsEventsTriggerAuthenticatedTriggerAsync(string eventName, ElsaWorkflowsApiEndpointsEventsTriggerAuthenticatedRequest request, System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaModelsListResponseOfCommitStrategyDescriptor> ElsaWorkflowsApiEndpointsCommitStrategiesWorkflowsListListAsync();
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaModelsListResponseOfCommitStrategyDescriptor> ElsaWorkflowsApiEndpointsCommitStrategiesWorkflowsListListAsync(System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaModelsListResponseOfCommitStrategyDescriptor> ElsaWorkflowsApiEndpointsCommitStrategiesActivitiesListListAsync();
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaModelsListResponseOfCommitStrategyDescriptor> ElsaWorkflowsApiEndpointsCommitStrategiesActivitiesListListAsync(System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task GetElsaWorkflowsApiEndpointsBookmarksResumeResumeAsync();
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task GetElsaWorkflowsApiEndpointsBookmarksResumeResumeAsync(System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PostElsaWorkflowsApiEndpointsBookmarksResumeResumeAsync();
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task PostElsaWorkflowsApiEndpointsBookmarksResumeResumeAsync(System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersReplayResponse> ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersReplayEndpointAsync(string id);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersReplayResponse> ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersReplayEndpointAsync(string id, System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersListResponse> GetElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersListEndpointAsync(int? page, int? pageSize, string? workflowInstanceId);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersListResponse> GetElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersListEndpointAsync(int? page, int? pageSize, string? workflowInstanceId, System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersListResponse> PostElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersListEndpointAsync();
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersListResponse> PostElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersListEndpointAsync(System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersBookmarkQueueDeadLetterModel> ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersGetEndpointAsync(string id);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersBookmarkQueueDeadLetterModel> ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersGetEndpointAsync(string id, System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersDeleteEndpointAsync(string id);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersDeleteEndpointAsync(string id, System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaModelsListResponseOfActivityExecutionRecordSummary> ElsaWorkflowsApiEndpointsActivityExecutionSummariesListSummariesEndpointAsync(string workflowInstanceId, string activityNodeId, bool? completed);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaModelsListResponseOfActivityExecutionRecordSummary> ElsaWorkflowsApiEndpointsActivityExecutionSummariesListSummariesEndpointAsync(string workflowInstanceId, string activityNodeId, bool? completed, System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsActivityExecutionsReportResponse> ElsaWorkflowsApiEndpointsActivityExecutionsReportReportAsync(ElsaWorkflowsApiEndpointsActivityExecutionsReportRequest request);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsActivityExecutionsReportResponse> ElsaWorkflowsApiEndpointsActivityExecutionsReportReportAsync(ElsaWorkflowsApiEndpointsActivityExecutionsReportRequest request, System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaModelsListResponseOfActivityExecutionRecord> ElsaWorkflowsApiEndpointsActivityExecutionsListListAsync(string workflowInstanceId, string activityNodeId, bool? completed);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaModelsListResponseOfActivityExecutionRecord> ElsaWorkflowsApiEndpointsActivityExecutionsListListAsync(string workflowInstanceId, string activityNodeId, bool? completed, System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsActivityExecutionsGetCallStackResponse> ElsaWorkflowsApiEndpointsActivityExecutionsGetCallStackEndpointAsync(string id, bool? includeCrossWorkflowChain, int? skip, int? take);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsActivityExecutionsGetCallStackResponse> ElsaWorkflowsApiEndpointsActivityExecutionsGetCallStackEndpointAsync(string id, bool? includeCrossWorkflowChain, int? skip, int? take, System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsRuntimeEntitiesActivityExecutionRecord> ElsaWorkflowsApiEndpointsActivityExecutionsGetEndpoint1Async(string id);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsRuntimeEntitiesActivityExecutionRecord> ElsaWorkflowsApiEndpointsActivityExecutionsGetEndpoint1Async(string id, System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsRuntimeEntitiesActivityExecutionRecord> ElsaWorkflowsApiEndpointsActivityExecutionsGetEndpoint2Async(string id);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsRuntimeEntitiesActivityExecutionRecord> ElsaWorkflowsApiEndpointsActivityExecutionsGetEndpoint2Async(string id, System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsRuntimeEntitiesActivityExecutionRecord> ElsaWorkflowsApiEndpointsActivityExecutionsGetEndpoint3Async();
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsRuntimeEntitiesActivityExecutionRecord> ElsaWorkflowsApiEndpointsActivityExecutionsGetEndpoint3Async(System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaModelsCountResponse> ElsaWorkflowsApiEndpointsActivityExecutionsCountCountAsync(string workflowInstanceId, string activityId, bool? completed);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaModelsCountResponse> ElsaWorkflowsApiEndpointsActivityExecutionsCountCountAsync(string workflowInstanceId, string activityId, bool? completed, System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsActivityDescriptorsListResponse> ElsaWorkflowsApiEndpointsActivityDescriptorsListListAsync();
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsActivityDescriptorsListResponse> ElsaWorkflowsApiEndpointsActivityDescriptorsListListAsync(System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsModelsActivityDescriptor> ElsaWorkflowsApiEndpointsActivityDescriptorsGetGetAsync(string typeName, int? version);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsModelsActivityDescriptor> ElsaWorkflowsApiEndpointsActivityDescriptorsGetGetAsync(string typeName, int? version, System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsActivityDescriptorOptionsGetResponse> ElsaWorkflowsApiEndpointsActivityDescriptorOptionsGetGetAsync(string activityTypeName, string propertyName, ElsaWorkflowsApiEndpointsActivityDescriptorOptionsGetRequest request);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsActivityDescriptorOptionsGetResponse> ElsaWorkflowsApiEndpointsActivityDescriptorOptionsGetGetAsync(string activityTypeName, string propertyName, ElsaWorkflowsApiEndpointsActivityDescriptorOptionsGetRequest request, System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaResilienceEndpointsSimulateResponseSimulatedResponse> ElsaResilienceEndpointsSimulateResponseSimulateResponseEndpointAsync();
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ElsaResilienceEndpointsSimulateResponseSimulatedResponse> ElsaResilienceEndpointsSimulateResponseSimulateResponseEndpointAsync(System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaResilienceEndpointsRetriesListEndpointAsync(string activityInstanceId);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaResilienceEndpointsRetriesListEndpointAsync(string activityInstanceId, System.Threading.CancellationToken cancellationToken);
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaResilienceEndpointsResilienceStrategiesListEndpointAsync();
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ElsaResilienceEndpointsResilienceStrategiesListEndpointAsync(System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetPermissionsAsync();
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetPermissionsAsync(System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetShareAllModuleManifest> GetCoreModulesAsync();
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetShareAllModuleManifest> GetCoreModulesAsync(System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetShareAllModuleManifest> GetMyModulesAsync();
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetShareAllModuleManifest> GetMyModulesAsync(System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesElsaHostApplicationQueriesElsaInfoDto> GetElsaInfoAsync();
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesElsaHostApplicationQueriesElsaInfoDto> GetElsaInfoAsync(System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonCreatedApiKeyDto> CreateApiKeyAsync(SoftsquarenetModularBlazorHostModulesAuthApplicationApiKeysCreateApiKeyCommand command);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonCreatedApiKeyDto> CreateApiKeyAsync(SoftsquarenetModularBlazorHostModulesAuthApplicationApiKeysCreateApiKeyCommand command, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorCorePaginationPagedResponseOfApiKeyDto> SearchApiKeysAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorCorePaginationPagedResponseOfApiKeyDto> SearchApiKeysAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task RevokeApiKeyAsync(System.Guid id);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task RevokeApiKeyAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorCorePaginationPagedResponseOfRoleDto> SearchRolesAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorCorePaginationPagedResponseOfRoleDto> SearchRolesAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonRoleDetailDto> CreateRoleAsync(SoftsquarenetModularBlazorHostModulesAuthApplicationRolesCreateRoleCommand command);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonRoleDetailDto> CreateRoleAsync(SoftsquarenetModularBlazorHostModulesAuthApplicationRolesCreateRoleCommand command, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonRoleDetailDto> GetRoleAsync(System.Guid id);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonRoleDetailDto> GetRoleAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonRoleDetailDto> UpdateRoleAsync(System.Guid id, SoftsquarenetModularBlazorHostModulesAuthInfrastructureEndpointsUpdateRoleRequest request);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonRoleDetailDto> UpdateRoleAsync(System.Guid id, SoftsquarenetModularBlazorHostModulesAuthInfrastructureEndpointsUpdateRoleRequest request, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task DeleteRoleAsync(System.Guid id);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task DeleteRoleAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetRolePermissionsAsync(System.Guid id);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetRolePermissionsAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonRoleDetailDto> SetRolePermissionsAsync(System.Guid id, SoftsquarenetModularBlazorHostModulesAuthInfrastructureEndpointsSetPermissionsRequest request);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonRoleDetailDto> SetRolePermissionsAsync(System.Guid id, SoftsquarenetModularBlazorHostModulesAuthInfrastructureEndpointsSetPermissionsRequest request, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonTokenResult> IssueTokenAsync(SoftsquarenetModularBlazorHostModulesAuthApplicationTokensLoginCommand command);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonTokenResult> IssueTokenAsync(SoftsquarenetModularBlazorHostModulesAuthApplicationTokensLoginCommand command, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonTokenResult> RefreshTokenAsync(SoftsquarenetModularBlazorHostModulesAuthApplicationTokensRefreshTokenCommand command);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonTokenResult> RefreshTokenAsync(SoftsquarenetModularBlazorHostModulesAuthApplicationTokensRefreshTokenCommand command, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task RevokeTokenAsync(SoftsquarenetModularBlazorHostModulesAuthApplicationTokensRevokeRefreshTokenCommand command);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task RevokeTokenAsync(SoftsquarenetModularBlazorHostModulesAuthApplicationTokensRevokeRefreshTokenCommand command, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonUserDetailDto> RegisterUserAsync(SoftsquarenetModularBlazorHostModulesAuthApplicationUsersCreateUserCommand command);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonUserDetailDto> RegisterUserAsync(SoftsquarenetModularBlazorHostModulesAuthApplicationUsersCreateUserCommand command, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorCorePaginationPagedResponseOfUserDto> SearchUsersAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorCorePaginationPagedResponseOfUserDto> SearchUsersAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonUserDetailDto> GetMyProfileAsync();
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonUserDetailDto> GetMyProfileAsync(System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ChangeMyPasswordAsync(SoftsquarenetModularBlazorHostModulesAuthApplicationUsersChangePasswordCommand command);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ChangeMyPasswordAsync(SoftsquarenetModularBlazorHostModulesAuthApplicationUsersChangePasswordCommand command, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonUserDetailDto> GetUserAsync(System.Guid id);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonUserDetailDto> GetUserAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonUserDetailDto> UpdateUserAsync(System.Guid id, SoftsquarenetModularBlazorHostModulesAuthInfrastructureEndpointsUpdateUserRequest request);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonUserDetailDto> UpdateUserAsync(System.Guid id, SoftsquarenetModularBlazorHostModulesAuthInfrastructureEndpointsUpdateUserRequest request, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task DeleteUserAsync(System.Guid id);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task DeleteUserAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonUserDto> ToggleUserStatusAsync(System.Guid id, SoftsquarenetModularBlazorHostModulesAuthInfrastructureEndpointsToggleStatusRequest request);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonUserDto> ToggleUserStatusAsync(System.Guid id, SoftsquarenetModularBlazorHostModulesAuthInfrastructureEndpointsToggleStatusRequest request, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetUserRolesAsync(System.Guid id);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetUserRolesAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonUserDetailDto> AssignUserRolesAsync(System.Guid id, SoftsquarenetModularBlazorHostModulesAuthInfrastructureEndpointsAssignRolesRequest request);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonUserDetailDto> AssignUserRolesAsync(System.Guid id, SoftsquarenetModularBlazorHostModulesAuthInfrastructureEndpointsAssignRolesRequest request, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetUserPermissionsAsync(System.Guid id);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetUserPermissionsAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ResetUserPasswordAsync(System.Guid id, SoftsquarenetModularBlazorHostModulesAuthInfrastructureEndpointsResetPasswordRequest request);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task ResetUserPasswordAsync(System.Guid id, SoftsquarenetModularBlazorHostModulesAuthInfrastructureEndpointsResetPasswordRequest request, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<SoftsquarenetModularBlazorHostModulesCatalogApplicationPackagesModulePackageDto>> ListModulePackagesAsync(SoftsquarenetModularBlazorHostModulesCatalogDomainModuleTarget? target);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<SoftsquarenetModularBlazorHostModulesCatalogApplicationPackagesModulePackageDto>> ListModulePackagesAsync(SoftsquarenetModularBlazorHostModulesCatalogDomainModuleTarget? target, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesCatalogApplicationPackagesModulePackageDto> UploadModulePackageAsync(SoftsquarenetModularBlazorHostModulesCatalogInfrastructureEndpointsUploadModulePackageForm form);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesCatalogApplicationPackagesModulePackageDto> UploadModulePackageAsync(SoftsquarenetModularBlazorHostModulesCatalogInfrastructureEndpointsUploadModulePackageForm form, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesCatalogApplicationPackagesModulePackageDto> GetModulePackageAsync(string id);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesCatalogApplicationPackagesModulePackageDto> GetModulePackageAsync(string id, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task DeleteModulePackageAsync(string id);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task DeleteModulePackageAsync(string id, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task DownloadModulePackageAsync(string id);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task DownloadModulePackageAsync(string id, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesCatalogApplicationPackagesModulePackageDto> SetModulePackageEnabledAsync(string id, SoftsquarenetModularBlazorHostModulesCatalogInfrastructureEndpointsSetEnabledRequest request);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesCatalogApplicationPackagesModulePackageDto> SetModulePackageEnabledAsync(string id, SoftsquarenetModularBlazorHostModulesCatalogInfrastructureEndpointsSetEnabledRequest request, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesCatalogApplicationPackagesModulePackageDto> SetModulePackageConfigurationAsync(string id, SoftsquarenetModularBlazorHostModulesCatalogInfrastructureEndpointsSetConfigurationRequest request);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesCatalogApplicationPackagesModulePackageDto> SetModulePackageConfigurationAsync(string id, SoftsquarenetModularBlazorHostModulesCatalogInfrastructureEndpointsSetConfigurationRequest request, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task RestartHostAsync();
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task RestartHostAsync(System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesMultitenancyApplicationCommandsTenantResult> CreateTenantAsync(SoftsquarenetModularBlazorHostModulesMultitenancyApplicationCommandsCreateTenantCommand command);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesMultitenancyApplicationCommandsTenantResult> CreateTenantAsync(SoftsquarenetModularBlazorHostModulesMultitenancyApplicationCommandsCreateTenantCommand command, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorCorePaginationPagedResponseOfTenantDto> SearchTenantsAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorCorePaginationPagedResponseOfTenantDto> SearchTenantsAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorCorePaginationPagedResponseOfTenantProvisioningDto> SearchProvisioningsAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorCorePaginationPagedResponseOfTenantProvisioningDto> SearchProvisioningsAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto> GetTenantAsync(string id);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto> GetTenantAsync(string id, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto> ActivateTenantAsync(string id);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto> ActivateTenantAsync(string id, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto> DeactivateTenantAsync(string id);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto> DeactivateTenantAsync(string id, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto> UpgradeTenantAsync(string id, SoftsquarenetModularBlazorHostModulesMultitenancyInfrastructureEndpointsRenewTenantRequest request);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto> UpgradeTenantAsync(string id, SoftsquarenetModularBlazorHostModulesMultitenancyInfrastructureEndpointsRenewTenantRequest request, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesMultitenancyApplicationTenantProvisioningDto> RetryTenantProvisioningAsync(string id);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesMultitenancyApplicationTenantProvisioningDto> RetryTenantProvisioningAsync(string id, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<TenantProvisioningDto> RetryTenantProvisioningAsync(string id, string? x_Tenant, System.Threading.CancellationToken cancellationToken);
 
     }
 
@@ -1262,8896 +461,27 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
         partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, System.Text.StringBuilder urlBuilder);
         partial void ProcessResponse(System.Net.Http.HttpClient client, System.Net.Http.HttpResponseMessage response);
 
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaModelsListResponseOfResolvedVariableModel> ElsaWorkflowsApiEndpointsWorkflowInstancesVariablesPostListAsync(string id, ElsaWorkflowsApiEndpointsWorkflowInstancesVariablesPostRequest request)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetPermissionsAsync(string? x_Tenant)
         {
-            return ElsaWorkflowsApiEndpointsWorkflowInstancesVariablesPostListAsync(id, request, System.Threading.CancellationToken.None);
+            return GetPermissionsAsync(x_Tenant, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaModelsListResponseOfResolvedVariableModel> ElsaWorkflowsApiEndpointsWorkflowInstancesVariablesPostListAsync(string id, ElsaWorkflowsApiEndpointsWorkflowInstancesVariablesPostRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetPermissionsAsync(string? x_Tenant, System.Threading.CancellationToken cancellationToken)
         {
-            if (id == null)
-                throw new System.ArgumentNullException("id");
-
-            if (request == null)
-                throw new System.ArgumentNullException("request");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(request, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-instances/{id}/variables"
-                    urlBuilder_.Append("elsa/api/workflow-instances/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/variables");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaModelsListResponseOfResolvedVariableModel>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaModelsListResponseOfResolvedVariableModel2> ElsaWorkflowsApiEndpointsWorkflowInstancesVariablesListListAsync(string id)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowInstancesVariablesListListAsync(id, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaModelsListResponseOfResolvedVariableModel2> ElsaWorkflowsApiEndpointsWorkflowInstancesVariablesListListAsync(string id, System.Threading.CancellationToken cancellationToken)
-        {
-            if (id == null)
-                throw new System.ArgumentNullException("id");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-instances/{id}/variables"
-                    urlBuilder_.Append("elsa/api/workflow-instances/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/variables");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaModelsListResponseOfResolvedVariableModel2>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesListResponse> GetElsaWorkflowsApiEndpointsWorkflowInstancesListListAsync(int? page, int? pageSize, string? searchTerm, string? definitionId, System.Collections.Generic.IEnumerable<string>? definitionIds, string? correlationId, string? name, int? version, bool? hasIncidents, bool? isSystem, ElsaWorkflowsWorkflowStatus? status, System.Collections.Generic.IEnumerable<string>? statuses, ElsaWorkflowsWorkflowSubStatus? subStatus, System.Collections.Generic.IEnumerable<string>? subStatuses, ElsaWorkflowsApiModelsOrderByWorkflowInstance? orderBy, ElsaCommonEntitiesOrderDirection? orderDirection, System.Collections.Generic.IEnumerable<ElsaWorkflowsManagementModelsTimestampFilter>? timestampFilters)
-        {
-            return GetElsaWorkflowsApiEndpointsWorkflowInstancesListListAsync(page, pageSize, searchTerm, definitionId, definitionIds, correlationId, name, version, hasIncidents, isSystem, status, statuses, subStatus, subStatuses, orderBy, orderDirection, timestampFilters, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesListResponse> GetElsaWorkflowsApiEndpointsWorkflowInstancesListListAsync(int? page, int? pageSize, string? searchTerm, string? definitionId, System.Collections.Generic.IEnumerable<string>? definitionIds, string? correlationId, string? name, int? version, bool? hasIncidents, bool? isSystem, ElsaWorkflowsWorkflowStatus? status, System.Collections.Generic.IEnumerable<string>? statuses, ElsaWorkflowsWorkflowSubStatus? subStatus, System.Collections.Generic.IEnumerable<string>? subStatuses, ElsaWorkflowsApiModelsOrderByWorkflowInstance? orderBy, ElsaCommonEntitiesOrderDirection? orderDirection, System.Collections.Generic.IEnumerable<ElsaWorkflowsManagementModelsTimestampFilter>? timestampFilters, System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-instances"
-                    urlBuilder_.Append("elsa/api/workflow-instances");
-                    urlBuilder_.Append('?');
-                    if (page != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("page")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(page, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (pageSize != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("pageSize")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(pageSize, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (searchTerm != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("searchTerm")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(searchTerm, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (definitionId != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("definitionId")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(definitionId, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (definitionIds != null)
-                    {
-                            foreach (var item_ in definitionIds) { urlBuilder_.Append(System.Uri.EscapeDataString("definitionIds")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(item_, System.Globalization.CultureInfo.InvariantCulture))).Append('&'); }
-                    }
-                    if (correlationId != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("correlationId")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(correlationId, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (name != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("name")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(name, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (version != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("version")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(version, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (hasIncidents != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("hasIncidents")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(hasIncidents, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (isSystem != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("isSystem")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(isSystem, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (status != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("status")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(status, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (statuses != null)
-                    {
-                            foreach (var item_ in statuses) { urlBuilder_.Append(System.Uri.EscapeDataString("statuses")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(item_, System.Globalization.CultureInfo.InvariantCulture))).Append('&'); }
-                    }
-                    if (subStatus != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("subStatus")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(subStatus, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (subStatuses != null)
-                    {
-                            foreach (var item_ in subStatuses) { urlBuilder_.Append(System.Uri.EscapeDataString("subStatuses")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(item_, System.Globalization.CultureInfo.InvariantCulture))).Append('&'); }
-                    }
-                    if (orderBy != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("orderBy")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(orderBy, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (orderDirection != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("orderDirection")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(orderDirection, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (timestampFilters != null)
-                    {
-                            foreach (var item_ in timestampFilters) { urlBuilder_.Append(System.Uri.EscapeDataString("timestampFilters")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(item_, System.Globalization.CultureInfo.InvariantCulture))).Append('&'); }
-                    }
-                    urlBuilder_.Length--;
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsWorkflowInstancesListResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesListResponse> PostElsaWorkflowsApiEndpointsWorkflowInstancesListListAsync()
-        {
-            return PostElsaWorkflowsApiEndpointsWorkflowInstancesListListAsync(System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesListResponse> PostElsaWorkflowsApiEndpointsWorkflowInstancesListListAsync(System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-instances"
-                    urlBuilder_.Append("elsa/api/workflow-instances");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsWorkflowInstancesListResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesJournalListResponse> ElsaWorkflowsApiEndpointsWorkflowInstancesJournalListGetAsync(string id, int? page, int? pageSize, int? skip, int? take)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowInstancesJournalListGetAsync(id, page, pageSize, skip, take, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesJournalListResponse> ElsaWorkflowsApiEndpointsWorkflowInstancesJournalListGetAsync(string id, int? page, int? pageSize, int? skip, int? take, System.Threading.CancellationToken cancellationToken)
-        {
-            if (id == null)
-                throw new System.ArgumentNullException("id");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-instances/{id}/journal"
-                    urlBuilder_.Append("elsa/api/workflow-instances/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/journal");
-                    urlBuilder_.Append('?');
-                    if (page != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("page")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(page, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (pageSize != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("pageSize")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(pageSize, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (skip != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("skip")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(skip, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (take != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("take")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(take, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    urlBuilder_.Length--;
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsWorkflowInstancesJournalListResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesJournalFilteredListResponse> ElsaWorkflowsApiEndpointsWorkflowInstancesJournalFilteredListGetAsync(string id, ElsaWorkflowsApiEndpointsWorkflowInstancesJournalFilteredListRequest request)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowInstancesJournalFilteredListGetAsync(id, request, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesJournalFilteredListResponse> ElsaWorkflowsApiEndpointsWorkflowInstancesJournalFilteredListGetAsync(string id, ElsaWorkflowsApiEndpointsWorkflowInstancesJournalFilteredListRequest request, System.Threading.CancellationToken cancellationToken)
-        {
-            if (id == null)
-                throw new System.ArgumentNullException("id");
-
-            if (request == null)
-                throw new System.ArgumentNullException("request");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(request, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-instances/{id}/journal"
-                    urlBuilder_.Append("elsa/api/workflow-instances/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/journal");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsWorkflowInstancesJournalFilteredListResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsRuntimeEntitiesWorkflowExecutionLogRecord> ElsaWorkflowsApiEndpointsWorkflowInstancesJournalGetLastEntryGetAsync(string workflowInstanceId, string activityId)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowInstancesJournalGetLastEntryGetAsync(workflowInstanceId, activityId, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsRuntimeEntitiesWorkflowExecutionLogRecord> ElsaWorkflowsApiEndpointsWorkflowInstancesJournalGetLastEntryGetAsync(string workflowInstanceId, string activityId, System.Threading.CancellationToken cancellationToken)
-        {
-            if (workflowInstanceId == null)
-                throw new System.ArgumentNullException("workflowInstanceId");
-
-            if (activityId == null)
-                throw new System.ArgumentNullException("activityId");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-instances/{workflowInstanceId}/journal/{activityId}"
-                    urlBuilder_.Append("elsa/api/workflow-instances/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(workflowInstanceId, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/journal/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(activityId, System.Globalization.CultureInfo.InvariantCulture)));
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsRuntimeEntitiesWorkflowExecutionLogRecord>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesImportResponse> ElsaWorkflowsApiEndpointsWorkflowInstancesImportImportAsync()
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowInstancesImportImportAsync(System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesImportResponse> ElsaWorkflowsApiEndpointsWorkflowInstancesImportImportAsync(System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/bulk-actions/import/workflow-instances"
-                    urlBuilder_.Append("elsa/api/bulk-actions/import/workflow-instances");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsWorkflowInstancesImportResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiModelsWorkflowInstanceModel> ElsaWorkflowsApiEndpointsWorkflowInstancesGetGetAsync(string id)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowInstancesGetGetAsync(id, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiModelsWorkflowInstanceModel> ElsaWorkflowsApiEndpointsWorkflowInstancesGetGetAsync(string id, System.Threading.CancellationToken cancellationToken)
-        {
-            if (id == null)
-                throw new System.ArgumentNullException("id");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-instances/{id}"
-                    urlBuilder_.Append("elsa/api/workflow-instances/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiModelsWorkflowInstanceModel>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowInstancesDeleteDeleteAsync(string id)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowInstancesDeleteDeleteAsync(id, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowInstancesDeleteDeleteAsync(string id, System.Threading.CancellationToken cancellationToken)
-        {
-            if (id == null)
-                throw new System.ArgumentNullException("id");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("DELETE");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-instances/{id}"
-                    urlBuilder_.Append("elsa/api/workflow-instances/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task GetElsaWorkflowsApiEndpointsWorkflowInstancesExportExport1Async(string? id, System.Collections.Generic.IEnumerable<string> ids, bool includeBookmarks, bool includeActivityExecutionLog, bool includeWorkflowExecutionLog)
-        {
-            return GetElsaWorkflowsApiEndpointsWorkflowInstancesExportExport1Async(id, ids, includeBookmarks, includeActivityExecutionLog, includeWorkflowExecutionLog, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task GetElsaWorkflowsApiEndpointsWorkflowInstancesExportExport1Async(string? id, System.Collections.Generic.IEnumerable<string> ids, bool includeBookmarks, bool includeActivityExecutionLog, bool includeWorkflowExecutionLog, System.Threading.CancellationToken cancellationToken)
-        {
-            if (ids == null)
-                throw new System.ArgumentNullException("ids");
-
-            if (includeBookmarks == null)
-                throw new System.ArgumentNullException("includeBookmarks");
-
-            if (includeActivityExecutionLog == null)
-                throw new System.ArgumentNullException("includeActivityExecutionLog");
-
-            if (includeWorkflowExecutionLog == null)
-                throw new System.ArgumentNullException("includeWorkflowExecutionLog");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/bulk-actions/export/workflow-instances"
-                    urlBuilder_.Append("elsa/api/bulk-actions/export/workflow-instances");
-                    urlBuilder_.Append('?');
-                    if (id != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("id")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                        foreach (var item_ in ids) { urlBuilder_.Append(System.Uri.EscapeDataString("ids")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(item_, System.Globalization.CultureInfo.InvariantCulture))).Append('&'); }
-                    urlBuilder_.Append(System.Uri.EscapeDataString("includeBookmarks")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(includeBookmarks, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    urlBuilder_.Append(System.Uri.EscapeDataString("includeActivityExecutionLog")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(includeActivityExecutionLog, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    urlBuilder_.Append(System.Uri.EscapeDataString("includeWorkflowExecutionLog")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(includeWorkflowExecutionLog, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    urlBuilder_.Length--;
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task PostElsaWorkflowsApiEndpointsWorkflowInstancesExportExport1Async()
-        {
-            return PostElsaWorkflowsApiEndpointsWorkflowInstancesExportExport1Async(System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task PostElsaWorkflowsApiEndpointsWorkflowInstancesExportExport1Async(System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/bulk-actions/export/workflow-instances"
-                    urlBuilder_.Append("elsa/api/bulk-actions/export/workflow-instances");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task GetElsaWorkflowsApiEndpointsWorkflowInstancesExportExport2Async(string id, System.Collections.Generic.IEnumerable<string> ids, bool includeBookmarks, bool includeActivityExecutionLog, bool includeWorkflowExecutionLog)
-        {
-            return GetElsaWorkflowsApiEndpointsWorkflowInstancesExportExport2Async(id, ids, includeBookmarks, includeActivityExecutionLog, includeWorkflowExecutionLog, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task GetElsaWorkflowsApiEndpointsWorkflowInstancesExportExport2Async(string id, System.Collections.Generic.IEnumerable<string> ids, bool includeBookmarks, bool includeActivityExecutionLog, bool includeWorkflowExecutionLog, System.Threading.CancellationToken cancellationToken)
-        {
-            if (id == null)
-                throw new System.ArgumentNullException("id");
-
-            if (ids == null)
-                throw new System.ArgumentNullException("ids");
-
-            if (includeBookmarks == null)
-                throw new System.ArgumentNullException("includeBookmarks");
-
-            if (includeActivityExecutionLog == null)
-                throw new System.ArgumentNullException("includeActivityExecutionLog");
-
-            if (includeWorkflowExecutionLog == null)
-                throw new System.ArgumentNullException("includeWorkflowExecutionLog");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-instances/{id}/export"
-                    urlBuilder_.Append("elsa/api/workflow-instances/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/export");
-                    urlBuilder_.Append('?');
-                        foreach (var item_ in ids) { urlBuilder_.Append(System.Uri.EscapeDataString("ids")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(item_, System.Globalization.CultureInfo.InvariantCulture))).Append('&'); }
-                    urlBuilder_.Append(System.Uri.EscapeDataString("includeBookmarks")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(includeBookmarks, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    urlBuilder_.Append(System.Uri.EscapeDataString("includeActivityExecutionLog")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(includeActivityExecutionLog, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    urlBuilder_.Append(System.Uri.EscapeDataString("includeWorkflowExecutionLog")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(includeWorkflowExecutionLog, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    urlBuilder_.Length--;
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task PostElsaWorkflowsApiEndpointsWorkflowInstancesExportExport2Async(string id)
-        {
-            return PostElsaWorkflowsApiEndpointsWorkflowInstancesExportExport2Async(id, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task PostElsaWorkflowsApiEndpointsWorkflowInstancesExportExport2Async(string id, System.Threading.CancellationToken cancellationToken)
-        {
-            if (id == null)
-                throw new System.ArgumentNullException("id");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-instances/{id}/export"
-                    urlBuilder_.Append("elsa/api/workflow-instances/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/export");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesExecutionStateResponse> ElsaWorkflowsApiEndpointsWorkflowInstancesExecutionStateExecutionStateAsync(string id)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowInstancesExecutionStateExecutionStateAsync(id, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesExecutionStateResponse> ElsaWorkflowsApiEndpointsWorkflowInstancesExecutionStateExecutionStateAsync(string id, System.Threading.CancellationToken cancellationToken)
-        {
-            if (id == null)
-                throw new System.ArgumentNullException("id");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-instances/{id}/execution-state"
-                    urlBuilder_.Append("elsa/api/workflow-instances/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/execution-state");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsWorkflowInstancesExecutionStateResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowInstancesCancelCancelAsync(string id)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowInstancesCancelCancelAsync(id, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowInstancesCancelCancelAsync(string id, System.Threading.CancellationToken cancellationToken)
-        {
-            if (id == null)
-                throw new System.ArgumentNullException("id");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/cancel/workflow-instances/{id}"
-                    urlBuilder_.Append("elsa/api/cancel/workflow-instances/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            return;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesBulkDeleteResponse> ElsaWorkflowsApiEndpointsWorkflowInstancesBulkDeleteBulkDelete1Async(ElsaWorkflowsApiEndpointsWorkflowInstancesBulkDeleteRequest request)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowInstancesBulkDeleteBulkDelete1Async(request, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesBulkDeleteResponse> ElsaWorkflowsApiEndpointsWorkflowInstancesBulkDeleteBulkDelete1Async(ElsaWorkflowsApiEndpointsWorkflowInstancesBulkDeleteRequest request, System.Threading.CancellationToken cancellationToken)
-        {
-            if (request == null)
-                throw new System.ArgumentNullException("request");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(request, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/bulk-actions/delete/workflow-instances"
-                    urlBuilder_.Append("elsa/api/bulk-actions/delete/workflow-instances");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsWorkflowInstancesBulkDeleteResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesBulkDeleteResponse> ElsaWorkflowsApiEndpointsWorkflowInstancesBulkDeleteBulkDelete2Async(ElsaWorkflowsApiEndpointsWorkflowInstancesBulkDeleteRequest request)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowInstancesBulkDeleteBulkDelete2Async(request, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesBulkDeleteResponse> ElsaWorkflowsApiEndpointsWorkflowInstancesBulkDeleteBulkDelete2Async(ElsaWorkflowsApiEndpointsWorkflowInstancesBulkDeleteRequest request, System.Threading.CancellationToken cancellationToken)
-        {
-            if (request == null)
-                throw new System.ArgumentNullException("request");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(request, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/bulk-actions/delete/workflow-instances/by-id"
-                    urlBuilder_.Append("elsa/api/bulk-actions/delete/workflow-instances/by-id");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsWorkflowInstancesBulkDeleteResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesBulkCancelResponse> ElsaWorkflowsApiEndpointsWorkflowInstancesBulkCancelBulkCancelAsync(ElsaWorkflowsApiEndpointsWorkflowInstancesBulkCancelRequest request)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowInstancesBulkCancelBulkCancelAsync(request, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowInstancesBulkCancelResponse> ElsaWorkflowsApiEndpointsWorkflowInstancesBulkCancelBulkCancelAsync(ElsaWorkflowsApiEndpointsWorkflowInstancesBulkCancelRequest request, System.Threading.CancellationToken cancellationToken)
-        {
-            if (request == null)
-                throw new System.ArgumentNullException("request");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(request, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/bulk-actions/cancel/workflow-instances"
-                    urlBuilder_.Append("elsa/api/bulk-actions/cancel/workflow-instances");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsWorkflowInstancesBulkCancelResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 400)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<FastEndpointsErrorResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            throw new ApiException<FastEndpointsErrorResponse>("Bad Request", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsVersionDeleteVersionAsync(string definitionId, string version)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowDefinitionsVersionDeleteVersionAsync(definitionId, version, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsVersionDeleteVersionAsync(string definitionId, string version, System.Threading.CancellationToken cancellationToken)
-        {
-            if (definitionId == null)
-                throw new System.ArgumentNullException("definitionId");
-
-            if (version == null)
-                throw new System.ArgumentNullException("version");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("DELETE");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-definitions/{definitionId}/version/{version}"
-                    urlBuilder_.Append("elsa/api/workflow-definitions/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(definitionId, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/version/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(version, System.Globalization.CultureInfo.InvariantCulture)));
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsVersionListVersionsAsync(string definitionId)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowDefinitionsVersionListVersionsAsync(definitionId, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsVersionListVersionsAsync(string definitionId, System.Threading.CancellationToken cancellationToken)
-        {
-            if (definitionId == null)
-                throw new System.ArgumentNullException("definitionId");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-definitions/{definitionId}/versions"
-                    urlBuilder_.Append("elsa/api/workflow-definitions/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(definitionId, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/versions");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsVersionRevertVersionAsync(string definitionId, string version)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowDefinitionsVersionRevertVersionAsync(definitionId, version, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsVersionRevertVersionAsync(string definitionId, string version, System.Threading.CancellationToken cancellationToken)
-        {
-            if (definitionId == null)
-                throw new System.ArgumentNullException("definitionId");
-
-            if (version == null)
-                throw new System.ArgumentNullException("version");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-definitions/{definitionId}/revert/{version}"
-                    urlBuilder_.Append("elsa/api/workflow-definitions/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(definitionId, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/revert/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(version, System.Globalization.CultureInfo.InvariantCulture)));
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsUpdateReferencesResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsUpdateReferencesUpdateReferencesAsync(string definitionId)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowDefinitionsUpdateReferencesUpdateReferencesAsync(definitionId, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsUpdateReferencesResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsUpdateReferencesUpdateReferencesAsync(string definitionId, System.Threading.CancellationToken cancellationToken)
-        {
-            if (definitionId == null)
-                throw new System.ArgumentNullException("definitionId");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-definitions/{definitionId}/update-references"
-                    urlBuilder_.Append("elsa/api/workflow-definitions/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(definitionId, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/update-references");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsWorkflowDefinitionsUpdateReferencesResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiModelsLinkedWorkflowDefinitionModel> ElsaWorkflowsApiEndpointsWorkflowDefinitionsRetractRetractAsync(string definitionId)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowDefinitionsRetractRetractAsync(definitionId, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiModelsLinkedWorkflowDefinitionModel> ElsaWorkflowsApiEndpointsWorkflowDefinitionsRetractRetractAsync(string definitionId, System.Threading.CancellationToken cancellationToken)
-        {
-            if (definitionId == null)
-                throw new System.ArgumentNullException("definitionId");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-definitions/{definitionId}/retract"
-                    urlBuilder_.Append("elsa/api/workflow-definitions/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(definitionId, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/retract");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiModelsLinkedWorkflowDefinitionModel>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsReloadReloadAsync()
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowDefinitionsReloadReloadAsync(System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsReloadReloadAsync(System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/actions/workflow-definitions/reload"
-                    urlBuilder_.Append("elsa/api/actions/workflow-definitions/reload");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsRefreshRefreshAsync(ElsaWorkflowsApiEndpointsWorkflowDefinitionsRefreshRequest request)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowDefinitionsRefreshRefreshAsync(request, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsRefreshRefreshAsync(ElsaWorkflowsApiEndpointsWorkflowDefinitionsRefreshRequest request, System.Threading.CancellationToken cancellationToken)
-        {
-            if (request == null)
-                throw new System.ArgumentNullException("request");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(request, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/actions/workflow-definitions/refresh"
-                    urlBuilder_.Append("elsa/api/actions/workflow-definitions/refresh");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsPublishResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsPublishPublishAsync(string definitionId)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowDefinitionsPublishPublishAsync(definitionId, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsPublishResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsPublishPublishAsync(string definitionId, System.Threading.CancellationToken cancellationToken)
-        {
-            if (definitionId == null)
-                throw new System.ArgumentNullException("definitionId");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-definitions/{definitionId}/publish"
-                    urlBuilder_.Append("elsa/api/workflow-definitions/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(definitionId, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/publish");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsWorkflowDefinitionsPublishResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiModelsLinkedWorkflowDefinitionModel> ElsaWorkflowsApiEndpointsWorkflowDefinitionsPostPostAsync(ElsaWorkflowsManagementModelsSaveWorkflowDefinitionRequest saveWorkflowDefinitionRequest)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowDefinitionsPostPostAsync(saveWorkflowDefinitionRequest, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiModelsLinkedWorkflowDefinitionModel> ElsaWorkflowsApiEndpointsWorkflowDefinitionsPostPostAsync(ElsaWorkflowsManagementModelsSaveWorkflowDefinitionRequest saveWorkflowDefinitionRequest, System.Threading.CancellationToken cancellationToken)
-        {
-            if (saveWorkflowDefinitionRequest == null)
-                throw new System.ArgumentNullException("saveWorkflowDefinitionRequest");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(saveWorkflowDefinitionRequest, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-definitions"
-                    urlBuilder_.Append("elsa/api/workflow-definitions");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiModelsLinkedWorkflowDefinitionModel>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaModelsPagedListResponseOfLinkedWorkflowDefinitionSummary> ElsaWorkflowsApiEndpointsWorkflowDefinitionsListListAsync(string? versionOptions, System.Collections.Generic.IEnumerable<string>? definitionIds, System.Collections.Generic.IEnumerable<string>? ids, string? materializer, System.Collections.Generic.IEnumerable<string>? label, int? page, int? pageSize, ElsaWorkflowsApiModelsOrderByWorkflowDefinition? orderBy, ElsaCommonEntitiesOrderDirection? orderDirection, string? searchTerm, bool? isSystem)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowDefinitionsListListAsync(versionOptions, definitionIds, ids, materializer, label, page, pageSize, orderBy, orderDirection, searchTerm, isSystem, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaModelsPagedListResponseOfLinkedWorkflowDefinitionSummary> ElsaWorkflowsApiEndpointsWorkflowDefinitionsListListAsync(string? versionOptions, System.Collections.Generic.IEnumerable<string>? definitionIds, System.Collections.Generic.IEnumerable<string>? ids, string? materializer, System.Collections.Generic.IEnumerable<string>? label, int? page, int? pageSize, ElsaWorkflowsApiModelsOrderByWorkflowDefinition? orderBy, ElsaCommonEntitiesOrderDirection? orderDirection, string? searchTerm, bool? isSystem, System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-definitions"
-                    urlBuilder_.Append("elsa/api/workflow-definitions");
-                    urlBuilder_.Append('?');
-                    if (versionOptions != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("versionOptions")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(versionOptions, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (definitionIds != null)
-                    {
-                            foreach (var item_ in definitionIds) { urlBuilder_.Append(System.Uri.EscapeDataString("definitionIds")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(item_, System.Globalization.CultureInfo.InvariantCulture))).Append('&'); }
-                    }
-                    if (ids != null)
-                    {
-                            foreach (var item_ in ids) { urlBuilder_.Append(System.Uri.EscapeDataString("ids")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(item_, System.Globalization.CultureInfo.InvariantCulture))).Append('&'); }
-                    }
-                    if (materializer != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("materializer")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(materializer, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (label != null)
-                    {
-                            foreach (var item_ in label) { urlBuilder_.Append(System.Uri.EscapeDataString("label")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(item_, System.Globalization.CultureInfo.InvariantCulture))).Append('&'); }
-                    }
-                    if (page != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("page")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(page, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (pageSize != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("pageSize")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(pageSize, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (orderBy != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("orderBy")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(orderBy, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (orderDirection != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("orderDirection")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(orderDirection, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (searchTerm != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("searchTerm")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(searchTerm, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (isSystem != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("isSystem")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(isSystem, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    urlBuilder_.Length--;
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaModelsPagedListResponseOfLinkedWorkflowDefinitionSummary>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsIsNameUniqueIsNameUniqueAsync(string name, string? definitionId)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowDefinitionsIsNameUniqueIsNameUniqueAsync(name, definitionId, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsIsNameUniqueIsNameUniqueAsync(string name, string? definitionId, System.Threading.CancellationToken cancellationToken)
-        {
-            if (name == null)
-                throw new System.ArgumentNullException("name");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-definitions/validation/is-name-unique"
-                    urlBuilder_.Append("elsa/api/workflow-definitions/validation/is-name-unique");
-                    urlBuilder_.Append('?');
-                    urlBuilder_.Append(System.Uri.EscapeDataString("name")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(name, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    if (definitionId != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("definitionId")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(definitionId, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    urlBuilder_.Length--;
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsImportFilesImportFilesAsync(string? id, string? tenantId, string? name, string? description, System.DateTime? createdAt, int? version, string? toolVersion, System.Collections.Generic.IEnumerable<ElsaWorkflowsModelsVariableDefinition>? variables, System.Collections.Generic.IEnumerable<ElsaWorkflowsModelsInputDefinition>? inputs, System.Collections.Generic.IEnumerable<ElsaWorkflowsModelsOutputDefinition>? outputs, System.Collections.Generic.IEnumerable<string>? outcomes, System.Collections.Generic.IDictionary<string, object>? customProperties, bool? isReadonly, bool? isSystem, bool? isLatest, bool? isPublished, ElsaWorkflowsModelsWorkflowOptions? options, bool? usableAsActivity, ElsaWorkflowsIActivity? root)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowDefinitionsImportFilesImportFilesAsync(id, tenantId, name, description, createdAt, version, toolVersion, variables, inputs, outputs, outcomes, customProperties, isReadonly, isSystem, isLatest, isPublished, options, usableAsActivity, root, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsImportFilesImportFilesAsync(string? id, string? tenantId, string? name, string? description, System.DateTime? createdAt, int? version, string? toolVersion, System.Collections.Generic.IEnumerable<ElsaWorkflowsModelsVariableDefinition>? variables, System.Collections.Generic.IEnumerable<ElsaWorkflowsModelsInputDefinition>? inputs, System.Collections.Generic.IEnumerable<ElsaWorkflowsModelsOutputDefinition>? outputs, System.Collections.Generic.IEnumerable<string>? outcomes, System.Collections.Generic.IDictionary<string, object>? customProperties, bool? isReadonly, bool? isSystem, bool? isLatest, bool? isPublished, ElsaWorkflowsModelsWorkflowOptions? options, bool? usableAsActivity, ElsaWorkflowsIActivity? root, System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var boundary_ = System.Guid.NewGuid().ToString();
-                    var content_ = new System.Net.Http.MultipartFormDataContent(boundary_);
-                    content_.Headers.Remove("Content-Type");
-                    content_.Headers.TryAddWithoutValidation("Content-Type", "multipart/form-data; boundary=" + boundary_);
-
-                    if (id == null)
-                        throw new System.ArgumentNullException("id");
-                    else
-                    {
-                        content_.Add(new System.Net.Http.StringContent(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)), "id");
-                    }
-
-                    if (tenantId != null)
-                    {
-                        content_.Add(new System.Net.Http.StringContent(ConvertToString(tenantId, System.Globalization.CultureInfo.InvariantCulture)), "tenantId");
-                    }
-
-                    if (name != null)
-                    {
-                        content_.Add(new System.Net.Http.StringContent(ConvertToString(name, System.Globalization.CultureInfo.InvariantCulture)), "name");
-                    }
-
-                    if (description != null)
-                    {
-                        content_.Add(new System.Net.Http.StringContent(ConvertToString(description, System.Globalization.CultureInfo.InvariantCulture)), "description");
-                    }
-
-                    if (createdAt == null)
-                        throw new System.ArgumentNullException("createdAt");
-                    else
-                    {
-                        content_.Add(new System.Net.Http.StringContent(ConvertToString(createdAt, System.Globalization.CultureInfo.InvariantCulture)), "createdAt");
-                    }
-
-                    if (version == null)
-                        throw new System.ArgumentNullException("version");
-                    else
-                    {
-                        content_.Add(new System.Net.Http.StringContent(ConvertToString(version, System.Globalization.CultureInfo.InvariantCulture)), "version");
-                    }
-
-                    if (toolVersion != null)
-                    {
-                        content_.Add(new System.Net.Http.StringContent(ConvertToString(toolVersion, System.Globalization.CultureInfo.InvariantCulture)), "toolVersion");
-                    }
-
-                    if (variables != null)
-                    {
-                        foreach (var item_ in variables)
-                        {
-                            content_.Add(new System.Net.Http.StringContent(ConvertToString(item_, System.Globalization.CultureInfo.InvariantCulture)), "variables");
-                        }
-                    }
-
-                    if (inputs != null)
-                    {
-                        foreach (var item_ in inputs)
-                        {
-                            content_.Add(new System.Net.Http.StringContent(ConvertToString(item_, System.Globalization.CultureInfo.InvariantCulture)), "inputs");
-                        }
-                    }
-
-                    if (outputs != null)
-                    {
-                        foreach (var item_ in outputs)
-                        {
-                            content_.Add(new System.Net.Http.StringContent(ConvertToString(item_, System.Globalization.CultureInfo.InvariantCulture)), "outputs");
-                        }
-                    }
-
-                    if (outcomes != null)
-                    {
-                        foreach (var item_ in outcomes)
-                        {
-                            content_.Add(new System.Net.Http.StringContent(ConvertToString(item_, System.Globalization.CultureInfo.InvariantCulture)), "outcomes");
-                        }
-                    }
-
-                    if (customProperties != null)
-                    {
-                        var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(customProperties, JsonSerializerSettings);
-                        content_.Add(new System.Net.Http.ByteArrayContent(json_), "customProperties");
-                    }
-
-                    if (isReadonly == null)
-                        throw new System.ArgumentNullException("isReadonly");
-                    else
-                    {
-                        content_.Add(new System.Net.Http.StringContent(ConvertToString(isReadonly, System.Globalization.CultureInfo.InvariantCulture)), "isReadonly");
-                    }
-
-                    if (isSystem == null)
-                        throw new System.ArgumentNullException("isSystem");
-                    else
-                    {
-                        content_.Add(new System.Net.Http.StringContent(ConvertToString(isSystem, System.Globalization.CultureInfo.InvariantCulture)), "isSystem");
-                    }
-
-                    if (isLatest == null)
-                        throw new System.ArgumentNullException("isLatest");
-                    else
-                    {
-                        content_.Add(new System.Net.Http.StringContent(ConvertToString(isLatest, System.Globalization.CultureInfo.InvariantCulture)), "isLatest");
-                    }
-
-                    if (isPublished == null)
-                        throw new System.ArgumentNullException("isPublished");
-                    else
-                    {
-                        content_.Add(new System.Net.Http.StringContent(ConvertToString(isPublished, System.Globalization.CultureInfo.InvariantCulture)), "isPublished");
-                    }
-
-                    if (options != null)
-                    {
-                        var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(options, JsonSerializerSettings);
-                        content_.Add(new System.Net.Http.ByteArrayContent(json_), "options");
-                    }
-
-                    if (usableAsActivity != null)
-                    {
-                        content_.Add(new System.Net.Http.StringContent(ConvertToString(usableAsActivity, System.Globalization.CultureInfo.InvariantCulture)), "usableAsActivity");
-                    }
-
-                    if (root != null)
-                    {
-                        var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(root, JsonSerializerSettings);
-                        content_.Add(new System.Net.Http.ByteArrayContent(json_), "root");
-                    }
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-definitions/import-files"
-                    urlBuilder_.Append("elsa/api/workflow-definitions/import-files");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task PostElsaWorkflowsApiEndpointsWorkflowDefinitionsImportImport1Async(ElsaWorkflowsManagementModelsWorkflowDefinitionModel workflowDefinitionModel)
-        {
-            return PostElsaWorkflowsApiEndpointsWorkflowDefinitionsImportImport1Async(workflowDefinitionModel, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task PostElsaWorkflowsApiEndpointsWorkflowDefinitionsImportImport1Async(ElsaWorkflowsManagementModelsWorkflowDefinitionModel workflowDefinitionModel, System.Threading.CancellationToken cancellationToken)
-        {
-            if (workflowDefinitionModel == null)
-                throw new System.ArgumentNullException("workflowDefinitionModel");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(workflowDefinitionModel, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-definitions/import"
-                    urlBuilder_.Append("elsa/api/workflow-definitions/import");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task PutElsaWorkflowsApiEndpointsWorkflowDefinitionsImportImport1Async(ElsaWorkflowsManagementModelsWorkflowDefinitionModel workflowDefinitionModel)
-        {
-            return PutElsaWorkflowsApiEndpointsWorkflowDefinitionsImportImport1Async(workflowDefinitionModel, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task PutElsaWorkflowsApiEndpointsWorkflowDefinitionsImportImport1Async(ElsaWorkflowsManagementModelsWorkflowDefinitionModel workflowDefinitionModel, System.Threading.CancellationToken cancellationToken)
-        {
-            if (workflowDefinitionModel == null)
-                throw new System.ArgumentNullException("workflowDefinitionModel");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(workflowDefinitionModel, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("PUT");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-definitions/import"
-                    urlBuilder_.Append("elsa/api/workflow-definitions/import");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task PostElsaWorkflowsApiEndpointsWorkflowDefinitionsImportImport2Async(string definitionId, ElsaWorkflowsManagementModelsWorkflowDefinitionModel workflowDefinitionModel)
-        {
-            return PostElsaWorkflowsApiEndpointsWorkflowDefinitionsImportImport2Async(definitionId, workflowDefinitionModel, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task PostElsaWorkflowsApiEndpointsWorkflowDefinitionsImportImport2Async(string definitionId, ElsaWorkflowsManagementModelsWorkflowDefinitionModel workflowDefinitionModel, System.Threading.CancellationToken cancellationToken)
-        {
-            if (definitionId == null)
-                throw new System.ArgumentNullException("definitionId");
-
-            if (workflowDefinitionModel == null)
-                throw new System.ArgumentNullException("workflowDefinitionModel");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(workflowDefinitionModel, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-definitions/{definitionId}/import"
-                    urlBuilder_.Append("elsa/api/workflow-definitions/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(definitionId, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/import");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task PutElsaWorkflowsApiEndpointsWorkflowDefinitionsImportImport2Async(string definitionId, ElsaWorkflowsManagementModelsWorkflowDefinitionModel workflowDefinitionModel)
-        {
-            return PutElsaWorkflowsApiEndpointsWorkflowDefinitionsImportImport2Async(definitionId, workflowDefinitionModel, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task PutElsaWorkflowsApiEndpointsWorkflowDefinitionsImportImport2Async(string definitionId, ElsaWorkflowsManagementModelsWorkflowDefinitionModel workflowDefinitionModel, System.Threading.CancellationToken cancellationToken)
-        {
-            if (definitionId == null)
-                throw new System.ArgumentNullException("definitionId");
-
-            if (workflowDefinitionModel == null)
-                throw new System.ArgumentNullException("workflowDefinitionModel");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(workflowDefinitionModel, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("PUT");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-definitions/{definitionId}/import"
-                    urlBuilder_.Append("elsa/api/workflow-definitions/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(definitionId, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/import");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsGraphGraphAsync(string id, string parentNodeId)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowDefinitionsGraphGraphAsync(id, parentNodeId, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsGraphGraphAsync(string id, string parentNodeId, System.Threading.CancellationToken cancellationToken)
-        {
-            if (id == null)
-                throw new System.ArgumentNullException("id");
-
-            if (parentNodeId == null)
-                throw new System.ArgumentNullException("parentNodeId");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-definitions/subgraph/{id}"
-                    urlBuilder_.Append("elsa/api/workflow-definitions/subgraph/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append('?');
-                    urlBuilder_.Append(System.Uri.EscapeDataString("parentNodeId")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(parentNodeId, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    urlBuilder_.Length--;
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsGraphSegmentsNodesAsync(string id, string childNodeId)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowDefinitionsGraphSegmentsNodesAsync(id, childNodeId, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsGraphSegmentsNodesAsync(string id, string childNodeId, System.Threading.CancellationToken cancellationToken)
-        {
-            if (id == null)
-                throw new System.ArgumentNullException("id");
-
-            if (childNodeId == null)
-                throw new System.ArgumentNullException("childNodeId");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-definitions/subgraph/segments/{id}"
-                    urlBuilder_.Append("elsa/api/workflow-definitions/subgraph/segments/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append('?');
-                    urlBuilder_.Append(System.Uri.EscapeDataString("childNodeId")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(childNodeId, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    urlBuilder_.Length--;
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsGetManyByIdGetManyByIdAsync(System.Collections.Generic.IEnumerable<string> ids)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowDefinitionsGetManyByIdGetManyByIdAsync(ids, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsGetManyByIdGetManyByIdAsync(System.Collections.Generic.IEnumerable<string> ids, System.Threading.CancellationToken cancellationToken)
-        {
-            if (ids == null)
-                throw new System.ArgumentNullException("ids");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-definitions/many-by-id"
-                    urlBuilder_.Append("elsa/api/workflow-definitions/many-by-id");
-                    urlBuilder_.Append('?');
-                        foreach (var item_ in ids) { urlBuilder_.Append(System.Uri.EscapeDataString("ids")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(item_, System.Globalization.CultureInfo.InvariantCulture))).Append('&'); }
-                    urlBuilder_.Length--;
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task GetWorkflowDefinitionByIdAsync(string id)
-        {
-            return GetWorkflowDefinitionByIdAsync(id, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task GetWorkflowDefinitionByIdAsync(string id, System.Threading.CancellationToken cancellationToken)
-        {
-            if (id == null)
-                throw new System.ArgumentNullException("id");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-definitions/by-id/{id}"
-                    urlBuilder_.Append("elsa/api/workflow-definitions/by-id/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsGetByDefinitionIdGetByDefinitionId1Async(string definitionId, string? versionOptions)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowDefinitionsGetByDefinitionIdGetByDefinitionId1Async(definitionId, versionOptions, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsGetByDefinitionIdGetByDefinitionId1Async(string definitionId, string? versionOptions, System.Threading.CancellationToken cancellationToken)
-        {
-            if (definitionId == null)
-                throw new System.ArgumentNullException("definitionId");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-definitions/by-definition-id/{definitionId}"
-                    urlBuilder_.Append("elsa/api/workflow-definitions/by-definition-id/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(definitionId, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append('?');
-                    if (versionOptions != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("versionOptions")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(versionOptions, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    urlBuilder_.Length--;
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsGetByDefinitionIdGetByDefinitionId2Async(string definitionId, string? versionOptions)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowDefinitionsGetByDefinitionIdGetByDefinitionId2Async(definitionId, versionOptions, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsGetByDefinitionIdGetByDefinitionId2Async(string definitionId, string? versionOptions, System.Threading.CancellationToken cancellationToken)
-        {
-            if (definitionId == null)
-                throw new System.ArgumentNullException("definitionId");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-definitions/{definitionId}"
-                    urlBuilder_.Append("elsa/api/workflow-definitions/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(definitionId, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append('?');
-                    if (versionOptions != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("versionOptions")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(versionOptions, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    urlBuilder_.Length--;
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsDeleteDeleteAsync(string definitionId)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowDefinitionsDeleteDeleteAsync(definitionId, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsDeleteDeleteAsync(string definitionId, System.Threading.CancellationToken cancellationToken)
-        {
-            if (definitionId == null)
-                throw new System.ArgumentNullException("definitionId");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("DELETE");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-definitions/{definitionId}"
-                    urlBuilder_.Append("elsa/api/workflow-definitions/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(definitionId, System.Globalization.CultureInfo.InvariantCulture)));
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task GetElsaWorkflowsApiEndpointsWorkflowDefinitionsExportExport1Async(string? definitionId, string? versionOptions, System.Collections.Generic.IEnumerable<string>? ids, bool includeConsumingWorkflows)
-        {
-            return GetElsaWorkflowsApiEndpointsWorkflowDefinitionsExportExport1Async(definitionId, versionOptions, ids, includeConsumingWorkflows, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task GetElsaWorkflowsApiEndpointsWorkflowDefinitionsExportExport1Async(string? definitionId, string? versionOptions, System.Collections.Generic.IEnumerable<string>? ids, bool includeConsumingWorkflows, System.Threading.CancellationToken cancellationToken)
-        {
-            if (includeConsumingWorkflows == null)
-                throw new System.ArgumentNullException("includeConsumingWorkflows");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/bulk-actions/export/workflow-definitions"
-                    urlBuilder_.Append("elsa/api/bulk-actions/export/workflow-definitions");
-                    urlBuilder_.Append('?');
-                    if (definitionId != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("definitionId")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(definitionId, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (versionOptions != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("versionOptions")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(versionOptions, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (ids != null)
-                    {
-                            foreach (var item_ in ids) { urlBuilder_.Append(System.Uri.EscapeDataString("ids")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(item_, System.Globalization.CultureInfo.InvariantCulture))).Append('&'); }
-                    }
-                    urlBuilder_.Append(System.Uri.EscapeDataString("includeConsumingWorkflows")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(includeConsumingWorkflows, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    urlBuilder_.Length--;
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task PostElsaWorkflowsApiEndpointsWorkflowDefinitionsExportExport1Async()
-        {
-            return PostElsaWorkflowsApiEndpointsWorkflowDefinitionsExportExport1Async(System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task PostElsaWorkflowsApiEndpointsWorkflowDefinitionsExportExport1Async(System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/bulk-actions/export/workflow-definitions"
-                    urlBuilder_.Append("elsa/api/bulk-actions/export/workflow-definitions");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task GetElsaWorkflowsApiEndpointsWorkflowDefinitionsExportExport2Async(string definitionId, string? versionOptions, System.Collections.Generic.IEnumerable<string>? ids, bool includeConsumingWorkflows)
-        {
-            return GetElsaWorkflowsApiEndpointsWorkflowDefinitionsExportExport2Async(definitionId, versionOptions, ids, includeConsumingWorkflows, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task GetElsaWorkflowsApiEndpointsWorkflowDefinitionsExportExport2Async(string definitionId, string? versionOptions, System.Collections.Generic.IEnumerable<string>? ids, bool includeConsumingWorkflows, System.Threading.CancellationToken cancellationToken)
-        {
-            if (definitionId == null)
-                throw new System.ArgumentNullException("definitionId");
-
-            if (includeConsumingWorkflows == null)
-                throw new System.ArgumentNullException("includeConsumingWorkflows");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-definitions/{definitionId}/export"
-                    urlBuilder_.Append("elsa/api/workflow-definitions/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(definitionId, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/export");
-                    urlBuilder_.Append('?');
-                    if (versionOptions != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("versionOptions")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(versionOptions, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (ids != null)
-                    {
-                            foreach (var item_ in ids) { urlBuilder_.Append(System.Uri.EscapeDataString("ids")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(item_, System.Globalization.CultureInfo.InvariantCulture))).Append('&'); }
-                    }
-                    urlBuilder_.Append(System.Uri.EscapeDataString("includeConsumingWorkflows")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(includeConsumingWorkflows, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    urlBuilder_.Length--;
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task PostElsaWorkflowsApiEndpointsWorkflowDefinitionsExportExport2Async(string definitionId)
-        {
-            return PostElsaWorkflowsApiEndpointsWorkflowDefinitionsExportExport2Async(definitionId, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task PostElsaWorkflowsApiEndpointsWorkflowDefinitionsExportExport2Async(string definitionId, System.Threading.CancellationToken cancellationToken)
-        {
-            if (definitionId == null)
-                throw new System.ArgumentNullException("definitionId");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-definitions/{definitionId}/export"
-                    urlBuilder_.Append("elsa/api/workflow-definitions/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(definitionId, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/export");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsExecuteGetEndpointAsync(string definitionId, string? correlationId, string? name, string? triggerActivityId, ElsaWorkflowsModelsActivityHandle? activityHandle, string? versionOptions, string? input, string? variables)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowDefinitionsExecuteGetEndpointAsync(definitionId, correlationId, name, triggerActivityId, activityHandle, versionOptions, input, variables, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsExecuteGetEndpointAsync(string definitionId, string? correlationId, string? name, string? triggerActivityId, ElsaWorkflowsModelsActivityHandle? activityHandle, string? versionOptions, string? input, string? variables, System.Threading.CancellationToken cancellationToken)
-        {
-            if (definitionId == null)
-                throw new System.ArgumentNullException("definitionId");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-definitions/{definitionId}/execute"
-                    urlBuilder_.Append("elsa/api/workflow-definitions/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(definitionId, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/execute");
-                    urlBuilder_.Append('?');
-                    if (correlationId != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("correlationId")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(correlationId, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (name != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("name")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(name, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (triggerActivityId != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("triggerActivityId")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(triggerActivityId, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (activityHandle != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("activityHandle")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(activityHandle, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (versionOptions != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("versionOptions")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(versionOptions, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (input != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("input")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(input, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (variables != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("variables")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(variables, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    urlBuilder_.Length--;
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsExecuteResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsExecutePostEndpointAsync(string definitionId)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowDefinitionsExecutePostEndpointAsync(definitionId, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsExecuteResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsExecutePostEndpointAsync(string definitionId, System.Threading.CancellationToken cancellationToken)
-        {
-            if (definitionId == null)
-                throw new System.ArgumentNullException("definitionId");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-definitions/{definitionId}/execute"
-                    urlBuilder_.Append("elsa/api/workflow-definitions/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(definitionId, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/execute");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsWorkflowDefinitionsExecuteResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsDispatchResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsDispatchEndpointAsync(string definitionId, ElsaWorkflowsApiEndpointsWorkflowDefinitionsDispatchRequest request)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowDefinitionsDispatchEndpointAsync(definitionId, request, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsDispatchResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsDispatchEndpointAsync(string definitionId, ElsaWorkflowsApiEndpointsWorkflowDefinitionsDispatchRequest request, System.Threading.CancellationToken cancellationToken)
-        {
-            if (definitionId == null)
-                throw new System.ArgumentNullException("definitionId");
-
-            if (request == null)
-                throw new System.ArgumentNullException("request");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(request, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-definitions/{definitionId}/dispatch"
-                    urlBuilder_.Append("elsa/api/workflow-definitions/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(definitionId, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/dispatch");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsWorkflowDefinitionsDispatchResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsDeleteVersionDeleteVersionAsync(string id)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowDefinitionsDeleteVersionDeleteVersionAsync(id, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsWorkflowDefinitionsDeleteVersionDeleteVersionAsync(string id, System.Threading.CancellationToken cancellationToken)
-        {
-            if (id == null)
-                throw new System.ArgumentNullException("id");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("DELETE");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-definition-versions/{id}"
-                    urlBuilder_.Append("elsa/api/workflow-definition-versions/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsCountResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsCountCountAsync()
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowDefinitionsCountCountAsync(System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsCountResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsCountCountAsync(System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-definitions/query/count"
-                    urlBuilder_.Append("elsa/api/workflow-definitions/query/count");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsWorkflowDefinitionsCountResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsConsumersResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsConsumersConsumersAsync(string definitionId)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowDefinitionsConsumersConsumersAsync(definitionId, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsConsumersResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsConsumersConsumersAsync(string definitionId, System.Threading.CancellationToken cancellationToken)
-        {
-            if (definitionId == null)
-                throw new System.ArgumentNullException("definitionId");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-definitions/{definitionId}/consumers"
-                    urlBuilder_.Append("elsa/api/workflow-definitions/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(definitionId, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/consumers");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsWorkflowDefinitionsConsumersResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkRetractResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkRetractBulkRetractAsync(ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkRetractRequest request)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkRetractBulkRetractAsync(request, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkRetractResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkRetractBulkRetractAsync(ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkRetractRequest request, System.Threading.CancellationToken cancellationToken)
-        {
-            if (request == null)
-                throw new System.ArgumentNullException("request");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(request, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/bulk-actions/retract/workflow-definitions/by-definition-ids"
-                    urlBuilder_.Append("elsa/api/bulk-actions/retract/workflow-definitions/by-definition-ids");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkRetractResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkPublishResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkPublishBulkPublishAsync(ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkPublishRequest request)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkPublishBulkPublishAsync(request, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkPublishResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkPublishBulkPublishAsync(ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkPublishRequest request, System.Threading.CancellationToken cancellationToken)
-        {
-            if (request == null)
-                throw new System.ArgumentNullException("request");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(request, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/bulk-actions/publish/workflow-definitions/by-definition-ids"
-                    urlBuilder_.Append("elsa/api/bulk-actions/publish/workflow-definitions/by-definition-ids");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkPublishResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDispatchResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDispatchEndpointAsync(string definitionId, ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDispatchRequest request)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDispatchEndpointAsync(definitionId, request, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDispatchResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDispatchEndpointAsync(string definitionId, ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDispatchRequest request, System.Threading.CancellationToken cancellationToken)
-        {
-            if (definitionId == null)
-                throw new System.ArgumentNullException("definitionId");
-
-            if (request == null)
-                throw new System.ArgumentNullException("request");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(request, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/workflow-definitions/{definitionId}/bulk-dispatch"
-                    urlBuilder_.Append("elsa/api/workflow-definitions/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(definitionId, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/bulk-dispatch");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDispatchResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDeleteVersionsResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDeleteVersionsBulkDeleteVersionsAsync(ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDeleteVersionsRequest request)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDeleteVersionsBulkDeleteVersionsAsync(request, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDeleteVersionsResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDeleteVersionsBulkDeleteVersionsAsync(ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDeleteVersionsRequest request, System.Threading.CancellationToken cancellationToken)
-        {
-            if (request == null)
-                throw new System.ArgumentNullException("request");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(request, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/bulk-actions/delete/workflow-definitions/by-id"
-                    urlBuilder_.Append("elsa/api/bulk-actions/delete/workflow-definitions/by-id");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDeleteVersionsResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDeleteResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDeleteBulkDeleteAsync(ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDeleteRequest request)
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDeleteBulkDeleteAsync(request, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDeleteResponse> ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDeleteBulkDeleteAsync(ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDeleteRequest request, System.Threading.CancellationToken cancellationToken)
-        {
-            if (request == null)
-                throw new System.ArgumentNullException("request");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(request, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/bulk-actions/delete/workflow-definitions/by-definition-id"
-                    urlBuilder_.Append("elsa/api/bulk-actions/delete/workflow-definitions/by-definition-id");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDeleteResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaModelsListResponseOfWorkflowActivationStrategyDescriptor> ElsaWorkflowsApiEndpointsWorkflowActivationStrategiesListListAsync()
-        {
-            return ElsaWorkflowsApiEndpointsWorkflowActivationStrategiesListListAsync(System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaModelsListResponseOfWorkflowActivationStrategyDescriptor> ElsaWorkflowsApiEndpointsWorkflowActivationStrategiesListListAsync(System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/descriptors/workflow-activation-strategies"
-                    urlBuilder_.Append("elsa/api/descriptors/workflow-activation-strategies");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaModelsListResponseOfWorkflowActivationStrategyDescriptor>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsVariableTypesListResponse> ElsaWorkflowsApiEndpointsVariableTypesListListAsync()
-        {
-            return ElsaWorkflowsApiEndpointsVariableTypesListListAsync(System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsVariableTypesListResponse> ElsaWorkflowsApiEndpointsVariableTypesListListAsync(System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/descriptors/variables"
-                    urlBuilder_.Append("elsa/api/descriptors/variables");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsVariableTypesListResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsTestsActivitiesEndpointAsync(ElsaWorkflowsApiEndpointsTestsActivitiesRequest request)
-        {
-            return ElsaWorkflowsApiEndpointsTestsActivitiesEndpointAsync(request, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsTestsActivitiesEndpointAsync(ElsaWorkflowsApiEndpointsTestsActivitiesRequest request, System.Threading.CancellationToken cancellationToken)
-        {
-            if (request == null)
-                throw new System.ArgumentNullException("request");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(request, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/tests/activities"
-                    urlBuilder_.Append("elsa/api/tests/activities");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsTasksCompleteResponse> ElsaWorkflowsApiEndpointsTasksCompleteCompleteAsync(string taskId, ElsaWorkflowsApiEndpointsTasksCompleteRequest request)
-        {
-            return ElsaWorkflowsApiEndpointsTasksCompleteCompleteAsync(taskId, request, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsTasksCompleteResponse> ElsaWorkflowsApiEndpointsTasksCompleteCompleteAsync(string taskId, ElsaWorkflowsApiEndpointsTasksCompleteRequest request, System.Threading.CancellationToken cancellationToken)
-        {
-            if (taskId == null)
-                throw new System.ArgumentNullException("taskId");
-
-            if (request == null)
-                throw new System.ArgumentNullException("request");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(request, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/tasks/{taskId}/complete"
-                    urlBuilder_.Append("elsa/api/tasks/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(taskId, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/complete");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsTasksCompleteResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsStorageDriversListResponse> ElsaWorkflowsApiEndpointsStorageDriversListListAsync()
-        {
-            return ElsaWorkflowsApiEndpointsStorageDriversListListAsync(System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsStorageDriversListResponse> ElsaWorkflowsApiEndpointsStorageDriversListListAsync(System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/descriptors/storage-drivers"
-                    urlBuilder_.Append("elsa/api/descriptors/storage-drivers");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsStorageDriversListResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaModelsListResponseOfExpressionDescriptorModel> ElsaWorkflowsApiEndpointsScriptingExpressionDescriptorsListListAsync()
-        {
-            return ElsaWorkflowsApiEndpointsScriptingExpressionDescriptorsListListAsync(System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaModelsListResponseOfExpressionDescriptorModel> ElsaWorkflowsApiEndpointsScriptingExpressionDescriptorsListListAsync(System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/descriptors/expression-descriptors"
-                    urlBuilder_.Append("elsa/api/descriptors/expression-descriptors");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaModelsListResponseOfExpressionDescriptorModel>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsRuntimeAdminStatusResponse> ElsaWorkflowsApiEndpointsRuntimeAdminStatusStatusEndpointAsync()
-        {
-            return ElsaWorkflowsApiEndpointsRuntimeAdminStatusStatusEndpointAsync(System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsRuntimeAdminStatusResponse> ElsaWorkflowsApiEndpointsRuntimeAdminStatusStatusEndpointAsync(System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/admin/workflow-runtime/status"
-                    urlBuilder_.Append("elsa/api/admin/workflow-runtime/status");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsRuntimeAdminStatusResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsRuntimeAdminStatusResponse> ElsaWorkflowsApiEndpointsRuntimeAdminResumeResumeEndpointAsync()
-        {
-            return ElsaWorkflowsApiEndpointsRuntimeAdminResumeResumeEndpointAsync(System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsRuntimeAdminStatusResponse> ElsaWorkflowsApiEndpointsRuntimeAdminResumeResumeEndpointAsync(System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/admin/workflow-runtime/resume"
-                    urlBuilder_.Append("elsa/api/admin/workflow-runtime/resume");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsRuntimeAdminStatusResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsRuntimeAdminStatusResponse> ElsaWorkflowsApiEndpointsRuntimeAdminPausePauseEndpointAsync(ElsaWorkflowsApiEndpointsRuntimeAdminPauseRequest pauseRequest)
-        {
-            return ElsaWorkflowsApiEndpointsRuntimeAdminPausePauseEndpointAsync(pauseRequest, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsRuntimeAdminStatusResponse> ElsaWorkflowsApiEndpointsRuntimeAdminPausePauseEndpointAsync(ElsaWorkflowsApiEndpointsRuntimeAdminPauseRequest pauseRequest, System.Threading.CancellationToken cancellationToken)
-        {
-            if (pauseRequest == null)
-                throw new System.ArgumentNullException("pauseRequest");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(pauseRequest, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/admin/workflow-runtime/pause"
-                    urlBuilder_.Append("elsa/api/admin/workflow-runtime/pause");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsRuntimeAdminStatusResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsRuntimeAdminForceDrainResponse> ElsaWorkflowsApiEndpointsRuntimeAdminForceDrainForceDrainEndpointAsync(ElsaWorkflowsApiEndpointsRuntimeAdminForceDrainRequest forceDrainRequest)
-        {
-            return ElsaWorkflowsApiEndpointsRuntimeAdminForceDrainForceDrainEndpointAsync(forceDrainRequest, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsRuntimeAdminForceDrainResponse> ElsaWorkflowsApiEndpointsRuntimeAdminForceDrainForceDrainEndpointAsync(ElsaWorkflowsApiEndpointsRuntimeAdminForceDrainRequest forceDrainRequest, System.Threading.CancellationToken cancellationToken)
-        {
-            if (forceDrainRequest == null)
-                throw new System.ArgumentNullException("forceDrainRequest");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(forceDrainRequest, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/admin/workflow-runtime/force-drain"
-                    urlBuilder_.Append("elsa/api/admin/workflow-runtime/force-drain");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsRuntimeAdminForceDrainResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsPackageResponse> ElsaWorkflowsApiEndpointsPackageVersionAsync()
-        {
-            return ElsaWorkflowsApiEndpointsPackageVersionAsync(System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsPackageResponse> ElsaWorkflowsApiEndpointsPackageVersionAsync(System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/package/version"
-                    urlBuilder_.Append("elsa/api/package/version");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsPackageResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaModelsListResponseOfOutputConverterDescriptorModel> ElsaWorkflowsApiEndpointsOutputConvertersListListAsync()
-        {
-            return ElsaWorkflowsApiEndpointsOutputConvertersListListAsync(System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaModelsListResponseOfOutputConverterDescriptorModel> ElsaWorkflowsApiEndpointsOutputConvertersListListAsync(System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/descriptors/output-converters"
-                    urlBuilder_.Append("elsa/api/descriptors/output-converters");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaModelsListResponseOfOutputConverterDescriptorModel>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaModelsListResponseOfLogPersistenceStrategyDescriptor> ElsaWorkflowsApiEndpointsLogPersistenceStrategiesListEndpointAsync()
-        {
-            return ElsaWorkflowsApiEndpointsLogPersistenceStrategiesListEndpointAsync(System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaModelsListResponseOfLogPersistenceStrategyDescriptor> ElsaWorkflowsApiEndpointsLogPersistenceStrategiesListEndpointAsync(System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/descriptors/log-persistence-strategies"
-                    urlBuilder_.Append("elsa/api/descriptors/log-persistence-strategies");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaModelsListResponseOfLogPersistenceStrategyDescriptor>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaModelsListResponseOfIncidentStrategyDescriptor> ElsaWorkflowsApiEndpointsIncidentStrategiesListListAsync()
-        {
-            return ElsaWorkflowsApiEndpointsIncidentStrategiesListListAsync(System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaModelsListResponseOfIncidentStrategyDescriptor> ElsaWorkflowsApiEndpointsIncidentStrategiesListListAsync(System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/descriptors/incident-strategies"
-                    urlBuilder_.Append("elsa/api/descriptors/incident-strategies");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaModelsListResponseOfIncidentStrategyDescriptor>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaModelsListResponseOfFeatureDescriptor> ElsaWorkflowsApiEndpointsFeaturesListListAsync()
-        {
-            return ElsaWorkflowsApiEndpointsFeaturesListListAsync(System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaModelsListResponseOfFeatureDescriptor> ElsaWorkflowsApiEndpointsFeaturesListListAsync(System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/features/installed"
-                    urlBuilder_.Append("elsa/api/features/installed");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaModelsListResponseOfFeatureDescriptor>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaFeaturesModelsFeatureDescriptor> ElsaWorkflowsApiEndpointsFeaturesGetGetAsync(string fullName)
-        {
-            return ElsaWorkflowsApiEndpointsFeaturesGetGetAsync(fullName, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaFeaturesModelsFeatureDescriptor> ElsaWorkflowsApiEndpointsFeaturesGetGetAsync(string fullName, System.Threading.CancellationToken cancellationToken)
-        {
-            if (fullName == null)
-                throw new System.ArgumentNullException("fullName");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/features/installed/{fullName}"
-                    urlBuilder_.Append("elsa/api/features/installed/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(fullName, System.Globalization.CultureInfo.InvariantCulture)));
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaFeaturesModelsFeatureDescriptor>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsEventsTriggerPublicTriggerAsync()
-        {
-            return ElsaWorkflowsApiEndpointsEventsTriggerPublicTriggerAsync(System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsEventsTriggerPublicTriggerAsync(System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/events/trigger"
-                    urlBuilder_.Append("elsa/api/events/trigger");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsEventsTriggerAuthenticatedTriggerAsync(string eventName, ElsaWorkflowsApiEndpointsEventsTriggerAuthenticatedRequest request)
-        {
-            return ElsaWorkflowsApiEndpointsEventsTriggerAuthenticatedTriggerAsync(eventName, request, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsEventsTriggerAuthenticatedTriggerAsync(string eventName, ElsaWorkflowsApiEndpointsEventsTriggerAuthenticatedRequest request, System.Threading.CancellationToken cancellationToken)
-        {
-            if (eventName == null)
-                throw new System.ArgumentNullException("eventName");
-
-            if (request == null)
-                throw new System.ArgumentNullException("request");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(request, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/events/{eventName}/trigger"
-                    urlBuilder_.Append("elsa/api/events/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(eventName, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/trigger");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaModelsListResponseOfCommitStrategyDescriptor> ElsaWorkflowsApiEndpointsCommitStrategiesWorkflowsListListAsync()
-        {
-            return ElsaWorkflowsApiEndpointsCommitStrategiesWorkflowsListListAsync(System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaModelsListResponseOfCommitStrategyDescriptor> ElsaWorkflowsApiEndpointsCommitStrategiesWorkflowsListListAsync(System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/descriptors/commit-strategies/workflows"
-                    urlBuilder_.Append("elsa/api/descriptors/commit-strategies/workflows");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaModelsListResponseOfCommitStrategyDescriptor>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaModelsListResponseOfCommitStrategyDescriptor> ElsaWorkflowsApiEndpointsCommitStrategiesActivitiesListListAsync()
-        {
-            return ElsaWorkflowsApiEndpointsCommitStrategiesActivitiesListListAsync(System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaModelsListResponseOfCommitStrategyDescriptor> ElsaWorkflowsApiEndpointsCommitStrategiesActivitiesListListAsync(System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/descriptors/commit-strategies/activities"
-                    urlBuilder_.Append("elsa/api/descriptors/commit-strategies/activities");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaModelsListResponseOfCommitStrategyDescriptor>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task GetElsaWorkflowsApiEndpointsBookmarksResumeResumeAsync()
-        {
-            return GetElsaWorkflowsApiEndpointsBookmarksResumeResumeAsync(System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task GetElsaWorkflowsApiEndpointsBookmarksResumeResumeAsync(System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/bookmarks/resume"
-                    urlBuilder_.Append("elsa/api/bookmarks/resume");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task PostElsaWorkflowsApiEndpointsBookmarksResumeResumeAsync()
-        {
-            return PostElsaWorkflowsApiEndpointsBookmarksResumeResumeAsync(System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task PostElsaWorkflowsApiEndpointsBookmarksResumeResumeAsync(System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/bookmarks/resume"
-                    urlBuilder_.Append("elsa/api/bookmarks/resume");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersReplayResponse> ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersReplayEndpointAsync(string id)
-        {
-            return ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersReplayEndpointAsync(id, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersReplayResponse> ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersReplayEndpointAsync(string id, System.Threading.CancellationToken cancellationToken)
-        {
-            if (id == null)
-                throw new System.ArgumentNullException("id");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/bookmark-queue/dead-letters/{id}/replay"
-                    urlBuilder_.Append("elsa/api/bookmark-queue/dead-letters/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/replay");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersReplayResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersListResponse> GetElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersListEndpointAsync(int? page, int? pageSize, string? workflowInstanceId)
-        {
-            return GetElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersListEndpointAsync(page, pageSize, workflowInstanceId, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersListResponse> GetElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersListEndpointAsync(int? page, int? pageSize, string? workflowInstanceId, System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/bookmark-queue/dead-letters"
-                    urlBuilder_.Append("elsa/api/bookmark-queue/dead-letters");
-                    urlBuilder_.Append('?');
-                    if (page != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("page")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(page, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (pageSize != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("pageSize")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(pageSize, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (workflowInstanceId != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("workflowInstanceId")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(workflowInstanceId, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    urlBuilder_.Length--;
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersListResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersListResponse> PostElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersListEndpointAsync()
-        {
-            return PostElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersListEndpointAsync(System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersListResponse> PostElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersListEndpointAsync(System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/bookmark-queue/dead-letters"
-                    urlBuilder_.Append("elsa/api/bookmark-queue/dead-letters");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersListResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersBookmarkQueueDeadLetterModel> ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersGetEndpointAsync(string id)
-        {
-            return ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersGetEndpointAsync(id, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersBookmarkQueueDeadLetterModel> ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersGetEndpointAsync(string id, System.Threading.CancellationToken cancellationToken)
-        {
-            if (id == null)
-                throw new System.ArgumentNullException("id");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/bookmark-queue/dead-letters/{id}"
-                    urlBuilder_.Append("elsa/api/bookmark-queue/dead-letters/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersBookmarkQueueDeadLetterModel>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersDeleteEndpointAsync(string id)
-        {
-            return ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersDeleteEndpointAsync(id, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersDeleteEndpointAsync(string id, System.Threading.CancellationToken cancellationToken)
-        {
-            if (id == null)
-                throw new System.ArgumentNullException("id");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("DELETE");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/bookmark-queue/dead-letters/{id}"
-                    urlBuilder_.Append("elsa/api/bookmark-queue/dead-letters/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaModelsListResponseOfActivityExecutionRecordSummary> ElsaWorkflowsApiEndpointsActivityExecutionSummariesListSummariesEndpointAsync(string workflowInstanceId, string activityNodeId, bool? completed)
-        {
-            return ElsaWorkflowsApiEndpointsActivityExecutionSummariesListSummariesEndpointAsync(workflowInstanceId, activityNodeId, completed, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaModelsListResponseOfActivityExecutionRecordSummary> ElsaWorkflowsApiEndpointsActivityExecutionSummariesListSummariesEndpointAsync(string workflowInstanceId, string activityNodeId, bool? completed, System.Threading.CancellationToken cancellationToken)
-        {
-            if (workflowInstanceId == null)
-                throw new System.ArgumentNullException("workflowInstanceId");
-
-            if (activityNodeId == null)
-                throw new System.ArgumentNullException("activityNodeId");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/activity-execution-summaries/list"
-                    urlBuilder_.Append("elsa/api/activity-execution-summaries/list");
-                    urlBuilder_.Append('?');
-                    urlBuilder_.Append(System.Uri.EscapeDataString("workflowInstanceId")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(workflowInstanceId, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    urlBuilder_.Append(System.Uri.EscapeDataString("activityNodeId")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(activityNodeId, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    if (completed != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("completed")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(completed, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    urlBuilder_.Length--;
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaModelsListResponseOfActivityExecutionRecordSummary>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsActivityExecutionsReportResponse> ElsaWorkflowsApiEndpointsActivityExecutionsReportReportAsync(ElsaWorkflowsApiEndpointsActivityExecutionsReportRequest request)
-        {
-            return ElsaWorkflowsApiEndpointsActivityExecutionsReportReportAsync(request, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsActivityExecutionsReportResponse> ElsaWorkflowsApiEndpointsActivityExecutionsReportReportAsync(ElsaWorkflowsApiEndpointsActivityExecutionsReportRequest request, System.Threading.CancellationToken cancellationToken)
-        {
-            if (request == null)
-                throw new System.ArgumentNullException("request");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(request, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/activity-executions/report"
-                    urlBuilder_.Append("elsa/api/activity-executions/report");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsActivityExecutionsReportResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaModelsListResponseOfActivityExecutionRecord> ElsaWorkflowsApiEndpointsActivityExecutionsListListAsync(string workflowInstanceId, string activityNodeId, bool? completed)
-        {
-            return ElsaWorkflowsApiEndpointsActivityExecutionsListListAsync(workflowInstanceId, activityNodeId, completed, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaModelsListResponseOfActivityExecutionRecord> ElsaWorkflowsApiEndpointsActivityExecutionsListListAsync(string workflowInstanceId, string activityNodeId, bool? completed, System.Threading.CancellationToken cancellationToken)
-        {
-            if (workflowInstanceId == null)
-                throw new System.ArgumentNullException("workflowInstanceId");
-
-            if (activityNodeId == null)
-                throw new System.ArgumentNullException("activityNodeId");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/activity-executions/list"
-                    urlBuilder_.Append("elsa/api/activity-executions/list");
-                    urlBuilder_.Append('?');
-                    urlBuilder_.Append(System.Uri.EscapeDataString("workflowInstanceId")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(workflowInstanceId, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    urlBuilder_.Append(System.Uri.EscapeDataString("activityNodeId")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(activityNodeId, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    if (completed != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("completed")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(completed, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    urlBuilder_.Length--;
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaModelsListResponseOfActivityExecutionRecord>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsActivityExecutionsGetCallStackResponse> ElsaWorkflowsApiEndpointsActivityExecutionsGetCallStackEndpointAsync(string id, bool? includeCrossWorkflowChain, int? skip, int? take)
-        {
-            return ElsaWorkflowsApiEndpointsActivityExecutionsGetCallStackEndpointAsync(id, includeCrossWorkflowChain, skip, take, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsActivityExecutionsGetCallStackResponse> ElsaWorkflowsApiEndpointsActivityExecutionsGetCallStackEndpointAsync(string id, bool? includeCrossWorkflowChain, int? skip, int? take, System.Threading.CancellationToken cancellationToken)
-        {
-            if (id == null)
-                throw new System.ArgumentNullException("id");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/activity-executions/{id}/call-stack"
-                    urlBuilder_.Append("elsa/api/activity-executions/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/call-stack");
-                    urlBuilder_.Append('?');
-                    if (includeCrossWorkflowChain != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("includeCrossWorkflowChain")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(includeCrossWorkflowChain, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (skip != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("skip")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(skip, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (take != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("take")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(take, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    urlBuilder_.Length--;
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsActivityExecutionsGetCallStackResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsRuntimeEntitiesActivityExecutionRecord> ElsaWorkflowsApiEndpointsActivityExecutionsGetEndpoint1Async(string id)
-        {
-            return ElsaWorkflowsApiEndpointsActivityExecutionsGetEndpoint1Async(id, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsRuntimeEntitiesActivityExecutionRecord> ElsaWorkflowsApiEndpointsActivityExecutionsGetEndpoint1Async(string id, System.Threading.CancellationToken cancellationToken)
-        {
-            if (id == null)
-                throw new System.ArgumentNullException("id");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/activity-executions/{id}"
-                    urlBuilder_.Append("elsa/api/activity-executions/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsRuntimeEntitiesActivityExecutionRecord>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsRuntimeEntitiesActivityExecutionRecord> ElsaWorkflowsApiEndpointsActivityExecutionsGetEndpoint2Async(string id)
-        {
-            return ElsaWorkflowsApiEndpointsActivityExecutionsGetEndpoint2Async(id, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsRuntimeEntitiesActivityExecutionRecord> ElsaWorkflowsApiEndpointsActivityExecutionsGetEndpoint2Async(string id, System.Threading.CancellationToken cancellationToken)
-        {
-            if (id == null)
-                throw new System.ArgumentNullException("id");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/activity-executions/{id}"
-                    urlBuilder_.Append("elsa/api/activity-executions/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsRuntimeEntitiesActivityExecutionRecord>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsRuntimeEntitiesActivityExecutionRecord> ElsaWorkflowsApiEndpointsActivityExecutionsGetEndpoint3Async()
-        {
-            return ElsaWorkflowsApiEndpointsActivityExecutionsGetEndpoint3Async(System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsRuntimeEntitiesActivityExecutionRecord> ElsaWorkflowsApiEndpointsActivityExecutionsGetEndpoint3Async(System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/activity-executions/by-id"
-                    urlBuilder_.Append("elsa/api/activity-executions/by-id");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsRuntimeEntitiesActivityExecutionRecord>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaModelsCountResponse> ElsaWorkflowsApiEndpointsActivityExecutionsCountCountAsync(string workflowInstanceId, string activityId, bool? completed)
-        {
-            return ElsaWorkflowsApiEndpointsActivityExecutionsCountCountAsync(workflowInstanceId, activityId, completed, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaModelsCountResponse> ElsaWorkflowsApiEndpointsActivityExecutionsCountCountAsync(string workflowInstanceId, string activityId, bool? completed, System.Threading.CancellationToken cancellationToken)
-        {
-            if (workflowInstanceId == null)
-                throw new System.ArgumentNullException("workflowInstanceId");
-
-            if (activityId == null)
-                throw new System.ArgumentNullException("activityId");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/activity-executions/count"
-                    urlBuilder_.Append("elsa/api/activity-executions/count");
-                    urlBuilder_.Append('?');
-                    urlBuilder_.Append(System.Uri.EscapeDataString("workflowInstanceId")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(workflowInstanceId, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    urlBuilder_.Append(System.Uri.EscapeDataString("activityId")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(activityId, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    if (completed != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("completed")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(completed, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    urlBuilder_.Length--;
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaModelsCountResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsActivityDescriptorsListResponse> ElsaWorkflowsApiEndpointsActivityDescriptorsListListAsync()
-        {
-            return ElsaWorkflowsApiEndpointsActivityDescriptorsListListAsync(System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsActivityDescriptorsListResponse> ElsaWorkflowsApiEndpointsActivityDescriptorsListListAsync(System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/descriptors/activities"
-                    urlBuilder_.Append("elsa/api/descriptors/activities");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsActivityDescriptorsListResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsModelsActivityDescriptor> ElsaWorkflowsApiEndpointsActivityDescriptorsGetGetAsync(string typeName, int? version)
-        {
-            return ElsaWorkflowsApiEndpointsActivityDescriptorsGetGetAsync(typeName, version, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsModelsActivityDescriptor> ElsaWorkflowsApiEndpointsActivityDescriptorsGetGetAsync(string typeName, int? version, System.Threading.CancellationToken cancellationToken)
-        {
-            if (typeName == null)
-                throw new System.ArgumentNullException("typeName");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/descriptors/activities/{typeName}"
-                    urlBuilder_.Append("elsa/api/descriptors/activities/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(typeName, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append('?');
-                    if (version != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("version")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(version, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    urlBuilder_.Length--;
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsModelsActivityDescriptor>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsActivityDescriptorOptionsGetResponse> ElsaWorkflowsApiEndpointsActivityDescriptorOptionsGetGetAsync(string activityTypeName, string propertyName, ElsaWorkflowsApiEndpointsActivityDescriptorOptionsGetRequest request)
-        {
-            return ElsaWorkflowsApiEndpointsActivityDescriptorOptionsGetGetAsync(activityTypeName, propertyName, request, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaWorkflowsApiEndpointsActivityDescriptorOptionsGetResponse> ElsaWorkflowsApiEndpointsActivityDescriptorOptionsGetGetAsync(string activityTypeName, string propertyName, ElsaWorkflowsApiEndpointsActivityDescriptorOptionsGetRequest request, System.Threading.CancellationToken cancellationToken)
-        {
-            if (activityTypeName == null)
-                throw new System.ArgumentNullException("activityTypeName");
-
-            if (propertyName == null)
-                throw new System.ArgumentNullException("propertyName");
-
-            if (request == null)
-                throw new System.ArgumentNullException("request");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(request, JsonSerializerSettings);
-                    var content_ = new System.Net.Http.ByteArrayContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/descriptors/activities/{activityTypeName}/options/{propertyName}"
-                    urlBuilder_.Append("elsa/api/descriptors/activities/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(activityTypeName, System.Globalization.CultureInfo.InvariantCulture)));
-                    urlBuilder_.Append("/options/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(propertyName, System.Globalization.CultureInfo.InvariantCulture)));
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaWorkflowsApiEndpointsActivityDescriptorOptionsGetResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ElsaResilienceEndpointsSimulateResponseSimulatedResponse> ElsaResilienceEndpointsSimulateResponseSimulateResponseEndpointAsync()
-        {
-            return ElsaResilienceEndpointsSimulateResponseSimulateResponseEndpointAsync(System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ElsaResilienceEndpointsSimulateResponseSimulatedResponse> ElsaResilienceEndpointsSimulateResponseSimulateResponseEndpointAsync(System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/simulate-response"
-                    urlBuilder_.Append("elsa/api/simulate-response");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ElsaResilienceEndpointsSimulateResponseSimulatedResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task ElsaResilienceEndpointsRetriesListEndpointAsync(string activityInstanceId)
-        {
-            return ElsaResilienceEndpointsRetriesListEndpointAsync(activityInstanceId, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ElsaResilienceEndpointsRetriesListEndpointAsync(string activityInstanceId, System.Threading.CancellationToken cancellationToken)
-        {
-            if (activityInstanceId == null)
-                throw new System.ArgumentNullException("activityInstanceId");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/resilience/retries/{activityInstanceId}"
-                    urlBuilder_.Append("elsa/api/resilience/retries/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(activityInstanceId, System.Globalization.CultureInfo.InvariantCulture)));
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task ElsaResilienceEndpointsResilienceStrategiesListEndpointAsync()
-        {
-            return ElsaResilienceEndpointsResilienceStrategiesListEndpointAsync(System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>No Content</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ElsaResilienceEndpointsResilienceStrategiesListEndpointAsync(System.Threading.CancellationToken cancellationToken)
-        {
             var client_ = _httpClient;
             var disposeClient_ = false;
             try
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "elsa/api/resilience/strategies"
-                    urlBuilder_.Append("elsa/api/resilience/strategies");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
 
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 204)
-                        {
-                            return;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetPermissionsAsync()
-        {
-            return GetPermissionsAsync(System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetPermissionsAsync(System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
@@ -10212,15 +542,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetShareAllModuleManifest> GetCoreModulesAsync()
+        public virtual System.Threading.Tasks.Task<ModuleManifest> GetCoreModulesAsync(string? x_Tenant)
         {
-            return GetCoreModulesAsync(System.Threading.CancellationToken.None);
+            return GetCoreModulesAsync(x_Tenant, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetShareAllModuleManifest> GetCoreModulesAsync(System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ModuleManifest> GetCoreModulesAsync(string? x_Tenant, System.Threading.CancellationToken cancellationToken)
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -10228,6 +560,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
@@ -10261,7 +596,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetShareAllModuleManifest>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<ModuleManifest>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -10288,15 +623,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetShareAllModuleManifest> GetMyModulesAsync()
+        public virtual System.Threading.Tasks.Task<ModuleManifest> GetMyModulesAsync(string? x_Tenant)
         {
-            return GetMyModulesAsync(System.Threading.CancellationToken.None);
+            return GetMyModulesAsync(x_Tenant, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetShareAllModuleManifest> GetMyModulesAsync(System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ModuleManifest> GetMyModulesAsync(string? x_Tenant, System.Threading.CancellationToken cancellationToken)
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -10304,6 +641,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
@@ -10337,7 +677,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetShareAllModuleManifest>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<ModuleManifest>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -10370,91 +710,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesElsaHostApplicationQueriesElsaInfoDto> GetElsaInfoAsync()
+        public virtual System.Threading.Tasks.Task<CreatedApiKeyDto> CreateApiKeyAsync(string? x_Tenant, CreateApiKeyCommand command)
         {
-            return GetElsaInfoAsync(System.Threading.CancellationToken.None);
+            return CreateApiKeyAsync(x_Tenant, command, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesElsaHostApplicationQueriesElsaInfoDto> GetElsaInfoAsync(System.Threading.CancellationToken cancellationToken)
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                
-                    // Operation Path: "api/v1/elsa/info"
-                    urlBuilder_.Append("api/v1/elsa/info");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorHostModulesElsaHostApplicationQueriesElsaInfoDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await ReadAsStringAsync(response_.Content, cancellationToken).ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonCreatedApiKeyDto> CreateApiKeyAsync(SoftsquarenetModularBlazorHostModulesAuthApplicationApiKeysCreateApiKeyCommand command)
-        {
-            return CreateApiKeyAsync(command, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonCreatedApiKeyDto> CreateApiKeyAsync(SoftsquarenetModularBlazorHostModulesAuthApplicationApiKeysCreateApiKeyCommand command, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<CreatedApiKeyDto> CreateApiKeyAsync(string? x_Tenant, CreateApiKeyCommand command, System.Threading.CancellationToken cancellationToken)
         {
             if (command == null)
                 throw new System.ArgumentNullException("command");
@@ -10465,6 +731,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(command, JsonSerializerSettings);
                     var content_ = new System.Net.Http.ByteArrayContent(json_);
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
@@ -10502,7 +771,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonCreatedApiKeyDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<CreatedApiKeyDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -10512,12 +781,12 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         else
                         if (status_ == 400)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<MicrosoftAspNetCoreHttpHttpValidationProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<HttpValidationProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
-                            throw new ApiException<MicrosoftAspNetCoreHttpHttpValidationProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                            throw new ApiException<HttpValidationProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
                         }
                         else
                         {
@@ -10539,15 +808,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorCorePaginationPagedResponseOfApiKeyDto> SearchApiKeysAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields)
+        public virtual System.Threading.Tasks.Task<PagedResponseOfApiKeyDto> SearchApiKeysAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields, string? x_Tenant)
         {
-            return SearchApiKeysAsync(pageNumber, pageSize, orderBy, keyword, searchFields, System.Threading.CancellationToken.None);
+            return SearchApiKeysAsync(pageNumber, pageSize, orderBy, keyword, searchFields, x_Tenant, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorCorePaginationPagedResponseOfApiKeyDto> SearchApiKeysAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<PagedResponseOfApiKeyDto> SearchApiKeysAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields, string? x_Tenant, System.Threading.CancellationToken cancellationToken)
         {
             if (pageNumber == null)
                 throw new System.ArgumentNullException("pageNumber");
@@ -10561,6 +832,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
@@ -10610,7 +884,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorCorePaginationPagedResponseOfApiKeyDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<PagedResponseOfApiKeyDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -10637,15 +911,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task RevokeApiKeyAsync(System.Guid id)
+        public virtual System.Threading.Tasks.Task RevokeApiKeyAsync(System.Guid id, string? x_Tenant)
         {
-            return RevokeApiKeyAsync(id, System.Threading.CancellationToken.None);
+            return RevokeApiKeyAsync(id, x_Tenant, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task RevokeApiKeyAsync(System.Guid id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task RevokeApiKeyAsync(System.Guid id, string? x_Tenant, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -10656,6 +932,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("DELETE");
 
                     var urlBuilder_ = new System.Text.StringBuilder();
@@ -10711,15 +990,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorCorePaginationPagedResponseOfRoleDto> SearchRolesAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields)
+        public virtual System.Threading.Tasks.Task<PagedResponseOfRoleDto> SearchRolesAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields, string? x_Tenant)
         {
-            return SearchRolesAsync(pageNumber, pageSize, orderBy, keyword, searchFields, System.Threading.CancellationToken.None);
+            return SearchRolesAsync(pageNumber, pageSize, orderBy, keyword, searchFields, x_Tenant, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorCorePaginationPagedResponseOfRoleDto> SearchRolesAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<PagedResponseOfRoleDto> SearchRolesAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields, string? x_Tenant, System.Threading.CancellationToken cancellationToken)
         {
             if (pageNumber == null)
                 throw new System.ArgumentNullException("pageNumber");
@@ -10733,6 +1014,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
@@ -10782,7 +1066,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorCorePaginationPagedResponseOfRoleDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<PagedResponseOfRoleDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -10809,15 +1093,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonRoleDetailDto> CreateRoleAsync(SoftsquarenetModularBlazorHostModulesAuthApplicationRolesCreateRoleCommand command)
+        public virtual System.Threading.Tasks.Task<RoleDetailDto> CreateRoleAsync(string? x_Tenant, CreateRoleCommand command)
         {
-            return CreateRoleAsync(command, System.Threading.CancellationToken.None);
+            return CreateRoleAsync(x_Tenant, command, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonRoleDetailDto> CreateRoleAsync(SoftsquarenetModularBlazorHostModulesAuthApplicationRolesCreateRoleCommand command, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<RoleDetailDto> CreateRoleAsync(string? x_Tenant, CreateRoleCommand command, System.Threading.CancellationToken cancellationToken)
         {
             if (command == null)
                 throw new System.ArgumentNullException("command");
@@ -10828,6 +1114,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(command, JsonSerializerSettings);
                     var content_ = new System.Net.Http.ByteArrayContent(json_);
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
@@ -10865,7 +1154,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonRoleDetailDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<RoleDetailDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -10875,12 +1164,12 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         else
                         if (status_ == 400)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<MicrosoftAspNetCoreHttpHttpValidationProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<HttpValidationProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
-                            throw new ApiException<MicrosoftAspNetCoreHttpHttpValidationProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                            throw new ApiException<HttpValidationProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
                         }
                         else
                         {
@@ -10902,15 +1191,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonRoleDetailDto> GetRoleAsync(System.Guid id)
+        public virtual System.Threading.Tasks.Task<RoleDetailDto> GetRoleAsync(System.Guid id, string? x_Tenant)
         {
-            return GetRoleAsync(id, System.Threading.CancellationToken.None);
+            return GetRoleAsync(id, x_Tenant, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonRoleDetailDto> GetRoleAsync(System.Guid id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<RoleDetailDto> GetRoleAsync(System.Guid id, string? x_Tenant, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -10921,6 +1212,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
@@ -10955,7 +1249,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonRoleDetailDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<RoleDetailDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -10965,12 +1259,12 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         else
                         if (status_ == 404)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<MicrosoftAspNetCoreMvcProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<ProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
-                            throw new ApiException<MicrosoftAspNetCoreMvcProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                            throw new ApiException<ProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
                         }
                         else
                         {
@@ -10992,15 +1286,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonRoleDetailDto> UpdateRoleAsync(System.Guid id, SoftsquarenetModularBlazorHostModulesAuthInfrastructureEndpointsUpdateRoleRequest request)
+        public virtual System.Threading.Tasks.Task<RoleDetailDto> UpdateRoleAsync(System.Guid id, string? x_Tenant, UpdateRoleRequest request)
         {
-            return UpdateRoleAsync(id, request, System.Threading.CancellationToken.None);
+            return UpdateRoleAsync(id, x_Tenant, request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonRoleDetailDto> UpdateRoleAsync(System.Guid id, SoftsquarenetModularBlazorHostModulesAuthInfrastructureEndpointsUpdateRoleRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<RoleDetailDto> UpdateRoleAsync(System.Guid id, string? x_Tenant, UpdateRoleRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -11014,6 +1310,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(request, JsonSerializerSettings);
                     var content_ = new System.Net.Http.ByteArrayContent(json_);
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
@@ -11052,7 +1351,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonRoleDetailDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<RoleDetailDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -11062,12 +1361,12 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         else
                         if (status_ == 400)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<MicrosoftAspNetCoreHttpHttpValidationProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<HttpValidationProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
-                            throw new ApiException<MicrosoftAspNetCoreHttpHttpValidationProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                            throw new ApiException<HttpValidationProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
                         }
                         else
                         {
@@ -11089,15 +1388,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task DeleteRoleAsync(System.Guid id)
+        public virtual System.Threading.Tasks.Task DeleteRoleAsync(System.Guid id, string? x_Tenant)
         {
-            return DeleteRoleAsync(id, System.Threading.CancellationToken.None);
+            return DeleteRoleAsync(id, x_Tenant, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task DeleteRoleAsync(System.Guid id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task DeleteRoleAsync(System.Guid id, string? x_Tenant, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -11108,6 +1409,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("DELETE");
 
                     var urlBuilder_ = new System.Text.StringBuilder();
@@ -11163,15 +1467,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetRolePermissionsAsync(System.Guid id)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetRolePermissionsAsync(System.Guid id, string? x_Tenant)
         {
-            return GetRolePermissionsAsync(id, System.Threading.CancellationToken.None);
+            return GetRolePermissionsAsync(id, x_Tenant, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetRolePermissionsAsync(System.Guid id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetRolePermissionsAsync(System.Guid id, string? x_Tenant, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -11182,6 +1488,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
@@ -11244,15 +1553,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonRoleDetailDto> SetRolePermissionsAsync(System.Guid id, SoftsquarenetModularBlazorHostModulesAuthInfrastructureEndpointsSetPermissionsRequest request)
+        public virtual System.Threading.Tasks.Task<RoleDetailDto> SetRolePermissionsAsync(System.Guid id, string? x_Tenant, SetPermissionsRequest request)
         {
-            return SetRolePermissionsAsync(id, request, System.Threading.CancellationToken.None);
+            return SetRolePermissionsAsync(id, x_Tenant, request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonRoleDetailDto> SetRolePermissionsAsync(System.Guid id, SoftsquarenetModularBlazorHostModulesAuthInfrastructureEndpointsSetPermissionsRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<RoleDetailDto> SetRolePermissionsAsync(System.Guid id, string? x_Tenant, SetPermissionsRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -11266,6 +1577,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(request, JsonSerializerSettings);
                     var content_ = new System.Net.Http.ByteArrayContent(json_);
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
@@ -11305,7 +1619,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonRoleDetailDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<RoleDetailDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -11315,12 +1629,12 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         else
                         if (status_ == 400)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<MicrosoftAspNetCoreHttpHttpValidationProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<HttpValidationProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
-                            throw new ApiException<MicrosoftAspNetCoreHttpHttpValidationProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                            throw new ApiException<HttpValidationProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
                         }
                         else
                         {
@@ -11342,15 +1656,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonTokenResult> IssueTokenAsync(SoftsquarenetModularBlazorHostModulesAuthApplicationTokensLoginCommand command)
+        public virtual System.Threading.Tasks.Task<TokenResult> IssueTokenAsync(string? x_Tenant, LoginCommand command)
         {
-            return IssueTokenAsync(command, System.Threading.CancellationToken.None);
+            return IssueTokenAsync(x_Tenant, command, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonTokenResult> IssueTokenAsync(SoftsquarenetModularBlazorHostModulesAuthApplicationTokensLoginCommand command, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<TokenResult> IssueTokenAsync(string? x_Tenant, LoginCommand command, System.Threading.CancellationToken cancellationToken)
         {
             if (command == null)
                 throw new System.ArgumentNullException("command");
@@ -11361,6 +1677,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(command, JsonSerializerSettings);
                     var content_ = new System.Net.Http.ByteArrayContent(json_);
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
@@ -11398,7 +1717,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonTokenResult>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<TokenResult>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -11408,22 +1727,22 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         else
                         if (status_ == 400)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<MicrosoftAspNetCoreHttpHttpValidationProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<HttpValidationProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
-                            throw new ApiException<MicrosoftAspNetCoreHttpHttpValidationProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                            throw new ApiException<HttpValidationProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
                         }
                         else
                         if (status_ == 401)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<MicrosoftAspNetCoreMvcProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<ProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
-                            throw new ApiException<MicrosoftAspNetCoreMvcProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                            throw new ApiException<ProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
                         }
                         else
                         {
@@ -11445,15 +1764,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonTokenResult> RefreshTokenAsync(SoftsquarenetModularBlazorHostModulesAuthApplicationTokensRefreshTokenCommand command)
+        public virtual System.Threading.Tasks.Task<TokenResult> RefreshTokenAsync(string? x_Tenant, RefreshTokenCommand command)
         {
-            return RefreshTokenAsync(command, System.Threading.CancellationToken.None);
+            return RefreshTokenAsync(x_Tenant, command, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonTokenResult> RefreshTokenAsync(SoftsquarenetModularBlazorHostModulesAuthApplicationTokensRefreshTokenCommand command, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<TokenResult> RefreshTokenAsync(string? x_Tenant, RefreshTokenCommand command, System.Threading.CancellationToken cancellationToken)
         {
             if (command == null)
                 throw new System.ArgumentNullException("command");
@@ -11464,6 +1785,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(command, JsonSerializerSettings);
                     var content_ = new System.Net.Http.ByteArrayContent(json_);
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
@@ -11501,7 +1825,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonTokenResult>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<TokenResult>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -11511,12 +1835,12 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         else
                         if (status_ == 401)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<MicrosoftAspNetCoreMvcProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<ProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
-                            throw new ApiException<MicrosoftAspNetCoreMvcProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                            throw new ApiException<ProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
                         }
                         else
                         {
@@ -11538,15 +1862,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task RevokeTokenAsync(SoftsquarenetModularBlazorHostModulesAuthApplicationTokensRevokeRefreshTokenCommand command)
+        public virtual System.Threading.Tasks.Task RevokeTokenAsync(string? x_Tenant, RevokeRefreshTokenCommand command)
         {
-            return RevokeTokenAsync(command, System.Threading.CancellationToken.None);
+            return RevokeTokenAsync(x_Tenant, command, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task RevokeTokenAsync(SoftsquarenetModularBlazorHostModulesAuthApplicationTokensRevokeRefreshTokenCommand command, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task RevokeTokenAsync(string? x_Tenant, RevokeRefreshTokenCommand command, System.Threading.CancellationToken cancellationToken)
         {
             if (command == null)
                 throw new System.ArgumentNullException("command");
@@ -11557,6 +1883,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(command, JsonSerializerSettings);
                     var content_ = new System.Net.Http.ByteArrayContent(json_);
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
@@ -11615,15 +1944,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonUserDetailDto> RegisterUserAsync(SoftsquarenetModularBlazorHostModulesAuthApplicationUsersCreateUserCommand command)
+        public virtual System.Threading.Tasks.Task<UserDetailDto> RegisterUserAsync(string? x_Tenant, CreateUserCommand command)
         {
-            return RegisterUserAsync(command, System.Threading.CancellationToken.None);
+            return RegisterUserAsync(x_Tenant, command, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonUserDetailDto> RegisterUserAsync(SoftsquarenetModularBlazorHostModulesAuthApplicationUsersCreateUserCommand command, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<UserDetailDto> RegisterUserAsync(string? x_Tenant, CreateUserCommand command, System.Threading.CancellationToken cancellationToken)
         {
             if (command == null)
                 throw new System.ArgumentNullException("command");
@@ -11634,6 +1965,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(command, JsonSerializerSettings);
                     var content_ = new System.Net.Http.ByteArrayContent(json_);
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
@@ -11671,7 +2005,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonUserDetailDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<UserDetailDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -11681,12 +2015,12 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         else
                         if (status_ == 400)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<MicrosoftAspNetCoreHttpHttpValidationProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<HttpValidationProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
-                            throw new ApiException<MicrosoftAspNetCoreHttpHttpValidationProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                            throw new ApiException<HttpValidationProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
                         }
                         else
                         {
@@ -11708,15 +2042,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorCorePaginationPagedResponseOfUserDto> SearchUsersAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields)
+        public virtual System.Threading.Tasks.Task<PagedResponseOfUserDto> SearchUsersAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields, string? x_Tenant)
         {
-            return SearchUsersAsync(pageNumber, pageSize, orderBy, keyword, searchFields, System.Threading.CancellationToken.None);
+            return SearchUsersAsync(pageNumber, pageSize, orderBy, keyword, searchFields, x_Tenant, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorCorePaginationPagedResponseOfUserDto> SearchUsersAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<PagedResponseOfUserDto> SearchUsersAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields, string? x_Tenant, System.Threading.CancellationToken cancellationToken)
         {
             if (pageNumber == null)
                 throw new System.ArgumentNullException("pageNumber");
@@ -11730,6 +2066,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
@@ -11779,7 +2118,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorCorePaginationPagedResponseOfUserDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<PagedResponseOfUserDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -11806,15 +2145,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonUserDetailDto> GetMyProfileAsync()
+        public virtual System.Threading.Tasks.Task<UserDetailDto> GetMyProfileAsync(string? x_Tenant)
         {
-            return GetMyProfileAsync(System.Threading.CancellationToken.None);
+            return GetMyProfileAsync(x_Tenant, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonUserDetailDto> GetMyProfileAsync(System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<UserDetailDto> GetMyProfileAsync(string? x_Tenant, System.Threading.CancellationToken cancellationToken)
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -11822,6 +2163,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
@@ -11855,7 +2199,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonUserDetailDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<UserDetailDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -11882,15 +2226,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task ChangeMyPasswordAsync(SoftsquarenetModularBlazorHostModulesAuthApplicationUsersChangePasswordCommand command)
+        public virtual System.Threading.Tasks.Task ChangeMyPasswordAsync(string? x_Tenant, ChangePasswordCommand command)
         {
-            return ChangeMyPasswordAsync(command, System.Threading.CancellationToken.None);
+            return ChangeMyPasswordAsync(x_Tenant, command, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ChangeMyPasswordAsync(SoftsquarenetModularBlazorHostModulesAuthApplicationUsersChangePasswordCommand command, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task ChangeMyPasswordAsync(string? x_Tenant, ChangePasswordCommand command, System.Threading.CancellationToken cancellationToken)
         {
             if (command == null)
                 throw new System.ArgumentNullException("command");
@@ -11901,6 +2247,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(command, JsonSerializerSettings);
                     var content_ = new System.Net.Http.ByteArrayContent(json_);
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
@@ -11942,12 +2291,12 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         else
                         if (status_ == 400)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<MicrosoftAspNetCoreHttpHttpValidationProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<HttpValidationProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
-                            throw new ApiException<MicrosoftAspNetCoreHttpHttpValidationProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                            throw new ApiException<HttpValidationProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
                         }
                         else
                         {
@@ -11969,15 +2318,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonUserDetailDto> GetUserAsync(System.Guid id)
+        public virtual System.Threading.Tasks.Task<UserDetailDto> GetUserAsync(System.Guid id, string? x_Tenant)
         {
-            return GetUserAsync(id, System.Threading.CancellationToken.None);
+            return GetUserAsync(id, x_Tenant, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonUserDetailDto> GetUserAsync(System.Guid id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<UserDetailDto> GetUserAsync(System.Guid id, string? x_Tenant, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -11988,6 +2339,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
@@ -12022,7 +2376,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonUserDetailDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<UserDetailDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -12032,12 +2386,12 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         else
                         if (status_ == 404)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<MicrosoftAspNetCoreMvcProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<ProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
-                            throw new ApiException<MicrosoftAspNetCoreMvcProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                            throw new ApiException<ProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
                         }
                         else
                         {
@@ -12059,15 +2413,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonUserDetailDto> UpdateUserAsync(System.Guid id, SoftsquarenetModularBlazorHostModulesAuthInfrastructureEndpointsUpdateUserRequest request)
+        public virtual System.Threading.Tasks.Task<UserDetailDto> UpdateUserAsync(System.Guid id, string? x_Tenant, UpdateUserRequest request)
         {
-            return UpdateUserAsync(id, request, System.Threading.CancellationToken.None);
+            return UpdateUserAsync(id, x_Tenant, request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonUserDetailDto> UpdateUserAsync(System.Guid id, SoftsquarenetModularBlazorHostModulesAuthInfrastructureEndpointsUpdateUserRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<UserDetailDto> UpdateUserAsync(System.Guid id, string? x_Tenant, UpdateUserRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -12081,6 +2437,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(request, JsonSerializerSettings);
                     var content_ = new System.Net.Http.ByteArrayContent(json_);
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
@@ -12119,7 +2478,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonUserDetailDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<UserDetailDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -12129,12 +2488,12 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         else
                         if (status_ == 400)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<MicrosoftAspNetCoreHttpHttpValidationProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<HttpValidationProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
-                            throw new ApiException<MicrosoftAspNetCoreHttpHttpValidationProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                            throw new ApiException<HttpValidationProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
                         }
                         else
                         {
@@ -12156,15 +2515,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task DeleteUserAsync(System.Guid id)
+        public virtual System.Threading.Tasks.Task DeleteUserAsync(System.Guid id, string? x_Tenant)
         {
-            return DeleteUserAsync(id, System.Threading.CancellationToken.None);
+            return DeleteUserAsync(id, x_Tenant, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task DeleteUserAsync(System.Guid id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task DeleteUserAsync(System.Guid id, string? x_Tenant, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -12175,6 +2536,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("DELETE");
 
                     var urlBuilder_ = new System.Text.StringBuilder();
@@ -12230,15 +2594,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonUserDto> ToggleUserStatusAsync(System.Guid id, SoftsquarenetModularBlazorHostModulesAuthInfrastructureEndpointsToggleStatusRequest request)
+        public virtual System.Threading.Tasks.Task<UserDto> ToggleUserStatusAsync(System.Guid id, string? x_Tenant, ToggleStatusRequest request)
         {
-            return ToggleUserStatusAsync(id, request, System.Threading.CancellationToken.None);
+            return ToggleUserStatusAsync(id, x_Tenant, request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonUserDto> ToggleUserStatusAsync(System.Guid id, SoftsquarenetModularBlazorHostModulesAuthInfrastructureEndpointsToggleStatusRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<UserDto> ToggleUserStatusAsync(System.Guid id, string? x_Tenant, ToggleStatusRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -12252,6 +2618,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(request, JsonSerializerSettings);
                     var content_ = new System.Net.Http.ByteArrayContent(json_);
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
@@ -12291,7 +2660,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonUserDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<UserDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -12318,15 +2687,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetUserRolesAsync(System.Guid id)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetUserRolesAsync(System.Guid id, string? x_Tenant)
         {
-            return GetUserRolesAsync(id, System.Threading.CancellationToken.None);
+            return GetUserRolesAsync(id, x_Tenant, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetUserRolesAsync(System.Guid id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetUserRolesAsync(System.Guid id, string? x_Tenant, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -12337,6 +2708,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
@@ -12399,15 +2773,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonUserDetailDto> AssignUserRolesAsync(System.Guid id, SoftsquarenetModularBlazorHostModulesAuthInfrastructureEndpointsAssignRolesRequest request)
+        public virtual System.Threading.Tasks.Task<UserDetailDto> AssignUserRolesAsync(System.Guid id, string? x_Tenant, AssignRolesRequest request)
         {
-            return AssignUserRolesAsync(id, request, System.Threading.CancellationToken.None);
+            return AssignUserRolesAsync(id, x_Tenant, request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonUserDetailDto> AssignUserRolesAsync(System.Guid id, SoftsquarenetModularBlazorHostModulesAuthInfrastructureEndpointsAssignRolesRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<UserDetailDto> AssignUserRolesAsync(System.Guid id, string? x_Tenant, AssignRolesRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -12421,6 +2797,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(request, JsonSerializerSettings);
                     var content_ = new System.Net.Http.ByteArrayContent(json_);
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
@@ -12460,7 +2839,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonUserDetailDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<UserDetailDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -12487,15 +2866,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetUserPermissionsAsync(System.Guid id)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetUserPermissionsAsync(System.Guid id, string? x_Tenant)
         {
-            return GetUserPermissionsAsync(id, System.Threading.CancellationToken.None);
+            return GetUserPermissionsAsync(id, x_Tenant, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetUserPermissionsAsync(System.Guid id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<string>> GetUserPermissionsAsync(System.Guid id, string? x_Tenant, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -12506,6 +2887,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
@@ -12568,15 +2952,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task ResetUserPasswordAsync(System.Guid id, SoftsquarenetModularBlazorHostModulesAuthInfrastructureEndpointsResetPasswordRequest request)
+        public virtual System.Threading.Tasks.Task ResetUserPasswordAsync(System.Guid id, string? x_Tenant, ResetPasswordRequest request)
         {
-            return ResetUserPasswordAsync(id, request, System.Threading.CancellationToken.None);
+            return ResetUserPasswordAsync(id, x_Tenant, request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task ResetUserPasswordAsync(System.Guid id, SoftsquarenetModularBlazorHostModulesAuthInfrastructureEndpointsResetPasswordRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task ResetUserPasswordAsync(System.Guid id, string? x_Tenant, ResetPasswordRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -12590,6 +2976,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(request, JsonSerializerSettings);
                     var content_ = new System.Net.Http.ByteArrayContent(json_);
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
@@ -12633,12 +3022,12 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         else
                         if (status_ == 400)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<MicrosoftAspNetCoreHttpHttpValidationProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<HttpValidationProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
-                            throw new ApiException<MicrosoftAspNetCoreHttpHttpValidationProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                            throw new ApiException<HttpValidationProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
                         }
                         else
                         {
@@ -12660,15 +3049,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<SoftsquarenetModularBlazorHostModulesCatalogApplicationPackagesModulePackageDto>> ListModulePackagesAsync(SoftsquarenetModularBlazorHostModulesCatalogDomainModuleTarget? target)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ModulePackageDto>> ListModulePackagesAsync(ModuleTarget? target, string? x_Tenant)
         {
-            return ListModulePackagesAsync(target, System.Threading.CancellationToken.None);
+            return ListModulePackagesAsync(target, x_Tenant, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<SoftsquarenetModularBlazorHostModulesCatalogApplicationPackagesModulePackageDto>> ListModulePackagesAsync(SoftsquarenetModularBlazorHostModulesCatalogDomainModuleTarget? target, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ModulePackageDto>> ListModulePackagesAsync(ModuleTarget? target, string? x_Tenant, System.Threading.CancellationToken cancellationToken)
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -12676,6 +3067,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
@@ -12715,7 +3109,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.ICollection<SoftsquarenetModularBlazorHostModulesCatalogApplicationPackagesModulePackageDto>>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.ICollection<ModulePackageDto>>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -12742,15 +3136,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesCatalogApplicationPackagesModulePackageDto> UploadModulePackageAsync(SoftsquarenetModularBlazorHostModulesCatalogInfrastructureEndpointsUploadModulePackageForm form)
+        public virtual System.Threading.Tasks.Task<ModulePackageDto> UploadModulePackageAsync(UploadModulePackageForm form, string? x_Tenant)
         {
-            return UploadModulePackageAsync(form, System.Threading.CancellationToken.None);
+            return UploadModulePackageAsync(form, x_Tenant, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesCatalogApplicationPackagesModulePackageDto> UploadModulePackageAsync(SoftsquarenetModularBlazorHostModulesCatalogInfrastructureEndpointsUploadModulePackageForm form, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ModulePackageDto> UploadModulePackageAsync(UploadModulePackageForm form, string? x_Tenant, System.Threading.CancellationToken cancellationToken)
         {
             if (form == null)
                 throw new System.ArgumentNullException("form");
@@ -12761,6 +3157,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
                     request_.Method = new System.Net.Http.HttpMethod("POST");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
@@ -12798,7 +3197,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorHostModulesCatalogApplicationPackagesModulePackageDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<ModulePackageDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -12808,12 +3207,12 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         else
                         if (status_ == 400)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<MicrosoftAspNetCoreHttpHttpValidationProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<HttpValidationProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
-                            throw new ApiException<MicrosoftAspNetCoreHttpHttpValidationProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                            throw new ApiException<HttpValidationProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
                         }
                         else
                         {
@@ -12835,15 +3234,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesCatalogApplicationPackagesModulePackageDto> GetModulePackageAsync(string id)
+        public virtual System.Threading.Tasks.Task<ModulePackageDto> GetModulePackageAsync(string id, string? x_Tenant)
         {
-            return GetModulePackageAsync(id, System.Threading.CancellationToken.None);
+            return GetModulePackageAsync(id, x_Tenant, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesCatalogApplicationPackagesModulePackageDto> GetModulePackageAsync(string id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ModulePackageDto> GetModulePackageAsync(string id, string? x_Tenant, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -12854,6 +3255,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
@@ -12888,7 +3292,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorHostModulesCatalogApplicationPackagesModulePackageDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<ModulePackageDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -12898,12 +3302,12 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         else
                         if (status_ == 404)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<MicrosoftAspNetCoreMvcProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<ProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
-                            throw new ApiException<MicrosoftAspNetCoreMvcProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                            throw new ApiException<ProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
                         }
                         else
                         {
@@ -12925,15 +3329,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task DeleteModulePackageAsync(string id)
+        public virtual System.Threading.Tasks.Task DeleteModulePackageAsync(string id, string? x_Tenant)
         {
-            return DeleteModulePackageAsync(id, System.Threading.CancellationToken.None);
+            return DeleteModulePackageAsync(id, x_Tenant, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task DeleteModulePackageAsync(string id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task DeleteModulePackageAsync(string id, string? x_Tenant, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -12944,6 +3350,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("DELETE");
 
                     var urlBuilder_ = new System.Text.StringBuilder();
@@ -12999,15 +3408,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task DownloadModulePackageAsync(string id)
+        public virtual System.Threading.Tasks.Task DownloadModulePackageAsync(string id, string? x_Tenant)
         {
-            return DownloadModulePackageAsync(id, System.Threading.CancellationToken.None);
+            return DownloadModulePackageAsync(id, x_Tenant, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task DownloadModulePackageAsync(string id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task DownloadModulePackageAsync(string id, string? x_Tenant, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -13018,6 +3429,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
 
                     var urlBuilder_ = new System.Text.StringBuilder();
@@ -13052,12 +3466,12 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 404)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<MicrosoftAspNetCoreMvcProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<ProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
-                            throw new ApiException<MicrosoftAspNetCoreMvcProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                            throw new ApiException<ProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
                         }
                         else
 
@@ -13086,15 +3500,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesCatalogApplicationPackagesModulePackageDto> SetModulePackageEnabledAsync(string id, SoftsquarenetModularBlazorHostModulesCatalogInfrastructureEndpointsSetEnabledRequest request)
+        public virtual System.Threading.Tasks.Task<ModulePackageDto> SetModulePackageEnabledAsync(string id, string? x_Tenant, SetEnabledRequest request)
         {
-            return SetModulePackageEnabledAsync(id, request, System.Threading.CancellationToken.None);
+            return SetModulePackageEnabledAsync(id, x_Tenant, request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesCatalogApplicationPackagesModulePackageDto> SetModulePackageEnabledAsync(string id, SoftsquarenetModularBlazorHostModulesCatalogInfrastructureEndpointsSetEnabledRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ModulePackageDto> SetModulePackageEnabledAsync(string id, string? x_Tenant, SetEnabledRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -13108,6 +3524,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(request, JsonSerializerSettings);
                     var content_ = new System.Net.Http.ByteArrayContent(json_);
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
@@ -13147,7 +3566,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorHostModulesCatalogApplicationPackagesModulePackageDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<ModulePackageDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -13174,15 +3593,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesCatalogApplicationPackagesModulePackageDto> SetModulePackageConfigurationAsync(string id, SoftsquarenetModularBlazorHostModulesCatalogInfrastructureEndpointsSetConfigurationRequest request)
+        public virtual System.Threading.Tasks.Task<ModulePackageDto> SetModulePackageConfigurationAsync(string id, string? x_Tenant, SetConfigurationRequest request)
         {
-            return SetModulePackageConfigurationAsync(id, request, System.Threading.CancellationToken.None);
+            return SetModulePackageConfigurationAsync(id, x_Tenant, request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesCatalogApplicationPackagesModulePackageDto> SetModulePackageConfigurationAsync(string id, SoftsquarenetModularBlazorHostModulesCatalogInfrastructureEndpointsSetConfigurationRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ModulePackageDto> SetModulePackageConfigurationAsync(string id, string? x_Tenant, SetConfigurationRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -13196,6 +3617,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(request, JsonSerializerSettings);
                     var content_ = new System.Net.Http.ByteArrayContent(json_);
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
@@ -13235,7 +3659,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorHostModulesCatalogApplicationPackagesModulePackageDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<ModulePackageDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -13245,12 +3669,12 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         else
                         if (status_ == 400)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<MicrosoftAspNetCoreHttpHttpValidationProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<HttpValidationProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
-                            throw new ApiException<MicrosoftAspNetCoreHttpHttpValidationProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                            throw new ApiException<HttpValidationProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
                         }
                         else
                         {
@@ -13272,15 +3696,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task RestartHostAsync()
+        public virtual System.Threading.Tasks.Task RestartHostAsync(string? x_Tenant)
         {
-            return RestartHostAsync(System.Threading.CancellationToken.None);
+            return RestartHostAsync(x_Tenant, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task RestartHostAsync(System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task RestartHostAsync(string? x_Tenant, System.Threading.CancellationToken cancellationToken)
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -13288,6 +3714,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
                     request_.Method = new System.Net.Http.HttpMethod("POST");
 
@@ -13343,15 +3772,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesMultitenancyApplicationCommandsTenantResult> CreateTenantAsync(SoftsquarenetModularBlazorHostModulesMultitenancyApplicationCommandsCreateTenantCommand command)
+        public virtual System.Threading.Tasks.Task<TenantResult> CreateTenantAsync(string? x_Tenant, CreateTenantCommand command)
         {
-            return CreateTenantAsync(command, System.Threading.CancellationToken.None);
+            return CreateTenantAsync(x_Tenant, command, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesMultitenancyApplicationCommandsTenantResult> CreateTenantAsync(SoftsquarenetModularBlazorHostModulesMultitenancyApplicationCommandsCreateTenantCommand command, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<TenantResult> CreateTenantAsync(string? x_Tenant, CreateTenantCommand command, System.Threading.CancellationToken cancellationToken)
         {
             if (command == null)
                 throw new System.ArgumentNullException("command");
@@ -13362,6 +3793,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(command, JsonSerializerSettings);
                     var content_ = new System.Net.Http.ByteArrayContent(json_);
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
@@ -13399,7 +3833,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorHostModulesMultitenancyApplicationCommandsTenantResult>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<TenantResult>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -13409,12 +3843,12 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         else
                         if (status_ == 400)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<MicrosoftAspNetCoreHttpHttpValidationProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<HttpValidationProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
-                            throw new ApiException<MicrosoftAspNetCoreHttpHttpValidationProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                            throw new ApiException<HttpValidationProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
                         }
                         else
                         {
@@ -13436,15 +3870,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorCorePaginationPagedResponseOfTenantDto> SearchTenantsAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields)
+        public virtual System.Threading.Tasks.Task<PagedResponseOfTenantDto> SearchTenantsAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields, string? x_Tenant)
         {
-            return SearchTenantsAsync(pageNumber, pageSize, orderBy, keyword, searchFields, System.Threading.CancellationToken.None);
+            return SearchTenantsAsync(pageNumber, pageSize, orderBy, keyword, searchFields, x_Tenant, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorCorePaginationPagedResponseOfTenantDto> SearchTenantsAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<PagedResponseOfTenantDto> SearchTenantsAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields, string? x_Tenant, System.Threading.CancellationToken cancellationToken)
         {
             if (pageNumber == null)
                 throw new System.ArgumentNullException("pageNumber");
@@ -13458,6 +3894,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
@@ -13507,7 +3946,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorCorePaginationPagedResponseOfTenantDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<PagedResponseOfTenantDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -13534,15 +3973,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorCorePaginationPagedResponseOfTenantProvisioningDto> SearchProvisioningsAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields)
+        public virtual System.Threading.Tasks.Task<PagedResponseOfTenantProvisioningDto> SearchProvisioningsAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields, string? x_Tenant)
         {
-            return SearchProvisioningsAsync(pageNumber, pageSize, orderBy, keyword, searchFields, System.Threading.CancellationToken.None);
+            return SearchProvisioningsAsync(pageNumber, pageSize, orderBy, keyword, searchFields, x_Tenant, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorCorePaginationPagedResponseOfTenantProvisioningDto> SearchProvisioningsAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<PagedResponseOfTenantProvisioningDto> SearchProvisioningsAsync(int pageNumber, int pageSize, System.Collections.Generic.IEnumerable<string>? orderBy, string? keyword, System.Collections.Generic.IEnumerable<string>? searchFields, string? x_Tenant, System.Threading.CancellationToken cancellationToken)
         {
             if (pageNumber == null)
                 throw new System.ArgumentNullException("pageNumber");
@@ -13556,6 +3997,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
@@ -13605,7 +4049,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorCorePaginationPagedResponseOfTenantProvisioningDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<PagedResponseOfTenantProvisioningDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -13632,15 +4076,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto> GetTenantAsync(string id)
+        public virtual System.Threading.Tasks.Task<TenantDto> GetTenantAsync(string id, string? x_Tenant)
         {
-            return GetTenantAsync(id, System.Threading.CancellationToken.None);
+            return GetTenantAsync(id, x_Tenant, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto> GetTenantAsync(string id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<TenantDto> GetTenantAsync(string id, string? x_Tenant, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -13651,6 +4097,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
@@ -13685,7 +4134,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<TenantDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -13695,12 +4144,12 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         else
                         if (status_ == 404)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<MicrosoftAspNetCoreMvcProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<ProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
-                            throw new ApiException<MicrosoftAspNetCoreMvcProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                            throw new ApiException<ProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
                         }
                         else
                         {
@@ -13722,15 +4171,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto> ActivateTenantAsync(string id)
+        public virtual System.Threading.Tasks.Task<TenantDto> ActivateTenantAsync(string id, string? x_Tenant)
         {
-            return ActivateTenantAsync(id, System.Threading.CancellationToken.None);
+            return ActivateTenantAsync(id, x_Tenant, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto> ActivateTenantAsync(string id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<TenantDto> ActivateTenantAsync(string id, string? x_Tenant, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -13741,6 +4192,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
                     request_.Method = new System.Net.Http.HttpMethod("POST");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
@@ -13777,7 +4231,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<TenantDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -13804,15 +4258,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto> DeactivateTenantAsync(string id)
+        public virtual System.Threading.Tasks.Task<TenantDto> DeactivateTenantAsync(string id, string? x_Tenant)
         {
-            return DeactivateTenantAsync(id, System.Threading.CancellationToken.None);
+            return DeactivateTenantAsync(id, x_Tenant, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto> DeactivateTenantAsync(string id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<TenantDto> DeactivateTenantAsync(string id, string? x_Tenant, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -13823,6 +4279,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
                     request_.Method = new System.Net.Http.HttpMethod("POST");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
@@ -13859,7 +4318,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<TenantDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -13886,15 +4345,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto> UpgradeTenantAsync(string id, SoftsquarenetModularBlazorHostModulesMultitenancyInfrastructureEndpointsRenewTenantRequest request)
+        public virtual System.Threading.Tasks.Task<TenantDto> UpgradeTenantAsync(string id, string? x_Tenant, RenewTenantRequest request)
         {
-            return UpgradeTenantAsync(id, request, System.Threading.CancellationToken.None);
+            return UpgradeTenantAsync(id, x_Tenant, request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto> UpgradeTenantAsync(string id, SoftsquarenetModularBlazorHostModulesMultitenancyInfrastructureEndpointsRenewTenantRequest request, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<TenantDto> UpgradeTenantAsync(string id, string? x_Tenant, RenewTenantRequest request, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -13908,6 +4369,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(request, JsonSerializerSettings);
                     var content_ = new System.Net.Http.ByteArrayContent(json_);
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
@@ -13947,7 +4411,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<TenantDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -13957,12 +4421,12 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         else
                         if (status_ == 400)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<MicrosoftAspNetCoreHttpHttpValidationProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<HttpValidationProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
-                            throw new ApiException<MicrosoftAspNetCoreHttpHttpValidationProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                            throw new ApiException<HttpValidationProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
                         }
                         else
                         {
@@ -13984,15 +4448,17 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             }
         }
 
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesMultitenancyApplicationTenantProvisioningDto> RetryTenantProvisioningAsync(string id)
+        public virtual System.Threading.Tasks.Task<TenantProvisioningDto> RetryTenantProvisioningAsync(string id, string? x_Tenant)
         {
-            return RetryTenantProvisioningAsync(id, System.Threading.CancellationToken.None);
+            return RetryTenantProvisioningAsync(id, x_Tenant, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="x_Tenant">Tenant id or identifier. Omit for the root tenant. A JWT only works for the tenant it was issued for.</param>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SoftsquarenetModularBlazorHostModulesMultitenancyApplicationTenantProvisioningDto> RetryTenantProvisioningAsync(string id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<TenantProvisioningDto> RetryTenantProvisioningAsync(string id, string? x_Tenant, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -14003,6 +4469,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
+
+                    if (x_Tenant != null)
+                        request_.Headers.TryAddWithoutValidation("X-Tenant", ConvertToString(x_Tenant, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
                     request_.Method = new System.Net.Http.HttpMethod("POST");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
@@ -14039,7 +4508,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<SoftsquarenetModularBlazorHostModulesMultitenancyApplicationTenantProvisioningDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<TenantProvisioningDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -14196,2645 +4665,16 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaModelsListResponseOfResolvedVariableModel
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("items")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsApiEndpointsWorkflowInstancesVariablesPostResolvedVariableModel> Items { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("count")]
-        public long Count { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowInstancesVariablesPostResolvedVariableModel
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public string Id { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        public string Name { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("value")]
-        public object? Value { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowInstancesVariablesPostRequest
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("variables")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsVariableUpdateValue> Variables { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsVariableUpdateValue
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public string Id { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("value")]
-        public object? Value { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaModelsListResponseOfResolvedVariableModel2
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("items")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsApiEndpointsWorkflowInstancesVariablesListResolvedVariableModel> Items { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("count")]
-        public long Count { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowInstancesVariablesListResolvedVariableModel
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public string Id { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        public string Name { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("value")]
-        public object? Value { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowInstancesListResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("items")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsManagementModelsWorkflowInstanceSummary> Items { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("totalCount")]
-        public long TotalCount { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsManagementModelsWorkflowInstanceSummary
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public string Id { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("tenantId")]
-        public string? TenantId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("definitionId")]
-        public string DefinitionId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("definitionVersionId")]
-        public string DefinitionVersionId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("version")]
-        public int Version { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("status")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<ElsaWorkflowsWorkflowStatus>))]
-        public ElsaWorkflowsWorkflowStatus Status { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("subStatus")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<ElsaWorkflowsWorkflowSubStatus>))]
-        public ElsaWorkflowsWorkflowSubStatus SubStatus { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("correlationId")]
-        public string? CorrelationId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        public string? Name { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("incidentCount")]
-        public int IncidentCount { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("createdAt")]
-        public System.DateTime CreatedAt { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("updatedAt")]
-        public System.DateTime? UpdatedAt { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("finishedAt")]
-        public System.DateTime? FinishedAt { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum ElsaWorkflowsWorkflowStatus
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Running")]
-        Running = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Finished")]
-        Finished = 1,
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum ElsaWorkflowsWorkflowSubStatus
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Pending")]
-        Pending = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Executing")]
-        Executing = 1,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Suspended")]
-        Suspended = 2,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Finished")]
-        Finished = 3,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Cancelled")]
-        Cancelled = 4,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Faulted")]
-        Faulted = 5,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Interrupted")]
-        Interrupted = 6,
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowInstancesListRequest
-    {
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum ElsaWorkflowsApiModelsOrderByWorkflowInstance
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Created")]
-        Created = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"UpdatedAt")]
-        UpdatedAt = 1,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Finished")]
-        Finished = 2,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Name")]
-        Name = 3,
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum ElsaCommonEntitiesOrderDirection
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Ascending")]
-        Ascending = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Descending")]
-        Descending = 1,
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsManagementModelsTimestampFilter
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("column")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string Column { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("operator")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<ElsaWorkflowsManagementEnumsTimestampFilterOperator>))]
-        public ElsaWorkflowsManagementEnumsTimestampFilterOperator Operator { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("timestamp")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public System.DateTime Timestamp { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum ElsaWorkflowsManagementEnumsTimestampFilterOperator
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Is")]
-        Is = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"IsNot")]
-        IsNot = 1,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"LessThan")]
-        LessThan = 2,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"GreaterThan")]
-        GreaterThan = 3,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"LessThanOrEqual")]
-        LessThanOrEqual = 4,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"GreaterThanOrEqual")]
-        GreaterThanOrEqual = 5,
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowInstancesJournalListResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("items")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsApiModelsExecutionLogRecord> Items { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("totalCount")]
-        public long TotalCount { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiModelsExecutionLogRecord
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public string Id { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityInstanceId")]
-        public string ActivityInstanceId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("parentActivityInstanceId")]
-        public string? ParentActivityInstanceId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityId")]
-        public string ActivityId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityType")]
-        public string ActivityType { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityTypeVersion")]
-        public int ActivityTypeVersion { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityName")]
-        public string? ActivityName { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("nodeId")]
-        public string NodeId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("timestamp")]
-        public System.DateTime Timestamp { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("sequence")]
-        public long Sequence { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("eventName")]
-        public string? EventName { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("message")]
-        public string? Message { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("source")]
-        public string? Source { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityState")]
-        [System.Obsolete]
-        public System.Collections.Generic.IDictionary<string, object>? ActivityState { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("payload")]
-        public object? Payload { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowInstancesJournalListRequest
-    {
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsRuntimeEntitiesWorkflowExecutionLogRecord : ElsaCommonEntitiesEntity
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("workflowDefinitionId")]
-        public string WorkflowDefinitionId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("workflowDefinitionVersionId")]
-        public string WorkflowDefinitionVersionId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("workflowInstanceId")]
-        public string WorkflowInstanceId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("workflowVersion")]
-        public int WorkflowVersion { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityInstanceId")]
-        public string ActivityInstanceId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("parentActivityInstanceId")]
-        public string? ParentActivityInstanceId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityId")]
-        public string ActivityId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityType")]
-        public string ActivityType { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityTypeVersion")]
-        public int ActivityTypeVersion { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityName")]
-        public string? ActivityName { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityNodeId")]
-        public string ActivityNodeId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("timestamp")]
-        public System.DateTime Timestamp { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("sequence")]
-        public long Sequence { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("eventName")]
-        public string? EventName { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("message")]
-        public string? Message { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("source")]
-        public string? Source { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityState")]
-        [System.Obsolete("Look at the ActivityExecutionRecord.ActivityState property instead.")]
-        public System.Collections.Generic.IDictionary<string, object>? ActivityState { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("payload")]
-        public object? Payload { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public abstract partial class ElsaCommonEntitiesEntity
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public string Id { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("tenantId")]
-        public string? TenantId { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowInstancesJournalGetLastEntryRequest
-    {
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowInstancesJournalFilteredListResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("items")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsApiModelsExecutionLogRecord> Items { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("totalCount")]
-        public long TotalCount { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowInstancesJournalFilteredListRequest
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("filter")]
-        public ElsaWorkflowsApiEndpointsWorkflowInstancesJournalFilteredListJournalFilter? Filter { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("page")]
-        public int? Page { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("pageSize")]
-        public int? PageSize { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("skip")]
-        public int? Skip { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("take")]
-        public int? Take { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowInstancesJournalFilteredListJournalFilter
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityIds")]
-        public System.Collections.Generic.ICollection<string>? ActivityIds { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityNodeIds")]
-        public System.Collections.Generic.ICollection<string>? ActivityNodeIds { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("excludedActivityTypes")]
-        public System.Collections.Generic.ICollection<string>? ExcludedActivityTypes { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("eventNames")]
-        public System.Collections.Generic.ICollection<string>? EventNames { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowInstancesImportResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("imported")]
-        public int Imported { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class FastEndpointsEmptyRequest
-    {
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiModelsWorkflowInstanceModel
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public string Id { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("definitionId")]
-        public string DefinitionId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("definitionVersionId")]
-        public string DefinitionVersionId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("version")]
-        public int Version { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("parentWorkflowInstanceId")]
-        public string? ParentWorkflowInstanceId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("workflowState")]
-        public ElsaWorkflowsStateWorkflowState WorkflowState { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("status")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<ElsaWorkflowsWorkflowStatus>))]
-        public ElsaWorkflowsWorkflowStatus Status { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("subStatus")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<ElsaWorkflowsWorkflowSubStatus>))]
-        public ElsaWorkflowsWorkflowSubStatus SubStatus { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("isExecuting")]
-        public bool IsExecuting { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("correlationId")]
-        public string? CorrelationId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        public string? Name { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("incidentCount")]
-        public int IncidentCount { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("isSystem")]
-        public bool IsSystem { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("createdAt")]
-        public System.DateTime CreatedAt { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("updatedAt")]
-        public System.DateTime UpdatedAt { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("finishedAt")]
-        public System.DateTime? FinishedAt { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsStateWorkflowState
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public string Id { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("definitionId")]
-        public string DefinitionId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("definitionVersionId")]
-        public string DefinitionVersionId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("definitionVersion")]
-        public int DefinitionVersion { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("parentWorkflowInstanceId")]
-        public string? ParentWorkflowInstanceId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("correlationId")]
-        public string? CorrelationId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        public string? Name { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("status")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<ElsaWorkflowsWorkflowStatus>))]
-        public ElsaWorkflowsWorkflowStatus Status { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("subStatus")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<ElsaWorkflowsWorkflowSubStatus>))]
-        public ElsaWorkflowsWorkflowSubStatus SubStatus { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("isExecuting")]
-        public bool IsExecuting { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("bookmarks")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsModelsBookmark> Bookmarks { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("incidents")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsModelsActivityIncident> Incidents { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("isSystem")]
-        public bool IsSystem { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("completionCallbacks")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsStateCompletionCallbackState> CompletionCallbacks { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityExecutionContexts")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsStateActivityExecutionContextState> ActivityExecutionContexts { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("scheduledActivities")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsStateActivityWorkItemState> ScheduledActivities { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("executionLogSequence")]
-        public long ExecutionLogSequence { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("input")]
-        public System.Collections.Generic.IDictionary<string, object> Input { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("output")]
-        public System.Collections.Generic.IDictionary<string, object> Output { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("properties")]
-        public System.Collections.Generic.IDictionary<string, object> Properties { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("createdAt")]
-        public System.DateTime CreatedAt { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("updatedAt")]
-        public System.DateTime UpdatedAt { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("finishedAt")]
-        public System.DateTime? FinishedAt { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsModelsBookmark
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public string Id { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        public string Name { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("hash")]
-        public string Hash { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("payload")]
-        public object? Payload { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityId")]
-        public string ActivityId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityNodeId")]
-        public string ActivityNodeId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityInstanceId")]
-        public string? ActivityInstanceId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("createdAt")]
-        public System.DateTime CreatedAt { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("autoBurn")]
-        public bool AutoBurn { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("callbackMethodName")]
-        public string? CallbackMethodName { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("autoComplete")]
-        public bool AutoComplete { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("metadata")]
-        public System.Collections.Generic.IDictionary<string, string>? Metadata { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsModelsActivityIncident
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityId")]
-        public string ActivityId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityNodeId")]
-        public string ActivityNodeId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityInstanceId")]
-        public string? ActivityInstanceId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityType")]
-        public string ActivityType { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("message")]
-        public string Message { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("exception")]
-        public ElsaWorkflowsStateExceptionState? Exception { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("timestamp")]
-        public System.DateTime Timestamp { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsStateExceptionState
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("type")]
-        public string Type { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("message")]
-        public string Message { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("stackTrace")]
-        public string? StackTrace { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("innerException")]
-        public ElsaWorkflowsStateExceptionState? InnerException { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("metadata")]
-        public System.Collections.Generic.IDictionary<string, string>? Metadata { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsStateCompletionCallbackState
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("ownerInstanceId")]
-        public string OwnerInstanceId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("childNodeId")]
-        public string ChildNodeId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("methodName")]
-        public string? MethodName { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("tag")]
-        public object? Tag { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsStateActivityExecutionContextState
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public string Id { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("callStackDepth")]
-        public int CallStackDepth { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("parentContextId")]
-        public string? ParentContextId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("scheduledActivityNodeId")]
-        public string ScheduledActivityNodeId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("ownerActivityNodeId")]
-        public string? OwnerActivityNodeId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("properties")]
-        public System.Collections.Generic.IDictionary<string, object> Properties { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("metadata")]
-        public System.Collections.Generic.IDictionary<string, object> Metadata { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityState")]
-        public System.Collections.Generic.IDictionary<string, object>? ActivityState { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("dynamicVariables")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsMemoryVariable> DynamicVariables { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("status")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<ElsaWorkflowsActivityStatus>))]
-        public ElsaWorkflowsActivityStatus Status { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("isExecuting")]
-        public bool IsExecuting { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("faultCount")]
-        public int FaultCount { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("startedAt")]
-        public System.DateTime StartedAt { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("completedAt")]
-        public System.DateTime? CompletedAt { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("tag")]
-        public object? Tag { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsMemoryVariable : ElsaExpressionsModelsMemoryBlockReference
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        public string Name { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("value")]
-        public object? Value { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("storageDriverType")]
-        public string? StorageDriverType { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaExpressionsModelsMemoryBlockReference
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public string Id { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum ElsaWorkflowsActivityStatus
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Pending")]
-        Pending = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Running")]
-        Running = 1,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Completed")]
-        Completed = 2,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Canceled")]
-        Canceled = 3,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Faulted")]
-        Faulted = 4,
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsStateActivityWorkItemState
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityNodeId")]
-        public string ActivityNodeId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("ownerContextId")]
-        public string? OwnerContextId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("tag")]
-        public object? Tag { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("variables")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsMemoryVariable>? Variables { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("existingActivityExecutionContextId")]
-        public string? ExistingActivityExecutionContextId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("input")]
-        public System.Collections.Generic.IDictionary<string, object> Input { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("schedulingActivityExecutionId")]
-        public string? SchedulingActivityExecutionId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("schedulingWorkflowInstanceId")]
-        public string? SchedulingWorkflowInstanceId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("schedulingCallStackDepth")]
-        public int? SchedulingCallStackDepth { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowInstancesGetRequest
-    {
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowInstancesExportRequest
-    {
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowInstancesExecutionStateResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("status")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<ElsaWorkflowsWorkflowStatus>))]
-        public ElsaWorkflowsWorkflowStatus Status { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("subStatus")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<ElsaWorkflowsWorkflowSubStatus>))]
-        public ElsaWorkflowsWorkflowSubStatus SubStatus { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("updatedAt")]
-        public System.DateTime UpdatedAt { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowInstancesExecutionStateRequest
-    {
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowInstancesDeleteRequest
-    {
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowInstancesCancelRequest
-    {
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowInstancesBulkDeleteResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("deleted")]
-        public long Deleted { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowInstancesBulkDeleteRequest
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("ids")]
-        public System.Collections.Generic.ICollection<string>? Ids { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("workflowDefinitionId")]
-        public string? WorkflowDefinitionId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("workflowDefinitionIds")]
-        public System.Collections.Generic.ICollection<string>? WorkflowDefinitionIds { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowInstancesBulkCancelResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("cancelled")]
-        public int Cancelled { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowInstancesBulkCancelRequest
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("ids")]
-        public System.Collections.Generic.ICollection<string>? Ids { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("definitionVersionId")]
-        public string? DefinitionVersionId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("definitionId")]
-        public string? DefinitionId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("versionOptions")]
-        public string? VersionOptions { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class FastEndpointsErrorResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("statusCode")]
-        public int StatusCode { get; set; } = 400;
-
-        [System.Text.Json.Serialization.JsonPropertyName("message")]
-        public string Message { get; set; } = "One or more errors occurred!";
-
-        [System.Text.Json.Serialization.JsonPropertyName("errors")]
-        public System.Collections.Generic.IDictionary<string, System.Collections.Generic.ICollection<string>> Errors { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowDefinitionsUpdateReferencesResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("affectedWorkflows")]
-        public System.Collections.Generic.ICollection<string> AffectedWorkflows { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowDefinitionsUpdateReferencesRequest
-    {
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiModelsLinkedWorkflowDefinitionModel : ElsaWorkflowsManagementModelsWorkflowDefinitionModel
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("links")]
-        public System.Collections.Generic.ICollection<ElsaModelsLink>? Links { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaModelsLink
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("href")]
-        public string Href { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("rel")]
-        public string Rel { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("method")]
-        public string Method { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsManagementModelsWorkflowDefinitionModel
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public string Id { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("tenantId")]
-        public string? TenantId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        public string? Name { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("description")]
-        public string? Description { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("createdAt")]
-        public System.DateTime CreatedAt { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("version")]
-        public int Version { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("toolVersion")]
-        public string? ToolVersion { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("variables")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsModelsVariableDefinition>? Variables { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("inputs")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsModelsInputDefinition>? Inputs { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("outputs")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsModelsOutputDefinition>? Outputs { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("outcomes")]
-        public System.Collections.Generic.ICollection<string>? Outcomes { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("customProperties")]
-        public System.Collections.Generic.IDictionary<string, object>? CustomProperties { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("isReadonly")]
-        public bool IsReadonly { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("isSystem")]
-        public bool IsSystem { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("isLatest")]
-        public bool IsLatest { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("isPublished")]
-        public bool IsPublished { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("options")]
-        public ElsaWorkflowsModelsWorkflowOptions? Options { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("usableAsActivity")]
-        [System.Obsolete("Use Options.UsableAsActivity instead")]
-        public bool? UsableAsActivity { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("root")]
-        public ElsaWorkflowsIActivity? Root { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsModelsVariableDefinition
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public string Id { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        public string Name { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("typeName")]
-        public string TypeName { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("isArray")]
-        public bool IsArray { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("value")]
-        public string? Value { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("storageDriverTypeName")]
-        public string? StorageDriverTypeName { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsModelsInputDefinition : ElsaWorkflowsModelsArgumentDefinition
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("uiHint")]
-        public string UiHint { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("storageDriverType")]
-        public string? StorageDriverType { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public abstract partial class ElsaWorkflowsModelsArgumentDefinition
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("type")]
-        public string Type { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        public string Name { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("displayName")]
-        public string DisplayName { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("description")]
-        public string Description { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("category")]
-        public string Category { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsModelsOutputDefinition : ElsaWorkflowsModelsArgumentDefinition
-    {
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsModelsWorkflowOptions
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("activationStrategyType")]
-        public string? ActivationStrategyType { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("usableAsActivity")]
-        public bool? UsableAsActivity { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("autoUpdateConsumingWorkflows")]
-        public bool AutoUpdateConsumingWorkflows { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityCategory")]
-        public string? ActivityCategory { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("incidentStrategyType")]
-        public string? IncidentStrategyType { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("commitStrategyName")]
-        public string? CommitStrategyName { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public abstract partial class ElsaWorkflowsIActivity
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public string Id { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("nodeId")]
-        public string NodeId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        public string? Name { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("type")]
-        public string Type { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("version")]
-        public int Version { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("customProperties")]
-        public System.Collections.Generic.IDictionary<string, object> CustomProperties { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("metadata")]
-        public System.Collections.Generic.IDictionary<string, object> Metadata { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowDefinitionsRetractRequest
-    {
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowDefinitionsRefreshRequest
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("definitionIds")]
-        public System.Collections.Generic.ICollection<string>? DefinitionIds { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowDefinitionsPublishResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("workflowDefinition")]
-        public ElsaWorkflowsApiModelsLinkedWorkflowDefinitionModel WorkflowDefinition { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("alreadyPublished")]
-        public bool AlreadyPublished { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("consumingWorkflowCount")]
-        public int ConsumingWorkflowCount { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("validationErrors")]
-        public System.Collections.Generic.ICollection<string> ValidationErrors { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowDefinitionsPublishRequest
-    {
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsManagementModelsSaveWorkflowDefinitionRequest
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("model")]
-        public ElsaWorkflowsManagementModelsWorkflowDefinitionModel Model { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("publish")]
-        public bool? Publish { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaModelsPagedListResponseOfLinkedWorkflowDefinitionSummary : ElsaModelsLinkedResource
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("items")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsApiModelsLinkedWorkflowDefinitionSummary> Items { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("totalCount")]
-        public long TotalCount { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiModelsLinkedWorkflowDefinitionSummary : ElsaWorkflowsManagementModelsWorkflowDefinitionSummary
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("links")]
-        public System.Collections.Generic.ICollection<ElsaModelsLink>? Links { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("isMaterializerAvailable")]
-        public bool IsMaterializerAvailable { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsManagementModelsWorkflowDefinitionSummary
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public string Id { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("definitionId")]
-        public string DefinitionId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        public string? Name { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("description")]
-        public string? Description { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("version")]
-        public int? Version { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("toolVersion")]
-        public string? ToolVersion { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("isLatest")]
-        public bool IsLatest { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("isPublished")]
-        public bool IsPublished { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("providerName")]
-        public string? ProviderName { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("materializerName")]
-        public string MaterializerName { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("createdAt")]
-        public System.DateTime CreatedAt { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("isReadonly")]
-        public bool IsReadonly { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaModelsLinkedResource
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("links")]
-        public System.Collections.Generic.ICollection<ElsaModelsLink> Links { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowDefinitionsListRequest
-    {
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum ElsaWorkflowsApiModelsOrderByWorkflowDefinition
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Created")]
-        Created = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Name")]
-        Name = 1,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Version")]
-        Version = 2,
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowDefinitionsIsNameUniqueRequest
-    {
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowDefinitionsGraphRequest
-    {
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowDefinitionsGraphSegmentsRequest
-    {
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowDefinitionsGetManyByIdRequest
-    {
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowDefinitionsGetByIdRequest
-    {
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowDefinitionsGetByDefinitionIdRequest
-    {
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowDefinitionsExportRequest
-    {
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowDefinitionsExecuteGetRequest
-    {
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsModelsActivityHandle
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityId")]
-        public string? ActivityId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityNodeId")]
-        public string? ActivityNodeId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityInstanceId")]
-        public string? ActivityInstanceId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityHash")]
-        public string? ActivityHash { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowDefinitionsExecuteResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("workflowState")]
-        public ElsaWorkflowsStateWorkflowState WorkflowState { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowDefinitionsDispatchResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("workflowInstanceId")]
-        public string WorkflowInstanceId { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowDefinitionsDispatchRequest
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("instanceId")]
-        public string? InstanceId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("correlationId")]
-        public string? CorrelationId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("triggerActivityId")]
-        public string? TriggerActivityId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("versionOptions")]
-        public string? VersionOptions { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("input")]
-        public object? Input { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("channel")]
-        public string? Channel { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowDefinitionsDeleteVersionRequest
-    {
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowDefinitionsDeleteRequest
-    {
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowDefinitionsCountResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("count")]
-        public long Count { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowDefinitionsConsumersResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("consumingWorkflowDefinitionIds")]
-        public System.Collections.Generic.ICollection<string> ConsumingWorkflowDefinitionIds { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowDefinitionsConsumersRequest
-    {
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkRetractResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("retracted")]
-        public System.Collections.Generic.ICollection<string> Retracted { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("alreadyRetracted")]
-        public System.Collections.Generic.ICollection<string> AlreadyRetracted { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("skipped")]
-        public System.Collections.Generic.ICollection<string> Skipped { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("notPublished")]
-        [System.Obsolete("Use AlreadyRetracted instead")]
-        public System.Collections.Generic.ICollection<string> NotPublished { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("notFound")]
-        public System.Collections.Generic.ICollection<string> NotFound { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkRetractRequest
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("definitionIds")]
-        public System.Collections.Generic.ICollection<string> DefinitionIds { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkPublishResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("published")]
-        public System.Collections.Generic.ICollection<string> Published { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("alreadyPublished")]
-        public System.Collections.Generic.ICollection<string> AlreadyPublished { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("notFound")]
-        public System.Collections.Generic.ICollection<string> NotFound { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("skipped")]
-        public System.Collections.Generic.ICollection<string> Skipped { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("updatedConsumers")]
-        public System.Collections.Generic.ICollection<string> UpdatedConsumers { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("failed")]
-        public System.Collections.Generic.ICollection<string> Failed { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("warnings")]
-        public System.Collections.Generic.IDictionary<string, System.Collections.Generic.ICollection<string>> Warnings { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkPublishRequest
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("definitionIds")]
-        public System.Collections.Generic.ICollection<string> DefinitionIds { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDispatchResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("workflowInstanceIds")]
-        public System.Collections.Generic.ICollection<string> WorkflowInstanceIds { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDispatchRequest
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("versionOptions")]
-        public string? VersionOptions { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("triggerActivityId")]
-        public string? TriggerActivityId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("input")]
-        public object? Input { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("count")]
-        public int Count { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDeleteVersionsResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("deleted")]
-        public long Deleted { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDeleteVersionsRequest
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("ids")]
-        public System.Collections.Generic.ICollection<string> Ids { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDeleteResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("deleted")]
-        public long Deleted { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowDefinitionsBulkDeleteRequest
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("definitionIds")]
-        public System.Collections.Generic.ICollection<string> DefinitionIds { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaModelsListResponseOfWorkflowActivationStrategyDescriptor
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("items")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsApiEndpointsWorkflowActivationStrategiesListWorkflowActivationStrategyDescriptor> Items { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("count")]
-        public long Count { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsWorkflowActivationStrategiesListWorkflowActivationStrategyDescriptor
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("displayName")]
-        public string DisplayName { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("description")]
-        public string Description { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("typeName")]
-        public string TypeName { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsVariableTypesListResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("items")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsApiEndpointsVariableTypesListVariableTypeDescriptor> Items { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsVariableTypesListVariableTypeDescriptor
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("typeName")]
-        public string TypeName { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("displayName")]
-        public string DisplayName { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("category")]
-        public string Category { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("description")]
-        public string? Description { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsTestsActivitiesRequest
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("workflowDefinitionHandle")]
-        public ElsaWorkflowsModelsWorkflowDefinitionHandle WorkflowDefinitionHandle { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityHandle")]
-        public ElsaWorkflowsModelsActivityHandle ActivityHandle { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsModelsWorkflowDefinitionHandle
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("definitionId")]
-        public string? DefinitionId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("versionOptions")]
-        public string? VersionOptions { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("definitionVersionId")]
-        public string? DefinitionVersionId { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsTasksCompleteResponse
-    {
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsTasksCompleteRequest
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("result")]
-        public object? Result { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsStorageDriversListResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("items")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsApiEndpointsStorageDriversListStorageDriverDescriptor> Items { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsStorageDriversListStorageDriverDescriptor
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("typeName")]
-        public string TypeName { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("displayName")]
-        public string DisplayName { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("priority")]
-        public double Priority { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("deprecated")]
-        public bool Deprecated { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaModelsListResponseOfExpressionDescriptorModel
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("items")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsApiEndpointsScriptingExpressionDescriptorsListExpressionDescriptorModel> Items { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("count")]
-        public long Count { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsScriptingExpressionDescriptorsListExpressionDescriptorModel
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("type")]
-        public string Type { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("displayName")]
-        public string DisplayName { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("isSerializable")]
-        public bool IsSerializable { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("isBrowsable")]
-        public bool IsBrowsable { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("properties")]
-        public System.Collections.Generic.IDictionary<string, object> Properties { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsRuntimeAdminStatusResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("state")]
-        public ElsaWorkflowsApiEndpointsRuntimeAdminQuiescenceStateDto State { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("sources")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsApiEndpointsRuntimeAdminIngressSourceStateDto> Sources { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activeExecutionCycleCount")]
-        public int ActiveExecutionCycleCount { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsRuntimeAdminQuiescenceStateDto
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("reason")]
-        public string Reason { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("isAcceptingNewWork")]
-        public bool IsAcceptingNewWork { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("pausedAt")]
-        public System.DateTime? PausedAt { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("drainStartedAt")]
-        public System.DateTime? DrainStartedAt { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("pauseReasonText")]
-        public string? PauseReasonText { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("pauseRequestedBy")]
-        public string? PauseRequestedBy { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("generationId")]
-        public string GenerationId { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsRuntimeAdminIngressSourceStateDto
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        public string Name { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("state")]
-        public string State { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("lastError")]
-        public string? LastError { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("lastTransitionAt")]
-        public System.DateTime? LastTransitionAt { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsRuntimeAdminPauseRequest
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("reason")]
-        public string? Reason { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsRuntimeAdminForceDrainResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("outcome")]
-        public ElsaWorkflowsApiEndpointsRuntimeAdminDrainOutcomeDto Outcome { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsRuntimeAdminDrainOutcomeDto
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("overallResult")]
-        public string OverallResult { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("startedAt")]
-        public System.DateTime StartedAt { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("completedAt")]
-        public System.DateTime CompletedAt { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("pausePhaseDuration")]
-        public System.TimeSpan PausePhaseDuration { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("waitPhaseDuration")]
-        public System.TimeSpan WaitPhaseDuration { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("sources")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsApiEndpointsRuntimeAdminIngressSourceStateDto> Sources { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("executionCyclesForceCancelledCount")]
-        public int ExecutionCyclesForceCancelledCount { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("forceCancelledInstanceIds")]
-        public System.Collections.Generic.ICollection<string> ForceCancelledInstanceIds { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsRuntimeAdminForceDrainRequest
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("reason")]
-        public string? Reason { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsPackageResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("packageVersion")]
-        public string PackageVersion { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaModelsListResponseOfOutputConverterDescriptorModel
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("items")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsApiEndpointsOutputConvertersListOutputConverterDescriptorModel> Items { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("count")]
-        public long Count { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsOutputConvertersListOutputConverterDescriptorModel
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public string Id { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("sourceTypeName")]
-        public string SourceTypeName { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("resultTypeName")]
-        public string ResultTypeName { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("displayName")]
-        public string DisplayName { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("description")]
-        public string? Description { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("settingsSchema")]
-        public object? SettingsSchema { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaModelsListResponseOfLogPersistenceStrategyDescriptor
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("items")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsApiEndpointsLogPersistenceStrategiesListLogPersistenceStrategyDescriptor> Items { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("count")]
-        public long Count { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsLogPersistenceStrategiesListLogPersistenceStrategyDescriptor
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("displayName")]
-        public string DisplayName { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("description")]
-        public string Description { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("typeName")]
-        public string TypeName { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaModelsListResponseOfIncidentStrategyDescriptor
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("items")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsApiEndpointsIncidentStrategiesListIncidentStrategyDescriptor> Items { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("count")]
-        public long Count { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsIncidentStrategiesListIncidentStrategyDescriptor
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("displayName")]
-        public string DisplayName { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("description")]
-        public string Description { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("typeName")]
-        public string TypeName { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaModelsListResponseOfFeatureDescriptor
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("items")]
-        public System.Collections.Generic.ICollection<ElsaFeaturesModelsFeatureDescriptor> Items { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("count")]
-        public long Count { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaFeaturesModelsFeatureDescriptor
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        public string Name { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("namespace")]
-        public string Namespace { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("fullName")]
-        public string FullName { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("displayName")]
-        public string DisplayName { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("description")]
-        public string Description { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsEventsTriggerAuthenticatedRequest
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("workflowInstanceId")]
-        public string? WorkflowInstanceId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("correlationId")]
-        public string? CorrelationId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityInstanceId")]
-        public string? ActivityInstanceId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("input")]
-        public object? Input { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("workflowExecutionMode")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<ElsaWorkflowsModelsWorkflowExecutionMode>))]
-        public ElsaWorkflowsModelsWorkflowExecutionMode WorkflowExecutionMode { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum ElsaWorkflowsModelsWorkflowExecutionMode
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Synchronous")]
-        Synchronous = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Asynchronous")]
-        Asynchronous = 1,
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaModelsListResponseOfCommitStrategyDescriptor
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("items")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsApiEndpointsCommitStrategiesCommitStrategyDescriptor> Items { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("count")]
-        public long Count { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsCommitStrategiesCommitStrategyDescriptor
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        public string Name { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("displayName")]
-        public string DisplayName { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("description")]
-        public string Description { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersReplayResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("replayed")]
-        public bool Replayed { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("queueItemId")]
-        public string? QueueItemId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("reason")]
-        public string? Reason { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersListResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("items")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersBookmarkQueueDeadLetterModel> Items { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("totalCount")]
-        public long TotalCount { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersBookmarkQueueDeadLetterModel
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public string Id { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("tenantId")]
-        public string? TenantId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("originalQueueItemId")]
-        public string OriginalQueueItemId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("workflowInstanceId")]
-        public string? WorkflowInstanceId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("correlationId")]
-        public string? CorrelationId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("bookmarkId")]
-        public string? BookmarkId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("stimulusHash")]
-        public string? StimulusHash { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityInstanceId")]
-        public string? ActivityInstanceId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityTypeName")]
-        public string? ActivityTypeName { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("originalCreatedAt")]
-        public System.DateTime OriginalCreatedAt { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("deadLetteredAt")]
-        public System.DateTime DeadLetteredAt { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("reason")]
-        public string Reason { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("deliveryAttempts")]
-        public int DeliveryAttempts { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("lastAttemptedAt")]
-        public System.DateTime? LastAttemptedAt { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("lastErrorType")]
-        public string? LastErrorType { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("lastErrorMessage")]
-        public string? LastErrorMessage { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("canReplay")]
-        public bool CanReplay { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("replayedAt")]
-        public System.DateTime? ReplayedAt { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("replayedQueueItemId")]
-        public string? ReplayedQueueItemId { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsBookmarkQueueDeadLettersListRequest
-    {
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaModelsListResponseOfActivityExecutionRecordSummary
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("items")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsRuntimeEntitiesActivityExecutionRecordSummary> Items { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("count")]
-        public long Count { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsRuntimeEntitiesActivityExecutionRecordSummary : ElsaCommonEntitiesEntity
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("workflowInstanceId")]
-        public string WorkflowInstanceId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityId")]
-        public string ActivityId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityNodeId")]
-        public string ActivityNodeId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityType")]
-        public string ActivityType { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityTypeVersion")]
-        public int ActivityTypeVersion { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityName")]
-        public string? ActivityName { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("startedAt")]
-        public System.DateTime StartedAt { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("hasBookmarks")]
-        public bool HasBookmarks { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("status")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<ElsaWorkflowsActivityStatus>))]
-        public ElsaWorkflowsActivityStatus Status { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("metadata")]
-        public System.Collections.Generic.IDictionary<string, object>? Metadata { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("aggregateFaultCount")]
-        public int AggregateFaultCount { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("completedAt")]
-        public System.DateTime? CompletedAt { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsActivityExecutionSummariesListSummariesRequest
-    {
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsActivityExecutionsReportResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("stats")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsRuntimeActivityExecutionStats> Stats { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsRuntimeActivityExecutionStats
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityId")]
-        public string ActivityId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityNodeId")]
-        public string ActivityNodeId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("startedCount")]
-        public long StartedCount { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("completedCount")]
-        public long CompletedCount { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("uncompletedCount")]
-        public long UncompletedCount { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("isBlocked")]
-        public bool IsBlocked { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("isFaulted")]
-        public bool IsFaulted { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("aggregateFaultCount")]
-        public int AggregateFaultCount { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("metadata")]
-        public System.Collections.Generic.IDictionary<string, object>? Metadata { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsActivityExecutionsReportRequest
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("workflowInstanceId")]
-        public string WorkflowInstanceId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityNodeIds")]
-        public System.Collections.Generic.ICollection<string> ActivityNodeIds { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaModelsListResponseOfActivityExecutionRecord
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("items")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsRuntimeEntitiesActivityExecutionRecord> Items { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("count")]
-        public long Count { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsRuntimeEntitiesActivityExecutionRecord : ElsaCommonEntitiesEntity
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("workflowInstanceId")]
-        public string WorkflowInstanceId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityId")]
-        public string ActivityId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityNodeId")]
-        public string ActivityNodeId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityType")]
-        public string ActivityType { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityTypeVersion")]
-        public int ActivityTypeVersion { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityName")]
-        public string? ActivityName { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityState")]
-        public System.Collections.Generic.IDictionary<string, object>? ActivityState { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("payload")]
-        public System.Collections.Generic.IDictionary<string, object>? Payload { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("outputs")]
-        public System.Collections.Generic.IDictionary<string, object>? Outputs { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("properties")]
-        public System.Collections.Generic.IDictionary<string, object>? Properties { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("metadata")]
-        public System.Collections.Generic.IDictionary<string, object>? Metadata { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("exception")]
-        public ElsaWorkflowsStateExceptionState? Exception { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("startedAt")]
-        public System.DateTime StartedAt { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("hasBookmarks")]
-        public bool HasBookmarks { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("status")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<ElsaWorkflowsActivityStatus>))]
-        public ElsaWorkflowsActivityStatus Status { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("aggregateFaultCount")]
-        public int AggregateFaultCount { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("completedAt")]
-        public System.DateTime? CompletedAt { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("schedulingActivityExecutionId")]
-        public string? SchedulingActivityExecutionId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("schedulingActivityId")]
-        public string? SchedulingActivityId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("schedulingWorkflowInstanceId")]
-        public string? SchedulingWorkflowInstanceId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("callStackDepth")]
-        public int? CallStackDepth { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsActivityExecutionsListRequest
-    {
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsActivityExecutionsGetCallStackResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("activityExecutionId")]
-        public string ActivityExecutionId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("items")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsRuntimeEntitiesActivityExecutionRecord> Items { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("totalCount")]
-        public long TotalCount { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsActivityExecutionsGetCallStackRequest
-    {
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaModelsCountResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("count")]
-        public long Count { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsActivityExecutionsCountRequest
-    {
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsActivityDescriptorsListResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("items")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsModelsActivityDescriptor> Items { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("count")]
-        public int Count { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsModelsActivityDescriptor
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("tenantId")]
-        public string? TenantId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("typeName")]
-        public string TypeName { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("clrType")]
-        public string ClrType { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("namespace")]
-        public string Namespace { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        public string Name { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("version")]
-        public int Version { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("category")]
-        public string Category { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("displayName")]
-        public string? DisplayName { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("description")]
-        public string? Description { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("inputs")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsModelsInputDescriptor> Inputs { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("outputs")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsModelsOutputDescriptor> Outputs { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("kind")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<ElsaWorkflowsActivityKind>))]
-        public ElsaWorkflowsActivityKind Kind { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("runAsynchronously")]
-        public bool RunAsynchronously { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("ports")]
-        public System.Collections.Generic.ICollection<ElsaWorkflowsModelsPort> Ports { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("customProperties")]
-        public System.Collections.Generic.IDictionary<string, object> CustomProperties { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("constructionProperties")]
-        public System.Collections.Generic.IDictionary<string, object> ConstructionProperties { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("isContainer")]
-        public bool IsContainer { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("isBrowsable")]
-        public bool IsBrowsable { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("isStart")]
-        public bool IsStart { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("isTerminal")]
-        public bool IsTerminal { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsModelsInputDescriptor : ElsaWorkflowsModelsPropertyDescriptor
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("isWrapped")]
-        public bool IsWrapped { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("uiHint")]
-        public string UiHint { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("category")]
-        public string? Category { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("defaultValue")]
-        public object? DefaultValue { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("defaultSyntax")]
-        public string? DefaultSyntax { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("isReadOnly")]
-        public bool? IsReadOnly { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("isSensitive")]
-        public bool IsSensitive { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("storageDriverType")]
-        public string? StorageDriverType { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("autoEvaluate")]
-        public bool AutoEvaluate { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("evaluatorType")]
-        public string? EvaluatorType { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("uiSpecifications")]
-        public System.Collections.Generic.IDictionary<string, object>? UiSpecifications { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public abstract partial class ElsaWorkflowsModelsPropertyDescriptor
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        public string Name { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("typeName")]
-        public string TypeName { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("displayName")]
-        public string? DisplayName { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("description")]
-        public string? Description { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("order")]
-        public float Order { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("isBrowsable")]
-        public bool? IsBrowsable { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("isSerializable")]
-        public bool? IsSerializable { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("isSynthetic")]
-        public bool IsSynthetic { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsModelsOutputDescriptor : ElsaWorkflowsModelsPropertyDescriptor
-    {
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum ElsaWorkflowsActivityKind
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Action")]
-        Action = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Trigger")]
-        Trigger = 1,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Job")]
-        Job = 2,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Task")]
-        Task = 3,
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsModelsPort
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        public string Name { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("displayName")]
-        public string? DisplayName { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("type")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<ElsaWorkflowsModelsPortType>))]
-        public ElsaWorkflowsModelsPortType Type { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("isBrowsable")]
-        public bool IsBrowsable { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum ElsaWorkflowsModelsPortType
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Embedded")]
-        Embedded = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Flow")]
-        Flow = 1,
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsActivityDescriptorsGetRequest
-    {
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsActivityDescriptorOptionsGetResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("items")]
-        public System.Collections.Generic.IDictionary<string, object> Items { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaWorkflowsApiEndpointsActivityDescriptorOptionsGetRequest
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("version")]
-        public int? Version { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("context")]
-        public object? Context { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ElsaResilienceEndpointsSimulateResponseSimulatedResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("message")]
-        public string Message { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetShareAllModuleManifest
+    public partial class ModuleManifest
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("modules")]
-        public System.Collections.Generic.ICollection<SoftsquarenetShareAllModuleDescriptor> Modules { get; set; } = default!;
+        public System.Collections.Generic.ICollection<ModuleDescriptor> Modules { get; set; } = default!;
 
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetShareAllModuleDescriptor
+    public partial class ModuleDescriptor
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("id")]
@@ -16847,8 +4687,8 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
         public string Version { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("kind")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<SoftsquarenetShareAllModuleKind>))]
-        public SoftsquarenetShareAllModuleKind Kind { get; set; } = default!;
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<ModuleKind>))]
+        public ModuleKind Kind { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("url")]
         public string Url { get; set; } = default!;
@@ -16884,12 +4724,12 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
         public System.Collections.Generic.ICollection<string> Styles { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("nav")]
-        public System.Collections.Generic.ICollection<SoftsquarenetShareAllModuleNavItem> Nav { get; set; } = default!;
+        public System.Collections.Generic.ICollection<ModuleNavItem> Nav { get; set; } = default!;
 
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum SoftsquarenetShareAllModuleKind
+    public enum ModuleKind
     {
 
         [System.Runtime.Serialization.EnumMember(Value = @"Dll")]
@@ -16901,7 +4741,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetShareAllModuleNavItem
+    public partial class ModuleNavItem
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("title")]
@@ -16916,26 +4756,11 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorHostModulesElsaHostApplicationQueriesElsaInfoDto
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("apiBasePath")]
-        public string ApiBasePath { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("tenantId")]
-        public string TenantId { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("schema")]
-        public string Schema { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorHostModulesAuthApplicationCommonCreatedApiKeyDto
+    public partial class CreatedApiKeyDto
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("apiKey")]
-        public SoftsquarenetModularBlazorHostModulesAuthApplicationCommonApiKeyDto ApiKey { get; set; } = default!;
+        public ApiKeyDto ApiKey { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("key")]
         public string Key { get; set; } = default!;
@@ -16943,7 +4768,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorHostModulesAuthApplicationCommonApiKeyDto
+    public partial class ApiKeyDto
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("id")]
@@ -16973,7 +4798,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class MicrosoftAspNetCoreHttpHttpValidationProblemDetails : MicrosoftAspNetCoreMvcProblemDetails
+    public partial class HttpValidationProblemDetails : ProblemDetails
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("errors")]
@@ -16982,7 +4807,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class MicrosoftAspNetCoreMvcProblemDetails
+    public partial class ProblemDetails
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("type")]
@@ -17012,7 +4837,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorHostModulesAuthApplicationApiKeysCreateApiKeyCommand
+    public partial class CreateApiKeyCommand
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("name")]
@@ -17024,11 +4849,11 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorCorePaginationPagedResponseOfApiKeyDto
+    public partial class PagedResponseOfApiKeyDto
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("items")]
-        public System.Collections.Generic.ICollection<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonApiKeyDto> Items { get; set; } = default!;
+        public System.Collections.Generic.ICollection<ApiKeyDto> Items { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("totalCount")]
         public int TotalCount { get; set; } = default!;
@@ -17051,11 +4876,11 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorCorePaginationPagedResponseOfRoleDto
+    public partial class PagedResponseOfRoleDto
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("items")]
-        public System.Collections.Generic.ICollection<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonRoleDto> Items { get; set; } = default!;
+        public System.Collections.Generic.ICollection<RoleDto> Items { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("totalCount")]
         public int TotalCount { get; set; } = default!;
@@ -17078,7 +4903,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorHostModulesAuthApplicationCommonRoleDto
+    public partial class RoleDto
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("id")]
@@ -17096,11 +4921,11 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorHostModulesAuthApplicationCommonRoleDetailDto
+    public partial class RoleDetailDto
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("role")]
-        public SoftsquarenetModularBlazorHostModulesAuthApplicationCommonRoleDto Role { get; set; } = default!;
+        public RoleDto Role { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("permissions")]
         public System.Collections.Generic.ICollection<string> Permissions { get; set; } = default!;
@@ -17108,7 +4933,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorHostModulesAuthApplicationRolesCreateRoleCommand
+    public partial class CreateRoleCommand
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("name")]
@@ -17120,7 +4945,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorHostModulesAuthInfrastructureEndpointsUpdateRoleRequest
+    public partial class UpdateRoleRequest
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("name")]
@@ -17132,7 +4957,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorHostModulesAuthInfrastructureEndpointsSetPermissionsRequest
+    public partial class SetPermissionsRequest
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("permissions")]
@@ -17141,7 +4966,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorHostModulesAuthApplicationCommonTokenResult
+    public partial class TokenResult
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("accessToken")]
@@ -17159,7 +4984,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorHostModulesAuthApplicationTokensLoginCommand
+    public partial class LoginCommand
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("userName")]
@@ -17171,7 +4996,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorHostModulesAuthApplicationTokensRefreshTokenCommand
+    public partial class RefreshTokenCommand
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("refreshToken")]
@@ -17180,7 +5005,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorHostModulesAuthApplicationTokensRevokeRefreshTokenCommand
+    public partial class RevokeRefreshTokenCommand
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("refreshToken")]
@@ -17189,11 +5014,11 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorHostModulesAuthApplicationCommonUserDetailDto
+    public partial class UserDetailDto
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("user")]
-        public SoftsquarenetModularBlazorHostModulesAuthApplicationCommonUserDto User { get; set; } = default!;
+        public UserDto User { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("roles")]
         public System.Collections.Generic.ICollection<string> Roles { get; set; } = default!;
@@ -17201,7 +5026,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorHostModulesAuthApplicationCommonUserDto
+    public partial class UserDto
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("id")]
@@ -17228,7 +5053,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorHostModulesAuthApplicationUsersCreateUserCommand
+    public partial class CreateUserCommand
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("userName")]
@@ -17252,11 +5077,11 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorCorePaginationPagedResponseOfUserDto
+    public partial class PagedResponseOfUserDto
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("items")]
-        public System.Collections.Generic.ICollection<SoftsquarenetModularBlazorHostModulesAuthApplicationCommonUserDto> Items { get; set; } = default!;
+        public System.Collections.Generic.ICollection<UserDto> Items { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("totalCount")]
         public int TotalCount { get; set; } = default!;
@@ -17279,7 +5104,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorHostModulesAuthApplicationUsersChangePasswordCommand
+    public partial class ChangePasswordCommand
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("currentPassword")]
@@ -17291,7 +5116,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorHostModulesAuthInfrastructureEndpointsUpdateUserRequest
+    public partial class UpdateUserRequest
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("email")]
@@ -17306,7 +5131,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorHostModulesAuthInfrastructureEndpointsToggleStatusRequest
+    public partial class ToggleStatusRequest
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("activate")]
@@ -17315,7 +5140,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorHostModulesAuthInfrastructureEndpointsAssignRolesRequest
+    public partial class AssignRolesRequest
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("roles")]
@@ -17324,7 +5149,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorHostModulesAuthInfrastructureEndpointsResetPasswordRequest
+    public partial class ResetPasswordRequest
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("newPassword")]
@@ -17333,7 +5158,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorHostModulesCatalogApplicationPackagesModulePackageDto
+    public partial class ModulePackageDto
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("id")]
@@ -17349,12 +5174,12 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
         public string Version { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("target")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<SoftsquarenetModularBlazorHostModulesCatalogDomainModuleTarget>))]
-        public SoftsquarenetModularBlazorHostModulesCatalogDomainModuleTarget Target { get; set; } = default!;
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<ModuleTarget>))]
+        public ModuleTarget Target { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("kind")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<SoftsquarenetShareAllModuleKind>))]
-        public SoftsquarenetShareAllModuleKind Kind { get; set; } = default!;
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<ModuleKind>))]
+        public ModuleKind Kind { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("fileName")]
         public string FileName { get; set; } = default!;
@@ -17386,7 +5211,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum SoftsquarenetModularBlazorHostModulesCatalogDomainModuleTarget
+    public enum ModuleTarget
     {
 
         [System.Runtime.Serialization.EnumMember(Value = @"Host")]
@@ -17398,15 +5223,15 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorHostModulesCatalogInfrastructureEndpointsUploadModulePackageForm
+    public partial class UploadModulePackageForm
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("file")]
         public byte[] File { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("target")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<SoftsquarenetModularBlazorHostModulesCatalogDomainModuleTarget>))]
-        public SoftsquarenetModularBlazorHostModulesCatalogDomainModuleTarget Target { get; set; } = default!;
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<ModuleTarget>))]
+        public ModuleTarget Target { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("name")]
         public string? Name { get; set; } = default!;
@@ -17414,7 +5239,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorHostModulesCatalogInfrastructureEndpointsSetEnabledRequest
+    public partial class SetEnabledRequest
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("enabled")]
@@ -17423,7 +5248,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorHostModulesCatalogInfrastructureEndpointsSetConfigurationRequest
+    public partial class SetConfigurationRequest
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("configuration")]
@@ -17432,19 +5257,19 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorHostModulesMultitenancyApplicationCommandsTenantResult
+    public partial class TenantResult
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("tenant")]
-        public SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto Tenant { get; set; } = default!;
+        public TenantDto Tenant { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("provisioning")]
-        public SoftsquarenetModularBlazorHostModulesMultitenancyApplicationTenantProvisioningDto? Provisioning { get; set; } = default!;
+        public TenantProvisioningDto? Provisioning { get; set; } = default!;
 
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto
+    public partial class TenantDto
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("id")]
@@ -17457,8 +5282,8 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
         public string Name { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("provider")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<SoftsquarenetModularBlazorCoreDatabaseProvider>))]
-        public SoftsquarenetModularBlazorCoreDatabaseProvider Provider { get; set; } = default!;
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<DatabaseProvider>))]
+        public DatabaseProvider Provider { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("adminEmail")]
         public string? AdminEmail { get; set; } = default!;
@@ -17475,7 +5300,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum SoftsquarenetModularBlazorCoreDatabaseProvider
+    public enum DatabaseProvider
     {
 
         [System.Runtime.Serialization.EnumMember(Value = @"SqlServer")]
@@ -17490,7 +5315,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorHostModulesMultitenancyApplicationTenantProvisioningDto
+    public partial class TenantProvisioningDto
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("id")]
@@ -17517,7 +5342,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorHostModulesMultitenancyApplicationCommandsCreateTenantCommand
+    public partial class CreateTenantCommand
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("identifier")]
@@ -17527,8 +5352,8 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
         public string Name { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("provider")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<SoftsquarenetModularBlazorCoreDatabaseProvider>))]
-        public SoftsquarenetModularBlazorCoreDatabaseProvider Provider { get; set; } = default!;
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<DatabaseProvider>))]
+        public DatabaseProvider Provider { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("connectionString")]
         public string ConnectionString { get; set; } = default!;
@@ -17545,11 +5370,11 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorCorePaginationPagedResponseOfTenantDto
+    public partial class PagedResponseOfTenantDto
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("items")]
-        public System.Collections.Generic.ICollection<SoftsquarenetModularBlazorCoreTenancyAbstractionsTenantDto> Items { get; set; } = default!;
+        public System.Collections.Generic.ICollection<TenantDto> Items { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("totalCount")]
         public int TotalCount { get; set; } = default!;
@@ -17572,11 +5397,11 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorCorePaginationPagedResponseOfTenantProvisioningDto
+    public partial class PagedResponseOfTenantProvisioningDto
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("items")]
-        public System.Collections.Generic.ICollection<SoftsquarenetModularBlazorHostModulesMultitenancyApplicationTenantProvisioningDto> Items { get; set; } = default!;
+        public System.Collections.Generic.ICollection<TenantProvisioningDto> Items { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("totalCount")]
         public int TotalCount { get; set; } = default!;
@@ -17599,7 +5424,7 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SoftsquarenetModularBlazorHostModulesMultitenancyInfrastructureEndpointsRenewTenantRequest
+    public partial class RenewTenantRequest
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("months")]

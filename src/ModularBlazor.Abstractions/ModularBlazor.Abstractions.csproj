@@ -1,12 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk"><!-- Contracts shared by the host and every module. Keep it dependency-free. -->
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor"><!-- Contracts shared by the host and every module. Keep it dependency-free. -->
 
   <PropertyGroup>
     <AssemblyName>$(SoftSquarePrefix).ModularBlazor.Abstractions</AssemblyName>
     <RootNamespace>$(SoftSquarePrefix).ModularBlazor.Abstractions</RootNamespace>
   </PropertyGroup>
-
-
+  
   <ItemGroup>
+    <SupportedPlatform Include="browser" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.*" PrivateAssets="all" />
     <ProjectReference Include="..\Share.All\Share.All.csproj" />
   </ItemGroup>
 </Project>

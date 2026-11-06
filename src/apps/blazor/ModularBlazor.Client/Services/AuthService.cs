@@ -15,13 +15,13 @@ public sealed class AuthService(ModuleManager modules, IApiClient apiClient) : I
 
     public event Action? Changed;
 
-    public async Task<bool> LoginAsync(string userName, string password)
+    public async Task<bool> LoginAsync(string tenantId, string userName, string password)
     {
         if (string.IsNullOrWhiteSpace(userName) || string.IsNullOrEmpty(password)) return false;
 
         var role = userName.Trim().Equals("admin", StringComparison.OrdinalIgnoreCase) ? "admin" : "user";
 
-        var token = apiClient.IssueTokenAsync(new() { UserName = userName, Password = password });
+        var token = apiClient.IssueTokenAsync(tenantId, new() { UserName = userName, Password = password });
 
         // Phase 2: only now does the app learn which modules this user has (metadata only).
         await modules.LoadUserModulesAsync(role);

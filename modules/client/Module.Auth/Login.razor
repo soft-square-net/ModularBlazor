@@ -45,7 +45,7 @@
     _busy = true;
     try
     {
-      if (await Auth.LoginAsync(_userName, _password))
+      if (await Auth.LoginAsync(_tenant, _userName, _password))
         Nav.NavigateTo(SafeReturnUrl(), replace: true);
       else
         _error = "Enter a user name and a password.";

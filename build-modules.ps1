@@ -6,7 +6,7 @@ Set-Location $PSScriptRoot
 $out = "src/apps/blazor/ModularBlazor.Client/wwwroot/modules"
 New-Item -ItemType Directory -Force -Path $out | Out-Null
 Remove-Item "$out/*.dll", "$out/*.nupkg" -ErrorAction SilentlyContinue
-
+# TODO Load the modules name from the Directory into $dllModules variable
 $dllModules = "Layouts.Default", "Layouts.Admin", "Module.Auth", "Module.Dashboard", "Module.Admin"
 foreach ($m in $dllModules) {
     dotnet build "modules/client/$m/$m.csproj" -c $Config -o "artifacts/$m" --nologo -v q

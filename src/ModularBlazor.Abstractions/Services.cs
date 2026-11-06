@@ -11,7 +11,7 @@ public interface IAuthService
   event Action? Changed;
 
   /// <summary>On success the user's module metadata has been fetched.</summary>
-  Task<bool> LoginAsync(string userName, string password);
+  Task<bool> LoginAsync(string tenantId, string userName, string password);
   Task LogoutAsync();
 }
 
