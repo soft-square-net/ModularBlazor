@@ -1,0 +1,21 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch"
+  },
+  "license": "MIT",
+  "keywords": [],
+  "author": "",
+  "type": "module",
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.0.0",
+    "glob": "^13.0.6",
+    "postcss": "^8.4.0",
+    "sass": "^1.80.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.2"
+  }
+}

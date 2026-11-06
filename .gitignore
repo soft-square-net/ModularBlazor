@@ -11,3 +11,7 @@ src/ModularBlazor.Client/wwwroot/modules/*.nupkg
 
 # Module store (uploaded packages, generated build inputs)
 /src/api/ModularBlazor.Host/modules-store/
+/modules/client/Layouts.Admin/node-app/node_modules
+*.json
+/modules/client/Layouts.Admin/node-app/package-lock.json
+/modules/client/Layouts.Admin/node-app/yarn.lock
