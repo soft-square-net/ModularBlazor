@@ -1,0 +1,17 @@
+<Project>
+
+  <!--
+    Every file under a module's wwwroot is embedded in the module assembly as the resource "module-assets/<path>"
+    (forward slashes, exact path - no folder/file name guessing). The host reads these straight from the DLL bytes
+    (EmbeddedAssetReader), so a .dll module needs nothing but the .dll: its css and js travel inside it.
+    Source maps and the Blazor initializer file (*.lib.module.js, which only runs for build-time references) stay out.
+  -->
+  <Target Name="EmbedModuleAssets" BeforeTargets="AssignTargetPaths" Condition="Exists('$(MSBuildProjectDirectory)/wwwroot')">
+    <ItemGroup>
+      <_ModuleAsset Include="wwwroot/**/*" Exclude="wwwroot/**/*.map;wwwroot/**/*.lib.module.js" />
+      <EmbeddedResource Include="@(_ModuleAsset)"
+                        LogicalName="module-assets/$([System.String]::Copy('%(_ModuleAsset.RecursiveDir)').Replace('\','/'))%(_ModuleAsset.Filename)%(_ModuleAsset.Extension)" />
+    </ItemGroup>
+  </Target>
+
+</Project>

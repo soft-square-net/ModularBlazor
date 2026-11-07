@@ -54,7 +54,8 @@ modules/client/Module.Admin             dll, lazy      - /admin, /admin/users (r
   "layout": "default",                   // key of a layout registered with [LayoutKey]
   "dependencies": ["Layouts.Admin"],     // loaded first
   "extraAssemblies": [],                 // dll only: private dependency dlls
-  "styles": ["reports.css"],             // dll: urls; nupkg: paths under the package's staticwebassets/
+  "styles": ["css/reports.css"],         // path under the module's wwwroot (packaged in the module), or a url
+  "scripts": ["js/module.js"],           // optional; defaults to js/module.js when the module has one
   "hidden": false,
   "nav": [{ "title": "Reports", "href": "reports", "order": 20 }]
 }
@@ -69,14 +70,28 @@ A module is a Razor class library that references `ModularBlazor.Abstractions`. 
   Layout precedence: page `@layout` > `[UseLayout]` > descriptor `layout` > `default`.
 * **Services:** inject `IAuthService` / `IModuleNavigation` (provided by the host). Don't reference the host project.
 * **.dll:** build and publish just `Module.X.dll`. **.nupkg:** `dotnet pack`; the loader takes `lib/<best tfm>/*.dll`
-  and `.css` under `staticwebassets/`.
+  and everything under `staticwebassets/`.
+* **Static files (css/js):** every file under a module's `wwwroot` is embedded in its assembly
+  (`modules/client/Directory.Build.targets`), so a `.dll` module needs nothing else. Reference them in the
+  descriptor relative to `wwwroot` (`css/a.css`, `js/module.js`; `wwwroot/` and `_content/<asm>/` prefixes are ignored).
+* **Module script:** an ES module whose `default` export (or `init`) runs on activation with `{ moduleId }`, and
+  whose `dispose()` (on the module or on the object it returns) runs on deactivation. `Layouts.Admin/node-app`
+  builds one with vite (`dotnet build -p:BuildNodeApp=true`). `*.lib.module.js` initializers never run for modules
+  loaded at runtime; the host runs `js/module.js` itself.
 
 ## Things to know
 
 * **Trimming is disabled** in the host (`PublishTrimmed=false`). Modules are unknown at publish time and may use any
   framework API; a trimmed host would throw `MissingMethodException`. Keep it off.
-* **No unloading.** WebAssembly can't unload assemblies. Logging out removes the user's metadata and menu, and
-  `ModuleRouteView` re-checks auth and `requiredRole` on every page render, so cached modules stay protected.
+* **Load once, activate per page.** `ModuleManager` loads a module's code once. `ActiveModuleService` follows
+  navigation: startup modules (layouts, login) stay active, the current route's module (plus its `dependencies`)
+  gets its styles/scripts applied before the page renders, and they are removed when you leave. Scripts re-run
+  on every activation, so write them to be disposed.
+* **Unloading.** `ModuleManager.Unload(id)` removes a module's routes, layouts, assets, styles and scripts, and
+  `ReloadAsync(id)` swaps in a new file. Each module has its own load context; the assembly *memory* is only freed
+  when the runtime supports collectible contexts (`ModuleOptions.CollectibleLoadContexts`, off by default and
+  experimental on WebAssembly). Logging out removes the user's metadata and menu, and `ModuleRouteView`
+  re-checks auth and `requiredRole` on every page render.
 * **NuGet dependencies are not resolved.** Only the assemblies inside the package are loaded. Bundle private
   dependencies in the package's `lib/<tfm>/` folder; anything already loaded in the host is skipped.
 * **Version alignment.** Modules compile against the host's framework version; keep them on the same major.

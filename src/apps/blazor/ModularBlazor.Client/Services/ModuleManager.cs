@@ -1,21 +1,19 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 using soft.square.net.ModularBlazor.Abstractions;
 using soft.square.net.Share.All;
 using System.Net.Http.Json;
 using System.Reflection;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
-using System.Runtime.Loader;
 using System.Security.Cryptography;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace soft.square.net.ModularBlazor.Client.Services;
 
 /// <summary>
-/// Owns the module catalog and loads modules (.dll or .nupkg) into the running app.
+/// Owns the module catalog and the *code* lifecycle of modules (.dll or .nupkg): load, and unload.
+/// The browser-side lifecycle (styles, scripts) belongs to ActiveModuleService, which follows navigation.
 /// Three phases feed it:
 ///   1. LoadStartupModulesAsync      - core manifest, then every LoadOnStartup module
 ///   2. LoadUserModulesAsync         - per-user metadata after login (no code downloaded yet)
@@ -30,25 +28,10 @@ public sealed class ModuleManager : IModuleNavigation
     Converters = { new JsonStringEnumConverter() }
   };
 
-
   private readonly HttpClient _http;
-  private readonly IJSRuntime _js;
   private readonly ModuleOptions _options;
-  private readonly ActiveModuleService _moduleService;
-
-  // COMBINE into a single constructor
-  public ModuleManager(
-      HttpClient http,
-      IJSRuntime js,
-      ModuleOptions options,
-      ActiveModuleService moduleService)
-  {
-    _http = http;
-    _js = js;
-    _options = options;
-    _moduleService = moduleService; // Now available to use inside LoadAsync!
-  }
-
+  private readonly ModuleAssetStore _assets;
+  private readonly IReadOnlyDictionary<ModuleKind, IModulePackageReader> _readers;
 
   private readonly Dictionary<string, ModuleDescriptor> _catalog = new(StringComparer.OrdinalIgnoreCase);
   private readonly HashSet<string> _userModuleIds = new(StringComparer.OrdinalIgnoreCase);
@@ -57,13 +40,18 @@ public sealed class ModuleManager : IModuleNavigation
   private readonly Dictionary<Assembly, ModuleDescriptor> _owners = new();
   private readonly Dictionary<string, Type> _layouts = new(StringComparer.OrdinalIgnoreCase);
 
-  private sealed record LoadedModule(ModuleDescriptor Descriptor, IReadOnlyList<Assembly> Assemblies);
+  private sealed record LoadedModule(ModuleDescriptor Descriptor, IReadOnlyList<Assembly> Assemblies, ModuleLoadContext Context);
 
-  public ModuleManager(HttpClient http, IJSRuntime js, ModuleOptions options)
+  public ModuleManager(
+      HttpClient http,
+      ModuleOptions options,
+      ModuleAssetStore assets,
+      IEnumerable<IModulePackageReader> readers)
   {
     _http = http;
-    _js = js;
     _options = options;
+    _assets = assets;
+    _readers = readers.ToDictionary(r => r.Kind);
   }
 
   /// <summary>Passed to the Router. Mutated as modules load; the Router re-reads it on every navigation.</summary>
@@ -85,6 +73,25 @@ public sealed class ModuleManager : IModuleNavigation
           .ToList();
 
   public bool IsLoaded(string id) => _loaded.ContainsKey(id);
+
+  public ModuleDescriptor? GetDescriptor(string id) => _catalog.GetValueOrDefault(id);
+
+  /// <summary>The module and everything it depends on, dependencies first. Unknown ids and cycles are skipped.</summary>
+  public IReadOnlyList<string> GetDependencyClosure(string id)
+  {
+    var result = new List<string>();
+    var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+    void Visit(string current)
+    {
+      if (!visited.Add(current) || !_catalog.TryGetValue(current, out var d)) return;
+      foreach (var dependency in d.Dependencies) Visit(dependency);
+      result.Add(d.Id);
+    }
+
+    Visit(id);
+    return result;
+  }
 
   public ModuleDescriptor? GetOwner(Assembly assembly) => _owners.GetValueOrDefault(assembly);
 
@@ -216,109 +223,24 @@ public sealed class ModuleManager : IModuleNavigation
       foreach (var dependency in d.Dependencies)
         await EnsureLoadedAsync(dependency, next, CancellationToken.None);
 
-      var bytes = await DownloadAsync(d.Url, d.Kind == ModuleKind.NuPkg ? "PK" : "MZ");
-      VerifyHash(d, bytes);
+      var primary = await DownloadAsync(d.Url, d.Kind == ModuleKind.NuPkg ? "PK" : "MZ");
+      VerifyHash(d, primary);
 
-      var images = new List<byte[]>();
-      IReadOnlyDictionary<string, byte[]> staticAssets = new Dictionary<string, byte[]>();
+      if (!_readers.TryGetValue(d.Kind, out var reader))
+        throw new InvalidOperationException($"No package reader is registered for module kind '{d.Kind}'.");
 
-      if (d.Kind == ModuleKind.NuPkg)
-      {
-        var package = NuPkgReader.Read(bytes);
-        images.AddRange(package.Assemblies);
-        staticAssets = package.StaticAssets;
-      }
-      else
-      {
-        images.Add(bytes);
-        foreach (var extra in d.ExtraAssemblies)
-          images.Add(await DownloadAsync(extra, "MZ"));
+      var package = await reader.ReadAsync(d, primary, url => DownloadAsync(url, "MZ"));
 
-        // NEW: Extract static assets directly from the main DLL binary resources
-        staticAssets = ExtractStaticAssetsFromDllBytes(bytes);
-      }
-
+      var context = new ModuleLoadContext(d.Id, _options.CollectibleLoadContexts, FindModuleAssembly);
       var assemblies = new List<Assembly>();
-      foreach (var image in images)
+      foreach (var image in package.Assemblies)
       {
-        var name = GetAssemblyName(image);
-
         // The host (or an earlier module) already provides it - never load a second copy.
-        if (AssemblyLoadContext.Default.Assemblies.Any(a =>
-                string.Equals(a.GetName().Name, name, StringComparison.OrdinalIgnoreCase)))
-          continue;
-
-        assemblies.Add(AssemblyLoadContext.Default.LoadFromStream(new MemoryStream(image)));
+        if (IsProvidedElsewhere(GetAssemblyName(image))) continue;
+        assemblies.Add(context.LoadFromStream(new MemoryStream(image)));
       }
 
-      // Remove the old direct calls:
-      // await InjectStylesAsync(d, staticAssets);
-      // await InjectJavaScriptAsync(d, staticAssets);
-
-      // NEW: Publish directly to the Virtual path manager state registry
-      _moduleService.SetActiveModule(d.Id, staticAssets, d.Styles, d.Scripts);
-
-      foreach (var assembly in assemblies)
-      {
-        _owners[assembly] = d;
-        RegisterLayouts(assembly);
-        RouterAssemblies.Add(assembly);
-      }
-
-      _loaded[d.Id] = new LoadedModule(d, assemblies);
-      Changed?.Invoke();
-    }
-    finally
-    {
-      _inflight.Remove(d.Id);
-    }
-  }
-
-  private async Task LoadAsync2(ModuleDescriptor d, string[] chain)
-  {
-    // Guarantees the caller has stored this task in _inflight before the finally block runs.
-    await Task.Yield();
-
-    try
-    {
-      var next = new List<string>(chain) { d.Id }.ToArray();
-      foreach (var dependency in d.Dependencies)
-        await EnsureLoadedAsync(dependency, next, CancellationToken.None);
-
-      var bytes = await DownloadAsync(d.Url, d.Kind == ModuleKind.NuPkg ? "PK" : "MZ");
-      VerifyHash(d, bytes);
-
-      var images = new List<byte[]>();
-      IReadOnlyDictionary<string, byte[]> staticAssets = new Dictionary<string, byte[]>();
-
-      if (d.Kind == ModuleKind.NuPkg)
-      {
-        var package = NuPkgReader.Read(bytes);
-        images.AddRange(package.Assemblies);
-        staticAssets = package.StaticAssets;
-      }
-      else
-      {
-        images.Add(bytes);
-        foreach (var extra in d.ExtraAssemblies)
-          images.Add(await DownloadAsync(extra, "MZ"));
-      }
-
-      var assemblies = new List<Assembly>();
-      foreach (var image in images)
-      {
-        var name = GetAssemblyName(image);
-
-        // The host (or an earlier module) already provides it - never load a second copy.
-        if (AssemblyLoadContext.Default.Assemblies.Any(a =>
-                string.Equals(a.GetName().Name, name, StringComparison.OrdinalIgnoreCase)))
-          continue;
-
-        assemblies.Add(AssemblyLoadContext.Default.LoadFromStream(new MemoryStream(image)));
-      }
-
-      await InjectStylesAsync(d, staticAssets);
-      await InjectJavaScriptAsync(d, staticAssets);
+      _assets.Set(d.Id, package.Assets);
 
       foreach (var assembly in assemblies)
       {
@@ -327,13 +249,63 @@ public sealed class ModuleManager : IModuleNavigation
         RouterAssemblies.Add(assembly); // the Router picks routable pages up on its next refresh
       }
 
-      _loaded[d.Id] = new LoadedModule(d, assemblies);
+      _loaded[d.Id] = new LoadedModule(d, assemblies, context);
       Changed?.Invoke();
     }
     finally
     {
       _inflight.Remove(d.Id);
     }
+  }
+
+  // ---------------------------------------------------------------- unload
+
+  /// <summary>
+  /// Takes a module out of the running app: its routes (the Router stops seeing the assemblies), layouts, assets and
+  /// load context. The ActiveModuleService hears about it through Changed and removes the module's styles/scripts.
+  /// Returns false when the module is not loaded. Throws when another loaded module still depends on it.
+  /// </summary>
+  public bool Unload(string id)
+  {
+    if (!_loaded.TryGetValue(id, out var module)) return false;
+
+    var dependents = _loaded.Values
+        .Where(m => m.Descriptor.Dependencies.Contains(id, StringComparer.OrdinalIgnoreCase))
+        .Select(m => m.Descriptor.Id)
+        .ToList();
+    if (dependents.Count > 0)
+      throw new InvalidOperationException($"Cannot unload '{id}': required by {string.Join(", ", dependents)}.");
+
+    foreach (var assembly in module.Assemblies)
+    {
+      RouterAssemblies.Remove(assembly);
+      _owners.Remove(assembly);
+
+      foreach (var key in _layouts.Where(kv => kv.Value.Assembly == assembly).Select(kv => kv.Key).ToList())
+        _layouts.Remove(key);
+    }
+
+    _loaded.Remove(id);
+    _assets.Remove(id);
+
+    try
+    {
+      module.Context.Unload(); // only releases memory for a collectible context on a runtime that supports it
+    }
+    catch (Exception ex) when (ex is InvalidOperationException or PlatformNotSupportedException or NotSupportedException)
+    {
+      Console.WriteLine($"[module {id}] assembly memory stays until reload: {ex.Message}");
+    }
+
+    Changed?.Invoke();
+    return true;
+  }
+
+  /// <summary>Unloads the module and loads it again (e.g. after its file was replaced on the server).</summary>
+  public Task ReloadAsync(string id, CancellationToken cancellationToken = default)
+  {
+    Unload(id);
+    return EnsureLoadedAsync(id, cancellationToken);
   }
 
   // ---------------------------------------------------------------- helpers
@@ -398,197 +370,16 @@ public sealed class ModuleManager : IModuleNavigation
     }
   }
 
-  private async Task InjectStylesAsync2(ModuleDescriptor d, IReadOnlyDictionary<string, byte[]> staticAssets)
-  {
-    for (var i = 0; i < d.Styles.Length; i++)
-    {
-      var id = $"module-{d.Id}-{i}";
-      var style = d.Styles[i];
+  private bool IsProvidedElsewhere(string name)
+      => AssemblyLoadContextDefaultHas(name) || FindModuleAssembly(new AssemblyName(name)) is not null;
 
-      if (d.Kind == ModuleKind.NuPkg)
-      {
-        var key = style.Replace('\\', '/').TrimStart('/');
-        if (staticAssets.TryGetValue(key, out var css))
-          await _js.InvokeVoidAsync("moduleHost.setStyleText", id, Encoding.UTF8.GetString(css));
-      }
-      else
-      {
-        await _js.InvokeVoidAsync("moduleHost.setStyleLink", id, style);
-      }
-    }
-  }
+  private static bool AssemblyLoadContextDefaultHas(string name)
+      => System.Runtime.Loader.AssemblyLoadContext.Default.Assemblies.Any(a =>
+          string.Equals(a.GetName().Name, name, StringComparison.OrdinalIgnoreCase));
 
-  private async Task InjectStylesAsync1(ModuleDescriptor d, IReadOnlyDictionary<string, byte[]> staticAssets)
-  {
-    for (var i = 0; i < d.Styles.Length; i++)
-    {
-      var id = $"module-{d.Id}-{i}";
-      var style = d.Styles[i];
-
-      // Standardize the key format to match the extraction dictionary
-      var key = style.Replace('\\', '/').TrimStart('/');
-
-      // ALWAYS check if we have the file bytes in memory first
-      if (staticAssets.TryGetValue(key, out var css))
-      {
-        await _js.InvokeVoidAsync("moduleHost.setStyleText", id, Encoding.UTF8.GetString(css));
-      }
-      else
-      {
-        // Fallback: If not embedded in memory, load it as a hosted link URL
-        await _js.InvokeVoidAsync("moduleHost.setStyleLink", id, style);
-      }
-    }
-  }
-
-
-  private async Task InjectStylesAsync(ModuleDescriptor d, IReadOnlyDictionary<string, byte[]> staticAssets)
-  {
-    for (var i = 0; i < d.Styles.Length; i++)
-    {
-      var id = $"module-{d.Id}-{i}";
-      var style = d.Styles[i]; // e.g., "wwwroot/css/report.css" or "css/report.css"
-
-      // 1. Standardize path slashes
-      var key = style.Replace('\\', '/').TrimStart('/');
-
-      // 2. Lookup check A: Direct match (e.g., "wwwroot/css/report.css")
-      if (staticAssets.TryGetValue(key, out var css))
-      {
-        await _js.InvokeVoidAsync("moduleHost.setStyleText", id, Encoding.UTF8.GetString(css));
-      }
-      // 3. Lookup check B: If key starts with wwwroot/, try stripping it (e.g., "css/report.css")
-      else if (key.StartsWith("wwwroot/", StringComparison.OrdinalIgnoreCase) &&
-               staticAssets.TryGetValue(key.Substring(8), out css))
-      {
-        await _js.InvokeVoidAsync("moduleHost.setStyleText", id, Encoding.UTF8.GetString(css));
-      }
-      // 4. Lookup check C: If style didn't have wwwroot/, try adding it (e.g., "wwwroot/css/report.css")
-      else if (!key.StartsWith("wwwroot/", StringComparison.OrdinalIgnoreCase) &&
-               staticAssets.TryGetValue($"wwwroot/{key}", out css))
-      {
-        await _js.InvokeVoidAsync("moduleHost.setStyleText", id, Encoding.UTF8.GetString(css));
-      }
-      else
-      {
-        // Fallback: If not found in the package bytes, fall back to link URL
-        await _js.InvokeVoidAsync("moduleHost.setStyleLink", id, style);
-      }
-    }
-  }
-
-  /// <summary>
-  /// By Ahmed Galal to extend the module loader to inject startup module.js 
-  /// </summary>
-  /// <param name="d"></param>
-  /// <param name="staticAssets"></param>
-  /// <returns></returns>
-  /// 
-  private async Task InjectJavaScriptAsync(ModuleDescriptor d, IReadOnlyDictionary<string, byte[]> staticAssets)
-  {
-    for (var i = 0; i < d.Scripts.Length; i++)
-    {
-      var id = $"module-{d.Id}-{i}";
-      var scriptPath = d.Scripts[i];
-
-      var key = scriptPath.Replace('\\', '/').TrimStart('/');
-
-      // ALWAYS check if we have the file bytes in memory first
-      if (staticAssets.TryGetValue(key, out var jsBytes))
-      {
-        await _js.InvokeVoidAsync("moduleHost.loadScriptFromBytes", id, jsBytes);
-      }
-      else
-      {
-        // Fallback: Load natively from a public web URL host
-        await _js.InvokeVoidAsync("moduleHost.loadScriptFromUrl", id, scriptPath);
-      }
-    }
-  }
-
-  private async Task InjectJavaScriptAsync2(ModuleDescriptor d, IReadOnlyDictionary<string, byte[]> staticAssets)
-  {
-    for (var i = 0; i < d.Scripts.Length; i++)
-    {
-      var id = $"module-{d.Id}-{i}";
-      var scriptPath = d.Scripts[i];
-
-      if (d.Kind == ModuleKind.NuPkg)
-      {
-        var key = scriptPath.Replace('\\', '/').TrimStart('/');
-        if (staticAssets.TryGetValue(key, out var jsBytes))
-        {
-          // Pass raw bytes to JS to create a temporary Blob URL and run init
-          await _js.InvokeVoidAsync("moduleHost.loadScriptFromBytes", id, jsBytes);
-        }
-      }
-      else
-      {
-        // Load natively from a public web URL host
-        await _js.InvokeVoidAsync("moduleHost.loadScriptFromUrl", id, scriptPath);
-      }
-    }
-  }
-
-
-  #region Helpers
-
-  private IReadOnlyDictionary<string, byte[]> ExtractStaticAssetsFromDllBytes(byte[] dllBytes)
-  {
-    var assetsDictionary = new Dictionary<string, byte[]>(StringComparer.OrdinalIgnoreCase);
-
-    try
-    {
-      var assembly = Assembly.Load(dllBytes);
-      var assemblyName = assembly.GetName().Name; // "soft.square.net.Layouts.Admin"
-      var resourceNames = assembly.GetManifestResourceNames();
-
-      // Exact prefixes built by .NET for your folders
-      var jsPrefix = $"{assemblyName}.wwwroot.js.";
-      var cssPrefix = $"{assemblyName}.wwwroot.css.";
-
-      foreach (var resourceName in resourceNames)
-      {
-        string sanitizedKey = null;
-
-        if (resourceName.StartsWith(jsPrefix, StringComparison.OrdinalIgnoreCase))
-        {
-          // Isolate filename (e.g., "module.js" or "lib.module.js")
-          var fileName = resourceName.Substring(jsPrefix.Length);
-          sanitizedKey = $"wwwroot/js/{fileName}";
-        }
-        else if (resourceName.StartsWith(cssPrefix, StringComparison.OrdinalIgnoreCase))
-        {
-          // Isolate filename (e.g., "module.css")
-          var fileName = resourceName.Substring(cssPrefix.Length);
-          sanitizedKey = $"wwwroot/css/{fileName}";
-        }
-
-        // If it matches our static assets profile, read the stream
-        if (sanitizedKey != null)
-        {
-          using var stream = assembly.GetManifestResourceStream(resourceName);
-          if (stream != null)
-          {
-            using var memoryStream = new MemoryStream();
-            stream.CopyTo(memoryStream);
-            assetsDictionary[sanitizedKey] = memoryStream.ToArray();
-
-            // Optional: Debug line to verify the exact key format being saved in memory
-            Console.WriteLine($"[Module Loader] Successfully mapped asset key: '{sanitizedKey}'");
-          }
-        }
-      }
-    }
-    catch (Exception ex)
-    {
-      Console.WriteLine($"Failed to parse embedded resources out of DLL: {ex.Message}");
-    }
-
-    return assetsDictionary;
-  }
-
-
-  #endregion
-
+  /// <summary>Resolves an assembly one loaded module brought along, for another module that references it.</summary>
+  private Assembly? FindModuleAssembly(AssemblyName name)
+      => _loaded.Values
+          .SelectMany(m => m.Assemblies)
+          .FirstOrDefault(a => string.Equals(a.GetName().Name, name.Name, StringComparison.OrdinalIgnoreCase));
 }

@@ -41,7 +41,8 @@ internal static class NuPkgReader
         foreach (var e in zip.Entries)
         {
             if (e.FullName.StartsWith(StaticAssetsPrefix, StringComparison.OrdinalIgnoreCase)
-                && e.FullName.EndsWith(".css", StringComparison.OrdinalIgnoreCase))
+                && !e.FullName.EndsWith('/')
+                && !e.FullName.EndsWith(".map", StringComparison.OrdinalIgnoreCase))
             {
                 statics[e.FullName[StaticAssetsPrefix.Length..]] = ReadAll(e);
             }

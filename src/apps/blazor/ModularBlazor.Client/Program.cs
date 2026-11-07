@@ -11,6 +11,9 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddSingleton(new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddSingleton(new ModuleOptions());
+builder.Services.AddSingleton<ModuleAssetStore>();
+builder.Services.AddSingleton<IModulePackageReader, DllPackageReader>();
+builder.Services.AddSingleton<IModulePackageReader, NuPkgPackageReader>();
 builder.Services.AddSingleton<ModuleManager>();
 builder.Services.AddSingleton<ActiveModuleService>();
 builder.Services.AddSingleton<IModuleNavigation>(sp => sp.GetRequiredService<ModuleManager>());
@@ -28,5 +31,8 @@ var host = builder.Build();
 
 // Phase 1: the main modules (layouts, login) are downloaded before the first render.
 await host.Services.GetRequiredService<ModuleManager>().LoadStartupModulesAsync();
+
+// ...and their styles/scripts go live (startup modules stay active for the whole session).
+await host.Services.GetRequiredService<ActiveModuleService>().SyncAsync();
 
 await host.RunAsync();

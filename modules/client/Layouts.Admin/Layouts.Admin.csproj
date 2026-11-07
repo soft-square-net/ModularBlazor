@@ -1,18 +1,18 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
-  
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
   <PropertyGroup>
-    <!-- Tells the SDK to embed static assets directly into the assembly binary -->
-    <GenerateEmbeddedStaticWebAssetsManifest>true</GenerateEmbeddedStaticWebAssetsManifest>
+    <!-- node-app is a separate toolchain; keep its sources and node_modules out of the .NET globs. -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);node-app/**</DefaultItemExcludes>
+    <!-- wwwroot/js/module.js is built by node-app (vite). dotnet build compiles it only when asked:
+         dotnet build -p:BuildNodeApp=true   (otherwise the committed wwwroot/js/module.js is used). -->
+    <BuildNodeApp Condition="'$(BuildNodeApp)' == ''">false</BuildNodeApp>
   </PropertyGroup>
 
-  <ItemGroup>
-    <!-- Dynamically injects the wwwroot content into the assembly resource manifest -->
-    <EmbeddedResource Include="wwwroot\**" />
-  </ItemGroup>
+  <!-- wwwroot is embedded into the assembly by ../Directory.Build.targets (see EmbedModuleAssets). -->
 
-  <ItemGroup>
-    <EmbeddedResource Include="lib.module.js" />
-  </ItemGroup>
-  
+  <Target Name="BuildNodeApp" BeforeTargets="EmbedModuleAssets" Condition="'$(BuildNodeApp)' == 'true'">
+    <Exec Command="npm install" WorkingDirectory="$(MSBuildProjectDirectory)/node-app" />
+    <Exec Command="npm run build" WorkingDirectory="$(MSBuildProjectDirectory)/node-app" />
+  </Target>
+
 </Project>
-

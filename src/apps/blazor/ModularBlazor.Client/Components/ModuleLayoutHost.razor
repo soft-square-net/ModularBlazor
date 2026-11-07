@@ -1,8 +1,4 @@
 @inject ModuleManager Modules
-@inject NavigationManager NavManager
-@inject ActiveModuleService ModuleService
-@inject JSRuntime JS
-@implements IDisposable
 
 <LayoutView Layout="Modules.ResolveLayout(LayoutKey)">@ChildContent</LayoutView>
 
@@ -11,23 +7,4 @@
     [Parameter] public string? LayoutKey { get; set; }
 
     [Parameter] public RenderFragment? ChildContent { get; set; }
-
-  protected override void OnInitialized()
-  {
-    NavManager.LocationChanged += HandleNavigationCleanup;
-  }
-
-  private void HandleNavigationCleanup(object sender, LocationChangedEventArgs e)
-  {
-    // When navigating away, completely purge the loaded style variables
-    ModuleService.ClearActiveModule();
-
-    // Tell your JS engine to drop module references to clear memory
-    _ = JS.InvokeVoidAsync("moduleHost.unloadModules");
-  }
-
-  public void Dispose()
-  {
-    NavManager.LocationChanged -= HandleNavigationCleanup;
-  }
 }
