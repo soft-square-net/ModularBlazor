@@ -12,6 +12,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddSingleton(new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddSingleton(new ModuleOptions());
 builder.Services.AddSingleton<ModuleManager>();
+builder.Services.AddSingleton<ActiveModuleService>();
 builder.Services.AddSingleton<IModuleNavigation>(sp => sp.GetRequiredService<ModuleManager>());
 builder.Services.AddSingleton<AuthService>();
 builder.Services.AddSingleton<IAuthService>(sp => sp.GetRequiredService<AuthService>());

@@ -1,1 +1,18 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor" />
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+  
+  <PropertyGroup>
+    <!-- Tells the SDK to embed static assets directly into the assembly binary -->
+    <GenerateEmbeddedStaticWebAssetsManifest>true</GenerateEmbeddedStaticWebAssetsManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Dynamically injects the wwwroot content into the assembly resource manifest -->
+    <EmbeddedResource Include="wwwroot\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="lib.module.js" />
+  </ItemGroup>
+  
+</Project>
+

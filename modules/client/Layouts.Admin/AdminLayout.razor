@@ -1,6 +1,8 @@
+@using Microsoft.JSInterop
 @inherits LayoutComponentBase
 @attribute [LayoutKey("admin")]
 @inject IAuthService Auth
+@inject IJSRuntime JS
 
 <div class="shell-admin">
     <header class="topbar">
@@ -15,3 +17,13 @@
 
     <main class="shell-main">@Body</main>
 </div>
+
+
+
+@code {
+  protected override async Task OnInitializedAsync()
+  {
+    // This works globally on any page without custom base classes
+    // var result = await JS.InvokeAsync<string>("window.myCustomJsInterop.performAction", "Hello from Blazor");
+  }
+}

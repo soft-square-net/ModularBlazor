@@ -54,6 +54,7 @@ public sealed class ModuleDescriptor
     /// Stylesheets. Dll modules: urls. NuPkg modules: paths inside the package's staticwebassets/ folder.
     /// </summary>
     public string[] Styles { get; set; } = [];
+    public string[] Scripts { get; set; } = [];
 
     public ModuleNavItem[] Nav { get; set; } = [];
 }
