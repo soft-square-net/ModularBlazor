@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
     <!-- Modules are loaded at runtime and may call any framework API, so the host must not
@@ -8,6 +8,10 @@
     <AssemblyName>$(SoftSquarePrefix).ModularBlazor.Client</AssemblyName>
     <RootNamespace>$(SoftSquarePrefix).ModularBlazor.Client</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="node-app\src\app.scss" />
+  </ItemGroup>
 
   <!-- wwwroot/moduleHost.js must stay a normal static file: index.html loads it with <script src="moduleHost.js">.
        (Removing it from Content / embedding it keeps it out of the published site, and the stylesheets of
@@ -21,5 +25,28 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\ModularBlazor.Abstractions\ModularBlazor.Abstractions.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Include="node-app\src\app.ts" />
+    <TypeScriptCompile Include="node-app\src\db.ts" />
+    <TypeScriptCompile Include="node-app\src\helpers\observableQuery.ts" />
+    <TypeScriptCompile Include="node-app\src\types\Theme.ts" />
+  </ItemGroup>
+
+  
+  <PropertyGroup>
+    <!-- node-app is a separate toolchain; keep its sources and node_modules out of the .NET globs. -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);node-app/**</DefaultItemExcludes>
+    <!-- wwwroot/js/module.js is built by node-app (vite). dotnet build compiles it only when asked:
+         dotnet build -p:BuildNodeApp=true   (otherwise the committed wwwroot/js/module.js is used). -->
+    <BuildNodeApp Condition="'$(BuildNodeApp)' == ''">false</BuildNodeApp>
+  </PropertyGroup>
+
+  <!-- wwwroot is embedded into the assembly by ../Directory.Build.targets (see EmbedModuleAssets). -->
+
+  <Target Name="BuildNodeApp" BeforeTargets="EmbedModuleAssets" Condition="'$(BuildNodeApp)' == 'true'">
+    <Exec Command="npm install" WorkingDirectory="$(MSBuildProjectDirectory)/node-app" />
+    <Exec Command="npm run build" WorkingDirectory="$(MSBuildProjectDirectory)/node-app" />
+  </Target>
 
 </Project>
