@@ -15,3 +15,10 @@ src/ModularBlazor.Client/wwwroot/modules/*.nupkg
 *.json
 /modules/client/Layouts.Admin/node-app/package-lock.json
 /modules/client/Layouts.Admin/node-app/yarn.lock
+/src/apps/blazor/ModularBlazor.Client/wwwroot/modules/soft.square.net.Layouts.Admin.dll
+/src/apps/blazor/ModularBlazor.Client/wwwroot/modules/user-modules.admin.json
+/src/apps/blazor/ModularBlazor.Client/wwwroot/modules/soft.square.net.Module.Reports.1.0.0.nupkg
+/src/apps/blazor/ModularBlazor.Client/wwwroot/modules/soft.square.net.Module.Dashboard.dll
+/src/apps/blazor/ModularBlazor.Client/wwwroot/modules/soft.square.net.Layouts.Default.dll
+/src/apps/blazor/ModularBlazor.Client/wwwroot/modules/soft.square.net.Module.Admin.dll
+/src/apps/blazor/ModularBlazor.Client/wwwroot/modules/soft.square.net.Module.Auth.dll
