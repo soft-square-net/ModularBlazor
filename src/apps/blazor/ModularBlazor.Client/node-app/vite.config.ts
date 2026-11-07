@@ -14,7 +14,7 @@ export default defineConfig({
     lib: {
       entry: resolve(__dirname, 'src/app.ts'),
       formats: ['es'], // Forces ES Module export for Blazor IJSObjectReference
-      fileName: () => 'module.js' // The exact name of the file Blazor will load
+      fileName: () => 'app.js' // The exact name of the file Blazor will load
     },
 
     // 4. Optional: Generates source maps so you can debug your TypeScript files in the browser

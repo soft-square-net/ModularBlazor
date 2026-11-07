@@ -1,6 +1,5 @@
 
-import { dbsInit } from './db'
-
+import { dbsInit } from './db' 
 namespace ModularBlazor.Client {
   interface IModule { }
   export class Module implements IModule {

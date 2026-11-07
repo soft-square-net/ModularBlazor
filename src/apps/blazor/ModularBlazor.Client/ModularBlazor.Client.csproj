@@ -10,6 +10,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="node-app\package.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="node-app\.gitignore" />
     <None Include="node-app\src\app.scss" />
   </ItemGroup>
 
@@ -31,6 +36,11 @@
     <TypeScriptCompile Include="node-app\src\db.ts" />
     <TypeScriptCompile Include="node-app\src\helpers\observableQuery.ts" />
     <TypeScriptCompile Include="node-app\src\types\Theme.ts" />
+    <TypeScriptCompile Include="node-app\vite.config.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\js\" />
   </ItemGroup>
 
   
