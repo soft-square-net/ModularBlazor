@@ -26,13 +26,18 @@ window.moduleHost = (() => {
     registry.set(moduleId, entry);
 
     for (const s of spec?.styles ?? []) {
-      let el;
+      // CSS packaged in the module lives in memory as a Blob; a <link> points at it, like a real stylesheet file.
+      let el = document.createElement('link');
+      el.rel = 'stylesheet';
       if (s.css != null) {
-        el = document.createElement('style');
-        el.textContent = s.css;
+        const css = `${s.css}\n/*# sourceURL=module://${moduleId}/${s.id}.css */`;
+        const blobUrl = URL.createObjectURL(new Blob([css], { type: 'text/css' }));
+        // Once the browser has parsed it the blob is no longer needed.
+        const release = () => URL.revokeObjectURL(blobUrl);
+        el.addEventListener('load', release, { once: true });
+        el.addEventListener('error', release, { once: true });
+        el.href = blobUrl;
       } else if (s.href) {
-        el = document.createElement('link');
-        el.rel = 'stylesheet';
         el.href = s.href;
       } else continue;
 
