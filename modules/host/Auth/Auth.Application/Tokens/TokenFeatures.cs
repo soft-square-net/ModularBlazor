@@ -61,7 +61,7 @@ public sealed class LoginCommandHandler(
 
 // ---- refresh ----
 
-public sealed record RefreshTokenCommand(string RefreshToken) : IRequest<TokenResult>;
+public sealed record RefreshTokenCommand(string RefreshToken, string? Token) : IRequest<TokenResult>;
 
 public sealed class RefreshTokenCommandValidator : AbstractValidator<RefreshTokenCommand>
 {

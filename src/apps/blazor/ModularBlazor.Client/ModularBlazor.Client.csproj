@@ -23,12 +23,12 @@
        .nupkg modules then fail with "Could not find 'moduleHost.setStyleText'".) -->
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.*" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.*" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer"  PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\ModularBlazor.Abstractions\ModularBlazor.Abstractions.csproj" />
+    <ProjectReference Include="..\ModularBlazor.Infrastructure\ModularBlazor.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,85 +1,93 @@
+@using Microsoft.AspNetCore.Components.Authorization
 @inject ModuleManager Modules
 @inject ActiveModuleService Active
-@inject IAuthService Auth
+@* @inject IAuthService Auth *@
 @inject NavigationManager Nav
 
-<Router AppAssembly="@typeof(App).Assembly"
-        AdditionalAssemblies="Modules.RouterAssemblies"
-        OnNavigateAsync="OnNavigateAsync">
+<CascadingAuthenticationState>
+  <Router AppAssembly="@typeof(App).Assembly"
+          AdditionalAssemblies="Modules.RouterAssemblies"
+          OnNavigateAsync="OnNavigateAsync">
     <Navigating>
-        <div class="route-loading" role="status"><span class="spinner"></span> Loading module…</div>
+      <div class="route-loading" role="status"><span class="spinner"></span> Loading module…</div>
     </Navigating>
     <Found Context="routeData">
-        <ModuleRouteView RouteData="routeData" />
+      <ModuleRouteView RouteData="routeData" />
     </Found>
     <NotFound>
-        <ModuleLayoutHost>
-            <PageTitle>Not found</PageTitle>
-            <h1>404</h1>
-            <p>There is nothing at this address.</p>
-        </ModuleLayoutHost>
+      <ModuleLayoutHost>
+        <PageTitle>Not found</PageTitle>
+        <h1>404</h1>
+        <p>There is nothing at this address.</p>
+      </ModuleLayoutHost>
     </NotFound>
-</Router>
-
+  </Router>
+</CascadingAuthenticationState>
 @code {
-    // Pages that never need a module download or a signed-in user.
-    private static readonly HashSet<string> PublicPaths = new(StringComparer.OrdinalIgnoreCase)
+
+  [CascadingParameter]
+  public Task<AuthenticationState> AuthState { get; set; } = default!;
+
+  // Pages that never need a module download or a signed-in user.
+  private static readonly HashSet<string> PublicPaths = new(StringComparer.OrdinalIgnoreCase)
     {
         "", "login", "module-error"
     };
 
-    /// <summary>
-    /// Phase 3. Runs before the Router resolves a URL: if the URL belongs to a module that is not
-    /// loaded yet, download it now so its pages exist by the time routing happens.
-    /// </summary>
-    private async Task OnNavigateAsync(NavigationContext context)
+  /// <summary>
+  /// Phase 3. Runs before the Router resolves a URL: if the URL belongs to a module that is not
+  /// loaded yet, download it now so its pages exist by the time routing happens.
+  /// </summary>
+  private async Task OnNavigateAsync(NavigationContext context)
+  {
+    var path = ModuleManager.NormalizePath(context.Path);
+
+    if (PublicPaths.Contains(path))
     {
-        var path = ModuleManager.NormalizePath(context.Path);
-
-        if (PublicPaths.Contains(path))
-        {
-            await Active.NavigateAsync(null); // leaving a module: its styles and scripts go
-            return;
-        }
-
-        var module = Modules.FindByPath(path);
-
-        if (module is null)
-        {
-            // Signed out and the address is unknown: it may be a deep link into a module the
-            // user will be given after login, so sign in first and come back.
-            if (!Auth.IsAuthenticated) RedirectToLogin(path);
-            else await Active.NavigateAsync(null);
-            return;
-        }
-
-        if (module.RequiresAuth && !Auth.IsAuthenticated)
-        {
-            RedirectToLogin(path);
-            return;
-        }
-
-        try
-        {
-            await Modules.EnsureLoadedAsync(module.Id, context.CancellationToken);
-
-            // Styles and scripts are applied before the page renders, so there is no flash of unstyled content.
-            if (!context.CancellationToken.IsCancellationRequested)
-                await Active.NavigateAsync(module);
-        }
-        catch (OperationCanceledException)
-        {
-            // The user navigated elsewhere; the download keeps going and caches the module.
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Module '{module.Id}' failed to load: {ex}");
-            Nav.NavigateTo(
-                $"module-error?module={Uri.EscapeDataString(module.Id)}&message={Uri.EscapeDataString(ex.Message)}",
-                replace: true);
-        }
+      await Active.NavigateAsync(null); // leaving a module: its styles and scripts go
+      return;
     }
 
-    private void RedirectToLogin(string returnPath)
-        => Nav.NavigateTo($"login?returnUrl={Uri.EscapeDataString(returnPath)}", replace: true);
+    var usr = (await AuthState).User.Identity;
+
+    var module = Modules.FindByPath(path);
+
+    if (module is null)
+    {
+      // Signed out and the address is unknown: it may be a deep link into a module the
+      // user will be given after login, so sign in first and come back.
+      if (!(usr?.IsAuthenticated ?? false)) RedirectToLogin(path);
+      else await Active.NavigateAsync(null);
+      return;
+    }
+
+    if (module.RequiresAuth && !(usr?.IsAuthenticated ?? false))
+    {
+      RedirectToLogin(path);
+      return;
+    }
+
+    try
+    {
+      await Modules.EnsureLoadedAsync(module.Id, context.CancellationToken);
+
+      // Styles and scripts are applied before the page renders, so there is no flash of unstyled content.
+      if (!context.CancellationToken.IsCancellationRequested)
+        await Active.NavigateAsync(module);
+    }
+    catch (OperationCanceledException)
+    {
+      // The user navigated elsewhere; the download keeps going and caches the module.
+    }
+    catch (Exception ex)
+    {
+      Console.Error.WriteLine($"Module '{module.Id}' failed to load: {ex}");
+      Nav.NavigateTo(
+          $"module-error?module={Uri.EscapeDataString(module.Id)}&message={Uri.EscapeDataString(ex.Message)}",
+          replace: true);
+    }
+  }
+
+  private void RedirectToLogin(string returnPath)
+      => Nav.NavigateTo($"login?returnUrl={Uri.EscapeDataString(returnPath)}", replace: true);
 }

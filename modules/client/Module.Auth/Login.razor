@@ -1,6 +1,9 @@
 @page "/login"
+@using soft.square.net.ModularBlazor.Abstractions.Api
+@using soft.square.net.ModularBlazor.Abstractions.Auth
 @attribute [UseLayout("auth")]
-@inject IAuthService Auth
+@inject IAuthenticationService authService
+@inject IModuleNavigation Modules
 @inject NavigationManager Nav
 
 <PageTitle>Sign in</PageTitle>
@@ -45,10 +48,15 @@
     _busy = true;
     try
     {
-      if (await Auth.LoginAsync(_tenant, _userName, _password))
+      if (await authService.LoginAsync(_tenant, new LoginCommand() { UserName = _userName, Password = _password }))
+      {
+        await Modules.LoadUserModulesAsync("admin");
         Nav.NavigateTo(SafeReturnUrl(), replace: true);
+      }
       else
+      {
         _error = "Enter a user name and a password.";
+      }
     }
     catch (Exception ex)
     {

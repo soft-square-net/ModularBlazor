@@ -44,13 +44,10 @@
       "serializeTypeInformation": false,
       "queryNullValue": "",
       "className": "ApiClient",
-      "modelClassName": "{model}",
       "operationGenerationMode": "MultipleClientsFromOperationId",
       "includedOperationIds": [],
       "excludedOperationIds": [],
-      "additionalNamespaceUsages": [
-        "Share.All"
-      ],
+      "additionalNamespaceUsages": [],
       "additionalContractNamespaceUsages": [],
       "generateOptionalParameters": false,
       "generateJsonMethods": false,
@@ -106,9 +103,7 @@
       "serviceHost": null,
       "serviceSchemes": null,
       "output": "ApiClient.cs",
-      "newLineBehavior": "Auto",
-      "propertyNameGenerator": null,
-      "propertyNameGenerators": null
+      "newLineBehavior": "Auto"
     }
   }
 }

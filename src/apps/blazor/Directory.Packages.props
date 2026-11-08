@@ -1,0 +1,35 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+    <EnablePackageVersionOverride>true</EnablePackageVersionOverride>
+    <!-- Add this line to allow wildcards like 10.0.* -->
+    <CentralPackageFloatingVersionsEnabled>true</CentralPackageFloatingVersionsEnabled>
+  </PropertyGroup>
+  <PropertyGroup>
+    <IsPublishable>true</IsPublishable>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <!--<PackageVersion Include="CodeBeam.MudBlazor.Extensions" Version="9.2.0" />
+    <PackageVersion Include="MediatR.Courier" Version="6.0.0" />
+    <PackageVersion Include="MudBlazor" Version="9.4.0" />
+    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.6.0.109712" />
+    <PackageVersion Include="MediatR" Version="12.4.1" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="10.0.*" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.*" />
+    <PackageVersion Include="Microsoft.Extensions.Localization" Version="10.0.*" />-->
+    <!--<PackageVersion Include="MudBlazor" Version="8.15.0" />-->
+    <!--<PackageVersion Include="MudBlazor.Extensions" Version="9.4.0" />-->
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.*" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.*" PrivateAssets="all" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication"  Version="10.0.*"/>
+    <PackageVersion Include="Microsoft.Extensions.Http"  Version="10.0.*"/>
+    <PackageVersion Include="Microsoft.Extensions.Localization"  Version="10.0.*"/>
+    <PackageVersion Include="Blazored.LocalStorage" Version="4.5.0" />
+  </ItemGroup>
+</Project>

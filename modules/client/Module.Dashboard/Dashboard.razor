@@ -1,10 +1,10 @@
 @page "/dashboard"
-@inject IAuthService Auth
+@* @inject IAuthService Auth *@
 
 <PageTitle>Dashboard</PageTitle>
 
 <h1>Dashboard</h1>
-<p>Hello <strong>@Auth.UserName</strong>. This page comes from <code>Module.Dashboard.dll</code>, downloaded the first time you opened it.</p>
+<p>Hello <strong>@currentUser?.Name</strong>. This page comes from <code>Module.Dashboard.dll</code>, downloaded the first time you opened it.</p>
 
 <div class="cards">
     <div class="card-tile"><small>Open tickets</small><div class="value">@_tickets</div></div>
@@ -15,5 +15,15 @@
 <p><button @onclick="() => _tickets++">Add ticket</button></p>
 
 @code {
+  [Inject] public IAuthenticationService Auth { get; set; } = default!;
     private int _tickets = 7;
+  UserInfo? currentUser;
+  protected override async Task OnInitializedAsync()
+  {
+    currentUser = await _currentUser.GetUserInfoAsync();
+    if (currentUser == null)
+    {
+      await Auth.ReLoginAsync("/dashboard");
+    }
+  }
 }

@@ -47,6 +47,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Identity\Tokens\" />
     <Folder Include="Identity\Users\" />
     <Folder Include="Theming\" />
   </ItemGroup>

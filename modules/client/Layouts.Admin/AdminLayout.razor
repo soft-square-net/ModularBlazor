@@ -1,7 +1,8 @@
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.JSInterop
 @inherits LayoutComponentBase
 @attribute [LayoutKey("admin")]
-@inject IAuthService Auth
+@inject IAuthorizationService authService
 @inject IJSRuntime JS
 
 <div class="shell-admin">
@@ -12,7 +13,7 @@
             <NavLink href="admin/users">Users</NavLink>
         </nav>
         <a href="">&larr; Back to app</a>
-        <small>@Auth.UserName</small>
+    <small>@authService</small>
     </header>
 
     <main class="shell-main">@Body</main>

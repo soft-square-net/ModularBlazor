@@ -1,6 +1,8 @@
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using soft.square.net.ModularBlazor.Host.Modules.Auth.Application.Common;
 using soft.square.net.ModularBlazor.Host.Modules.Auth.Application.Tokens;
+using soft.square.net.Share.All.Authorization;
 
 namespace soft.square.net.ModularBlazor.Host.Modules.Auth.Infrastructure.Endpoints;
 
@@ -16,8 +18,12 @@ public sealed class TokenEndpoints : ICarterModule
     {
         var group = app.MapGroup($"{IdentityRoutes.Base}/tokens").WithTags("Tokens").AllowAnonymous();
 
-        group.MapPost("/", async (LoginCommand command, ISender sender, CancellationToken ct)
-                => Results.Ok(await sender.Send(command, ct)))
+        group.MapPost("/", async (
+                LoginCommand command, 
+                ISender sender,
+                // [FromHeader(Name = TenantConstants.Identifier)] string tenant,
+                CancellationToken ct)
+                                      => Results.Ok(await sender.Send(command, ct)))
             .WithName("IssueToken")
             .WithSummary("Sign in with user name (or email) and password; returns a JWT access token and a refresh token")
             .Produces<TokenResult>()
@@ -31,7 +37,9 @@ public sealed class TokenEndpoints : ICarterModule
             .Produces<TokenResult>()
             .ProducesProblem(StatusCodes.Status401Unauthorized);
 
-        group.MapPost("/revoke", async (RevokeRefreshTokenCommand command, ISender sender, CancellationToken ct) =>
+
+
+    group.MapPost("/revoke", async (RevokeRefreshTokenCommand command, ISender sender, CancellationToken ct) =>
             {
                 await sender.Send(command, ct);
                 return Results.NoContent();
@@ -39,5 +47,8 @@ public sealed class TokenEndpoints : ICarterModule
             .WithName("RevokeToken")
             .WithSummary("Sign out: revoke a refresh token")
             .Produces(StatusCodes.Status204NoContent);
-    }
+
+
+    
+  }
 }

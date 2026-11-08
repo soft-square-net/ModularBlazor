@@ -6,8 +6,6 @@
 
 #nullable enable
 
-using Share.All;
-
 #pragma warning disable 108 // Disable "CS0108 '{derivedDto}.ToJson()' hides inherited member '{dtoBase}.ToJson()'. Use the new keyword if hiding was intended."
 #pragma warning disable 114 // Disable "CS0114 '{derivedDto}.RaisePropertyChanged(String)' hides inherited member 'dtoBase.RaisePropertyChanged(String)'. To make the current member override that implementation, add the override keyword. Otherwise add the new keyword."
 #pragma warning disable 472 // Disable "CS0472 The result of the expression is always 'false' since a value of type 'Int32' is never equal to 'null' of type 'Int32?'
@@ -4723,6 +4721,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
         [System.Text.Json.Serialization.JsonPropertyName("styles")]
         public System.Collections.Generic.ICollection<string> Styles { get; set; } = default!;
 
+        [System.Text.Json.Serialization.JsonPropertyName("scripts")]
+        public System.Collections.Generic.ICollection<string> Scripts { get; set; } = default!;
+
         [System.Text.Json.Serialization.JsonPropertyName("nav")]
         public System.Collections.Generic.ICollection<ModuleNavItem> Nav { get; set; } = default!;
 
@@ -5001,6 +5002,9 @@ namespace soft.square.net.ModularBlazor.Abstractions.Api
 
         [System.Text.Json.Serialization.JsonPropertyName("refreshToken")]
         public string RefreshToken { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("token")]
+        public string? Token { get; set; } = default!;
 
     }
 

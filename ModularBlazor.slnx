@@ -13,6 +13,7 @@
     <Project Path="modules/host/ElsaHost/ElsaHost.Application/ElsaHost.Application.csproj" />
     <Project Path="modules/host/ElsaHost/ElsaHost.Infrastructure/ElsaHost.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/modules/host/Identity/" />
   <Folder Name="/modules/host/Multitenancy/">
     <Project Path="modules/host/Multitenancy/Multitenancy.Application/Multitenancy.Application.csproj" />
     <Project Path="modules/host/Multitenancy/Multitenancy.Domain/Multitenancy.Domain.csproj" />
@@ -42,6 +43,7 @@
   <Folder Name="/src/apps/" />
   <Folder Name="/src/apps/blazor/">
     <Project Path="src/apps/blazor/ModularBlazor.Client/ModularBlazor.Client.csproj" />
+    <Project Path="src/apps/blazor/ModularBlazor.Infrastructure/ModularBlazor.Infrastructure.csproj" Id="3712d96f-77e9-468d-8e44-ea93a1537de3" />
   </Folder>
   <Folder Name="/src/Aspire/">
     <Project Path="src/Aspire/Host/Host.csproj" />

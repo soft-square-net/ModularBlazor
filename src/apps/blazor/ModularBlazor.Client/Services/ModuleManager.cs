@@ -43,7 +43,7 @@ public sealed class ModuleManager : IModuleNavigation
   private sealed record LoadedModule(ModuleDescriptor Descriptor, IReadOnlyList<Assembly> Assemblies, ModuleLoadContext Context);
 
   public ModuleManager(
-      HttpClient http,
+      [FromKeyedServices("LocalHttpClient")] HttpClient http,
       ModuleOptions options,
       ModuleAssetStore assets,
       IEnumerable<IModulePackageReader> readers)

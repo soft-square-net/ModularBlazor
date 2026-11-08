@@ -4,6 +4,8 @@ using soft.square.net.ModularBlazor.Core.Pagination;
 using soft.square.net.ModularBlazor.Host.Modules.Auth.Application.Common;
 using soft.square.net.ModularBlazor.Host.Modules.Auth.Application.Users;
 using soft.square.net.ModularBlazor.Infrastructure.Security;
+using System.Security.Claims;
+using soft.square.net.Share.All.Authorization;
 
 namespace soft.square.net.ModularBlazor.Host.Modules.Auth.Infrastructure.Endpoints;
 
@@ -99,5 +101,18 @@ public sealed class UserEndpoints : ICarterModule
             .RequirePermission(Permissions.Users.Update)
             .WithName("ResetUserPassword").WithSummary("Set another user's password")
             .Produces(StatusCodes.Status204NoContent).ProducesValidationProblem();
-    }
+
+        //group.MapGet("/permissions", async (ClaimsPrincipal user, ISender sender, CancellationToken ct) =>
+        //{
+        //  if (user.GetUserId() is not { } userId || string.IsNullOrEmpty(userId))
+        //  {
+        //    throw new UnauthorizedException();
+        //  }
+
+        //  return Results.Ok(await sender.Send(new GetUserPermissionsQuery(new Guid(user.GetUserId())), ct));
+        //})
+        //.WithName("GetUserPermissions")
+        //.WithSummary("Get current user permissions")
+        //.WithDescription("Get current user permissions");
+  }
 }
