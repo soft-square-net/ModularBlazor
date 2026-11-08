@@ -1,5 +1,5 @@
 @page "/dashboard"
-@* @inject IAuthService Auth *@
+@inject ICurrentUserService Users
 
 <PageTitle>Dashboard</PageTitle>
 
@@ -15,15 +15,9 @@
 <p><button @onclick="() => _tickets++">Add ticket</button></p>
 
 @code {
-  [Inject] public IAuthenticationService Auth { get; set; } = default!;
-    private int _tickets = 7;
-  UserInfo? currentUser;
-  protected override async Task OnInitializedAsync()
-  {
-    currentUser = await _currentUser.GetUserInfoAsync();
-    if (currentUser == null)
-    {
-      await Auth.ReLoginAsync("/dashboard");
-    }
-  }
+  private int _tickets = 7;
+  private UserInfo? currentUser;
+
+  // ModuleRouteView already sends signed-out visitors to the login page; this only shows the name.
+  protected override async Task OnInitializedAsync() => currentUser = await Users.GetUserInfoAsync();
 }

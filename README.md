@@ -5,8 +5,8 @@ with pluggable **layouts** that are modules too.
 
 | Phase | When | What happens |
 |---|---|---|
-| 1. Startup | before first render | `modules/core.json` is read; every module with `loadOnStartup` is downloaded (default layout, login page + auth layout). |
-| 2. After login | `AuthService.LoginAsync` | The user's module **metadata** is fetched (`modules/user-modules.{role}.json`, replace with your API). No module code is downloaded yet; the menu is built from the metadata. |
+| 1. Startup | before first render | the core manifest comes from the API's Catalog (`GET /api/modules/core`, public; `modules/core.json` is only the offline fallback); every module with `loadOnStartup` is downloaded (default layout, login page + auth layout). |
+| 2. After login (and after a page reload while signed in) | `JwtAuthenticationService.LoginAsync`, then the login page | The user's module **metadata** is fetched from the Catalog (`GET /api/me/modules`; the `role` claims in the token pick the modules). No module code is downloaded yet; the menu is built from the metadata. |
 | 3. On navigation | `Router.OnNavigateAsync` | The URL is matched against each module's `routePrefixes`. If the module isn't loaded, it (and its `dependencies`) is downloaded, its assemblies are added to `Router.AdditionalAssemblies`, and routing continues. |
 
 ## Run it
@@ -330,3 +330,16 @@ All assemblies, root namespaces and namespaces are prefixed with `soft.square.ne
 `AssemblyName` and `RootNamespace` for every project. Module **ids** in the manifests (`Module.Dashboard`, ...) stay short and
 logical; only the served files carry the prefix (`modules/soft.square.net.Module.Dashboard.dll`,
 `soft.square.net.Module.Reports.1.0.0.nupkg`).
+
+### Client authentication (JWT)
+
+* `ModularBlazor.Infrastructure` (`src/apps/blazor`): `JwtAuthenticationService` is the `AuthenticationStateProvider`,
+  `IAuthenticationService` and `IAccessTokenProvider` in one singleton. Tokens live in local storage
+  (`authToken`, `refreshToken`); the user, roles, tenant and permissions are the **claims of the access token**
+  (`sub`, `name`, `role`, `tenant`, `permission`), so there is no extra permissions call after sign-in.
+* Two API clients: `IApiClient` sends `Authorization: Bearer` and `X-Tenant` (the token's tenant); the keyed
+  `ApiClientNames.Anonymous` client sends nothing (sign-in, refresh, the public core manifest). The token handler
+  never redirects before a call; a 401 on a call that carried a token sends the user to `login`.
+* The token is refreshed a minute before it expires. If the refresh token is rejected the session ends.
+* Modules read the user through `ICurrentUserService` (`UserInfo`: name, roles, tenant), never the provider.
+* An unkeyed `HttpClient` is the framework's: this site's origin. The API is only reachable through the clients above.

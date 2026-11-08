@@ -47,6 +47,9 @@ public sealed class ModuleRegistration : AuditableAggregateRoot<string>
     public string[] Dependencies { get; set; } = [];
     public string[] ExtraAssemblies { get; set; } = [];
     public string[] Styles { get; set; } = [];
+
+    /// <summary>ES module scripts run when the module is activated. Empty: js/module.js if the module ships one.</summary>
+    public string[] Scripts { get; set; } = [];
     public ModuleNavItem[] Nav { get; set; } = [];
 
     /// <summary>Position in the manifest (menu order follows Nav.Order).</summary>

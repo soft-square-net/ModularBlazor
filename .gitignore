@@ -22,3 +22,6 @@ src/ModularBlazor.Client/wwwroot/modules/*.nupkg
 /src/apps/blazor/ModularBlazor.Client/wwwroot/modules/soft.square.net.Layouts.Default.dll
 /src/apps/blazor/ModularBlazor.Client/wwwroot/modules/soft.square.net.Module.Admin.dll
 /src/apps/blazor/ModularBlazor.Client/wwwroot/modules/soft.square.net.Module.Auth.dll
+
+# node toolchains
+node_modules/

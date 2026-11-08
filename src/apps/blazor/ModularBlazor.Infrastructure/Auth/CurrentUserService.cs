@@ -1,32 +1,40 @@
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.Authorization;
 using soft.square.net.ModularBlazor.Abstractions.Auth;
 
 namespace soft.square.net.ModularBlazor.Infrastructure.Auth;
 
-public class CurrentUserService : ICurrentUserService
+/// <summary>The signed-in user as modules see it. Cached until the authentication state changes.</summary>
+public sealed class CurrentUserService : ICurrentUserService
 {
-  private readonly AuthenticationStateProvider _authenticationStateProvider;
-  private UserInfo? _cached;
+    private readonly AuthenticationStateProvider _provider;
+    private UserInfo? _cached;
 
-  public CurrentUserService(AuthenticationStateProvider authenticationStateProvider)
-  {
-    _authenticationStateProvider = authenticationStateProvider;
-  }
+    public event Action? Changed;
 
-  public async Task<UserInfo?> GetUserInfoAsync()
-  {
-    if (_cached is not null)
-      return _cached;
-
-    var state = await _authenticationStateProvider.GetAuthenticationStateAsync();
-    var user = state.User;
-    if (user?.Identity?.IsAuthenticated == true)
+    public CurrentUserService(AuthenticationStateProvider provider)
     {
-      _cached = UserInfo.FromClaimsPrincipal(user);
-      return _cached;
+        _provider = provider;
+        _provider.AuthenticationStateChanged += _ =>
+        {
+            _cached = null;
+            Changed?.Invoke();
+        };
     }
 
-    return null;
-  }
+    public async Task<UserInfo?> GetUserInfoAsync()
+    {
+        if (_cached is not null) return _cached;
+
+        var user = (await _provider.GetAuthenticationStateAsync()).User;
+        if (user.Identity?.IsAuthenticated is not true) return null;
+
+        try
+        {
+            return _cached = UserInfo.FromClaimsPrincipal(user);
+        }
+        catch (InvalidOperationException)
+        {
+            return null; // a token without a "sub" claim is not a usable session
+        }
+    }
 }

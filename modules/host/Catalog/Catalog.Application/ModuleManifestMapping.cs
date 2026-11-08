@@ -25,6 +25,7 @@ internal static class ModuleManifestMapping
         Dependencies = m.Dependencies,
         ExtraAssemblies = m.ExtraAssemblies,
         Styles = m.Styles,
+        Scripts = m.Scripts,
         Nav = m.Nav
     };
 }

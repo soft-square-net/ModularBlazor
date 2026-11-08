@@ -1,5 +1,10 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.Extensions.DependencyInjection;
 using soft.square.net.ModularBlazor.Abstractions;
+using soft.square.net.ModularBlazor.Infrastructure.Auth;
+using soft.square.net.ModularBlazor.Infrastructure.Http;
+using Api = soft.square.net.ModularBlazor.Abstractions.Api;
 using soft.square.net.Share.All;
 using System.Net.Http.Json;
 using System.Reflection;
@@ -28,7 +33,11 @@ public sealed class ModuleManager : IModuleNavigation
     Converters = { new JsonStringEnumConverter() }
   };
 
-  private readonly HttpClient _http;
+  private readonly HttpClient _local;               // this site's own files: modules/*.dll, the offline manifest
+  private readonly IHttpClientFactory _httpClients;  // the API's authenticated client, for api/... module urls
+  private readonly Api.IApiClient _anonymousApi;     // the public core manifest (nobody is signed in yet)
+  private readonly Api.IApiClient _api;              // the signed-in user's manifest (bearer token + tenant header)
+  private readonly AuthenticationStateProvider _auth;
   private readonly ModuleOptions _options;
   private readonly ModuleAssetStore _assets;
   private readonly IReadOnlyDictionary<ModuleKind, IModulePackageReader> _readers;
@@ -43,15 +52,36 @@ public sealed class ModuleManager : IModuleNavigation
   private sealed record LoadedModule(ModuleDescriptor Descriptor, IReadOnlyList<Assembly> Assemblies, ModuleLoadContext Context);
 
   public ModuleManager(
-      [FromKeyedServices("LocalHttpClient")] HttpClient http,
+      [FromKeyedServices("LocalHttpClient")] HttpClient local,
+      IHttpClientFactory httpClients,
+      [FromKeyedServices(ApiClientNames.Anonymous)] Api.IApiClient anonymousApi,
+      Api.IApiClient api,
+      AuthenticationStateProvider auth,
       ModuleOptions options,
       ModuleAssetStore assets,
       IEnumerable<IModulePackageReader> readers)
   {
-    _http = http;
+    _local = local;
+    _httpClients = httpClients;
+    _anonymousApi = anonymousApi;
+    _api = api;
+    _auth = auth;
     _options = options;
     _assets = assets;
     _readers = readers.ToDictionary(r => r.Kind);
+
+    // Signing out ends the user's modules, whichever page triggered it.
+    _auth.AuthenticationStateChanged += async stateTask =>
+    {
+      try
+      {
+        if ((await stateTask).User.Identity?.IsAuthenticated is not true) ForgetUserModules();
+      }
+      catch (Exception ex)
+      {
+        Console.Error.WriteLine($"Could not react to the sign-out: {ex.Message}");
+      }
+    };
   }
 
   /// <summary>Passed to the Router. Mutated as modules load; the Router re-reads it on every navigation.</summary>
@@ -142,9 +172,18 @@ public sealed class ModuleManager : IModuleNavigation
 
   public async Task LoadStartupModulesAsync()
   {
-    // TODO get startup/core modules meta from ApiClient.GetCoreModules  Ahmed Galal
-    var manifest = await _http.GetFromJsonAsync<ModuleManifest>(_options.CoreManifestUrl, Json)
-                   ?? new ModuleManifest();
+    ModuleManifest manifest;
+    try
+    {
+      // The Catalog module's public endpoint: GET /api/modules/core.
+      manifest = ToManifest(await _anonymousApi.GetCoreModulesAsync(null));
+    }
+    catch (Exception ex) when (ex is Api.ApiException or HttpRequestException)
+    {
+      Console.Error.WriteLine($"Core modules: the API is not reachable ({ex.Message}); using {_options.CoreManifestUrl}.");
+      manifest = await _local.GetFromJsonAsync<ModuleManifest>(_options.CoreManifestUrl, Json) ?? new ModuleManifest();
+    }
+
     Register(manifest.Modules, user: false);
 
     var startup = _catalog.Values.Where(d => d.LoadOnStartup).Select(d => EnsureLoadedAsync(d.Id)).ToList();
@@ -153,25 +192,89 @@ public sealed class ModuleManager : IModuleNavigation
 
   // ---------------------------------------------------------------- phase 2: after login
 
-  /// <summary>Fetches the metadata for the signed-in user. No module code is downloaded here.</summary>
-  public async Task LoadUserModulesAsync(string role)
+  /// <summary>
+  /// Fetches the metadata for the signed-in user (GET /api/me/modules - the roles in the token decide which modules).
+  /// No module code is downloaded here.
+  /// </summary>
+  public async Task LoadUserModulesAsync(string? tenantId = null)
   {
-    var url = _options.UserModulesUrl.Replace("{role}", Uri.EscapeDataString(role.ToLowerInvariant()));
-    var manifest = await _http.GetFromJsonAsync<ModuleManifest>(url, Json);
-    if (manifest is null) return;
+    var manifest = ToManifest(await _api.GetMyModulesAsync(tenantId));
+
+    // A fresh answer replaces the previous one (a role may have been taken away since).
+    foreach (var stale in _userModuleIds.Where(id => manifest.Modules.All(m => !m.Id.Equals(id, StringComparison.OrdinalIgnoreCase))).ToList())
+    {
+      _catalog.Remove(stale);
+      _userModuleIds.Remove(stale);
+    }
+
     Register(manifest.Modules, user: true);
   }
 
+  /// <summary>After a page reload the token is still in local storage: get that user's modules before the first route.</summary>
+  public async Task RestoreUserModulesAsync()
+  {
+    if ((await _auth.GetAuthenticationStateAsync()).User.Identity?.IsAuthenticated is not true) return;
+
+    try
+    {
+      await LoadUserModulesAsync();
+    }
+    catch (Exception ex) when (ex is Api.ApiException or HttpRequestException)
+    {
+      // Expired session or API down: the router sends the user to the login page when a protected route needs a module.
+      Console.Error.WriteLine($"Could not restore the user's modules: {ex.Message}");
+    }
+  }
+
   /// <summary>
-  /// Forgets the user's module metadata (logout). Assemblies stay in memory - .NET cannot unload
-  /// them in WebAssembly - so ModuleRouteView still guards every page by auth and role.
+  /// Forgets the user's module metadata (logout) and unloads the user's modules that are loaded, dependents first, so
+  /// their routes disappear with the session. ModuleRouteView still guards every page by auth and role.
   /// </summary>
   public void ForgetUserModules()
   {
+    var ids = _userModuleIds.ToList();
+
+    // Unload only what nothing else still needs; repeat until a pass makes no progress (Module.Admin before Layouts.Admin).
+    bool progress;
+    do
+    {
+      progress = false;
+      foreach (var id in ids.Where(IsLoaded).ToList())
+      {
+        try { progress |= Unload(id); }
+        catch (InvalidOperationException) { /* still required by another loaded module; try again next pass */ }
+      }
+    } while (progress);
+
     foreach (var id in _userModuleIds) _catalog.Remove(id);
     _userModuleIds.Clear();
     Changed?.Invoke();
   }
+
+  private static ModuleManifest ToManifest(Api.ModuleManifest manifest) => new()
+  {
+    // The generated client has its own copies of these types (namespace Abstractions.Api); the host works with the shared ones.
+    Modules = manifest.Modules.Select(m => new ModuleDescriptor
+    {
+      Id = m.Id,
+      Name = m.Name,
+      Version = m.Version,
+      Kind = (ModuleKind)(int)m.Kind,
+      Url = m.Url,
+      Sha256 = m.Sha256,
+      LoadOnStartup = m.LoadOnStartup,
+      Hidden = m.Hidden,
+      RequiresAuth = m.RequiresAuth,
+      RequiredRole = m.RequiredRole,
+      RoutePrefixes = [.. m.RoutePrefixes],
+      Layout = m.Layout,
+      Dependencies = [.. m.Dependencies],
+      ExtraAssemblies = [.. m.ExtraAssemblies],
+      Styles = [.. m.Styles],
+      Scripts = [.. m.Scripts],
+      Nav = [.. m.Nav.Select(n => new ModuleNavItem(n.Title, n.Href, n.Order))]
+    }).ToList()
+  };
 
   private void Register(IEnumerable<ModuleDescriptor> modules, bool user)
   {
@@ -317,9 +420,7 @@ public sealed class ModuleManager : IModuleNavigation
   /// </summary>
   private async Task<byte[]> DownloadAsync(string url, string magic)
   {
-    // TODO Replace the following line by the actual ApiClient DownloadModule
-    // to get the dll or Pckg stream from the backend Ahmed Galal
-    using var response = await _http.GetAsync(url);
+    using var response = await ClientFor(url).GetAsync(url);
     response.EnsureSuccessStatusCode();
     var bytes = await response.Content.ReadAsByteArrayAsync();
 
@@ -333,6 +434,15 @@ public sealed class ModuleManager : IModuleNavigation
 
     return bytes;
   }
+
+  /// <summary>
+  /// Module files normally sit next to the app (relative url, this origin). A url under api/ is served by the API (for
+  /// example the module store's download endpoint) and goes through the authenticated client; absolute urls are used as is.
+  /// </summary>
+  private HttpClient ClientFor(string url)
+      => url.TrimStart('/').StartsWith("api/", StringComparison.OrdinalIgnoreCase)
+          ? _httpClients.CreateClient(ApiClientNames.Authenticated)
+          : _local;
 
   private static void VerifyHash(ModuleDescriptor d, byte[] bytes)
   {

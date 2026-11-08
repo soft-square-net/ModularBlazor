@@ -1,8 +1,7 @@
-@using Microsoft.AspNetCore.Authorization
 @using Microsoft.JSInterop
 @inherits LayoutComponentBase
 @attribute [LayoutKey("admin")]
-@inject IAuthorizationService authService
+@inject ICurrentUserService Users
 @inject IJSRuntime JS
 
 <div class="shell-admin">
@@ -13,7 +12,7 @@
             <NavLink href="admin/users">Users</NavLink>
         </nav>
         <a href="">&larr; Back to app</a>
-    <small>@authService</small>
+        <small>@_user?.Name</small>
     </header>
 
     <main class="shell-main">@Body</main>
@@ -22,9 +21,7 @@
 
 
 @code {
-  protected override async Task OnInitializedAsync()
-  {
-    // This works globally on any page without custom base classes
-    // var result = await JS.InvokeAsync<string>("window.myCustomJsInterop.performAction", "Hello from Blazor");
-  }
+  private UserInfo? _user;
+
+  protected override async Task OnInitializedAsync() => _user = await Users.GetUserInfoAsync();
 }

@@ -1,259 +1,204 @@
 using System.Security.Claims;
-using System.Text.Json;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using soft.square.net.ModularBlazor.Abstractions.Api;
 using soft.square.net.ModularBlazor.Abstractions.Auth;
+using soft.square.net.ModularBlazor.Infrastructure.Http;
 using soft.square.net.ModularBlazor.Infrastructure.Storage;
 using soft.square.net.Share.All.Authorization;
 
 namespace soft.square.net.ModularBlazor.Infrastructure.Auth.Jwt;
-// This is a client-side AuthenticationStateProvider that determines the user's authentication state by
-// looking for data persisted in the page when it was rendered on the server. This authentication state will
-// be fixed for the lifetime of the WebAssembly application. So, if the user needs to log in or out, a full
-// page reload is required.
-//
-// This only provides a user name and email for display purposes. It does not actually include any tokens
-// that authenticate to the server when making subsequent requests. That works separately using a
-// cookie that will be included on HttpClient requests to the server.
+
+/// <summary>
+/// Client side sign-in state, kept in the browser's local storage:
+///   * signs in / refreshes / revokes through an API client WITHOUT the token handler (no dependency cycle),
+///   * exposes the user as an AuthenticationStateProvider built from the access token's claims
+///     (name, role, tenant and every "permission" claim the server put in the token),
+///   * is the IAccessTokenProvider the HTTP handler asks for a fresh token (refreshing it a minute before expiry).
+/// Registered as a singleton: one instance serves components and the HTTP handler alike.
+/// </summary>
 public sealed class JwtAuthenticationService : AuthenticationStateProvider, IAuthenticationService, IAccessTokenProvider
 {
-  private readonly SemaphoreSlim _semaphore = new(1, 1);
-  private readonly IApiClient _client;
-  private readonly ILocalStorageService _localStorage;
-  private readonly NavigationManager _navigation;
+    private static readonly ClaimsPrincipal Anonymous = new(new ClaimsIdentity());
 
-  public Action Changed { get; set; } = default!;
+    private readonly SemaphoreSlim _refreshGate = new(1, 1);
+    private readonly IApiClient _client;
+    private readonly ILocalStorageService _localStorage;
+    private readonly NavigationManager _navigation;
 
-  public JwtAuthenticationService(PersistentComponentState state, ILocalStorageService localStorage, IApiClient client, NavigationManager navigation)
-  {
-    _localStorage = localStorage;
-    _client = client;
-    _navigation = navigation;
-  }
+    public event Action? Changed;
 
-  public override async Task<AuthenticationState> GetAuthenticationStateAsync()
-  {
-    string? cachedToken = await GetCachedAuthTokenAsync();
-    if (string.IsNullOrWhiteSpace(cachedToken))
+    public JwtAuthenticationService(ILocalStorageService localStorage, IHttpClientFactory httpClients, NavigationManager navigation)
     {
-      return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+        _localStorage = localStorage;
+        _navigation = navigation;
+        _client = new ApiClient(httpClients.CreateClient(ApiClientNames.Anonymous));
     }
 
-    // Generate claimsIdentity from cached token
-    var claimsIdentity = new ClaimsIdentity(GetClaimsFromJwt(cachedToken), "jwt");
+    // ------------------------------------------------------------------ state
 
-    // Add cached permissions as claims
-    if (await GetCachedPermissionsAsync() is List<string> cachedPermissions)
+    public override async Task<AuthenticationState> GetAuthenticationStateAsync()
+        => new(await ReadPrincipalAsync());
+
+    private async Task<ClaimsPrincipal> ReadPrincipalAsync()
     {
-      claimsIdentity.AddClaims(cachedPermissions.Select(p => new Claim(UsrClaims.Permission, p)));
-    }
+        var token = await GetCachedAsync(StorageConstants.Local.AuthToken);
+        if (string.IsNullOrWhiteSpace(token)) return Anonymous;
 
-    return new AuthenticationState(new ClaimsPrincipal(claimsIdentity));
-  }
-
-  public async Task<bool> LoginAsync(string tenantId, LoginCommand request)
-  {
-    var TokenResult = await _client.IssueTokenAsync(tenantId, request);
-
-    string? token = TokenResult.AccessToken;
-    string? refreshToken = TokenResult.RefreshToken;
-
-    if (string.IsNullOrWhiteSpace(token) || string.IsNullOrWhiteSpace(refreshToken))
-    {
-      return false;
-    }
-
-    await CacheAuthTokens(token, refreshToken);
-
-    // Get permissions for the current user and add them to the cache
-    var permissions = await _client.GetUserPermissionsAsync(new Guid(GetUserIdFromRawToken(token)), tenantId);
-    await CachePermissions(permissions);
-
-    Changed.Invoke();
-    NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
-
-    return true;
-  }
-
-  public async Task LogoutAsync()
-  {
-    await ClearCacheAsync();
-    Changed.Invoke();
-    NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
-
-    _navigation.NavigateTo("/login");
-  }
-
-  public void NavigateToExternalLogin(string returnUrl)
-  {
-    throw new NotImplementedException();
-  }
-
-  public async Task ReLoginAsync(string returnUrl)
-  {
-    await LogoutAsync();
-    _navigation.NavigateTo(returnUrl);
-  }
-
-  public async ValueTask<AccessTokenResult> RequestAccessToken(AccessTokenRequestOptions options)
-  {
-    return await RequestAccessToken();
-
-  }
-
-  public async ValueTask<AccessTokenResult> RequestAccessToken()
-  {
-    // We make sure the access token is only refreshed by one thread at a time. The other ones have to wait.
-    await _semaphore.WaitAsync();
-    try
-    {
-      var authState = await GetAuthenticationStateAsync();
-      if (authState.User.Identity?.IsAuthenticated is not true)
-      {
-        return new AccessTokenResult(AccessTokenResultStatus.RequiresRedirect, new(), "/login", default);
-      }
-
-      string? token = await GetCachedAuthTokenAsync();
-
-      //// Check if token needs to be refreshed (when its expiration time is less than 1 minute away)
-      var expTime = authState.User.GetExpiration();
-      var diff = expTime - DateTime.UtcNow;
-      if (diff.TotalMinutes <= 1)
-      {
-        //return new AccessTokenResult(AccessTokenResultStatus.RequiresRedirect, new(), "/login", default);
-        string? refreshToken = await GetCachedRefreshTokenAsync();
-        (bool succeeded, var response) = await TryRefreshTokenAsync(new RefreshTokenCommand { Token = token, RefreshToken = refreshToken });
-        if (!succeeded)
+        try
         {
-          return new AccessTokenResult(AccessTokenResultStatus.RequiresRedirect, new(), "/login", default);
+            // The token's own claim names ("name", "role") are what the identity uses, so IsInRole and Identity.Name work.
+            return new ClaimsPrincipal(new ClaimsIdentity(
+                JwtParser.Parse(token), "jwt", UserInfo.NameClaimType, UserInfo.RoleClaimType));
+        }
+        catch (Exception ex) when (ex is FormatException or System.Text.Json.JsonException)
+        {
+            await ClearCacheAsync(); // a damaged token is the same as no token
+            return Anonymous;
+        }
+    }
+
+    // ------------------------------------------------------------------ sign in / out
+
+    public async Task<bool> LoginAsync(string tenantId, LoginCommand request)
+    {
+        TokenResult result;
+        try
+        {
+            result = await _client.IssueTokenAsync(tenantId, request);
+        }
+        catch (ApiException ex) when (ex.StatusCode is 400 or 401)
+        {
+            return false; // wrong user name or password
         }
 
-        token = response?.AccessToken;
-      }
+        if (string.IsNullOrWhiteSpace(result.AccessToken) || string.IsNullOrWhiteSpace(result.RefreshToken))
+            return false;
 
-      return new AccessTokenResult(AccessTokenResultStatus.Success, new AccessToken() { Value = token! }, string.Empty, default);
-    }
-    finally
-    {
-      _semaphore.Release();
-    }
-  }
-
-  private async Task<(bool Succeeded, TokenResult? Token)> TryRefreshTokenAsync(RefreshTokenCommand request)
-  {
-    var authState = await GetAuthenticationStateAsync();
-    string? tenantKey = authState.User.GetTenant();
-    if (string.IsNullOrWhiteSpace(tenantKey))
-    {
-      throw new InvalidOperationException("Can't refresh token when user is not logged in!");
+        await CacheTokensAsync(result.AccessToken, result.RefreshToken);
+        RaiseChanged();
+        return true;
     }
 
-    try
+    public async Task LogoutAsync()
     {
-      var tokenResult = await _client.RefreshTokenAsync(tenantKey, request);
-
-      await CacheAuthTokens(tokenResult.AccessToken, tokenResult.RefreshToken);
-
-      return (true, tokenResult);
+        await SignOutAsync();
+        _navigation.NavigateTo("login");
     }
-    catch
+
+    public async Task ReLoginAsync(string returnUrl)
     {
-      return (false, null);
+        await SignOutAsync();
+        _navigation.NavigateTo($"login?returnUrl={Uri.EscapeDataString(returnUrl.TrimStart('/'))}");
     }
-  }
 
-  private async ValueTask CacheAuthTokens(string? token, string? refreshToken)
-  {
-    await _localStorage.SetItemAsync(StorageConstants.Local.AuthToken, token);
-    await _localStorage.SetItemAsync(StorageConstants.Local.RefreshToken, refreshToken);
-  }
+    public void NavigateToExternalLogin(string returnUrl)
+        => throw new NotSupportedException("Only the built-in user name / password sign-in is available.");
 
-  private ValueTask CachePermissions(ICollection<string> permissions)
-  {
-    return _localStorage.SetItemAsync(StorageConstants.Local.Permissions, permissions);
-  }
-
-  private async Task ClearCacheAsync()
-  {
-    await _localStorage.RemoveItemAsync(StorageConstants.Local.AuthToken);
-    await _localStorage.RemoveItemAsync(StorageConstants.Local.RefreshToken);
-    await _localStorage.RemoveItemAsync(StorageConstants.Local.Permissions);
-  }
-  private ValueTask<string?> GetCachedAuthTokenAsync()
-  {
-    return _localStorage.GetItemAsync<string?>(StorageConstants.Local.AuthToken);
-  }
-
-  private ValueTask<string?> GetCachedRefreshTokenAsync()
-  {
-    return _localStorage.GetItemAsync<string>(StorageConstants.Local.RefreshToken);
-  }
-
-  private ValueTask<ICollection<string>?> GetCachedPermissionsAsync()
-  {
-    return _localStorage.GetItemAsync<ICollection<string>>(StorageConstants.Local.Permissions);
-  }
-
-  private IEnumerable<Claim> GetClaimsFromJwt(string jwt)
-  {
-    var claims = new List<Claim>();
-    string payload = jwt.Split('.')[1];
-    byte[] jsonBytes = ParseBase64WithoutPadding(payload);
-    var keyValuePairs = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonBytes);
-
-    if (keyValuePairs is not null)
+    private async Task SignOutAsync()
     {
-      keyValuePairs.TryGetValue(ClaimTypes.Role, out object? roles);
+        var refreshToken = await GetCachedAsync(StorageConstants.Local.RefreshToken);
+        var tenant = await GetTenantAsync();
 
-      if (roles is not null)
-      {
-        string? rolesString = roles.ToString();
-        if (!string.IsNullOrEmpty(rolesString))
+        if (!string.IsNullOrWhiteSpace(refreshToken))
         {
-          if (rolesString.Trim().StartsWith("["))
-          {
-            string[]? parsedRoles = JsonSerializer.Deserialize<string[]>(rolesString);
+            try { await _client.RevokeTokenAsync(tenant, new RevokeRefreshTokenCommand { RefreshToken = refreshToken }); }
+            catch { /* best effort: the local session ends either way */ }
+        }
 
-            if (parsedRoles is not null)
+        await ClearCacheAsync();
+        RaiseChanged();
+    }
+
+    // ------------------------------------------------------------------ access token (for the HTTP handler)
+
+    public ValueTask<AccessTokenResult> RequestAccessToken(AccessTokenRequestOptions options) => RequestAccessToken();
+
+    public async ValueTask<AccessTokenResult> RequestAccessToken()
+    {
+        // One refresh at a time; concurrent requests wait here and then find the new token.
+        await _refreshGate.WaitAsync();
+        try
+        {
+            var token = await GetCachedAsync(StorageConstants.Local.AuthToken);
+            if (string.IsNullOrWhiteSpace(token)) return NeedsLogin();
+
+            var principal = await ReadPrincipalAsync();
+            if (principal.Identity?.IsAuthenticated is not true) return NeedsLogin();
+
+            if (principal.GetExpiration() - DateTimeOffset.UtcNow <= TimeSpan.FromMinutes(1))
             {
-              claims.AddRange(parsedRoles.Select(role => new Claim(ClaimTypes.Role, role)));
+                var refreshed = await TryRefreshAsync(token, principal.FindFirst(UsrClaims.Tenant)?.Value);
+                if (refreshed is null)
+                {
+                    await ClearCacheAsync(); // refresh token expired or revoked: the session is over
+                    RaiseChanged();
+                    return NeedsLogin();
+                }
+
+                token = refreshed;
             }
-          }
-          else
-          {
-            claims.Add(new Claim(ClaimTypes.Role, rolesString));
-          }
+
+            return new AccessTokenResult(AccessTokenResultStatus.Success, new AccessToken { Value = token }, string.Empty, default);
         }
-
-        keyValuePairs.Remove(ClaimTypes.Role);
-      }
-
-      claims.AddRange(keyValuePairs.Select(kvp => new Claim(kvp.Key, kvp.Value.ToString() ?? string.Empty)));
+        finally
+        {
+            _refreshGate.Release();
+        }
     }
 
-    return claims;
-  }
-  private byte[] ParseBase64WithoutPadding(string payload)
-  {
-    payload = payload.Trim().Replace('-', '+').Replace('_', '/');
-    string base64 = payload.PadRight(payload.Length + (4 - payload.Length % 4) % 4, '=');
-    return Convert.FromBase64String(base64);
-  }
-
-  public string? GetUserIdFromRawToken(string tokenString)
-  {
-    if (GetClaimsFromJwt(tokenString) is IEnumerable<Claim> jwtClaims && jwtClaims.Any())
+    private async Task<string?> TryRefreshAsync(string accessToken, string? tenant)
     {
-      // Look for standard "sub" or system NameIdentifier claim
-      var userId = jwtClaims.FirstOrDefault(c => c.Type == "sub")?.Value
-                   ?? jwtClaims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        var refreshToken = await GetCachedAsync(StorageConstants.Local.RefreshToken);
+        if (string.IsNullOrWhiteSpace(refreshToken)) return null;
 
-      return userId;
+        try
+        {
+            var result = await _client.RefreshTokenAsync(tenant, new RefreshTokenCommand { Token = accessToken, RefreshToken = refreshToken });
+            await CacheTokensAsync(result.AccessToken, result.RefreshToken);
+            return result.AccessToken;
+        }
+        catch (ApiException)
+        {
+            return null;
+        }
     }
 
-    return null;
-  }
+    private static AccessTokenResult NeedsLogin()
+        => new(AccessTokenResultStatus.RequiresRedirect, new AccessToken(), "login", default);
+
+    // ------------------------------------------------------------------ storage
+
+    private void RaiseChanged()
+    {
+        Changed?.Invoke();
+        NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+    }
+
+    private async Task<string?> GetTenantAsync()
+    {
+        var token = await GetCachedAsync(StorageConstants.Local.AuthToken);
+        return token is null ? null : JwtParser.GetClaim(token, UsrClaims.Tenant);
+    }
+
+    private async Task<string?> GetCachedAsync(string key)
+    {
+        try { return await _localStorage.GetItemAsStringAsync(key) is { } raw ? raw.Trim('"') : null; }
+        catch { return null; }
+    }
+
+    private async ValueTask CacheTokensAsync(string accessToken, string refreshToken)
+    {
+        await _localStorage.SetItemAsStringAsync(StorageConstants.Local.AuthToken, accessToken);
+        await _localStorage.SetItemAsStringAsync(StorageConstants.Local.RefreshToken, refreshToken);
+    }
+
+    private async Task ClearCacheAsync()
+    {
+        await _localStorage.RemoveItemAsync(StorageConstants.Local.AuthToken);
+        await _localStorage.RemoveItemAsync(StorageConstants.Local.RefreshToken);
+        await _localStorage.RemoveItemAsync(StorageConstants.Local.Permissions); // leftover of earlier versions
+    }
 }

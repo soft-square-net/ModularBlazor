@@ -10,5 +10,8 @@ public sealed class CatalogDbContext(DbContextOptions<CatalogDbContext> options,
 {
     protected override string Schema => SchemaNames.Catalog;
 
+    // The module list is one catalog for the whole installation: every tenant (and the signed-out core manifest) sees the same rows.
+    protected override bool IsTenantScoped => false;
+
     public DbSet<ModuleRegistration> Modules => Set<ModuleRegistration>();
 }

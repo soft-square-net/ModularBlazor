@@ -2,14 +2,11 @@ namespace soft.square.net.ModularBlazor.Client.Services;
 
 public sealed class ModuleOptions
 {
-    /// <summary>Manifest with the modules every visitor needs (layouts, login).</summary>
-    public string CoreManifestUrl { get; set; } = "modules/core.json";
-
     /// <summary>
-    /// Per-user module metadata, fetched after login. {role} is replaced by the user's role.
-    /// Point this at your API (e.g. "api/me/modules") to get real per-user catalogs.
+    /// Offline fallback for the core manifest. Normally the core modules come from the API's Catalog
+    /// (GET /api/modules/core); this local file is used only when the API cannot be reached at startup.
     /// </summary>
-    public string UserModulesUrl { get; set; } = "modules/user-modules.{role}.json";
+    public string CoreManifestUrl { get; set; } = "modules/core.json";
 
     /// <summary>
     /// Load every module into its own *collectible* AssemblyLoadContext so ModuleManager.Unload can release its memory.

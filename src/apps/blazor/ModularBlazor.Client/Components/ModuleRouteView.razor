@@ -1,8 +1,7 @@
 @using System.Reflection
-@using System.Security.Claims
 @using soft.square.net.ModularBlazor.Abstractions.Auth
 @inject ModuleManager Modules
-@inject ICurrentUserService currentUserService
+@inject ICurrentUserService CurrentUsers
 @inject NavigationManager Nav
 
 @if (_redirecting)
@@ -17,7 +16,7 @@ else if (_forbidden)
         <p>Your account does not have access to this module.</p>
     </LayoutView>
 }
-else
+else if (_ready)
 {
     <LayoutView Layout="_layout">
         <DynamicComponent Type="RouteData.PageType" Parameters="_parameters" />
@@ -25,27 +24,25 @@ else
 }
 
 @code {
-  [Parameter, EditorRequired] public RouteData RouteData { get; set; } = default!;
+    [Parameter, EditorRequired] public RouteData RouteData { get; set; } = default!;
 
-  private Type? _layout;
-  private IDictionary<string, object?>? _parameters;
-  private bool _redirecting;
-  private bool _forbidden;
-  private UserInfo? _currentUser;
+    private Type? _layout;
+    private IDictionary<string, object?>? _parameters;
+    private bool _redirecting;
+    private bool _forbidden;
+    private bool _ready;
 
-  protected override async Task OnInitializedAsync()
-  {
-    _currentUser = await currentUserService.GetUserInfoAsync();
-  }
-
-  protected override void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
     {
+        _ready = _redirecting = _forbidden = false;
+
         var pageType = RouteData.PageType;
         var owner = Modules.GetOwner(pageType.Assembly);
+        var user = await CurrentUsers.GetUserInfoAsync();
 
-        // Assemblies cannot be unloaded, so a page can outlive the user's access to it.
-        // Check on every render rather than trusting that the catalog was cleared.
-        _redirecting = owner is { RequiresAuth: true } && _currentUser is null;
+        // Modules can be loaded for the whole session, so a page can outlive the user's access to it.
+        // Check on every navigation rather than trusting that the catalog was cleared.
+        _redirecting = owner is { RequiresAuth: true } && user is null;
         if (_redirecting)
         {
             var returnUrl = Uri.EscapeDataString(ModuleManager.NormalizePath(Nav.ToBaseRelativePath(Nav.Uri)));
@@ -53,13 +50,14 @@ else
             return;
         }
 
-    // TODO Review Role Extractions: This is a simple role check, but we may want to support more complex policies in the future.
-        _forbidden = owner?.RequiredRole is { } role && !string.Equals(role, _currentUser.ToClaimsPrincipal().FindFirst(c => c.Type == ClaimTypes.Role )?.Value, StringComparison.OrdinalIgnoreCase);
+        // The role comes from the token's "role" claims (UserInfo.Roles).
+        _forbidden = owner?.RequiredRole is { } role && !(user?.IsInRole(role) ?? false);
 
         // Layout precedence: @layout on the page > [UseLayout] on the page > module's layout > default.
         _layout = pageType.GetCustomAttribute<LayoutAttribute>()?.LayoutType
                   ?? Modules.ResolveLayout(pageType.GetCustomAttribute<UseLayoutAttribute>()?.Key ?? owner?.Layout);
 
         _parameters = RouteData.RouteValues.ToDictionary(kv => kv.Key, kv => kv.Value);
+        _ready = true;
     }
 }

@@ -9,7 +9,7 @@
 <PageTitle>Sign in</PageTitle>
 
 <h2>Sign in</h2>
-<p class="hint">Demo: any user name and password works. Sign in as <code>admin</code> to receive the admin modules.</p>
+<p class="hint">Sign in with an account of the selected tenant. The default administrator is <code>admin</code>.</p>
 
 <form @onsubmit="SignInAsync" @onsubmit:preventDefault>
   <label for="user">User name</label>
@@ -19,7 +19,7 @@
   <input id="password" type="password" @bind="_password" autocomplete="current-password" />
 
   <label for="tenant">Tenant</label>
-  <select id="tenant" type="password" @bind="_tenant" autocomplete="current-tenent">
+  <select id="tenant" @bind="_tenant">
       <optgroup>
           <option value="root" selected>root</option>
       </optgroup>
@@ -50,12 +50,13 @@
     {
       if (await authService.LoginAsync(_tenant, new LoginCommand() { UserName = _userName, Password = _password }))
       {
-        await Modules.LoadUserModulesAsync("admin");
+        // The token decides which modules this user gets; their metadata comes from the API before we navigate.
+        await Modules.LoadUserModulesAsync(_tenant);
         Nav.NavigateTo(SafeReturnUrl(), replace: true);
       }
       else
       {
-        _error = "Enter a user name and a password.";
+        _error = "Invalid user name or password.";
       }
     }
     catch (Exception ex)

@@ -1,9 +1,9 @@
-@using soft.square.net.ModularBlazor.Abstractions.Api
 @inherits LayoutComponentBase
 @attribute [LayoutKey("default")]
 @implements IDisposable
 @inject IModuleNavigation Navigation
-@inject NavigationManager Nav
+@inject ICurrentUserService Users
+@inject IAuthenticationService Auth
 
 <div class="shell-default">
   <aside class="shell-sidebar">
@@ -11,18 +11,16 @@
 
     <nav>
       <NavLink href="" Match="NavLinkMatch.All">Home</NavLink>
-      @if (Navigation.Items is not null && Navigation?.Items.Count > 0){
-        foreach (var item in Navigation.Items)
-        {
-          <NavLink href="@item.Href">@item.Title</NavLink>
-        }
+      @foreach (var item in Navigation.Items)
+      {
+        <NavLink href="@item.Href">@item.Title</NavLink>
       }
     </nav>
 
     <div class="shell-user">
-      @if (currentUser is not null)
+      @if (_user is not null)
       {
-        <div>currentUser Name <small>(@currentUser.Name)</small></div>
+        <div>@_user.Name <small>(@string.Join(", ", _user.Roles))</small></div>
         <a href="login" @onclick="SignOutAsync" @onclick:preventDefault>Sign out</a>
       }
       else
@@ -36,29 +34,27 @@
 </div>
 
 @code {
-  [Inject] public IAuthenticationService Auth { get; set; } = default!;
-  UserInfo? currentUser;
+  private UserInfo? _user;
+
   protected override async Task OnInitializedAsync()
   {
     Navigation.Changed += OnChanged;
-    currentUser = await _currentUser.GetUserInfoAsync();
+    Users.Changed += OnChanged;
+    _user = await Users.GetUserInfoAsync();
   }
 
-  private void OnChanged() {
-    currentUser = _currentUser.GetUserInfoAsync().Result;
-
-      InvokeAsync(StateHasChanged);
-  }
-
-  private async Task SignOutAsync()
+  // Never block on the async user lookup (.Result freezes WebAssembly): hop onto the renderer and await it there.
+  private void OnChanged() => _ = InvokeAsync(async () =>
   {
-    await Auth.LogoutAsync();
-    Nav.NavigateTo("login");
-  }
+    _user = await Users.GetUserInfoAsync();
+    StateHasChanged();
+  });
+
+  private Task SignOutAsync() => Auth.LogoutAsync(); // clears the session and goes to the login page
 
   public void Dispose()
   {
     Navigation.Changed -= OnChanged;
-    Auth.Changed -= OnChanged;
+    Users.Changed -= OnChanged;
   }
 }

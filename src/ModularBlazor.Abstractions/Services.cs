@@ -19,6 +19,7 @@ namespace soft.square.net.ModularBlazor.Abstractions;
 public interface IModuleNavigation
 {
   IReadOnlyList<ModuleNavItem> Items { get; }
-  Task LoadUserModulesAsync(string role);
+  /// <summary>Fetches the signed-in user's module metadata from the API (the token decides which modules).</summary>
+  Task LoadUserModulesAsync(string? tenantId = null);
   event Action? Changed;
 }
