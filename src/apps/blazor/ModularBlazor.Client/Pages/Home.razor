@@ -8,7 +8,7 @@
 
 <h1>Modular Blazor</h1>
 
-@if (usr.Identity.IsAuthenticated)
+@if (usr.Identity?.IsAuthenticated is true)
 {
   <p>Signed in as <strong>@usr.Identity.Name</strong> Open a module from the menu and watch its state change below.</p>
 }
@@ -38,7 +38,8 @@ else
 @code {
   [CascadingParameter]
   public Task<AuthenticationState> AuthState { get; set; } = default!;
-  ClaimsPrincipal usr;
+  // Anonymous until the cascading state arrives: the first render happens before OnInitializedAsync finishes.
+  ClaimsPrincipal usr = new(new ClaimsIdentity());
   protected override void OnInitialized() => Modules.Changed += OnChanged;
   protected override async Task OnInitializedAsync()
   {
