@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.RegularExpressions;
+using Ardalis.Specification;
 using FluentValidation;
 using MediatR;
 using soft.square.net.ModularBlazor.Core.Abstractions;
@@ -55,7 +56,7 @@ internal static partial class RegistrationMapping
         m.RequiredRole, m.Layout, m.AvailableToRoles, m.RoutePrefixes, m.Dependencies, m.Styles, m.Scripts, m.Nav,
         m.PackageId, package?.FileName, package?.SizeBytes, package?.UploadedUtc);
 
-    public static async Task<ModuleRegistration> GetAsync(this IReadRepository<ModuleRegistration> modules, string id, CancellationToken ct)
+    public static async Task<ModuleRegistration> GetAsync(this IReadRepositoryBase<ModuleRegistration> modules, string id, CancellationToken ct)
         => await modules.FirstOrDefaultAsync(new ModuleByIdSpec(id), ct) ?? throw new NotFoundException($"Module '{id}' was not found.");
 }
 
