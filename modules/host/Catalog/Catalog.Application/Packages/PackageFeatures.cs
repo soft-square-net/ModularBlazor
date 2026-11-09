@@ -13,7 +13,7 @@ public sealed record ModulePackageDto(
     string FileName, string Sha256, long SizeBytes, bool Enabled, bool Loaded, bool RebuildRequired,
     string? Configuration, DateTime UploadedUtc, string? UploadedBy);
 
-public sealed record ModulePackageFile(Stream Content, string FileName, string ContentType);
+public sealed record ModulePackageFile(Stream Content, string FileName, string ContentType, string? ETag = null);
 
 internal static class PackageMapping
 {

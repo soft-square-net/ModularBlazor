@@ -7,9 +7,10 @@ public sealed class ModuleStoreOptions
 
     /// <summary>
     /// Folder of the module store, relative to the working directory (the Host project folder when started with
-    /// dotnet run). The Host project imports its host-modules.props, so keep it under the Host project.
+    /// dotnet run): assets/modules/client and assets/modules/host. The Host project imports host/host-modules.props
+    /// from here, so keep it under the Host project.
     /// </summary>
-    public string Path { get; set; } = "modules-store";
+    public string Path { get; set; } = "assets/modules";
 
     /// <summary>
     /// Accepts uploaded packages. Off by default: an uploaded host module runs inside the API after the next build,

@@ -12,7 +12,7 @@ using soft.square.net.ModularBlazor.Host.Modules.Catalog.Domain;
 namespace soft.square.net.ModularBlazor.Host.Modules.Catalog.Infrastructure.Packages;
 
 /// <summary>
-/// The module store on disk: files/&lt;id&gt;/&lt;file&gt; plus a modules.json manifest. A file store (not a database) on
+/// The module store on disk (assets/modules): host/&lt;id&gt;/&lt;file&gt; and client/&lt;id&gt;/&lt;file&gt; plus a modules.json manifest. A file store (not a database) on
 /// purpose: the build must be able to read it without the app running.
 /// </summary>
 internal sealed class FileModulePackageStore(ModuleStoreOptions options) : IModulePackageStore
@@ -70,7 +70,7 @@ internal sealed class FileModulePackageStore(ModuleStoreOptions options) : IModu
                 if (all.Any(p => p.Target == target && string.Equals(p.PackageId, packageId, StringComparison.OrdinalIgnoreCase) && p.Version == version))
                     throw new ConflictException($"{packageId} {version} is already in the store.");
 
-                Directory.CreateDirectory(Path.GetDirectoryName(BuildInputs.FilePath(Root, package))!);
+                Directory.CreateDirectory(BuildInputs.FolderOf(Root, package));
                 File.Move(temp, BuildInputs.FilePath(Root, package));
                 all.Add(package);
                 Save(all);
@@ -105,8 +105,11 @@ internal sealed class FileModulePackageStore(ModuleStoreOptions options) : IModu
         try
         {
             var all = Read();
-            if (all.RemoveAll(p => p.Id == id) == 0) return;
-            var folder = Path.Combine(Root, "files", id);
+            var package = all.FirstOrDefault(p => p.Id == id);
+            if (package is null) return;
+
+            all.Remove(package);
+            var folder = BuildInputs.FolderOf(Root, package);
             if (Directory.Exists(folder)) Directory.Delete(folder, recursive: true);
             Save(all);
         }

@@ -24,10 +24,25 @@ public sealed class ModuleRegistration : AuditableAggregateRoot<string>
         Url = url;
     }
 
+    /// <summary>Points the registration at a new file (a new version).</summary>
+    public void Describe(string name, string version, ModuleKind kind, string url)
+    {
+        Name = name;
+        Version = version;
+        Kind = kind;
+        Url = url;
+    }
+
     public string Name { get; private set; } = "";
     public string Version { get; private set; } = "1.0.0";
     public ModuleKind Kind { get; private set; }
     public string Url { get; private set; } = "";
+
+    /// <summary>Only enabled modules are offered to clients (in the core manifest, the user's manifest and as a download).</summary>
+    public bool Enabled { get; set; } = true;
+
+    /// <summary>The module-store package behind <see cref="Url"/>. Null: the file is served statically (seeded demo modules).</summary>
+    public string? PackageId { get; set; }
 
     /// <summary>Optional hex SHA-256 of the file the client downloads.</summary>
     public string? Sha256 { get; set; }

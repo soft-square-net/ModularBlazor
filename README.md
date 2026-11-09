@@ -230,33 +230,47 @@ Application + Infrastructure projects only (Elsa owns the workflow entities, so 
 published as their own document `elsa` (`/openapi/elsa.json`, ReDoc `/redoc/elsa`). Scalar lists both in its document selector.
 The Elsa document uses full-type-name schema ids to avoid Elsa's duplicate short names. See `OpenApiDocuments.cs`.
 
-### Module store: download, configure, enable, rebuild (Catalog module)
+### Module store: upload, register, enable, download (Catalog module)
 
-Host and client modules (`.dll` / `.nupkg`) are kept in a module store (`ModuleStore:Path`, default `modules-store` under the Host
-project, git-ignored): `files/<id>/<file>` plus a `modules.json` manifest. Endpoints under `/api/v1/modules`
-(`Permissions.Modules.View|Manage`, both held by `admin`):
+Modules (`.dll` / `.nupkg`) live in the Host project under `assets/modules/` (git-ignored), split by consumer:
+
+```
+assets/modules/
+  client/<id>/<file>      files the Blazor client downloads
+  host/<id>/<file>        files compiled into the API
+  host/host-modules.props, host-modules.config.json, nuget/   generated build inputs
+  modules.json            manifest (sha-256, size, enabled, target)
+```
+
+**Management page.** The admin layout has a *Modules* entry (`/admin/modules`, module `Module.Admin`) to upload client or host
+modules, edit a client module's catalog entry, enable/disable, download the file, delete, and restart the API.
+Needs `Permissions.Modules.View|Manage` (held by `admin`) and `ModuleStore:AllowUpload=true` (set in `appsettings.json`).
+
+**Client modules** (what the Blazor app loads):
 
 | Endpoint | Purpose |
 |---|---|
-| `POST /packages` (multipart: `file`, `target` = Host\|Client, `name`) | upload; starts disabled; needs `ModuleStore:AllowUpload=true` |
-| `GET /packages?target=`, `GET /packages/{id}`, `GET /packages/{id}/download` | list, details, download the file |
-| `PUT /packages/{id}/enabled` (`{"enabled":true}`) | enable or disable |
-| `PUT /packages/{id}/configuration` (`{"configuration":"{...}"}`) | JSON object, injected as `Modules:<Name>` |
-| `DELETE /packages/{id}`, `POST /restart` | remove; stop the app so the supervisor rebuilds |
+| `GET /api/v1/modules/registrations` | list catalog entries with their package info |
+| `POST /api/v1/modules/registrations` (multipart: `File`, `Metadata` json) | upload an assembly and register it; an existing id gets a new file/version and keeps its metadata. New entries start disabled unless `enabled` is set |
+| `PUT /api/v1/modules/registrations/{id}` | edit metadata (core/user, roles, routes, layout, nav, styles, scripts) |
+| `PUT /api/v1/modules/registrations/{id}/enabled` | enable or disable; disabled modules vanish from the client manifests |
+| `DELETE /api/v1/modules/registrations/{id}` | remove entry and file (409 while another module depends on it) |
+| `GET /api/modules/{id}/file` | **download for the client**: core modules are public, user modules need sign-in and a matching role; ETag = SHA-256 |
 
-**Host modules** extend the API, so they are compiled in: every change regenerates `modules-store/host-modules.props` (a
-`Reference` per enabled dll, a `PackageReference` plus a local feed `modules-store/nuget` per nupkg), which the Host project
-imports, and `host-modules.config.json`, loaded as configuration at startup. At startup `HostModules.All` adds the public
-`IHostModule` types of the enabled packages that are part of the build. `rebuildRequired` in the package list says when an
-enable/disable has not reached the running app yet. To apply it: `POST /restart`, with the app started by
-`scripts/run-host.ps1` (or `.sh`), which rebuilds and starts it again. A dll module must bring its own dependencies (use a nupkg
-for that). Docker/Aspire: the image build copies the store, so rebuild the image after enabling a module.
+**Loading in the client.** Core modules (`loadOnStartup`) download at startup; user modules download the first time one of their
+routes is opened. Bytes are kept in the browser Cache Storage under `module/{id}/{sha256}`: an unchanged module is never downloaded
+again, a new version replaces the old entry, and the core manifest is cached so the app can start while the API is unreachable
+(`ModuleOptions.CacheModules`).
 
-**Client modules** are stored and downloadable; to make the Blazor client load one, add a `ModuleRegistration` whose `Url` is its
-download endpoint (they are not auto-registered).
+**Host modules** extend the API, so they are compiled in. Upload with `POST /api/v1/modules/packages` (`target=Host`), then
+`PUT /packages/{id}/enabled`; every change regenerates `host/host-modules.props` (a `Reference` per enabled dll, a `PackageReference`
+plus local feed per nupkg), which the Host project imports, and `host-modules.config.json`. `rebuildRequired` says when a change has not
+reached the running app. Apply with `POST /api/v1/modules/restart` while running under `scripts/run-host.ps1` (or `.sh`). Other package
+endpoints: `GET /packages`, `GET /packages/{id}/download`, `PUT /packages/{id}/configuration`, `DELETE /packages/{id}`. A dll module must
+bring its own dependencies (use a nupkg). Docker/Aspire: rebuild the image after enabling a module.
 
-**Security.** An enabled host module runs with full trust inside the API. Upload is off by default
-(`ModuleStore:AllowUpload`), `Permissions.Modules.Manage` should be given to few, and every package's SHA-256 is recorded.
+**Security.** An enabled host module runs with full trust inside the API. Keep `Permissions.Modules.Manage` with few people; every
+package's SHA-256 is recorded and the client verifies it after download.
 
 ### One tenant model in the data layer: DbContextTenantBase
 

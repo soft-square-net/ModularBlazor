@@ -1,11 +1,11 @@
 # Supervisor for the host API: builds it, runs it, and when the app stopped because a restart was requested
-# (POST /api/v1/modules/restart leaves modules-store/restart.requested) rebuilds with the host modules enabled in
+# (POST /api/v1/modules/restart leaves assets/modules/restart.requested) rebuilds with the host modules enabled in
 # the module store and runs it again. Any other exit ends the loop.
 # Usage: .\scripts\run-host.ps1
 param([string[]]$RunArgs = @())
 Set-Location (Join-Path $PSScriptRoot "..")
 $project = "src/api/ModularBlazor.Host"
-$marker = Join-Path $project "modules-store/restart.requested"
+$marker = Join-Path $project "assets/modules/restart.requested"
 
 while ($true) {
     Write-Host "[run-host] building..."

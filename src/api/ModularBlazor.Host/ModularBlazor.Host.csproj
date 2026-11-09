@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <AssemblyName>$(SoftSquarePrefix).ModularBlazor.Host</AssemblyName>
@@ -35,6 +35,6 @@
   </ItemGroup>
 
   <!-- Host modules enabled in the module store (generated; see Catalog/Packages). Empty or absent until a module is enabled. -->
-  <Import Project="modules-store\host-modules.props" Condition="Exists('modules-store\host-modules.props')" />
+  <Import Project="assets\modules\host\host-modules.props" Condition="Exists('assets\modules\host\host-modules.props')" />
 
 </Project>

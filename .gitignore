@@ -10,7 +10,7 @@ src/ModularBlazor.Client/wwwroot/modules/*.nupkg
 /.playwright-mcp
 
 # Module store (uploaded packages, generated build inputs)
-/src/api/ModularBlazor.Host/modules-store/
+/src/api/ModularBlazor.Host/assets/modules/
 /modules/client/Layouts.Admin/node-app/node_modules
 *.json
 /modules/client/Layouts.Admin/node-app/package-lock.json

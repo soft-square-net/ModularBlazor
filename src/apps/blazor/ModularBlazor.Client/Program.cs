@@ -30,6 +30,7 @@ builder.Services.AddAuthentication(builder.Configuration);
 // Modules.
 builder.Services.AddSingleton(new ModuleOptions());
 builder.Services.AddSingleton<ModuleAssetStore>();
+builder.Services.AddSingleton<ModuleCache>();
 builder.Services.AddSingleton<IModulePackageReader, DllPackageReader>();
 builder.Services.AddSingleton<IModulePackageReader, NuPkgPackageReader>();
 builder.Services.AddSingleton<ModuleManager>();

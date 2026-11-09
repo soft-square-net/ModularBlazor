@@ -19,6 +19,7 @@ public sealed class ModuleRegistrationConfiguration : IEntityTypeConfiguration<M
         builder.Property(m => m.Sha256).HasMaxLength(64);
         builder.Property(m => m.RequiredRole).HasMaxLength(50);
         builder.Property(m => m.Layout).HasMaxLength(50);
+        builder.Property(m => m.PackageId).HasMaxLength(64);
 
         // Lists are stored as JSON text (same on every database provider).
         builder.Property(m => m.AvailableToRoles).HasJsonConversion();

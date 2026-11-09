@@ -17,7 +17,7 @@ namespace soft.square.net.ModularBlazor.Host;
 internal static class HostModules
 {
     /// <summary>Folder of the module store (ModuleStore:Path). Set before <see cref="All"/> is first used.</summary>
-    public static string StorePath { get; set; } = "modules-store";
+    public static string StorePath { get; set; } = "assets/modules";
 
     private static IHostModule[]? _all;
 

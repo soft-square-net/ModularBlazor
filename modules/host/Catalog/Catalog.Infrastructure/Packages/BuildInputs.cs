@@ -7,10 +7,11 @@ using soft.square.net.ModularBlazor.Host.Modules.Catalog.Domain;
 namespace soft.square.net.ModularBlazor.Host.Modules.Catalog.Infrastructure.Packages;
 
 /// <summary>
-/// Turns the enabled host packages into what the build and the app read:
+/// Turns the enabled host packages into what the build and the app read, in assets/modules/host/:
 ///   host-modules.props        MSBuild: Reference (dll) / PackageReference + local feed (nupkg). Imported by the Host project.
 ///   host-modules.config.json  configuration: Modules:&lt;Name&gt; = the package's configuration JSON. Loaded when the app starts.
 ///   nuget/                    local NuGet feed holding the enabled host .nupkg files.
+/// The packages themselves live in assets/modules/host/&lt;id&gt;/ and assets/modules/client/&lt;id&gt;/ (see <see cref="FilePath"/>).
 /// Regenerated after every change, so a rebuild always matches the manifest.
 /// </summary>
 internal static class BuildInputs
@@ -22,8 +23,11 @@ internal static class BuildInputs
     {
         var enabled = packages.Where(p => p.Enabled && p.Target == ModuleTarget.Host).ToList();
 
+        var hostRoot = Path.Combine(root, "host");
+        Directory.CreateDirectory(hostRoot);
+
         // Local feed: only the enabled nupkg files.
-        var feed = Path.Combine(root, "nuget");
+        var feed = Path.Combine(hostRoot, "nuget");
         if (Directory.Exists(feed)) Directory.Delete(feed, recursive: true);
         Directory.CreateDirectory(feed);
         foreach (var p in enabled.Where(p => p.Kind == ModuleKind.NuPkg))
@@ -34,7 +38,7 @@ internal static class BuildInputs
         {
             if (p.Kind == ModuleKind.Dll)
                 items.Add(new XElement("Reference", new XAttribute("Include", p.PackageId),
-                    new XElement("HintPath", $"$(MSBuildThisFileDirectory)files/{p.Id}/{p.FileName}")));
+                    new XElement("HintPath", $"$(MSBuildThisFileDirectory){p.Id}/{p.FileName}")));
             else
                 items.Add(new XElement("PackageReference", new XAttribute("Include", p.PackageId), new XAttribute("Version", p.Version)));
         }
@@ -45,14 +49,18 @@ internal static class BuildInputs
             project.Add(new XElement("PropertyGroup",
                 new XElement("RestoreAdditionalProjectSources", "$(RestoreAdditionalProjectSources);$(MSBuildThisFileDirectory)nuget")));
         project.Add(items);
-        new XDocument(project).Save(Path.Combine(root, PropsFile));
+        new XDocument(project).Save(Path.Combine(hostRoot, PropsFile));
 
         var modules = new JsonObject();
         foreach (var p in enabled.Where(p => !string.IsNullOrWhiteSpace(p.Configuration)))
             modules[p.Name] = JsonNode.Parse(p.Configuration!);
-        File.WriteAllText(Path.Combine(root, ConfigFile),
+        File.WriteAllText(Path.Combine(hostRoot, ConfigFile),
             new JsonObject { ["Modules"] = modules }.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
     }
 
-    public static string FilePath(string root, ModulePackage p) => Path.Combine(root, "files", p.Id, p.FileName);
+    /// <summary>assets/modules/host/&lt;id&gt;/&lt;file&gt; or assets/modules/client/&lt;id&gt;/&lt;file&gt;.</summary>
+    public static string FilePath(string root, ModulePackage p) => Path.Combine(FolderOf(root, p), p.FileName);
+
+    public static string FolderOf(string root, ModulePackage p)
+        => Path.Combine(root, p.Target == ModuleTarget.Host ? "host" : "client", p.Id);
 }

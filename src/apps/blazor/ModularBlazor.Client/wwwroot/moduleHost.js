@@ -92,6 +92,17 @@ window.moduleHost = (() => {
     activate,
     deactivate,
     isActive: moduleId => registry.has(moduleId),
+    // Hands bytes to the browser as a download (the management page's "Download").
+    saveFile: (fileName, bytes) => {
+      const url = URL.createObjectURL(new Blob([bytes]));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+    },
     // The object the module's script returned, for other scripts that need to talk to it.
     get: (moduleId, index = 0) => registry.get(moduleId)?.scripts[index]?.api ?? null,
   };

@@ -27,6 +27,7 @@ namespace soft.square.net.ModularBlazor.Client.Services;
 public sealed class ModuleManager : IModuleNavigation
 {
   public const string DefaultLayoutKey = "default";
+  private const string CoreManifestCacheKey = "manifest/core";
 
   private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web)
   {
@@ -40,6 +41,7 @@ public sealed class ModuleManager : IModuleNavigation
   private readonly AuthenticationStateProvider _auth;
   private readonly ModuleOptions _options;
   private readonly ModuleAssetStore _assets;
+  private readonly ModuleCache _cache;
   private readonly IReadOnlyDictionary<ModuleKind, IModulePackageReader> _readers;
 
   private readonly Dictionary<string, ModuleDescriptor> _catalog = new(StringComparer.OrdinalIgnoreCase);
@@ -59,6 +61,7 @@ public sealed class ModuleManager : IModuleNavigation
       AuthenticationStateProvider auth,
       ModuleOptions options,
       ModuleAssetStore assets,
+      ModuleCache cache,
       IEnumerable<IModulePackageReader> readers)
   {
     _local = local;
@@ -68,6 +71,7 @@ public sealed class ModuleManager : IModuleNavigation
     _auth = auth;
     _options = options;
     _assets = assets;
+    _cache = cache;
     _readers = readers.ToDictionary(r => r.Kind);
 
     // Signing out ends the user's modules, whichever page triggered it.
@@ -177,11 +181,17 @@ public sealed class ModuleManager : IModuleNavigation
     {
       // The Catalog module's public endpoint: GET /api/modules/core.
       manifest = ToManifest(await _anonymousApi.GetCoreModulesAsync(null));
+      if (_options.CacheModules)
+        await _cache.PutAsync(CoreManifestCacheKey, JsonSerializer.SerializeToUtf8Bytes(manifest, Json));
     }
     catch (Exception ex) when (ex is Api.ApiException or HttpRequestException)
     {
-      Console.Error.WriteLine($"Core modules: the API is not reachable ({ex.Message}); using {_options.CoreManifestUrl}.");
-      manifest = await _local.GetFromJsonAsync<ModuleManifest>(_options.CoreManifestUrl, Json) ?? new ModuleManifest();
+      // Offline or the API is down: the last core manifest we saw (its modules are cached too), then the file shipped with the app.
+      var cached = _options.CacheModules ? await _cache.GetAsync(CoreManifestCacheKey) : null;
+      Console.Error.WriteLine($"Core modules: the API is not reachable ({ex.Message}); using {(cached is null ? _options.CoreManifestUrl : "the cached manifest")}.");
+      manifest = cached is not null
+          ? JsonSerializer.Deserialize<ModuleManifest>(cached, Json) ?? new ModuleManifest()
+          : await _local.GetFromJsonAsync<ModuleManifest>(_options.CoreManifestUrl, Json) ?? new ModuleManifest();
     }
 
     Register(manifest.Modules, user: false);
@@ -326,8 +336,7 @@ public sealed class ModuleManager : IModuleNavigation
       foreach (var dependency in d.Dependencies)
         await EnsureLoadedAsync(dependency, next, CancellationToken.None);
 
-      var primary = await DownloadAsync(d.Url, d.Kind == ModuleKind.NuPkg ? "PK" : "MZ");
-      VerifyHash(d, primary);
+      var primary = await GetPackageBytesAsync(d);
 
       if (!_readers.TryGetValue(d.Kind, out var reader))
         throw new InvalidOperationException($"No package reader is registered for module kind '{d.Kind}'.");
@@ -443,6 +452,33 @@ public sealed class ModuleManager : IModuleNavigation
       => url.TrimStart('/').StartsWith("api/", StringComparison.OrdinalIgnoreCase)
           ? _httpClients.CreateClient(ApiClientNames.Authenticated)
           : _local;
+
+  /// <summary>
+  /// The module file: from the persistent cache when the catalog's SHA-256 matches a cached copy, otherwise downloaded
+  /// (core modules at startup, user modules the first time their route is visited) and cached for the next visit.
+  /// Without a SHA-256 in the catalog there is nothing to key the cache on, so such modules are always downloaded.
+  /// </summary>
+  private async Task<byte[]> GetPackageBytesAsync(ModuleDescriptor d)
+  {
+    var key = _options.CacheModules && !string.IsNullOrWhiteSpace(d.Sha256) ? $"module/{d.Id}/{d.Sha256!.Trim().ToLowerInvariant()}" : null;
+
+    if (key is not null && await _cache.GetAsync(key) is { } cached && Sha256Matches(d, cached))
+      return cached;
+
+    var bytes = await DownloadAsync(d.Url, d.Kind == ModuleKind.NuPkg ? "PK" : "MZ");
+    VerifyHash(d, bytes);
+
+    if (key is not null)
+    {
+      await _cache.RemovePrefixAsync($"module/{d.Id}/"); // older versions of this module
+      await _cache.PutAsync(key, bytes);
+    }
+
+    return bytes;
+  }
+
+  private static bool Sha256Matches(ModuleDescriptor d, byte[] bytes)
+      => Convert.ToHexString(SHA256.HashData(bytes)).Equals(d.Sha256!.Trim(), StringComparison.OrdinalIgnoreCase);
 
   private static void VerifyHash(ModuleDescriptor d, byte[] bytes)
   {

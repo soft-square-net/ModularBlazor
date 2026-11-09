@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Supervisor for the host API: builds it, runs it, and when the app stopped because a restart was requested
-# (POST /api/v1/modules/restart leaves modules-store/restart.requested) rebuilds with the host modules enabled in
+# (POST /api/v1/modules/restart leaves assets/modules/restart.requested) rebuilds with the host modules enabled in
 # the module store and runs it again. Any other exit ends the loop.
 # Usage: scripts/run-host.sh [extra dotnet run args]
 set -uo pipefail
 cd "$(dirname "$0")/.."
 PROJECT="src/api/ModularBlazor.Host"
-MARKER="$PROJECT/modules-store/restart.requested"
+MARKER="$PROJECT/assets/modules/restart.requested"
 
 while true; do
   echo "[run-host] building..."

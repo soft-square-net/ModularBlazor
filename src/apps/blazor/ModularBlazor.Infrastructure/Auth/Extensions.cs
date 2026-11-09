@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using soft.square.net.ModularBlazor.Abstractions;
 using soft.square.net.ModularBlazor.Abstractions.Api;
 using soft.square.net.ModularBlazor.Abstractions.Auth;
 using soft.square.net.ModularBlazor.Infrastructure.Auth.Jwt;
@@ -40,6 +41,8 @@ public static class Extensions
             new ApiClient(sp.GetRequiredService<IHttpClientFactory>().CreateClient(ApiClientNames.Authenticated)));
         services.AddKeyedSingleton<IApiClient>(ApiClientNames.Anonymous, (sp, _) =>
             new ApiClient(sp.GetRequiredService<IHttpClientFactory>().CreateClient(ApiClientNames.Anonymous)));
+
+        services.AddSingleton<IModuleAdminApi, ModuleAdminApi>();
 
         return services;
     }

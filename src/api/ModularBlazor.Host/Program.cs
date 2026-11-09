@@ -23,8 +23,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Module store: the enabled host modules' configuration (Modules:<Name>) is injected here, and the modules
 // themselves are found by HostModules.All (they are referenced by the build through host-modules.props).
-HostModules.StorePath = builder.Configuration["ModuleStore:Path"] ?? "modules-store";
-builder.Configuration.AddJsonFile(Path.Combine(Path.GetFullPath(HostModules.StorePath), "host-modules.config.json"),
+HostModules.StorePath = builder.Configuration["ModuleStore:Path"] ?? "assets/modules";
+builder.Configuration.AddJsonFile(Path.Combine(Path.GetFullPath(HostModules.StorePath), "host", "host-modules.config.json"),
     optional: true, reloadOnChange: false);
 
 // ModuleKind travels as "dll" / "nupkg", exactly what the Blazor client expects.
