@@ -24,7 +24,52 @@ public sealed class ModuleRegistrationRequest
     public string[] Styles { get; set; } = [];
     public string[] Scripts { get; set; } = [];
     public ModuleNavItem[] Nav { get; set; } = [];
+
+    /// <summary>
+    /// Host modules (API extensions) this client module needs. Missing ones are downloaded and enabled first; the client
+    /// module is switched on once they are running. Only done when <see cref="ApproveHostInstall"/> is true.
+    /// </summary>
+    public HostDependencyRequest[] HostDependencies { get; set; } = [];
+
+    /// <summary>The administrator has seen the plan (RegistrationPlanDto) and agreed to install the host modules in it.</summary>
+    public bool ApproveHostInstall { get; set; }
 }
+
+/// <summary>A host module a client module needs: an assembly name or NuGet package id, optionally a version and a source.</summary>
+public sealed class HostDependencyRequest
+{
+    /// <summary>Assembly name (dll) or NuGet package id (nupkg), e.g. "soft.square.net.Module.Reports.Host".</summary>
+    public string Package { get; set; } = "";
+
+    /// <summary>Exact version. Empty: any version already in the store.</summary>
+    public string? Version { get; set; }
+
+    /// <summary>https address of the .dll / .nupkg to download when the store has none. Empty: nuget.org (needs a version).</summary>
+    public string? SourceUrl { get; set; }
+}
+
+public enum HostDependencyState
+{
+    /// <summary>Enabled and part of the running API: nothing to do.</summary>
+    Running,
+
+    /// <summary>Enabled but not built into the running API yet: needs a restart.</summary>
+    EnabledPendingRestart,
+
+    /// <summary>In the module store but disabled: will be enabled.</summary>
+    InStore,
+
+    /// <summary>Not in the store: will be downloaded from <c>Source</c> and enabled.</summary>
+    WillDownload,
+
+    /// <summary>Not in the store and no way to get it (no version or source given).</summary>
+    Unavailable
+}
+
+public sealed record HostDependencyPlanItem(string Package, string? Version, HostDependencyState State, string? Source, string? Problem);
+
+/// <summary>What registering a client module would change on the host: shown to the administrator before approval.</summary>
+public sealed record RegistrationPlanDto(IReadOnlyList<HostDependencyPlanItem> Dependencies, bool NeedsApproval, bool NeedsRestart, bool Blocked);
 
 /// <summary>A registered client module as the management page sees it.</summary>
 public sealed record ModuleRegistrationDto(
@@ -32,4 +77,5 @@ public sealed record ModuleRegistrationDto(
     bool LoadOnStartup, bool Hidden, bool RequiresAuth, string? RequiredRole, string? Layout,
     string[] AvailableToRoles, string[] RoutePrefixes, string[] Dependencies, string[] Styles, string[] Scripts,
     ModuleNavItem[] Nav,
-    string? PackageId, string? FileName, long? SizeBytes, DateTime? UploadedUtc);
+    string? PackageId, string? FileName, long? SizeBytes, DateTime? UploadedUtc,
+    string[] HostDependencies, bool WaitingForHost);

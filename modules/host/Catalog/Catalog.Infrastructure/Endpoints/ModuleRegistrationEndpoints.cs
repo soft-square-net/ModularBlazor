@@ -22,7 +22,8 @@ public sealed class RegisterModuleForm
 
 /// <summary>
 /// Client modules in the catalog: register (upload) them, enable / disable them, and the download the Blazor client uses.
-///   POST   /api/v1/modules/registrations                 upload a .dll / .nupkg and register it
+///   POST   /api/v1/modules/registrations/plan            the host modules a client module needs, and what would be installed
+///   POST   /api/v1/modules/registrations                 upload a .dll / .nupkg and register it (installs approved host modules first)
 ///   GET    /api/v1/modules/registrations                 every registration, enabled or not
 ///   PUT    /api/v1/modules/registrations/{id}            edit metadata
 ///   PUT    /api/v1/modules/registrations/{id}/enabled    enable / disable
@@ -45,6 +46,13 @@ public sealed class ModuleRegistrationEndpoints : ICarterModule
             .WithSummary("Client modules registered in the catalog, enabled or not")
             .RequirePermission(Permissions.Modules.View, Permissions.Modules.Manage)
             .Produces<IReadOnlyList<ModuleRegistrationDto>>();
+
+        admin.MapPost("/plan", async (ModuleRegistrationRequest request, ISender sender, CancellationToken ct)
+                => Results.Ok(await sender.Send(new PlanModuleRegistrationQuery(request), ct)))
+            .WithName("PlanModuleRegistration")
+            .WithSummary("What registering this client module would install on the host (its host modules)")
+            .RequirePermission(Permissions.Modules.Manage)
+            .Produces<RegistrationPlanDto>();
 
         admin.MapPost("/", async ([FromForm] RegisterModuleForm form, ISender sender, ModuleStoreOptions options, CancellationToken ct) =>
             {

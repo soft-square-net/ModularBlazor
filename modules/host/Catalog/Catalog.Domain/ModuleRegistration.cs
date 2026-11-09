@@ -67,6 +67,12 @@ public sealed class ModuleRegistration : AuditableAggregateRoot<string>
     public string[] Scripts { get; set; } = [];
     public ModuleNavItem[] Nav { get; set; } = [];
 
+    /// <summary>Host modules this module needs ("Package" or "Package@Version"). It cannot be enabled before they run.</summary>
+    public string[] HostDependencies { get; set; } = [];
+
+    /// <summary>Wanted enabled, but waiting for its host modules to be part of the running API (set until the next restart).</summary>
+    public bool ActivateWhenHostReady { get; set; }
+
     /// <summary>Position in the manifest (menu order follows Nav.Order).</summary>
     public int SortOrder { get; set; }
 

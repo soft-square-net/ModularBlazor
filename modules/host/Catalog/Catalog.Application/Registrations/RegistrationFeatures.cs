@@ -54,7 +54,7 @@ internal static partial class RegistrationMapping
     public static ModuleRegistrationDto ToDto(this ModuleRegistration m, ModulePackage? package) => new(
         m.Id, m.Name, m.Version, m.Kind, m.Url, m.Sha256, m.Enabled, m.LoadOnStartup, m.Hidden, m.RequiresAuth,
         m.RequiredRole, m.Layout, m.AvailableToRoles, m.RoutePrefixes, m.Dependencies, m.Styles, m.Scripts, m.Nav,
-        m.PackageId, package?.FileName, package?.SizeBytes, package?.UploadedUtc);
+        m.PackageId, package?.FileName, package?.SizeBytes, package?.UploadedUtc, m.HostDependencies, m.ActivateWhenHostReady);
 
     public static async Task<ModuleRegistration> GetAsync(this IReadRepositoryBase<ModuleRegistration> modules, string id, CancellationToken ct)
         => await modules.FirstOrDefaultAsync(new ModuleByIdSpec(id), ct) ?? throw new NotFoundException($"Module '{id}' was not found.");
@@ -74,6 +74,16 @@ public sealed class ListModuleRegistrationsQueryHandler(IReadRepository<ModuleRe
     }
 }
 
+// ---- host dependencies: what registering would change, shown before the administrator approves
+public sealed record PlanModuleRegistrationQuery(ModuleRegistrationRequest Request) : IRequest<RegistrationPlanDto>;
+
+public sealed class PlanModuleRegistrationQueryHandler(IModulePackageStore store)
+    : IRequestHandler<PlanModuleRegistrationQuery, RegistrationPlanDto>
+{
+    public Task<RegistrationPlanDto> Handle(PlanModuleRegistrationQuery query, CancellationToken cancellationToken)
+        => HostDependencies.PlanAsync(query.Request.HostDependencies, store, cancellationToken);
+}
+
 // ---- upload + register
 public sealed record RegisterClientModuleCommand(string FileName, Stream Content, ModuleRegistrationRequest Request)
     : IRequest<ModuleRegistrationDto>;
@@ -88,6 +98,13 @@ public sealed class RegisterClientModuleCommandValidator : AbstractValidator<Reg
         RuleFor(c => c.Request.Id).Must(id => string.IsNullOrWhiteSpace(id) || RegistrationMapping.IdPattern().IsMatch(id.Trim()))
             .WithMessage("The module id may contain letters, digits, '.', '_' and '-'.");
         RuleFor(c => c.Request.Name).MaximumLength(200);
+        RuleForEach(c => c.Request.HostDependencies).ChildRules(d =>
+        {
+            d.RuleFor(x => x.Package).NotEmpty().MaximumLength(200).Must(p => !p.Contains('@') && !p.Contains('|'))
+                .WithMessage("A host module's package name is an assembly name or NuGet id.");
+            d.RuleFor(x => x.SourceUrl).Must(u => string.IsNullOrWhiteSpace(u) || u.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                .WithMessage("A host module source must be an https address.");
+        });
     }
 }
 
@@ -97,16 +114,30 @@ public sealed class RegisterClientModuleCommandValidator : AbstractValidator<Reg
 /// uploading a new build of a module must not reset its routes.
 /// </summary>
 public sealed class RegisterClientModuleCommandHandler(
-    IModulePackageStore store, IRepository<ModuleRegistration> modules, ICurrentUser user)
+    IModulePackageStore store, IHostPackageSource hostSource, IRepository<ModuleRegistration> modules, ICurrentUser user)
     : IRequestHandler<RegisterClientModuleCommand, ModuleRegistrationDto>
 {
     public async Task<ModuleRegistrationDto> Handle(RegisterClientModuleCommand command, CancellationToken cancellationToken)
     {
         var request = command.Request;
-        var package = await store.AddAsync(ModuleTarget.Client, command.FileName, command.Content, request.Name, user.UserName, cancellationToken);
 
+        // 1. Host modules first: nothing of the client module is installed unless they could be.
+        var plan = await HostDependencies.PlanAsync(request.HostDependencies, store, cancellationToken);
+        if (plan.Blocked)
+            throw new CustomException(string.Join(" ", plan.Dependencies.Where(d => d.Problem is not null).Select(d => $"{d.Package}: {d.Problem}")));
+        if (plan.NeedsApproval && !request.ApproveHostInstall)
+            throw new ConflictException("This module needs host modules that must be installed first; the administrator has to approve that.");
+
+        var undoHost = await HostDependencies.InstallAsync(request.HostDependencies, store, hostSource, user.UserName, cancellationToken);
+        var hostKeys = request.HostDependencies.Select(HostDependencies.Key).ToArray();
+        var hostRunning = await HostDependencies.AllRunningAsync(hostKeys, store, cancellationToken);
+
+        ModulePackage? package = null;
         try
         {
+            // 2. The client module itself.
+            package = await store.AddAsync(ModuleTarget.Client, command.FileName, command.Content, request.Name, user.UserName, cancellationToken);
+
             var id = RegistrationMapping.ResolveId(request.Id, package.PackageId);
             var url = RegistrationMapping.FileUrl(id);
             var name = string.IsNullOrWhiteSpace(request.Name) ? id : request.Name.Trim();
@@ -119,7 +150,9 @@ public sealed class RegisterClientModuleCommandHandler(
                 {
                     Sha256 = package.Sha256,
                     PackageId = package.Id,
-                    Enabled = request.Enabled,
+                    Enabled = request.Enabled && hostRunning,
+                    ActivateWhenHostReady = request.Enabled && !hostRunning,
+                    HostDependencies = hostKeys,
                     SortOrder = 100 + (await modules.CountAsync(cancellationToken)) * 10
                 };
                 existing.Apply(request);
@@ -131,6 +164,16 @@ public sealed class RegisterClientModuleCommandHandler(
                 existing.Describe(string.IsNullOrWhiteSpace(request.Name) ? existing.Name : name, package.Version, package.Kind, url);
                 existing.Sha256 = package.Sha256;
                 existing.PackageId = package.Id;
+
+                if (hostKeys.Length > 0)
+                {
+                    existing.HostDependencies = hostKeys;
+                    if (!hostRunning)
+                    {
+                        existing.ActivateWhenHostReady = existing.Enabled || request.Enabled;
+                        existing.Enabled = false;
+                    }
+                }
             }
 
             await modules.SaveChangesAsync(cancellationToken);
@@ -143,7 +186,8 @@ public sealed class RegisterClientModuleCommandHandler(
         }
         catch
         {
-            await store.DeleteAsync(package.Id, cancellationToken); // do not leave an orphan file behind
+            if (package is not null) await store.DeleteAsync(package.Id, cancellationToken); // do not leave an orphan file behind
+            await undoHost();
             throw;
         }
     }
@@ -176,7 +220,13 @@ public sealed class SetModuleRegistrationEnabledCommandHandler(IRepository<Modul
     public async Task<ModuleRegistrationDto> Handle(SetModuleRegistrationEnabledCommand command, CancellationToken cancellationToken)
     {
         var module = await modules.GetAsync(command.Id, cancellationToken);
+
+        if (command.Enabled && !await HostDependencies.AllRunningAsync(module.HostDependencies, store, cancellationToken))
+            throw new ConflictException(
+                $"'{module.Id}' needs the host modules {string.Join(", ", module.HostDependencies)}, which are not running yet. Enable them and restart the API; the module is switched on afterwards.");
+
         module.Enabled = command.Enabled;
+        module.ActivateWhenHostReady = false;
         await modules.SaveChangesAsync(cancellationToken);
         return module.ToDto(module.PackageId is null ? null : await store.FindAsync(module.PackageId, cancellationToken));
     }
@@ -237,5 +287,30 @@ public sealed class GetModuleFileQueryHandler(IReadRepository<ModuleRegistration
 
         var type = package.Kind == ModuleKind.NuPkg ? "application/octet-stream" : "application/x-msdownload";
         return new ModulePackageFile(store.OpenRead(package), package.FileName, type, package.Sha256);
+    }
+}
+
+// ---- after a restart: switch on the modules that were waiting for their host modules
+public sealed record ActivatePendingRegistrationsCommand : IRequest<int>;
+
+public sealed class ActivatePendingRegistrationsCommandHandler(IRepository<ModuleRegistration> modules, IModulePackageStore store)
+    : IRequestHandler<ActivatePendingRegistrationsCommand, int>
+{
+    public async Task<int> Handle(ActivatePendingRegistrationsCommand command, CancellationToken cancellationToken)
+    {
+        var waiting = (await modules.ListAsync(new AllModulesSpec(), cancellationToken))
+            .Where(m => m.ActivateWhenHostReady && !m.Enabled).ToList();
+
+        var activated = 0;
+        foreach (var module in waiting)
+        {
+            if (!await HostDependencies.AllRunningAsync(module.HostDependencies, store, cancellationToken)) continue;
+            module.Enabled = true;
+            module.ActivateWhenHostReady = false;
+            activated++;
+        }
+
+        if (activated > 0) await modules.SaveChangesAsync(cancellationToken);
+        return activated;
     }
 }

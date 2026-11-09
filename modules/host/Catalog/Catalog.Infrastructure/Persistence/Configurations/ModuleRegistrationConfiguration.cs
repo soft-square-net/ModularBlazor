@@ -29,6 +29,7 @@ public sealed class ModuleRegistrationConfiguration : IEntityTypeConfiguration<M
         builder.Property(m => m.Styles).HasJsonConversion();
         builder.Property(m => m.Scripts).HasJsonConversion();
         builder.Property(m => m.Nav).HasJsonConversion();
+        builder.Property(m => m.HostDependencies).HasJsonConversion();
 
         builder.HasIndex(m => m.SortOrder);
     }

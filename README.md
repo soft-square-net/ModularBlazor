@@ -257,6 +257,16 @@ Needs `Permissions.Modules.View|Manage` (held by `admin`) and `ModuleStore:Allow
 | `DELETE /api/v1/modules/registrations/{id}` | remove entry and file (409 while another module depends on it) |
 | `GET /api/modules/{id}/file` | **download for the client**: core modules are public, user modules need sign-in and a matching role; ETag = SHA-256 |
 
+**Client modules that need host modules.** A client module can declare `hostDependencies` (`Package@Version`, or `Package|https://source`;
+a version alone means nuget.org). `POST /registrations/plan` answers what would change; the management page shows that in a warning
+dialog (host modules run with full trust in the API). After approval (`approveHostInstall: true`) the API, in this order:
+1. enables the host module if it is in the store, otherwise downloads it (https only, `MaxUploadMb`, identity checked against the request) and enables it;
+2. stores and registers the client module, switched off, with `waitingForHost` set;
+3. after you restart the API (the page has a button), `PendingRegistrationActivator` switches the client module on once its host modules are part of the running build.
+
+If any step fails, the host changes of that call are undone and nothing of the client module is installed. Enabling such a module by hand
+before its host modules run is refused (409).
+
 **Loading in the client.** Core modules (`loadOnStartup`) download at startup; user modules download the first time one of their
 routes is opened. Bytes are kept in the browser Cache Storage under `module/{id}/{sha256}`: an unchanged module is never downloaded
 again, a new version replaces the old entry, and the core manifest is cached so the app can start while the API is unreachable

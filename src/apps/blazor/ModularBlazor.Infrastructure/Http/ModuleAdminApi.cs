@@ -22,6 +22,9 @@ public sealed class ModuleAdminApi(IHttpClientFactory httpClients) : IModuleAdmi
     public Task<IReadOnlyList<ModuleRegistrationDto>> ListRegistrationsAsync(CancellationToken ct = default)
         => GetAsync<IReadOnlyList<ModuleRegistrationDto>>("api/v1/modules/registrations", ct);
 
+    public async Task<RegistrationPlanDto> PlanRegistrationAsync(ModuleRegistrationRequest request, CancellationToken ct = default)
+        => await ReadAsync<RegistrationPlanDto>(await Client.PostAsJsonAsync("api/v1/modules/registrations/plan", request, Json, ct), ct);
+
     public async Task<ModuleRegistrationDto> RegisterAsync(Stream file, string fileName, ModuleRegistrationRequest request, CancellationToken ct = default)
     {
         using var form = new MultipartFormDataContent();

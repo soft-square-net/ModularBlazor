@@ -28,5 +28,10 @@ public sealed class CatalogModule : IHostModule
         services.AddSingleton(configuration.GetSection(ModuleStoreOptions.SectionName).Get<ModuleStoreOptions>() ?? new ModuleStoreOptions());
         services.AddSingleton<IModulePackageStore, FileModulePackageStore>();
         services.AddSingleton<IModuleRestart, ModuleRestart>();
+
+        // Client modules that need host modules: download them, and switch the client module on after a restart.
+        services.AddHttpClient();
+        services.AddSingleton<IHostPackageSource, HostPackageSource>();
+        services.AddHostedService<PendingRegistrationActivator>();
     }
 }

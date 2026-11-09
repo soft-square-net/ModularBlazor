@@ -23,6 +23,9 @@ public interface IModuleAdminApi
     // ---- client modules: the catalog (what the Blazor client downloads)
     Task<IReadOnlyList<ModuleRegistrationDto>> ListRegistrationsAsync(CancellationToken cancellationToken = default);
 
+    /// <summary>What registering a client module would install on the host (its host modules): show it, then register with ApproveHostInstall.</summary>
+    Task<RegistrationPlanDto> PlanRegistrationAsync(ModuleRegistrationRequest request, CancellationToken cancellationToken = default);
+
     /// <summary>Uploads a .dll / .nupkg and registers it. An existing id gets the new file and keeps its metadata.</summary>
     Task<ModuleRegistrationDto> RegisterAsync(Stream file, string fileName, ModuleRegistrationRequest request, CancellationToken cancellationToken = default);
 
