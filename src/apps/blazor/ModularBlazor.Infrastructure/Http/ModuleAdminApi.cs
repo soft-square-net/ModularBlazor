@@ -19,6 +19,27 @@ public sealed class ModuleAdminApi(IHttpClientFactory httpClients) : IModuleAdmi
 
     // ---------------------------------------------------------------- client modules
 
+    public async Task<ModuleInspectionDto> InspectAsync(Stream file, string fileName, CancellationToken ct = default)
+    {
+        using var form = new MultipartFormDataContent();
+        form.Add(FileContent(file), "File", fileName);
+        return await ReadAsync<ModuleInspectionDto>(await Client.PostAsync("api/v1/modules/inspections", form, ct), ct);
+    }
+
+    public Task<ModuleInspectionDto> GetInspectionAsync(string token, CancellationToken ct = default)
+        => GetAsync<ModuleInspectionDto>($"api/v1/modules/inspections/{Uri.EscapeDataString(token)}", ct);
+
+    public async Task<ModuleRegistrationDto> InstallInspectedClientAsync(string token, ModuleRegistrationRequest settings, CancellationToken ct = default)
+        => await ReadAsync<ModuleRegistrationDto>(
+            await Client.PostAsJsonAsync($"api/v1/modules/inspections/{Uri.EscapeDataString(token)}/install-client", settings, Json, ct), ct);
+
+    public async Task<ModulePackageInfo> InstallInspectedHostAsync(string token, HostModuleSettings settings, CancellationToken ct = default)
+        => await ReadAsync<ModulePackageInfo>(
+            await Client.PostAsJsonAsync($"api/v1/modules/inspections/{Uri.EscapeDataString(token)}/install-host", settings, Json, ct), ct);
+
+    public async Task DiscardInspectionAsync(string token, CancellationToken ct = default)
+        => await EnsureAsync(await Client.DeleteAsync($"api/v1/modules/inspections/{Uri.EscapeDataString(token)}", ct), ct);
+
     public Task<IReadOnlyList<ModuleRegistrationDto>> ListRegistrationsAsync(CancellationToken ct = default)
         => GetAsync<IReadOnlyList<ModuleRegistrationDto>>("api/v1/modules/registrations", ct);
 

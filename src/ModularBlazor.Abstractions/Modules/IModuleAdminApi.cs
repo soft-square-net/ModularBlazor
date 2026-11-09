@@ -20,6 +20,20 @@ public sealed class ModuleAdminException(string message, int statusCode) : Excep
 /// </summary>
 public interface IModuleAdminApi
 {
+    // ---- install from the file alone: upload, review the settings found in the module, confirm
+    /// <summary>Uploads a .dll / .nupkg and reads what it is (client, layout or host) and its default settings. The file waits for confirmation.</summary>
+    Task<ModuleInspectionDto> InspectAsync(Stream file, string fileName, CancellationToken cancellationToken = default);
+
+    Task<ModuleInspectionDto> GetInspectionAsync(string token, CancellationToken cancellationToken = default);
+
+    /// <summary>Registers and activates the waiting client / layout module with the confirmed settings.</summary>
+    Task<ModuleRegistrationDto> InstallInspectedClientAsync(string token, ModuleRegistrationRequest settings, CancellationToken cancellationToken = default);
+
+    /// <summary>Stores and enables the waiting host module with the confirmed settings (takes effect after a rebuild).</summary>
+    Task<ModulePackageInfo> InstallInspectedHostAsync(string token, HostModuleSettings settings, CancellationToken cancellationToken = default);
+
+    Task DiscardInspectionAsync(string token, CancellationToken cancellationToken = default);
+
     // ---- client modules: the catalog (what the Blazor client downloads)
     Task<IReadOnlyList<ModuleRegistrationDto>> ListRegistrationsAsync(CancellationToken cancellationToken = default);
 

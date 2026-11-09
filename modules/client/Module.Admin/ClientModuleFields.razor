@@ -1,0 +1,29 @@
+<label>Display name <input @bind="Model.Name" /></label>
+<label>Module id <input @bind="Model.Id" disabled="@IdLocked" placeholder="Module.Reports" /></label>
+
+<label class="check"><input type="checkbox" @bind="Model.Enabled" /> Activate (offer it to clients)</label>
+<label class="check"><input type="checkbox" @bind="Model.LoadOnStartup" /> Core module (downloaded at startup, before sign-in)</label>
+<label class="check"><input type="checkbox" @bind="Model.RequiresAuth" /> Requires sign-in</label>
+<label class="check"><input type="checkbox" @bind="Model.Hidden" /> Hidden from the menu</label>
+
+<label>Route prefixes <input @bind="Model.RoutePrefixes" placeholder="reports, reports/detail" /></label>
+<label>Layout <input @bind="Model.Layout" placeholder="default | admin | auth" /></label>
+<label>Required role <input @bind="Model.RequiredRole" placeholder="admin" /></label>
+<label>Offered to roles <input @bind="Model.AvailableToRoles" placeholder="empty: every signed-in user" /></label>
+<label>Depends on (client modules) <input @bind="Model.Dependencies" placeholder="Layouts.Admin" /></label>
+<label>Needs host modules
+  <textarea rows="3" @bind="Model.HostDependencies" disabled="@HostDependenciesLocked"
+            placeholder="one per line: Package@Version or Package@Version|https://source/file.nupkg"></textarea>
+</label>
+<span class="hint">Installed on the API first (after you approve), then this module is activated after the API restarts. A version alone downloads from nuget.org.</span>
+<label>Styles <input @bind="Model.Styles" placeholder="css/reports.css" /></label>
+<label>Scripts <input @bind="Model.Scripts" placeholder="empty: js/module.js if the module has one" /></label>
+<label>Menu entry <input @bind="Model.NavTitle" placeholder="title" /></label>
+<label>Menu link <input @bind="Model.NavHref" placeholder="reports" /></label>
+<label>Menu order <input type="number" @bind="Model.NavOrder" /></label>
+
+@code {
+  [Parameter, EditorRequired] public ModuleSettingsModel Model { get; set; } = null!;
+  [Parameter] public bool IdLocked { get; set; }
+  [Parameter] public bool HostDependenciesLocked { get; set; }
+}

@@ -2,11 +2,13 @@
 @using Microsoft.JSInterop
 @inject IModuleAdminApi Api
 @inject IJSRuntime JS
+@inject NavigationManager Navigation
 
 <PageTitle>Module management</PageTitle>
 
 <h1>Module management</h1>
 <p class="hint">
+  Upload a <strong>.dll or .nupkg</strong> and the page works out what it is; its default settings are read from the module itself.
   <strong>Client modules</strong> are what this Blazor app downloads: core modules at startup (then from the browser cache),
   user modules the first time their route is opened. <strong>Host modules</strong> extend the API and take effect after a rebuild.
 </p>
@@ -39,7 +41,7 @@ else
       @foreach (var m in _registrations)
       {
         <tr>
-          <td>@m.Id<br /><small>@m.Name</small></td>
+          <td>@m.Id<br /><small>@m.Name · @m.Routes.Length page(s)</small></td>
           <td>@m.Version</td>
           <td>@m.Kind</td>
           <td>@(m.LoadOnStartup ? "startup (core)" : "on navigation")</td>
@@ -135,96 +137,34 @@ else
   </p>
 }
 
-<h2>@(_editId is null ? "Add a module" : $"Edit {_editId}")</h2>
-<form class="module-form" @onsubmit="SubmitAsync" @onsubmit:preventDefault>
-  @if (_editId is null)
-  {
-    <label>Add to
-      <select @bind="_form.Target">
-        <option value="Client">Client modules (the Blazor app downloads it)</option>
-        <option value="Host">Host modules (extends the API)</option>
-      </select>
-    </label>
-  }
-
-  <label>@(_editId is null ? ".dll or .nupkg file" : "New version of the file (optional)")
-    <InputFile OnChange="OnFileChosen" accept=".dll,.nupkg" />
-  </label>
-  @if (_file is not null)
-  {
-    <p class="hint">@_file.Name (@FormatSize(_file.Size))</p>
-  }
-
-  <label>Display name <input @bind="_form.Name" placeholder="optional" /></label>
-
-  @if (_form.Target == "Client")
-  {
-    <label>Module id <input @bind="_form.Id" placeholder="Module.Reports (empty: from the assembly name)" disabled="@(_editId is not null)" /></label>
-
-    <label class="check"><input type="checkbox" @bind="_form.LoadOnStartup" /> Core module (downloaded at startup, before sign-in)</label>
-    <label class="check"><input type="checkbox" @bind="_form.RequiresAuth" /> Requires sign-in</label>
-    <label class="check"><input type="checkbox" @bind="_form.Hidden" /> Hidden from the menu</label>
-    <label class="check"><input type="checkbox" @bind="_form.Enabled" /> Enabled (offered to clients)</label>
-
-    <label>Route prefixes <input @bind="_form.RoutePrefixes" placeholder="reports, reports/detail" /></label>
-    <label>Layout <input @bind="_form.Layout" placeholder="default | admin | auth" /></label>
-    <label>Required role <input @bind="_form.RequiredRole" placeholder="admin" /></label>
-    <label>Offered to roles <input @bind="_form.AvailableToRoles" placeholder="empty: every signed-in user" /></label>
-    <label>Depends on <input @bind="_form.Dependencies" placeholder="Layouts.Admin" /></label>
-    <label>Needs host modules
-      <textarea rows="3" @bind="_form.HostDependencies" disabled="@(_editId is not null && _file is null)"
-                placeholder="one per line: Package@Version or Package|https://source/file.nupkg"></textarea>
-    </label>
-    <span class="hint">Installed on the API first (after you approve), then this module is installed. A version alone downloads from nuget.org.</span>
-    <label>Styles <input @bind="_form.Styles" placeholder="css/reports.css" /></label>
-    <label>Scripts <input @bind="_form.Scripts" placeholder="empty: js/module.js if the module has one" /></label>
-    <label>Menu entry <input @bind="_form.NavTitle" placeholder="title" /></label>
-    <label>Menu link <input @bind="_form.NavHref" placeholder="reports" /></label>
-    <label>Menu order <input type="number" @bind="_form.NavOrder" /></label>
-  }
-
-  <p>
-    <button type="submit" disabled="@_busy">@(_busy ? "Working…" : _editId is null ? "Upload" : "Save")</button>
-    @if (_editId is not null)
-    {
-      <button type="button" @onclick="CancelEdit" disabled="@_busy">Cancel</button>
-    }
-  </p>
-</form>
-
-@if (_plan is not null)
+@if (_editId is null)
 {
-  <div class="dialog-backdrop">
-    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="hostdlg">
-      <h3 id="hostdlg">Install host modules?</h3>
-      <p>
-        <strong>@(_pendingId ?? "This module")</strong> needs these host modules. They run with full trust inside the API,
-        take effect only after the API is rebuilt and restarted, and the client module is installed once they are in place.
-      </p>
-      <ul>
-        @foreach (var d in _plan.Dependencies)
-        {
-          <li>
-            <strong>@d.Package@(d.Version is null ? "" : " " + d.Version)</strong>: @DescribeState(d)
-            @if (d.Source is not null) { <br /><small>@d.Source</small> }
-          </li>
-        }
-      </ul>
-      <p class="actions">
-        <button type="button" @onclick="ApproveAsync" disabled="@_busy">Approve and install</button>
-        <button type="button" class="danger" @onclick="DeclinePlan" disabled="@_busy">Cancel</button>
-      </p>
-    </div>
-  </div>
+  <h2>Add a module</h2>
+  <p class="hint">
+    Choose a client, layout or host module. It is read (nothing is run), then you review its settings on the next page and install it.
+  </p>
+  <label>
+    <InputFile OnChange="UploadAsync" accept=".dll,.nupkg" disabled="@_busy" />
+  </label>
+}
+else
+{
+  <h2>Edit @_editId</h2>
+  <form class="module-form" @onsubmit="SaveAsync" @onsubmit:preventDefault>
+    <ClientModuleFields Model="_model" IdLocked="true" HostDependenciesLocked="true" />
+    <p>
+      <button type="submit" disabled="@_busy">@(_busy ? "Working…" : "Save")</button>
+      <button type="button" @onclick="CancelEdit" disabled="@_busy">Cancel</button>
+    </p>
+    <span class="hint">To install a new version of this module, upload the new file; its settings are kept.</span>
+  </form>
 }
 
 <style>
-  .dialog-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: grid; place-items: center; z-index: 1000; }
-  .dialog { background: #fff; color: #1b1b1b; padding: 1.25rem; border-radius: 8px; max-width: 560px; width: calc(100% - 2rem); }
   .module-form { display: grid; gap: .5rem; max-width: 560px; }
   .module-form label { display: grid; gap: .2rem; font-size: .9rem; }
   .module-form label.check { display: flex; gap: .5rem; align-items: center; }
-  .module-form input:not([type=checkbox]), .module-form select { padding: .4rem .5rem; }
+  .module-form input:not([type=checkbox]), .module-form select, .module-form textarea { padding: .4rem .5rem; }
   table.modules .actions { white-space: nowrap; }
   table.modules .actions button { margin-right: .25rem; }
   .ok-text { color: #14693a; }
@@ -232,41 +172,15 @@ else
 </style>
 
 @code {
-  private sealed class FormModel
-  {
-    public string Target { get; set; } = "Client";
-    public string? Id { get; set; }
-    public string? Name { get; set; }
-    public bool Enabled { get; set; }
-    public bool LoadOnStartup { get; set; }
-    public bool RequiresAuth { get; set; } = true;
-    public bool Hidden { get; set; }
-    public string? RoutePrefixes { get; set; }
-    public string? Layout { get; set; }
-    public string? RequiredRole { get; set; }
-    public string? AvailableToRoles { get; set; }
-    public string? Dependencies { get; set; }
-    public string? HostDependencies { get; set; }
-    public string? Styles { get; set; }
-    public string? Scripts { get; set; }
-    public string? NavTitle { get; set; }
-    public string? NavHref { get; set; }
-    public int NavOrder { get; set; } = 100;
-  }
-
   private const long MaxUploadBytes = 100L * 1024 * 1024;
 
   private IReadOnlyList<ModuleRegistrationDto>? _registrations;
   private IReadOnlyList<ModulePackageInfo>? _hostPackages;
-  private FormModel _form = new();
-  private IBrowserFile? _file;
+  private ModuleSettingsModel _model = new();
   private string? _editId;
   private string? _error;
   private string? _message;
   private bool _busy;
-  private RegistrationPlanDto? _plan;      // host modules waiting for the administrator's approval
-  private string? _pendingId;
-  private bool _approved;
 
   protected override Task OnInitializedAsync() => RefreshAsync();
 
@@ -275,8 +189,6 @@ else
     _registrations = await Api.ListRegistrationsAsync();
     _hostPackages = await Api.ListHostPackagesAsync();
   }
-
-  private void OnFileChosen(InputFileChangeEventArgs e) => _file = e.File;
 
   // Runs an action with the busy flag, shows the server's explanation when it fails, and refreshes the lists.
   private async Task RunAsync(Func<Task<string?>> action)
@@ -300,6 +212,23 @@ else
     {
       _busy = false;
     }
+  }
+
+  // Just the file: the API reads what it is and its defaults, then the settings page takes over.
+  private async Task UploadAsync(InputFileChangeEventArgs e)
+  {
+    _busy = true;
+    _error = _message = null;
+    try
+    {
+      await using var stream = e.File.OpenReadStream(MaxUploadBytes);
+      var inspection = await Api.InspectAsync(stream, e.File.Name);
+      Navigation.NavigateTo($"admin/modules/settings/{inspection.Token}");
+    }
+    catch (ModuleAdminException ex) { _error = ex.Message; }
+    catch (HttpRequestException ex) { _error = $"The API cannot be reached: {ex.Message}"; }
+    catch (IOException ex) { _error = ex.Message; }
+    finally { _busy = false; }
   }
 
   private Task SetEnabledAsync(ModuleRegistrationDto m, bool enabled) => RunAsync(async () =>
@@ -339,163 +268,26 @@ else
     return null;
   });
 
-  private Task SubmitAsync() => RunAsync(async () =>
-  {
-    if (_form.Target == "Host")
-    {
-      if (_file is null) throw new ModuleAdminException("Choose a .dll or .nupkg file.", 400);
-      await using var stream = _file.OpenReadStream(MaxUploadBytes);
-      var package = await Api.UploadHostPackageAsync(stream, _file.Name, _form.Name);
-      ResetForm();
-      return $"{package.Name} {package.Version} uploaded. Enable it, then rebuild the API.";
-    }
-
-    var request = ToRequest();
-    var uploading = _file is not null;
-
-    if (_editId is null && _file is null) throw new ModuleAdminException("Choose a .dll or .nupkg file.", 400);
-
-    // Host modules first: show what will be installed and wait for the administrator's approval.
-    if (uploading && request.HostDependencies.Length > 0 && !_approved)
-    {
-      var plan = await Api.PlanRegistrationAsync(request);
-      if (plan.Blocked)
-        throw new ModuleAdminException(string.Join(" ", plan.Dependencies.Where(d => d.Problem is not null).Select(d => $"{d.Package}: {d.Problem}")), 400);
-      if (plan.NeedsApproval)
-      {
-        _plan = plan;
-        _pendingId = _editId ?? _form.Id ?? _file!.Name;
-        return null; // the dialog continues with ApproveAsync
-      }
-    }
-
-    request.ApproveHostInstall = _approved;
-
-    if (_editId is null)
-    {
-      await using var stream = _file!.OpenReadStream(MaxUploadBytes);
-      var added = await Api.RegisterAsync(stream, _file.Name, request);
-      ResetForm();
-      return RegisteredMessage(added);
-    }
-
-    var id = _editId;
-    if (_file is not null)
-    {
-      // A new build of an existing module: the file is replaced, then the metadata edits are applied on top.
-      await using var stream = _file.OpenReadStream(MaxUploadBytes);
-      var replaced = await Api.RegisterAsync(stream, _file.Name,
-        new ModuleRegistrationRequest { Id = id, HostDependencies = request.HostDependencies, ApproveHostInstall = request.ApproveHostInstall, Enabled = request.Enabled });
-      if (replaced.WaitingForHost)
-      {
-        ResetForm();
-        return RegisteredMessage(replaced);
-      }
-    }
-
-    await Api.UpdateRegistrationAsync(id, request);
-    ResetForm();
-    return $"{id} saved.";
-  });
-
-  private Task ApproveAsync() { _plan = null; _approved = true; return SubmitSafeAsync(); }
-
-  private async Task SubmitSafeAsync()
-  {
-    try { await SubmitAsync(); }
-    finally { _approved = false; }
-  }
-
-  private void DeclinePlan() { _plan = null; _approved = false; }
-
-  private static string RegisteredMessage(ModuleRegistrationDto m)
-      => m.WaitingForHost
-          ? $"{m.Id} {m.Version} registered. Its host modules are installed; restart the API and it switches on by itself."
-          : $"{m.Id} {m.Version} registered{(m.Enabled ? "" : " (disabled: tick Enabled to offer it)")}.";
-
-  private static string DescribeState(HostDependencyPlanItem d) => d.State switch
-  {
-    HostDependencyState.Running => "already running",
-    HostDependencyState.EnabledPendingRestart => "already enabled, needs a restart",
-    HostDependencyState.InStore => "is in the module store and will be enabled",
-    HostDependencyState.WillDownload => "will be downloaded and enabled",
-    _ => d.Problem ?? "not available"
-  };
-
   private void Edit(ModuleRegistrationDto m)
   {
     _editId = m.Id;
-    _file = null;
     _error = _message = null;
-    var nav = m.Nav.FirstOrDefault();
-    _form = new FormModel
-    {
-      Target = "Client",
-      Id = m.Id,
-      Name = m.Name,
-      Enabled = m.Enabled,
-      LoadOnStartup = m.LoadOnStartup,
-      RequiresAuth = m.RequiresAuth,
-      Hidden = m.Hidden,
-      RoutePrefixes = string.Join(", ", m.RoutePrefixes),
-      Layout = m.Layout,
-      RequiredRole = m.RequiredRole,
-      AvailableToRoles = string.Join(", ", m.AvailableToRoles),
-      Dependencies = string.Join(", ", m.Dependencies),
-      HostDependencies = string.Join("\n", m.HostDependencies),
-      Styles = string.Join(", ", m.Styles),
-      Scripts = string.Join(", ", m.Scripts),
-      NavTitle = nav?.Title,
-      NavHref = nav?.Href,
-      NavOrder = nav?.Order ?? 100
-    };
+    _model = ModuleSettingsModel.From(m);
   }
 
-  private void CancelEdit() => ResetForm();
+  private Task SaveAsync() => RunAsync(async () =>
+  {
+    var id = _editId!;
+    await Api.UpdateRegistrationAsync(id, _model.ToRequest());
+    CancelEdit();
+    return $"{id} saved.";
+  });
 
-  private void ResetForm()
+  private void CancelEdit()
   {
     _editId = null;
-    _file = null;
-    _form = new FormModel();
+    _model = new();
   }
-
-  private ModuleRegistrationRequest ToRequest() => new()
-  {
-    Id = _editId ?? _form.Id,
-    Name = _form.Name,
-    Enabled = _form.Enabled,
-    LoadOnStartup = _form.LoadOnStartup,
-    RequiresAuth = _form.RequiresAuth,
-    Hidden = _form.Hidden,
-    RequiredRole = _form.RequiredRole,
-    Layout = _form.Layout,
-    AvailableToRoles = Split(_form.AvailableToRoles),
-    RoutePrefixes = Split(_form.RoutePrefixes),
-    Dependencies = Split(_form.Dependencies),
-    HostDependencies = ParseHostDependencies(_form.HostDependencies),
-    Styles = Split(_form.Styles),
-    Scripts = Split(_form.Scripts),
-    Nav = string.IsNullOrWhiteSpace(_form.NavTitle) ? [] : [new ModuleNavItem(_form.NavTitle.Trim(), (_form.NavHref ?? "").Trim(), _form.NavOrder)]
-  };
-
-  // "Package@Version" or "Package|https://source", one per line.
-  private static HostDependencyRequest[] ParseHostDependencies(string? text)
-      => (text ?? "").Split(['\n', '\r'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-          .Select(line =>
-          {
-            var parts = line.Split('|', 2, StringSplitOptions.TrimEntries);
-            var id = parts[0].Split('@', 2, StringSplitOptions.TrimEntries);
-            return new HostDependencyRequest
-            {
-              Package = id[0],
-              Version = id.Length > 1 && id[1].Length > 0 ? id[1] : null,
-              SourceUrl = parts.Length > 1 && parts[1].Length > 0 ? parts[1] : null
-            };
-          }).ToArray();
-
-  private static string[] Split(string? csv)
-      => (csv ?? "").Split([',', ';'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
   private static string Audience(ModuleRegistrationDto m)
       => m.LoadOnStartup ? "everyone"

@@ -1,0 +1,259 @@
+@page "/admin/modules/settings/{Token}"
+@using Microsoft.AspNetCore.Components.Forms
+@inject IModuleAdminApi Api
+@inject NavigationManager Navigation
+
+<PageTitle>Module settings</PageTitle>
+
+@if (_inspection is null && _error is null)
+{
+  <p class="hint">Reading the module…</p>
+}
+else if (_inspection is null)
+{
+  <p class="error-text">@_error</p>
+  <p><a href="admin/modules">Back to module management</a></p>
+}
+else if (_done is not null)
+{
+  <h1>@_inspection.DisplayName</h1>
+  <p class="ok-text">@_done</p>
+  @if (_restartNeeded)
+  {
+    <p>
+      <button type="button" @onclick="RestartAsync" disabled="@_busy">Restart the API</button>
+      <span class="hint">needs the supervisor: <code>scripts/run-host.ps1</code> / <code>.sh</code></span>
+    </p>
+  }
+  @if (_error is not null) { <p class="error-text">@_error</p> }
+  <p><a href="admin/modules">Back to module management</a></p>
+}
+else
+{
+  <h1>Install @_inspection.DisplayName</h1>
+  <p>
+    <span class="badge badge-on">@KindLabel</span>
+    <code>@_inspection.PackageId</code> @_inspection.Version · @_inspection.FileName
+  </p>
+  <p class="hint">
+    The settings below were read from the module itself (<code>[assembly: @(IsHost ? "HostModule" : "ClientModule")]</code>); change what you need.
+    @if (_inspection.ExistingId is not null) { <text> <strong>@_inspection.ExistingId</strong> is already installed: this uploads a new version and keeps its current settings.</text> }
+  </p>
+
+  @foreach (var warning in _inspection.Warnings)
+  {
+    <p class="error-text">@warning</p>
+  }
+  @if (_error is not null) { <p class="error-text">@_error</p> }
+
+  <form class="module-form" @onsubmit="InstallAsync" @onsubmit:preventDefault>
+    @if (IsHost)
+    {
+      <label>Name <input @bind="_hostSettings.Name" /></label>
+      <label>Configuration (JSON object, injected as <code>Modules:@(_hostSettings.Name)</code>)
+        <textarea rows="6" @bind="_hostSettings.ConfigurationJson" placeholder="{ }"></textarea>
+      </label>
+      <label class="check"><input type="checkbox" @bind="_hostSettings.Enabled" /> Enable (included in the next build)</label>
+      <span class="hint">A host module runs with full trust inside the API and takes effect after the API is rebuilt and restarted.</span>
+    }
+    else
+    {
+      <ClientModuleFields Model="_model" IdLocked="@(_inspection.ExistingId is not null)" />
+    }
+
+    <p>
+      <button type="submit" disabled="@_busy">@(_busy ? "Working…" : "Install and activate")</button>
+      <button type="button" class="danger" @onclick="CancelAsync" disabled="@_busy">Cancel</button>
+    </p>
+  </form>
+
+  @if (!IsHost)
+  {
+    <h2>Pages found in the module</h2>
+    @if (_inspection.Routes.Count == 0)
+    {
+      <p class="hint">No routable pages.</p>
+    }
+    else
+    {
+      <table class="modules">
+        <thead><tr><th>Route</th><th>Component</th><th>Layout</th><th>Access</th></tr></thead>
+        <tbody>
+          @foreach (var r in _inspection.Routes)
+          {
+            <tr>
+              <td><code>@r.Template</code></td>
+              <td><small>@r.Component</small></td>
+              <td>@(r.Layout ?? "")</td>
+              <td>@(r.RequiresAuth ? (r.Roles.Length > 0 ? string.Join(", ", r.Roles) : "signed in") : "public")</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      <p class="hint">These routes are saved in the catalog when the module is installed.</p>
+    }
+    @if (_inspection.LayoutKeys.Length > 0)
+    {
+      <p>Layouts provided: @string.Join(", ", _inspection.LayoutKeys)</p>
+    }
+  }
+}
+
+@if (_plan is not null)
+{
+  <div class="dialog-backdrop">
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="hostdlg">
+      <h3 id="hostdlg">Install host modules first?</h3>
+      <p>
+        <strong>@_inspection?.DisplayName</strong> needs these host modules. They run with full trust inside the API, take effect only after
+        the API is rebuilt and restarted, and this module is activated once they are in place.
+      </p>
+      <ul>
+        @foreach (var d in _plan.Dependencies)
+        {
+          <li>
+            <strong>@d.Package@(d.Version is null ? "" : " " + d.Version)</strong>: @DescribeState(d)
+            @if (d.Source is not null) { <br /><small>@d.Source</small> }
+          </li>
+        }
+      </ul>
+      <p>
+        <button type="button" @onclick="ApproveAsync" disabled="@_busy">Approve and install</button>
+        <button type="button" class="danger" @onclick="DeclinePlan" disabled="@_busy">Cancel</button>
+      </p>
+    </div>
+  </div>
+}
+
+<style>
+  .dialog-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: grid; place-items: center; z-index: 1000; }
+  .dialog { background: #fff; color: #1b1b1b; padding: 1.25rem; border-radius: 8px; max-width: 560px; width: calc(100% - 2rem); }
+  .module-form { display: grid; gap: .5rem; max-width: 560px; }
+  .module-form label { display: grid; gap: .2rem; font-size: .9rem; }
+  .module-form label.check { display: flex; gap: .5rem; align-items: center; }
+  .module-form input:not([type=checkbox]), .module-form select, .module-form textarea { padding: .4rem .5rem; }
+  .ok-text { color: #14693a; }
+  button.danger { color: #a4262c; }
+</style>
+
+@code {
+  [Parameter] public string Token { get; set; } = "";
+
+  private ModuleInspectionDto? _inspection;
+  private ModuleSettingsModel _model = new();
+  private HostModuleSettings _hostSettings = new();
+  private RegistrationPlanDto? _plan;
+  private bool _approved;
+  private bool _busy;
+  private bool _restartNeeded;
+  private string? _error;
+  private string? _done;
+  private string _loadedToken = "";
+
+  private bool IsHost => _inspection?.Detected == DetectedModuleKind.Host;
+
+  private string KindLabel => _inspection?.Detected switch
+  {
+    DetectedModuleKind.Host => "Host module (extends the API)",
+    DetectedModuleKind.Layout => "Layout module (client)",
+    _ => "Client module"
+  };
+
+  protected override async Task OnParametersSetAsync()
+  {
+    if (Token == _loadedToken) return;
+    _loadedToken = Token;
+    _inspection = null;
+    _error = _done = null;
+    try
+    {
+      _inspection = await Api.GetInspectionAsync(Token);
+      _model = ModuleSettingsModel.From(_inspection.Client);
+      _hostSettings = _inspection.Host;
+    }
+    catch (ModuleAdminException ex) { _error = ex.Message; }
+    catch (HttpRequestException ex) { _error = $"The API cannot be reached: {ex.Message}"; }
+  }
+
+  private async Task InstallAsync()
+  {
+    if (_inspection is null) return;
+    _busy = true;
+    _error = null;
+    try
+    {
+      if (IsHost)
+      {
+        var package = await Api.InstallInspectedHostAsync(Token, _hostSettings);
+        _done = $"{package.Name} {package.Version} is stored{(package.Enabled ? " and enabled" : "")}. It runs after the API is rebuilt and restarted.";
+        _restartNeeded = package.Enabled;
+        return;
+      }
+
+      var request = _model.ToRequest();
+      if (request.HostDependencies.Length > 0 && !_approved)
+      {
+        var plan = await Api.PlanRegistrationAsync(request);
+        if (plan.Blocked)
+          throw new ModuleAdminException(string.Join(" ", plan.Dependencies.Where(d => d.Problem is not null).Select(d => $"{d.Package}: {d.Problem}")), 400);
+        if (plan.NeedsApproval)
+        {
+          _plan = plan; // the dialog continues with ApproveAsync
+          return;
+        }
+      }
+
+      request.ApproveHostInstall = _approved;
+      var module = await Api.InstallInspectedClientAsync(Token, request);
+      _restartNeeded = module.WaitingForHost;
+      _done = module.WaitingForHost
+          ? $"{module.Id} {module.Version} is registered and its host modules are installed. Restart the API: the module switches on by itself afterwards."
+          : $"{module.Id} {module.Version} is installed{(module.Enabled ? " and active" : " (not active)")}. {module.Routes.Length} page route(s) recorded.";
+    }
+    catch (ModuleAdminException ex) { _error = ex.Message; }
+    catch (HttpRequestException ex) { _error = $"The API cannot be reached: {ex.Message}"; }
+    finally { _busy = false; }
+  }
+
+  private async Task ApproveAsync()
+  {
+    _plan = null;
+    _approved = true;
+    try { await InstallAsync(); }
+    finally { _approved = false; }
+  }
+
+  private void DeclinePlan() { _plan = null; _approved = false; }
+
+  private async Task CancelAsync()
+  {
+    _busy = true;
+    try { await Api.DiscardInspectionAsync(Token); }
+    catch (ModuleAdminException) { /* already gone */ }
+    finally { _busy = false; }
+    Navigation.NavigateTo("admin/modules");
+  }
+
+  private async Task RestartAsync()
+  {
+    _busy = true;
+    _error = null;
+    try
+    {
+      await Api.RestartHostAsync();
+      _done = "The API is stopping; the supervisor rebuilds and starts it again. Reload in a minute.";
+      _restartNeeded = false;
+    }
+    catch (ModuleAdminException ex) { _error = ex.Message; }
+    finally { _busy = false; }
+  }
+
+  private static string DescribeState(HostDependencyPlanItem d) => d.State switch
+  {
+    HostDependencyState.Running => "already running",
+    HostDependencyState.EnabledPendingRestart => "already enabled, needs a restart",
+    HostDependencyState.InStore => "is in the module store and will be enabled",
+    HostDependencyState.WillDownload => "will be downloaded and enabled",
+    _ => d.Problem ?? "not available"
+  };
+}

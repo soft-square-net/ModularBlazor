@@ -31,6 +31,20 @@ public sealed class ModuleRegistrationConfiguration : IEntityTypeConfiguration<M
         builder.Property(m => m.Nav).HasJsonConversion();
         builder.Property(m => m.HostDependencies).HasJsonConversion();
 
+        // Pages found inside the module at install time: table ModuleRoutes.
+        builder.OwnsMany(m => m.Routes, r =>
+        {
+            r.ToTable("ModuleRoutes");
+            r.WithOwner().HasForeignKey("ModuleId");
+            r.Property<int>("Id").ValueGeneratedOnAdd();
+            r.HasKey("Id");
+            r.Property(x => x.Template).HasMaxLength(500).IsRequired();
+            r.Property(x => x.Component).HasMaxLength(500).IsRequired();
+            r.Property(x => x.Layout).HasMaxLength(50);
+            r.Property(x => x.Roles).HasJsonConversion();
+            r.HasIndex(x => x.Template);
+        });
+
         builder.HasIndex(m => m.SortOrder);
     }
 }

@@ -78,4 +78,4 @@ public sealed record ModuleRegistrationDto(
     string[] AvailableToRoles, string[] RoutePrefixes, string[] Dependencies, string[] Styles, string[] Scripts,
     ModuleNavItem[] Nav,
     string? PackageId, string? FileName, long? SizeBytes, DateTime? UploadedUtc,
-    string[] HostDependencies, bool WaitingForHost);
+    string[] HostDependencies, bool WaitingForHost, ModuleRouteDto[] Routes);

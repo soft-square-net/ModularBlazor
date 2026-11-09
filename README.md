@@ -257,6 +257,25 @@ Needs `Permissions.Modules.View|Manage` (held by `admin`) and `ModuleStore:Allow
 | `DELETE /api/v1/modules/registrations/{id}` | remove entry and file (409 while another module depends on it) |
 | `GET /api/modules/{id}/file` | **download for the client**: core modules are public, user modules need sign-in and a matching role; ETag = SHA-256 |
 
+**Install from the file alone.** On the Module Management page you choose only a `.dll` / `.nupkg`. `POST /api/v1/modules/inspections` stores it
+as a pending upload and reads its metadata with `System.Reflection.Metadata` (the module's code is never loaded or run). The answer says
+what it is: **host** (a public `IHostModule`, or `[assembly: HostModule]`), **client** (pages or `[assembly: ClientModule]`) or **layout**
+(`[LayoutKey]` types), plus its defaults, written once in the module itself:
+
+```csharp
+[assembly: ClientModule(Name = "Reports", Layout = "default", RoutePrefixes = new[] { "reports" },
+                        Styles = new[] { "reports.css" }, NavTitle = "Reports", NavHref = "reports", NavOrder = 20)]
+[assembly: HostModule(Name = "Billing", DefaultConfiguration = "{\"Currency\":\"EUR\"}")]   // host module
+```
+
+The page then opens `admin/modules/settings/{token}` with those values filled in (an already installed id starts from its current
+settings). *Install and activate* registers + enables a client/layout module (host dependencies are planned and approved first, see below)
+or stores + enables a host module (rebuild needed; a new version replaces the enabled one). Pending uploads expire after two hours.
+Without an attribute, routes give the prefixes (`/reports/{id}` gives `reports`). A file that is none of these is rejected.
+
+**Module routes.** Whenever a client module is registered, every `@page` route in it is stored in the `ModuleRoutes` table (template,
+component, `[UseLayout]` key, `[Authorize]` and roles), shown in the settings page and returned as `routes` on each registration.
+
 **Client modules that need host modules.** A client module can declare `hostDependencies` (`Package@Version`, or `Package|https://source`;
 a version alone means nuget.org). `POST /registrations/plan` answers what would change; the management page shows that in a warning
 dialog (host modules run with full trust in the API). After approval (`approveHostInstall: true`) the API, in this order:

@@ -32,6 +32,10 @@ public sealed class CatalogModule : IHostModule
         // Client modules that need host modules: download them, and switch the client module on after a restart.
         services.AddHttpClient();
         services.AddSingleton<IHostPackageSource, HostPackageSource>();
+
+        // Upload only a file: read its metadata (nothing is run) and keep it until the administrator confirms the settings.
+        services.AddSingleton<IModuleInspector, ModuleInspector>();
+        services.AddSingleton<IPendingModuleStore, PendingModuleStore>();
         services.AddHostedService<PendingRegistrationActivator>();
     }
 }

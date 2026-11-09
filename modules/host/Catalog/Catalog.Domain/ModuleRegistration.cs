@@ -67,6 +67,15 @@ public sealed class ModuleRegistration : AuditableAggregateRoot<string>
     public string[] Scripts { get; set; } = [];
     public ModuleNavItem[] Nav { get; set; } = [];
 
+    /// <summary>Pages found in the module when it was installed (table ModuleRoutes).</summary>
+    public List<ModuleRoute> Routes { get; private set; } = [];
+
+    public void ReplaceRoutes(IEnumerable<ModuleRoute> routes)
+    {
+        Routes.Clear();
+        Routes.AddRange(routes);
+    }
+
     /// <summary>Host modules this module needs ("Package" or "Package@Version"). It cannot be enabled before they run.</summary>
     public string[] HostDependencies { get; set; } = [];
 

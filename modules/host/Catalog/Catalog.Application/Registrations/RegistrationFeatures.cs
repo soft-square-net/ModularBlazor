@@ -54,7 +54,7 @@ internal static partial class RegistrationMapping
     public static ModuleRegistrationDto ToDto(this ModuleRegistration m, ModulePackage? package) => new(
         m.Id, m.Name, m.Version, m.Kind, m.Url, m.Sha256, m.Enabled, m.LoadOnStartup, m.Hidden, m.RequiresAuth,
         m.RequiredRole, m.Layout, m.AvailableToRoles, m.RoutePrefixes, m.Dependencies, m.Styles, m.Scripts, m.Nav,
-        m.PackageId, package?.FileName, package?.SizeBytes, package?.UploadedUtc, m.HostDependencies, m.ActivateWhenHostReady);
+        m.PackageId, package?.FileName, package?.SizeBytes, package?.UploadedUtc, m.HostDependencies, m.ActivateWhenHostReady, InspectionMapping.ToDtos(m.Routes));
 
     public static async Task<ModuleRegistration> GetAsync(this IReadRepositoryBase<ModuleRegistration> modules, string id, CancellationToken ct)
         => await modules.FirstOrDefaultAsync(new ModuleByIdSpec(id), ct) ?? throw new NotFoundException($"Module '{id}' was not found.");
@@ -114,7 +114,7 @@ public sealed class RegisterClientModuleCommandValidator : AbstractValidator<Reg
 /// uploading a new build of a module must not reset its routes.
 /// </summary>
 public sealed class RegisterClientModuleCommandHandler(
-    IModulePackageStore store, IHostPackageSource hostSource, IRepository<ModuleRegistration> modules, ICurrentUser user)
+    IModulePackageStore store, IHostPackageSource hostSource, IModuleInspector inspector, IRepository<ModuleRegistration> modules, ICurrentUser user)
     : IRequestHandler<RegisterClientModuleCommand, ModuleRegistrationDto>
 {
     public async Task<ModuleRegistrationDto> Handle(RegisterClientModuleCommand command, CancellationToken cancellationToken)
@@ -142,6 +142,7 @@ public sealed class RegisterClientModuleCommandHandler(
             var url = RegistrationMapping.FileUrl(id);
             var name = string.IsNullOrWhiteSpace(request.Name) ? id : request.Name.Trim();
             var existing = await modules.FirstOrDefaultAsync(new ModuleByIdSpec(id), cancellationToken);
+            var routes = ReadRoutes(package);
             string? replacedPackage = null;
 
             if (existing is null)
@@ -156,6 +157,7 @@ public sealed class RegisterClientModuleCommandHandler(
                     SortOrder = 100 + (await modules.CountAsync(cancellationToken)) * 10
                 };
                 existing.Apply(request);
+                if (existing.RoutePrefixes.Length == 0) existing.RoutePrefixes = InspectionMapping.PrefixesOf(routes);
                 await modules.AddAsync(existing, cancellationToken);
             }
             else
@@ -164,6 +166,7 @@ public sealed class RegisterClientModuleCommandHandler(
                 existing.Describe(string.IsNullOrWhiteSpace(request.Name) ? existing.Name : name, package.Version, package.Kind, url);
                 existing.Sha256 = package.Sha256;
                 existing.PackageId = package.Id;
+                if (existing.RoutePrefixes.Length == 0) existing.RoutePrefixes = InspectionMapping.PrefixesOf(routes);
 
                 if (hostKeys.Length > 0)
                 {
@@ -176,6 +179,7 @@ public sealed class RegisterClientModuleCommandHandler(
                 }
             }
 
+            existing.ReplaceRoutes(InspectionMapping.ToRoutes(routes)); // the pages this build contains (table ModuleRoutes)
             await modules.SaveChangesAsync(cancellationToken);
 
             // The superseded file is no longer referenced by anything.
@@ -189,6 +193,20 @@ public sealed class RegisterClientModuleCommandHandler(
             if (package is not null) await store.DeleteAsync(package.Id, cancellationToken); // do not leave an orphan file behind
             await undoHost();
             throw;
+        }
+    }
+
+    /// <summary>The routable pages of the stored file. Best effort: an unreadable file just has no routes recorded.</summary>
+    private IReadOnlyList<ModuleRouteDto> ReadRoutes(ModulePackage package)
+    {
+        try
+        {
+            using var file = store.OpenRead(package);
+            return inspector.Inspect(file, package.FileName).Routes;
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            return [];
         }
     }
 }
