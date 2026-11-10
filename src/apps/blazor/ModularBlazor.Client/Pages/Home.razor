@@ -47,5 +47,5 @@ else
   }
   private void OnChanged() => InvokeAsync(StateHasChanged);
 
-    public void Dispose() => Modules.Changed -= OnChanged;
+  public void Dispose() => Modules.Changed -= OnChanged;
 }
