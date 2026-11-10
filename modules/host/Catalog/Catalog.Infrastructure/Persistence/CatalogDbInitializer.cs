@@ -22,19 +22,19 @@ public sealed class CatalogDbInitializer(CatalogDbContext dbContext) : DbInitial
                 "modules/soft.square.net.Module.Auth.dll")
             { LoadOnStartup = true, Hidden = true, RoutePrefixes = ["login"], Layout = "auth", SortOrder = 2 },
 
-            new ModuleRegistration("Module.Dashboard", "Dashboard", "1.0.0", ModuleKind.Dll,
-                "modules/soft.square.net.Module.Dashboard.dll")
-            {
-                RequiresAuth = true, RoutePrefixes = ["dashboard"], Layout = "default",
-                Nav = [new ModuleNavItem("Dashboard", "dashboard", 10)], SortOrder = 10
-            },
+            //new ModuleRegistration("Module.Dashboard", "Dashboard", "1.0.0", ModuleKind.Dll,
+            //    "modules/soft.square.net.Module.Dashboard.dll")
+            //{
+            //    RequiresAuth = true, RoutePrefixes = ["dashboard"], Layout = "default",
+            //    Nav = [new ModuleNavItem("Dashboard", "dashboard", 10)], SortOrder = 10
+            //},
 
-            new ModuleRegistration("Module.Reports", "Reports", "1.0.0", ModuleKind.NuPkg,
-                "modules/soft.square.net.Module.Reports.1.0.0.nupkg")
-            {
-                RequiresAuth = true, RoutePrefixes = ["reports"], Layout = "default", Styles = ["reports.css"],
-                Nav = [new ModuleNavItem("Reports", "reports", 20)], SortOrder = 20
-            },
+            //new ModuleRegistration("Module.Reports", "Reports", "1.0.0", ModuleKind.NuPkg,
+            //    "modules/soft.square.net.Module.Reports.1.0.0.nupkg")
+            //{
+            //    RequiresAuth = true, RoutePrefixes = ["reports"], Layout = "default", Styles = ["reports.css"],
+            //    Nav = [new ModuleNavItem("Reports", "reports", 20)], SortOrder = 20
+            //},
 
             new ModuleRegistration("Layouts.Admin", "Admin layout", "1.0.0", ModuleKind.Dll,
                 "modules/soft.square.net.Layouts.Admin.dll")
