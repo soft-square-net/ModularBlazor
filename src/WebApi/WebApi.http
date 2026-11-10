@@ -1,6 +1,45 @@
 @WebApi_HostAddress = http://localhost:5298
 
-GET {{WebApi_HostAddress}}/weatherforecast/
-Accept: application/json
+### Registered modules
+GET {{WebApi_HostAddress}}/api/admin/modules
 
-###
+### Install: upload the zipped build output of src/WebApi.Modules.Greeting (bin/Debug/net10.0/*)
+POST {{WebApi_HostAddress}}/api/admin/modules
+Content-Type: multipart/form-data; boundary=module
+
+--module
+Content-Disposition: form-data; name="package"; filename="greeting.zip"
+Content-Type: application/zip
+
+< ./greeting.zip
+--module--
+
+### Activate (load + services + routes)
+POST {{WebApi_HostAddress}}/api/admin/modules/greeting/activate
+
+### Call the module
+GET {{WebApi_HostAddress}}/api/greeting/john_doe
+
+### Module POST endpoint
+POST {{WebApi_HostAddress}}/api/greeting/echo
+Content-Type: application/json
+
+{ "text": "hello runtime world" }
+
+### Change settings (applied on next load)
+PUT {{WebApi_HostAddress}}/api/admin/modules/greeting/settings
+Content-Type: application/json
+
+{ "Greeting:Prefix": "Ahlan" }
+
+### Deactivate (routes removed, still loaded)
+POST {{WebApi_HostAddress}}/api/admin/modules/greeting/deactivate
+
+### Unload (dispose services, unload assemblies)
+POST {{WebApi_HostAddress}}/api/admin/modules/greeting/unload
+
+### Unloaded but not yet collected
+GET {{WebApi_HostAddress}}/api/admin/modules/unloading
+
+### Uninstall
+DELETE {{WebApi_HostAddress}}/api/admin/modules/greeting

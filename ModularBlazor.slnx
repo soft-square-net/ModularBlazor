@@ -46,6 +46,8 @@
     </Project>
     <Project Path="src/Share.All/Share.All.csproj" Id="1e77fb8d-d73a-4160-b58a-b98df7a9e673" />
     <Project Path="src/WebApi/WebApi.csproj" />
+    <Project Path="src/WebApi.Contracts/WebApi.Contracts.csproj" />
+    <Project Path="src/WebApi.Modules.Greeting/WebApi.Modules.Greeting.csproj" />
   </Folder>
   <Folder Name="/src/api/">
     <File Path="PACKIGINGMODULE.md" />

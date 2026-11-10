@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Contracts shared by the WebApi host and every runtime module.
+    The host references this project, so it always loads from the default AssemblyLoadContext:
+    modules must reference it with Private="false" so their IRuntimeModule is the host's type.
+  -->
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+</Project>
