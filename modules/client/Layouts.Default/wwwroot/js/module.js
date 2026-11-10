@@ -1,0 +1,2 @@
+var e;(function(e){let t;(function(e){let t;(function(e){class t{}e.Module=t;function n(){return console.log(`Core initialized.`),new t}e.Init=n})(t||=e.Admin||={})})(t||=e.Layouts||={})})(e||={}),e.Layouts.Admin.Init;
+//# sourceMappingURL=module.js.map

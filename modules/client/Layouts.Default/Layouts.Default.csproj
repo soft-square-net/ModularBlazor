@@ -1,1 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor" />
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+  <ItemGroup>
+    <Compile Remove="node-app\**" />
+    <Content Remove="node-app\**" />
+    <EmbeddedResource Remove="node-app\**" />
+    <None Remove="node-app\**" />
+  </ItemGroup>
+</Project>
