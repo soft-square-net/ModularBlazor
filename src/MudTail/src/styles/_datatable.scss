@@ -341,3 +341,93 @@ th[aria-sort="descending"] .mud-datatable__sort-icon { transform: rotate(180deg)
     .mud-datatable__size { margin-inline-start: 0; }
   }
 }
+
+// ───────── editing: New button, actions column, row menu ─────────
+
+.mud-datatable__create { margin-inline-start: auto; display: inline-flex; align-items: center; gap: 6px; }
+
+th.mud-datatable__actions, td.mud-datatable__actions { inline-size: 1%; white-space: nowrap; text-align: end; }
+.mud-datatable__action-bar { display: inline-flex; align-items: center; justify-content: flex-end; gap: 2px; }
+
+.mud-datatable__action {
+  --_c: var(--mud-palette-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: 0;
+  background: none;
+  color: var(--mud-palette-text-secondary);
+  font: inherit;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+
+  &[data-color="error"] { --_c: var(--mud-palette-error); }
+  &[data-color="success"] { --_c: var(--mud-palette-success); }
+  &[data-color="warning"] { --_c: var(--mud-palette-warning); }
+  &[data-color="info"] { --_c: var(--mud-palette-info); }
+  &[data-color="secondary"] { --_c: var(--mud-palette-secondary); }
+
+  &:hover:not(:disabled), &:focus-visible, &[aria-expanded="true"] {
+    color: var(--_c);
+    background: color-mix(in srgb, var(--_c) 12%, transparent);
+  }
+  &:focus-visible { outline: 2px solid var(--_c); outline-offset: 1px; }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+.mud-datatable__action--icon { inline-size: 2rem; block-size: 2rem; border-radius: 50%; }
+.mud-datatable__action--text {
+  padding: 4px 8px;
+  border-radius: var(--mud-default-borderradius, 4px);
+  color: var(--_c);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+// Row menu: on <body>, positioned by the script next to its button.
+.mud-datatable__menu {
+  position: fixed;
+  z-index: var(--mud-zindex-popover, 1200);
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 11rem;
+  padding-block: 6px;
+  border: 1px solid var(--mud-palette-lines-default);
+  border-radius: var(--mud-default-borderradius, 4px);
+  background: var(--mud-palette-surface);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+  animation: mud-dt-menu 120ms ease-out;
+
+  > button {
+    --_c: var(--mud-palette-text-primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    border: 0;
+    background: none;
+    color: var(--mud-palette-text-primary);
+    font: inherit;
+    font-size: 0.875rem;
+    text-align: start;
+    cursor: pointer;
+
+    > svg { color: var(--_c); flex: none; }
+    &[data-color="error"] { --_c: var(--mud-palette-error); color: var(--mud-palette-error); }
+    &[data-color="primary"] { --_c: var(--mud-palette-primary); }
+    &[data-color="success"] { --_c: var(--mud-palette-success); }
+    &[data-color="warning"] { --_c: var(--mud-palette-warning); }
+    &:hover:not(:disabled), &:focus-visible { background: color-mix(in srgb, var(--mud-palette-text-primary) 7%, transparent); outline: none; }
+    &:disabled { opacity: 0.45; cursor: not-allowed; }
+  }
+}
+.mud-datatable__menu-gap { inline-size: 16px; flex: none; }
+@keyframes mud-dt-menu { from { opacity: 0; transform: translateY(-4px); } }
+
+@media (max-width: 640px) {
+  .mud-datatable--stack .mud-datatable__table td.mud-datatable__actions { inline-size: 100%; align-items: center; }
+  .mud-datatable__create { margin-inline-start: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .mud-datatable__menu { animation: none; } }

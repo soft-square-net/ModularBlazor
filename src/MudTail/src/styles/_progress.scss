@@ -1,0 +1,216 @@
+// Progress: linear bars (determinate, buffer, indeterminate, striped) and circular progress, as a pure-CSS donut
+// (markup only: ideal for Razor) or an SVG ring built by MudProgressCircular (round caps, borders, indeterminate).
+// Everything is set with custom properties, so a value or colour change is a style change:
+//
+//   <div class="mud-progress" role="progressbar" aria-valuenow="42" aria-valuemin="0" aria-valuemax="100"
+//        style="--mud-progress-value: 42">
+//     <div class="mud-progress__track"><div class="mud-progress__bar"></div></div>
+//     <span class="mud-progress__label">42%</span>
+//   </div>
+//
+//   <div class="mud-donut" role="progressbar" aria-valuenow="68" style="--mud-progress-value: 68; --mud-progress-thickness: 10px">
+//     <span class="mud-donut__label">68%</span>
+//   </div>
+//
+// Custom properties (all optional):
+//   --mud-progress-value          0–100 (a plain number)            --mud-progress-buffer   0–100 (linear)
+//   --mud-progress-color          bar / arc colour (default: the tone, else primary)
+//   --mud-progress-track          track colour
+//   --mud-progress-height         linear bar height                  --mud-progress-radius   linear corner radius
+//   --mud-progress-size           donut diameter                     --mud-progress-thickness donut line width
+//   --mud-progress-border-width   border around the bar / both edges of the ring
+//   --mud-progress-border-color   its colour
+//   --mud-donut-hole              the donut's centre (default: the surface colour)
+
+// ---------- Linear ----------
+.mud-progress {
+  --_value: var(--mud-progress-value, 0);
+  --_color: var(--mud-progress-color, var(--mud-tone, var(--mud-palette-primary)));
+  --_track: var(--mud-progress-track, color-mix(in srgb, var(--_color) 16%, transparent));
+  --_height: var(--mud-progress-height, 0.5rem);
+  --_radius: var(--mud-progress-radius, 999px);
+  --_border: var(--mud-progress-border-width, 0px);
+
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  inline-size: 100%;
+  font-size: 0.8125rem;
+}
+
+.mud-progress__track {
+  position: relative;
+  flex: 1 1 auto;
+  overflow: hidden;
+  block-size: calc(var(--_height) + 2 * var(--_border));
+  border: var(--_border) solid var(--mud-progress-border-color, var(--mud-palette-lines-default));
+  border-radius: var(--_radius);
+  background: var(--_track);
+}
+
+.mud-progress__bar,
+.mud-progress__buffer {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  inline-size: calc(var(--_value) * 1%);
+  border-radius: inherit;
+  background: var(--_color);
+  transition: inline-size 400ms cubic-bezier(0.4, 0, 0.2, 1), background-color 300ms ease;
+}
+.mud-progress__buffer {
+  inline-size: calc(var(--mud-progress-buffer, 0) * 1%);
+  background: color-mix(in srgb, var(--_color) 32%, transparent);
+}
+
+// The value inside the bar (tall bars only: --mud-progress-height ≥ ~1rem).
+.mud-progress__bar > .mud-progress__value {
+  position: absolute;
+  inset-inline-end: 0.5rem;
+  inset-block: 0;
+  display: flex;
+  align-items: center;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.mud-progress__label {
+  flex: none;
+  min-inline-size: 2.75rem;
+  color: var(--mud-palette-text-secondary);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+
+// Labelled bar: a caption row above (title … value), the bar below.
+.mud-progress--stacked {
+  flex-wrap: wrap;
+  gap: 0.35rem 0.75rem;
+  > .mud-progress__caption { flex: 1 1 auto; color: var(--mud-palette-text-primary); font-weight: 500; }
+  > .mud-progress__label { order: 0; min-inline-size: 0; }
+  > .mud-progress__track { order: 1; flex-basis: 100%; }
+}
+
+.mud-progress--small { --mud-progress-height: 0.25rem; }
+.mud-progress--large { --mud-progress-height: 1.25rem; }
+.mud-progress--square { --mud-progress-radius: 0; }
+
+.mud-progress--striped .mud-progress__bar {
+  background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.22) 25%, transparent 25%, transparent 50%,
+    rgba(255, 255, 255, 0.22) 50%, rgba(255, 255, 255, 0.22) 75%, transparent 75%, transparent);
+  background-size: 1rem 1rem;
+}
+.mud-progress--animated .mud-progress__bar { animation: mud-progress-stripes 0.8s linear infinite; }
+[dir="rtl"] .mud-progress--animated .mud-progress__bar { animation-direction: reverse; }
+
+.mud-progress--indeterminate .mud-progress__bar {
+  inline-size: 40%;
+  animation: mud-progress-slide 1.3s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+// Segmented (steps): --mud-progress-steps gaps cut into the track.
+.mud-progress--steps .mud-progress__track {
+  --_steps: var(--mud-progress-steps, 5);
+  mask: repeating-linear-gradient(90deg, #000 0 calc(100% / var(--_steps) - 3px), transparent 0 calc(100% / var(--_steps)));
+}
+
+// ---------- Circular: CSS donut (no JavaScript) ----------
+.mud-donut {
+  --_value: var(--mud-progress-value, 0);
+  --_color: var(--mud-progress-color, var(--mud-tone, var(--mud-palette-primary)));
+  --_track: var(--mud-progress-track, color-mix(in srgb, var(--_color) 16%, transparent));
+  --_size: var(--mud-progress-size, 5rem);
+  --_thickness: var(--mud-progress-thickness, calc(var(--_size) / 9));
+  --_border: var(--mud-progress-border-width, 0px);
+  --_border-color: var(--mud-progress-border-color, var(--mud-palette-lines-default));
+
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  inline-size: var(--_size);
+  block-size: var(--_size);
+  border: var(--_border) solid var(--_border-color);
+  border-radius: 50%;
+  background: conic-gradient(var(--_color) calc(var(--_value) * 1%), var(--_track) 0);
+  vertical-align: middle;
+
+  // The hole, with the ring's inner border.
+  &::before {
+    content: "";
+    position: absolute;
+    inset: calc(var(--_thickness) - var(--_border));
+    border: var(--_border) solid var(--_border-color);
+    border-radius: 50%;
+    background: var(--mud-donut-hole, var(--mud-palette-surface));
+  }
+}
+// Counter-clockwise fill.
+.mud-donut--ccw { transform: scaleX(-1); > * { transform: scaleX(-1); } }
+
+.mud-donut__label {
+  position: relative;
+  color: var(--mud-palette-text-primary);
+  font-size: calc(var(--_size) * 0.22);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-align: center;
+
+  small { display: block; margin-block-start: 0.2em; color: var(--mud-palette-text-secondary); font-size: 0.5em; font-weight: 500; }
+}
+
+// ---------- Circular: SVG ring (MudProgressCircular) ----------
+.mud-progress-circular {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  vertical-align: middle;
+
+  > svg { display: block; overflow: visible; }
+}
+.mud-progress-circular__track { fill: none; }
+.mud-progress-circular__border { fill: none; }
+.mud-progress-circular__arc {
+  fill: none;
+  transition: stroke-dasharray 500ms cubic-bezier(0.4, 0, 0.2, 1), stroke 300ms ease;
+}
+.mud-progress-circular__label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--mud-palette-text-primary);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-align: center;
+
+  small { margin-block-start: 0.25em; color: var(--mud-palette-text-secondary); font-size: 0.5em; font-weight: 500; }
+}
+.mud-progress-circular.is-indeterminate {
+  > svg { animation: mud-spin 1.4s linear infinite; }
+  .mud-progress-circular__arc { transition: none; animation: mud-progress-arc 1.4s ease-in-out infinite; }
+}
+
+// ---------- Animations ----------
+@keyframes mud-progress-stripes { from { background-position: 1rem 0; } to { background-position: 0 0; } }
+@keyframes mud-progress-slide { from { inset-inline-start: -40%; } to { inset-inline-start: 100%; } }
+@keyframes mud-progress-arc {
+  0% { stroke-dasharray: 1 100; stroke-dashoffset: 0; }
+  50% { stroke-dasharray: 60 100; stroke-dashoffset: -15; }
+  100% { stroke-dasharray: 60 100; stroke-dashoffset: -99; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mud-progress__bar, .mud-progress__buffer, .mud-progress-circular__arc { transition: none; }
+  .mud-progress--animated .mud-progress__bar { animation: none; }
+  .mud-progress--indeterminate .mud-progress__bar { animation-duration: 3s; }
+}

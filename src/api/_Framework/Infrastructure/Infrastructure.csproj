@@ -12,10 +12,10 @@
 
   <ItemGroup>
     <!-- Multi-tenancy (Finbuckle). Bump to 10.x when you move to it; the code targets the 9.x API. -->
-    <PackageReference Include="Finbuckle.MultiTenant" Version="9.*" />
-    <PackageReference Include="Finbuckle.MultiTenant.AspNetCore" Version="9.*" />
-    <PackageReference Include="Finbuckle.MultiTenant.EntityFrameworkCore" Version="9.*" />
-
+    <PackageReference Include="Finbuckle.MultiTenant" Version="10.*" />
+    <PackageReference Include="Finbuckle.MultiTenant.AspNetCore" Version="10.*" />
+    <PackageReference Include="Finbuckle.MultiTenant.EntityFrameworkCore" Version="10.*" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.*" />
     <!-- EF Core 10 providers. Migrations live in src/migrations/*, one project per provider. -->
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.*" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.*" />

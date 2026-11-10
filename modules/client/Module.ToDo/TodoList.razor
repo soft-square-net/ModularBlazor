@@ -1,0 +1,108 @@
+@page "/todo"
+@inject IHttpClientFactory HttpClients
+
+<PageTitle>To-do</PageTitle>
+
+<h1>To-do</h1>
+<p>This page comes from <code>Module.ToDo.dll</code> and keeps its items in the <strong>Todo</strong> host module (<code>/api/v1/todos</code>).</p>
+
+<form class="todo-form" @onsubmit="AddAsync">
+    <input @bind="_title" @bind:event="oninput" placeholder="What needs doing?" maxlength="200" aria-label="New to-do" />
+    <button type="submit" disabled="@(_busy || string.IsNullOrWhiteSpace(_title))">Add</button>
+</form>
+
+@if (_error is not null)
+{
+    <p class="todo-error">@_error</p>
+}
+
+@if (_items is null)
+{
+    <p>Loading...</p>
+}
+else if (_items.Count == 0)
+{
+    <p>Nothing to do.</p>
+}
+else
+{
+    <ul class="todo-list">
+        @foreach (var item in _items)
+        {
+            <li class="@(item.IsCompleted ? "done" : null)">
+                <input type="checkbox" checked="@item.IsCompleted" disabled="@_busy" @onchange="() => ToggleAsync(item)" aria-label="Done" />
+                <span>@item.Title</span>
+                <button type="button" disabled="@_busy" @onclick="() => DeleteAsync(item)">Delete</button>
+            </li>
+        }
+    </ul>
+    <p><small>@_items.Count(i => !i.IsCompleted) open, @_items.Count(i => i.IsCompleted) done</small></p>
+}
+
+@code {
+    // The client's authenticated API client (bearer token + X-Tenant): ApiClientNames.Authenticated in ModularBlazor.Infrastructure.
+    private const string ApiClientName = "ModularBlazor.API";
+    private const string Endpoint = "api/v1/todos";
+
+    private sealed record TodoItemDto(Guid Id, string Title, string? Notes, bool IsCompleted, DateTime? CompletedOnUtc, DateTime CreatedOnUtc);
+    private sealed record PagedTodos(List<TodoItemDto> Items, int TotalCount);
+    private sealed record CreateTodo(string Title, string? Notes);
+    private sealed record SetCompleted(bool IsCompleted);
+
+    private List<TodoItemDto>? _items;
+    private string _title = "";
+    private string? _error;
+    private bool _busy;
+
+    private HttpClient Api => HttpClients.CreateClient(ApiClientName);
+
+    protected override Task OnInitializedAsync() => RunAsync(LoadAsync);
+
+    private async Task LoadAsync()
+    {
+        var page = await Api.GetFromJsonAsync<PagedTodos>($"{Endpoint}?pageSize=100&orderBy=IsCompleted&orderBy=CreatedOnUtc%20desc");
+        _items = page?.Items ?? [];
+    }
+
+    private Task AddAsync() => RunAsync(async () =>
+    {
+        if (string.IsNullOrWhiteSpace(_title)) return;
+        var response = await Api.PostAsJsonAsync(Endpoint, new CreateTodo(_title.Trim(), null));
+        response.EnsureSuccessStatusCode();
+        _title = "";
+        await LoadAsync();
+    });
+
+    private Task ToggleAsync(TodoItemDto item) => RunAsync(async () =>
+    {
+        var response = await Api.PutAsJsonAsync($"{Endpoint}/{item.Id}/completed", new SetCompleted(!item.IsCompleted));
+        response.EnsureSuccessStatusCode();
+        await LoadAsync();
+    });
+
+    private Task DeleteAsync(TodoItemDto item) => RunAsync(async () =>
+    {
+        var response = await Api.DeleteAsync($"{Endpoint}/{item.Id}");
+        response.EnsureSuccessStatusCode();
+        await LoadAsync();
+    });
+
+    private async Task RunAsync(Func<Task> action)
+    {
+        _busy = true;
+        _error = null;
+        try
+        {
+            await action();
+        }
+        catch (Exception ex)
+        {
+            _items ??= [];
+            _error = $"The Todo API did not answer: {ex.Message}";
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+}

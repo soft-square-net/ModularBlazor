@@ -37,6 +37,16 @@ import {
   openLightbox,
   autoInit as libAutoInit,
   setLocale,
+  createSpinner,
+  showLoading,
+  setButtonLoading,
+  pageLoader,
+  MudProgressLinear,
+  MudProgressCircular,
+  MudTreeView,
+  createStatCard,
+  MudImageEditor,
+  renderRecipe,
 } from './index.js';
 
 export * from './index.js';
@@ -187,6 +197,124 @@ export function lightbox(items, index = 0) {
 }
 
 const factories = {
+  // Progress: handle.setValue(n), setBuffer(n) (linear), setIndeterminate(bool), update(options). See MudProgress.js.
+  progress(host, options) {
+    const bar = new MudProgressLinear(options);
+    mountInto(host, bar.getElement());
+    return bar;
+  },
+
+  progressCircular(host, options) {
+    const ring = new MudProgressCircular(options);
+    mountInto(host, ring.getElement());
+    return ring;
+  },
+
+  // Tree view. Events: move ({ id, from: { parentId, index }, to: { parentId, index }, source }), select (node),
+  // toggle ({ id, expanded }), change (the whole tree, in order: save it, or apply the single move).
+  tree(host, options, emit) {
+    const tree = new MudTreeView({
+      ...options,
+      onMove: ({ node, from, to, source }) => emit('move', { id: node.id, from, to, source }),
+      onSelect: (node) => emit('select', node),
+      onToggle: (node, expanded) => emit('toggle', { id: node.id, expanded }),
+      onChange: (nodes) => emit('change', nodes),
+    });
+    mountInto(host, tree.getElement());
+    return {
+      setData: (nodes) => tree.setData(nodes ?? []),
+      getData: () => tree.getData(),
+      select: (id) => tree.select(id),
+      toggle: (id, expanded = null) => tree.toggle(id, expanded ?? undefined),
+      expandAll: () => tree.expandAll(),
+      collapseAll: () => tree.collapseAll(),
+      moveUp: (id) => tree.moveUp(id),
+      moveDown: (id) => tree.moveDown(id),
+      move: (id, parentId, index) => tree.move(id, parentId ?? null, index),
+      addNode: (parentId, node, index = null) => tree.addNode(parentId ?? null, node, index ?? Infinity),
+      removeNode: (id) => tree.removeNode(id),
+      updateNode: (id, patch) => tree.updateNode(id, patch),
+      dispose: () => tree.dispose(),
+    };
+  },
+
+  // Image editor. Events: opened, change (the edit state), exported (file list), uploaded, error.
+  // Bytes come back to .NET as a stream: InvokeAsync<IJSStreamReference>("exportImage", "webp", 0.86) or
+  // ("getFile", "thumbnail"), then OpenReadStreamAsync(maxBytes) and store it (e.g. POST it with your HttpClient).
+  imageEditor(host, options, emit) {
+    const meta = (f) => ({ name: f.name, fileName: f.fileName, width: f.width, height: f.height, type: f.type, size: f.size });
+    const editor = new MudImageEditor({
+      ...options,
+      onOpen: (info) => emit('opened', info),
+      onChange: (state) => emit('change', state),
+      onExport: (files, recipe) => { regenerated = null; emit('exported', { files: files.map(meta), recipe }); },
+      onUpload: (result) => emit('uploaded', result),
+      onError: (error) => emit('error', error),
+      // Saving through .NET: the Save button raises "save" with the file list; read each with getFile(name).
+      // The payload carries the recipe: store it with the original to regenerate these files later.
+      onSave: options.saveWith === 'dotnet' ? (files, _editor, recipe) => { emit('save', { files: files.map(meta), recipe }); return { ok: true }; } : options.onSave,
+    });
+    mountInto(host, editor.getElement());
+    const bytes = async (blob) => (blob ? new Uint8Array(await blob.arrayBuffer()) : null);
+    let regenerated = null; // files from the last renderRecipe()
+    return {
+      open: (src) => editor.open(src),
+      getState: () => editor.getState(),
+      setState: (state) => editor.setState(state),
+      undo: () => editor.undo(),
+      redo: () => editor.redo(),
+      reset: () => editor.reset(),
+      setTool: (id) => editor.setTool(id),
+      rotate: (direction) => editor.rotate(direction),
+      flip: (axis) => editor.flip(axis),
+      straighten: (angle) => editor.straighten(angle),
+      adjust: (values) => editor.adjust(values ?? {}),
+      applyPreset: (name) => editor.applyPreset(name),
+      crop: (rectOrRatio) => editor.crop(rectOrRatio),
+      resize: (size) => editor.resize(size),
+      zoomFit: () => editor.zoomFit(),
+      exportImage: async (format = null, quality = null) => bytes(await editor.exportImage({ ...(format ? { format } : {}), ...(quality ? { quality } : {}) })),
+      exportSizes: async () => (await editor.exportSizes()).map(meta),
+      getFile: (name) => bytes((regenerated ?? editor.exports).find((f) => f.name === name)?.blob),
+      // Recipes: getRecipe() for storage, applyRecipe(json) to edit again, renderRecipe(originalUrl, json) to
+      // regenerate the files without the editor's UI (then getFile(name) for each, as a stream).
+      getRecipe: () => editor.getRecipe(),
+      applyRecipe: (recipe, verify = 'warn') => editor.applyRecipe(recipe, { verify }),
+      renderRecipe: async (original, recipe, verify = 'warn') => {
+        const result = await renderRecipe(original, recipe, { verify });
+        regenerated = result.files;
+        return { files: result.files.map(meta), warnings: result.warnings };
+      },
+      upload: () => editor.upload(),
+      download: (name = null) => editor.download(name),
+      dispose: () => editor.dispose(),
+    };
+  },
+
+  // Stat hero card built from data (Razor can also write the markup and use behavior("stat-bars", element)).
+  statCard(host, options) {
+    let card = createStatCard(options);
+    mountInto(host, card.element);
+    return {
+      element: card.element,
+      update: (next) => { card.dispose(); card = createStatCard({ ...options, ...(next ?? {}) }); mountInto(host, card.element); },
+      dispose: () => card.dispose(),
+    };
+  },
+
+  spinner(host, options) {
+    const el = createSpinner(options);
+    mountInto(host, el);
+    return { element: el, dispose: () => el.remove() };
+  },
+
+  // Loading overlay over `host` (any element; the overlay is appended as its last child, absolutely positioned).
+  // Handle: show(), hide(), setText(text), isVisible(), dispose().
+  loading(host, options) {
+    if (!(host instanceof Element)) throw new Error('MudTail: "loading" needs the element to cover as its host.');
+    return showLoading(host, options);
+  },
+
   button(host, options, emit) {
     const el = createMudButton({ ...options, onClick: () => emit('click') });
     mountInto(host, el);
@@ -266,12 +394,31 @@ const factories = {
       };
     }
 
+    // Editing. crud: 'dotnet' (default) asks .NET to save: OnMudEvent("create" | "update" | "delete", { requestId, … }),
+    // answered with completeEdit(requestId, savedRow) or failEdit(requestId, message, errors). 'rest' uses server.url
+    // (POST / PUT / DELETE); 'client' only changes the rows in the browser.
+    const edits = new Map();
+    const ask = (name, payload) => new Promise((resolve, reject) => {
+      const requestId = ++seq;
+      edits.set(requestId, { resolve, reject });
+      emit(name, { requestId, ...payload });
+    });
+    const crud = options.crud ?? 'dotnet';
+    const hooks = crud === 'dotnet' ? {
+      onCreate: (model) => ask('create', { model }),
+      onUpdate: (model, row) => ask('update', { model, key: String(row?.[options.rowKey ?? 'id'] ?? '') }),
+      onDelete: (row) => ask('delete', { key: String(row?.[options.rowKey ?? 'id'] ?? ''), row }),
+    } : {};
+
     const table = new MudDataTable({
       ...options,
+      ...hooks,
       server,
       data: options.data ?? [],
       onRowClick: options.rowClick ? (row) => emit('rowclick', row) : null,
       onSelectionChange: (keys) => emit('selection', keys),
+      onAction: (action, row, t) => emit('action', { action, key: t.getKeyOf(row), row }),
+      onRowsChange: (change) => emit('changed', change),
     });
     mountInto(host, table.getElement());
 
@@ -292,7 +439,29 @@ const factories = {
       getQuery: () => table.getQuery(),
       getSelection: () => table.getSelection(),
       clearSelection: () => table.clearSelection(),
-      dispose: () => { pending.clear(); table.dispose(); },
+      openCreate: (defaults) => { table.openCreate(defaults ?? {}); },
+      openEdit: (key) => { table.openEdit(String(key)); },
+      deleteRow: (key, confirm = true) => { table.deleteRow(String(key), { confirm }); },
+      addRow: (row) => table.addRow(row),
+      updateRow: (row) => table.updateRow(row),
+      removeRow: (key) => table.removeRow(key),
+      completeEdit: (requestId, row = null) => {
+        const p = edits.get(requestId);
+        if (!p) return false;
+        edits.delete(requestId);
+        p.resolve(row ?? undefined);
+        return true;
+      },
+      failEdit: (requestId, message, errors = null) => {
+        const p = edits.get(requestId);
+        if (!p) return false;
+        edits.delete(requestId);
+        const error = new Error(message || '');
+        if (errors) error.errors = errors; // { Field: "message" } or ValidationProblemDetails' { Field: ["message"] }
+        p.reject(error);
+        return true;
+      },
+      dispose: () => { pending.clear(); edits.forEach((p) => p.reject(new Error('disposed'))); edits.clear(); table.dispose(); },
     };
   },
 
@@ -368,9 +537,21 @@ const factories = {
   },
 };
 
+/** Puts a button (ElementReference) in or out of its busy state: spinner, disabled, aria-busy. */
+export function buttonLoading(button, loading = true) {
+  setButtonLoading(button, !!loading);
+}
+
+/** The page-top loader: pageLoading(true) starts it (calls nest), pageLoading(false) finishes it; a number sets 0–100. */
+export function pageLoading(state = true) {
+  if (typeof state === 'number') pageLoader.set(state);
+  else if (state) pageLoader.start();
+  else pageLoader.done();
+}
+
 /**
  * Creates a component and returns its handle.
- * @param {'button'|'autocomplete'|'tabs'|'accordion'|'drawer'|'dialog'|'dock'|'datatable'} name
+ * @param {'button'|'autocomplete'|'tabs'|'accordion'|'drawer'|'dialog'|'dock'|'datatable'|'progress'|'progressCircular'|'spinner'|'loading'|'tree'|'statCard'|'imageEditor'} name
  * @param {Element|null} host   Blazor ElementReference to render into (ignored for drawer/dialog)
  * @param {object} options      The component's options (see the component's constructor)
  * @param {object|null} dotNetRef DotNetObjectReference that receives OnMudEvent(name, payload)

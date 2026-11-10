@@ -76,3 +76,29 @@ export { MudTabs } from './components/MudTabs.js';
 export { MudAccordion } from './components/MudAccordion.js';
 export { attachTooltip } from './components/MudTooltip.js';
 export { createAutocomplete } from './components/MudAutocomplete.js';
+
+// Loading and progress: spinners, overlay, busy buttons, page loader; linear and circular progress
+export { createSpinner, showLoading, setButtonLoading, pageLoader } from './components/MudLoading.js';
+export { MudProgressLinear, MudProgressCircular, toneColor, colorForValue } from './components/MudProgress.js';
+
+// Forms: EditForm (fields, model, validation, async submit with server errors), in a dialog, and confirmations
+export { MudEditForm, validateField, openEditDialog, confirmDialog } from './components/MudEditForm.js';
+
+// Tree view: levels, drag & drop reordering, move up / down buttons, keyboard (WAI-ARIA tree)
+export { MudTreeView } from './components/MudTreeView.js';
+
+// Stat hero card: a "how we compare" block of horizontal bars, one highlighted (markup + data-mud="stat-bars")
+export { createStatCard } from './components/MudStatCard.js';
+
+// Image editor: crop, rotate, adjust, draw, resize, output sizes, download and upload (+ the pure pipeline)
+export { MudImageEditor } from './image-editor/MudImageEditor.js';
+export {
+  applyAdjustments, histogram, fitSize, centeredCrop, rotatedBounds, presetAdjustments,
+  DEFAULT_ADJUSTMENTS, FILTER_PRESETS, ASPECT_RATIOS, SIZE_PRESETS,
+} from './image-editor/pipeline.js';
+export { loadSource as loadImage, renderSize, toBlob as canvasToBlob } from './image-editor/render.js';
+// Image recipes: store them with the original, regenerate the same files with renderRecipe(original, recipe)
+export {
+  createRecipe, normalizeRecipe, scaleEdit, matchSource, fingerprint, RecipeError, RECIPE_TYPE, RECIPE_VERSION,
+} from './image-editor/recipe.js';
+export { renderRecipe, renderOutputs } from './image-editor/outputs.js';

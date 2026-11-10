@@ -20,6 +20,12 @@
 @use "site" as *;
 @use "dock" as *;
 @use "datatable" as *;
+@use "loading" as *;
+@use "progress" as *;
+@use "edit-form" as *;
+@use "tree" as *;
+@use "stat-hero" as *;
+@use "image-editor" as *;
 
 // Global resets & typography baseline
 *, *::before, *::after {

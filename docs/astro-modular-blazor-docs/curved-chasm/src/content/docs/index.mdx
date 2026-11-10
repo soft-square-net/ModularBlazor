@@ -1,0 +1,46 @@
+---
+title: Astro × Modular Blazor
+description: Static Astro pages and Islands next to the Modular Blazor WebAssembly client, styled by MudTail.
+template: splash
+hero:
+  tagline: Ship the public site as fast static HTML with Astro, keep the signed-in app in Blazor WebAssembly, and give both one look with MudTail.
+  actions:
+    - text: Read the overview
+      link: /start/overview/
+      icon: right-arrow
+    - text: Pick an architecture
+      link: /guides/architecture/
+      icon: open-book
+      variant: minimal
+---
+
+import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+## What this covers
+
+<CardGrid>
+	<Card title="Two apps, one site" icon="puzzle">
+		Astro builds the public pages (news, sport, culture, docs) as plain HTML. The Modular Blazor client
+		runs the signed-in app under its own path and loads its modules at runtime.
+	</Card>
+	<Card title="Blazor islands" icon="rocket">
+		Put a Blazor component inside an Astro page and boot it only when it scrolls into view, like Astro's
+		`client:visible`.
+	</Card>
+	<Card title="One design system" icon="seti:css">
+		MudTail's tokens, components and `data-mud` behaviours work the same in an `.astro` page and in a
+		Razor layout.
+	</Card>
+	<Card title="English and Arabic" icon="translate">
+		Every page here also exists in Arabic, laid out right-to-left, just like MudTail itself.
+	</Card>
+</CardGrid>
+
+## Where to go next
+
+<CardGrid>
+	<LinkCard title="Concepts for Blazor developers" href="/start/concepts/" description="Astro Islands, client directives and how they map to Blazor." />
+	<LinkCard title="MudTail in Astro" href="/guides/mudtail-in-astro/" description="Install MudTail, load its CSS and start the behaviours." />
+	<LinkCard title="Blazor islands in Astro" href="/guides/blazor-islands/" description="A reusable BlazorIsland component with lazy loading." />
+	<LinkCard title="Hosting" href="/guides/hosting/" description="One nginx site: Astro at /, Blazor at /app/." />
+</CardGrid>

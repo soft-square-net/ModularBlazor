@@ -3,6 +3,8 @@ using soft.square.net.ModularBlazor.Core;
 using soft.square.net.ModularBlazor.Host.Modules.Auth.Infrastructure.Persistence;
 using soft.square.net.ModularBlazor.Host.Modules.Catalog.Infrastructure.Persistence;
 using soft.square.net.ModularBlazor.Host.Modules.Multitenancy.Infrastructure.Persistence;
+using soft.square.net.ModularBlazor.Host.Modules.Media.Infrastructure.Persistence;
+using soft.square.net.ModularBlazor.Host.Modules.Todo.Infrastructure.Persistence;
 using soft.square.net.ModularBlazor.Infrastructure.MultiTenancy;
 using soft.square.net.ModularBlazor.Infrastructure.Persistence;
 
@@ -37,4 +39,16 @@ public sealed class MultitenancyDbContextFactory : IDesignTimeDbContextFactory<M
 {
     public MultitenancyDbContext CreateDbContext(string[] args)
         => new(DesignTimeContexts.ModuleOptions<MultitenancyDbContext>(DatabaseProvider.SqlServer, "Multitenancy"), DesignTimeContexts.Tenant);
+}
+
+public sealed class TodoDbContextFactory : IDesignTimeDbContextFactory<TodoDbContext>
+{
+    public TodoDbContext CreateDbContext(string[] args)
+        => new(DesignTimeContexts.ModuleOptions<TodoDbContext>(DatabaseProvider.SqlServer, "Todo"), DesignTimeContexts.Tenant);
+}
+
+public sealed class MediaDbContextFactory : IDesignTimeDbContextFactory<MediaDbContext>
+{
+    public MediaDbContext CreateDbContext(string[] args)
+        => new(DesignTimeContexts.ModuleOptions<MediaDbContext>(DatabaseProvider.SqlServer, "Media"), DesignTimeContexts.Tenant);
 }

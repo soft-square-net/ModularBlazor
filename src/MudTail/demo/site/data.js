@@ -100,3 +100,12 @@ export const GALLERY = [
   ['Three Boats', 'E. Duarte, 2017', 1200, 820], ['Field Notes', 'K. Mensah, 2023', 900, 1150],
   ['Evening Market', 'F. Rossi, 2021', 1200, 900], ['Paper Moon', 'H. Saad, 2022', 900, 1250],
 ];
+
+// Stat hero (fictional figures): % of page visits that load in under two seconds.
+export const SPEED = [
+  { label: 'The Daily Mud', value: 71, icon: 'news', highlight: true },
+  { label: 'Regional dailies', value: 48, icon: 'globe' },
+  { label: 'National papers', value: 45, icon: 'docs' },
+  { label: 'News aggregators', value: 35, icon: 'dashboard' },
+  { label: 'Tabloids', value: 28, icon: 'image' },
+];

@@ -12,8 +12,8 @@ with pluggable **layouts** that are modules too.
 ## Run it
 
 ```bash
-./build-modules.sh            # or .\build-modules.ps1  - builds modules into src/ModularBlazor.Client/wwwroot/modules
-dotnet run --project src/ModularBlazor.Client
+./build-modules.sh            # or .\build-modules.ps1  - builds every module in modules/client into src/apps/blazor/ModularBlazor.Client/wwwroot/modules
+dotnet run --project src/apps/blazor/ModularBlazor.Client
 ```
 
 Sign in with any user/password. User name `admin` gets the admin modules (and the lazily loaded admin layout);
@@ -31,14 +31,22 @@ src/Aspire/Host                  Aspire AppHost: runs API, client, Postgres and 
 src/api/ModularBlazor.Host       minimal API: login + module catalog, documented with NSwag, ReDoc and Scalar
 src/api/_Framework/Core          shared kernel (BaseEntity, IAggregateRoot, IRepository, IDbInitializer, DatabaseProvider); carries the MediatR, FluentValidation and Ardalis.Specification packages
 src/api/_Framework/Infrastructure  multi-tenancy, EF Core providers, ModuleDbContext, Ardalis repository, MediatR/validation wiring (AddHostModules)
-modules/host/Auth, Catalog       API host modules, each as Domain / Application / Infrastructure projects (see below)
+modules/host/Auth, Catalog, Todo API host modules, each as Domain / Application / Infrastructure projects (see below)
 modules/client/Layouts.Default          dll, startup   - sidebar layout            [LayoutKey("default")]
 modules/client/Layouts.Admin            dll, lazy      - top-bar layout (dependency of Module.Admin) [LayoutKey("admin")]
 modules/client/Module.Auth              dll, startup   - /login + auth layout      [LayoutKey("auth")]
 modules/client/Module.Dashboard         dll, lazy      - /dashboard
 modules/client/Module.Reports           nupkg, lazy    - /reports, /reports/{id}, ships reports.css
 modules/client/Module.Admin             dll, lazy      - /admin, /admin/users (role: admin)
+modules/client/Module.ToDo              dll, lazy      - /todo, ships todo.css; uses the Todo host module (/api/v1/todos)
 ```
+
+**`modules/client` is the default folder for client modules.** `build-modules.ps1` / `build-modules.sh` build every
+`<Name>/<Name>.csproj` in it, so there is no module list to keep up to date. A module whose csproj sets `<PackageId>` is packed
+as a `.nupkg`; any other module ships as its `.dll`. To build another folder, run `.\build-modules.ps1 -ModulesDir <dir>`
+(sh: `./build-modules.sh Release <dir>`). A module created there also picks up `modules/client/Directory.Build.props` /
+`.targets` (the Abstractions reference and the embedded `wwwroot` assets). Add it to the `/modules/client/` solution folder
+of `ModularBlazor.slnx`.
 
 ## Module descriptor (JSON)
 
@@ -63,7 +71,8 @@ modules/client/Module.Admin             dll, lazy      - /admin, /admin/users (r
 
 ## Writing a module
 
-A module is a Razor class library that references `ModularBlazor.Abstractions`. Pages use `@page` as usual.
+A module is a Razor class library at `modules/client/<Name>/<Name>.csproj` that references `ModularBlazor.Abstractions`
+(the folder's `Directory.Build.props` adds the reference). Pages use `@page` as usual. `Module.Dashboard` is the smallest example.
 
 * **Layout module:** a `LayoutComponentBase` with `@attribute [LayoutKey("my-layout")]`. Any module can ship one; a
   module's pages choose it via `"layout"` in the descriptor, or a page can pick with `@attribute [UseLayout("my-layout")]`.
@@ -136,6 +145,7 @@ Features of the API live in `modules/host/<Module>/`, each module being three pr
 ```
 modules/host/Auth/    Auth.Domain (User) | Auth.Application (LoginCommand) | Auth.Infrastructure (AuthDbContext, LoginEndpoint, AuthModule)
 modules/host/Catalog/ Catalog.Domain (ModuleRegistration) | Catalog.Application (GetCoreModules/GetModulesForRole queries) | Catalog.Infrastructure
+modules/host/Todo/    Todo.Domain (TodoItem) | Todo.Application (CRUD commands/queries, specs, DTOs) | Todo.Infrastructure (TodoDbContext, /api/v1/todos, TodoModule)
 ```
 
 Request flow: Carter endpoint -> `ISender.Send(command)` -> validation behavior (FluentValidation, failures become a 400
@@ -323,7 +333,7 @@ tenant store, root included, so Elsa's tenant id is always the Finbuckle tenant 
 
 `src/migrations/{SqlServer,PostgreSql,MySql}` hold the migrations, one project per provider (`MySql` uses Oracle's `MySql.EntityFrameworkCore`)
 (assemblies `ModularBlazor.Migrations.*`, selected by name in `DatabaseProviders`). Each provider project has a migration set per
-context: `Migrations/App` (per-tenant `AppDbContext`), `Migrations/TenantStore`, `Migrations/Auth`, `Migrations/Catalog` and `Migrations/Multitenancy`.
+context: `Migrations/App` (per-tenant `AppDbContext`), `Migrations/TenantStore`, `Migrations/Auth`, `Migrations/Catalog`, `Migrations/Multitenancy` and `Migrations/Todo`.
 
 ```bash
 dotnet tool install --global dotnet-ef

@@ -3,9 +3,9 @@
 import '../i18n/index.js'; // first: sets the language (and direction) before anything renders
 import '../../src/styles/mudtail.scss';
 import '../styles/demo.css';
-import { initTheme, autoInit, setDirection, getDirection, getLocale } from 'mudtail';
+import { initTheme, autoInit, setDirection, getDirection, getLocale, getIconSvg } from 'mudtail';
 import { languageButton } from '../i18n/index.js';
-import { art, SITE_NAME, NAV, BREAKING, HERO, LATEST, MOST_READ, MATCHES, TABLE, GALLERY } from './data.js';
+import { art, SITE_NAME, NAV, BREAKING, HERO, LATEST, MOST_READ, MATCHES, TABLE, GALLERY, SPEED } from './data.js';
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-');
@@ -118,6 +118,31 @@ function gallery() {
 
 // ---------- Page ----------
 
+// Stat hero: the same markup a Razor page writes; data-mud="stat-bars" grows the bars in on scroll.
+function statHero() {
+  const bar = (s) => `
+        <li class="mud-stat-bar${s.highlight ? ' is-highlight' : ''}" style="--mud-stat-value: ${s.value}">
+          <span class="mud-stat-bar__label">${esc(s.label)}</span>
+          <span class="mud-stat-bar__track">
+            <span class="mud-stat-bar__fill"><span class="mud-stat-bar__icon" aria-hidden="true">${getIconSvg(s.icon, 20)}</span></span>
+            <span class="mud-stat-bar__value">${s.value}%</span>
+          </span>
+        </li>`;
+  return `
+    <section class="mud-stat-hero mud-stat-hero--dark" aria-labelledby="speed-title">
+      <header class="mud-stat-hero__head" data-mud-reveal>
+        <p class="mud-stat-hero__eyebrow">Best-in-class speed</p>
+        <h2 class="mud-stat-hero__title" id="speed-title">The fastest front page in the region</h2>
+        <p class="mud-stat-hero__lead">Every page is built from Blazor WebAssembly modules and MudTail, so it opens fast on any phone. Readers stay with the story, not the loading screen.</p>
+      </header>
+      <figure class="mud-stat-card" data-mud="stat-bars">
+        <figcaption class="mud-stat-card__caption">% of page visits that load in under two seconds</figcaption>
+        <ol class="mud-stat-bars">${SPEED.map(bar).join('')}</ol>
+        <p class="mud-stat-card__source"><a href="#">View the full dataset</a> · Fictional figures for this showcase, in the style of a <a href="#">reader panel</a> and the <a href="#">regional media index</a>.</p>
+      </figure>
+    </section>`;
+}
+
 function page() {
   const today = new Date().toLocaleDateString(getLocale(), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   return `
@@ -175,6 +200,8 @@ function page() {
           <div data-mud-reveal="slide-end">${leagueTable()}</div>
         </div>
       </section>
+
+      <div class="mud-section" id="speed">${statHero()}</div>
 
       <section class="mud-section" id="art" style="--mud-accent: #b45309; --mud-font-headline: Georgia, 'Times New Roman', serif">
         <div class="mud-section__header"><h2 class="mud-section__title">Culture · New acquisitions</h2><a class="mud-section__more" href="#">Visit the collection</a></div>

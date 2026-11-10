@@ -1,0 +1,7 @@
+.todo-form { display: flex; gap: .5rem; margin: 1rem 0; }
+.todo-form input { flex: 1; padding: .4rem .6rem; }
+.todo-list { list-style: none; padding: 0; margin: 0; }
+.todo-list li { display: flex; align-items: center; gap: .6rem; padding: .45rem 0; border-bottom: 1px solid rgba(127, 127, 127, .25); }
+.todo-list li.done span { text-decoration: line-through; opacity: .6; }
+.todo-list li span { flex: 1; }
+.todo-error { color: #c62828; }

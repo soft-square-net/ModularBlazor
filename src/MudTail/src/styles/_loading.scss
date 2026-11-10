@@ -1,0 +1,217 @@
+// Loading: spinners (ring, dots, bars, pulse), skeleton placeholders, a loading overlay for any container,
+// buttons in a busy state and a page-top loader. CSS only: JS helpers are in src/components/MudLoading.js.
+// Tokens only, logical properties only (mirrors in RTL); every animation stops for prefers-reduced-motion.
+//
+// Colour: a tone class sets --mud-tone, which spinners and progress bars use as their colour.
+//   <span class="mud-spinner mud-tone-success" role="status"><span class="mud-sr-only">Loading…</span></span>
+// Size and line width: --mud-spinner-size / --mud-spinner-width on the element (or the --small / --large modifiers).
+
+// ---------- Tones (shared with progress) ----------
+@each $tone in primary, secondary, info, success, warning, error, dark {
+  .mud-tone-#{$tone} { --mud-tone: var(--mud-palette-#{$tone}); }
+}
+.mud-tone-inherit { --mud-tone: currentColor; }
+
+// ---------- Spinner: ring ----------
+.mud-spinner {
+  --_size: var(--mud-spinner-size, 2.5rem);
+  --_width: var(--mud-spinner-width, calc(var(--_size) / 10));
+  --_color: var(--mud-spinner-color, var(--mud-tone, var(--mud-palette-primary)));
+  --_track: var(--mud-spinner-track, color-mix(in srgb, var(--_color) 18%, transparent));
+
+  display: inline-block;
+  flex: none;
+  inline-size: var(--_size);
+  block-size: var(--_size);
+  border: var(--_width) solid var(--_track);
+  border-block-start-color: var(--_color);
+  border-radius: 50%;
+  vertical-align: middle;
+  animation: mud-spin 0.8s linear infinite;
+}
+.mud-spinner--small { --mud-spinner-size: 1.25rem; }
+.mud-spinner--large { --mud-spinner-size: 4rem; }
+// Two-colour arc: the end segment in the tone as well.
+.mud-spinner--dual { border-block-end-color: var(--_color); }
+
+// ---------- Spinner: dots ----------
+.mud-spinner-dots {
+  --_size: var(--mud-spinner-size, 0.625rem);
+  --_color: var(--mud-spinner-color, var(--mud-tone, var(--mud-palette-primary)));
+
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--_size) * 0.6);
+  vertical-align: middle;
+
+  > span:not(.mud-sr-only),
+  &::before,
+  &::after {
+    content: "";
+    inline-size: var(--_size);
+    block-size: var(--_size);
+    border-radius: 50%;
+    background: var(--_color);
+    animation: mud-dot 1s ease-in-out infinite both;
+  }
+  &::before { animation-delay: -0.32s; }
+  > span:not(.mud-sr-only) { animation-delay: -0.16s; }
+}
+
+// ---------- Spinner: bars (equaliser: live audio / live match) ----------
+.mud-spinner-bars {
+  --_size: var(--mud-spinner-size, 1.5rem);
+  --_color: var(--mud-spinner-color, var(--mud-tone, var(--mud-palette-primary)));
+
+  display: inline-flex;
+  align-items: flex-end;
+  gap: calc(var(--_size) * 0.12);
+  block-size: var(--_size);
+  vertical-align: middle;
+
+  > i {
+    inline-size: calc(var(--_size) * 0.16);
+    block-size: 100%;
+    border-radius: 2px;
+    background: var(--_color);
+    transform-origin: bottom;
+    animation: mud-bar 0.9s ease-in-out infinite;
+  }
+  > i:nth-child(2) { animation-delay: -0.75s; }
+  > i:nth-child(3) { animation-delay: -0.5s; }
+  > i:nth-child(4) { animation-delay: -0.25s; }
+}
+
+// ---------- Spinner: pulse (a "live" beacon) ----------
+.mud-spinner-pulse {
+  --_size: var(--mud-spinner-size, 0.75rem);
+  --_color: var(--mud-spinner-color, var(--mud-tone, var(--mud-palette-error)));
+
+  position: relative;
+  display: inline-block;
+  inline-size: var(--_size);
+  block-size: var(--_size);
+  border-radius: 50%;
+  background: var(--_color);
+  vertical-align: middle;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: var(--_color);
+    animation: mud-pulse 1.4s ease-out infinite;
+  }
+}
+
+// ---------- Skeleton placeholders ----------
+.mud-skeleton {
+  --_base: var(--mud-skeleton-color, color-mix(in srgb, var(--mud-palette-text-primary) 9%, transparent));
+  --_shine: var(--mud-skeleton-shine, color-mix(in srgb, var(--mud-palette-surface) 55%, transparent));
+
+  position: relative;
+  display: block;
+  overflow: hidden;
+  block-size: 1em;
+  border-radius: var(--mud-default-borderradius, 4px);
+  background: var(--_base);
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, var(--_shine), transparent);
+    transform: translateX(-100%);
+    animation: mud-shimmer 1.4s ease-in-out infinite;
+  }
+}
+[dir="rtl"] .mud-skeleton::after { animation-name: mud-shimmer-rtl; }
+.mud-skeleton--text { block-size: 0.8em; margin-block: 0.35em; border-radius: 4px; }
+.mud-skeleton--title { block-size: 1.4em; inline-size: 70%; margin-block-end: 0.6em; }
+.mud-skeleton--circle { border-radius: 50%; inline-size: var(--mud-skeleton-size, 3rem); block-size: var(--mud-skeleton-size, 3rem); flex: none; }
+.mud-skeleton--rect { block-size: var(--mud-skeleton-height, 10rem); }
+.mud-skeleton--media { aspect-ratio: 16 / 9; block-size: auto; }
+.mud-skeleton--pulse::after { display: none; }
+.mud-skeleton--pulse { animation: mud-fade 1.2s ease-in-out infinite alternate; }
+
+// ---------- Loading overlay: <div class="mud-loading" aria-busy="true"> … <div class="mud-loading__overlay">… ----------
+.mud-loading { position: relative; }
+.mud-loading__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  border-radius: inherit;
+  background: var(--mud-loading-backdrop, color-mix(in srgb, var(--mud-palette-surface) 72%, transparent));
+  color: var(--mud-palette-text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 180ms ease, visibility 180ms;
+}
+.mud-loading__overlay--blur { backdrop-filter: blur(3px); }
+.mud-loading[aria-busy="true"] > .mud-loading__overlay,
+.mud-loading.is-loading > .mud-loading__overlay { opacity: 1; visibility: visible; }
+
+// ---------- Busy buttons: class "is-loading" (setButtonLoading) ----------
+.mud-button-root.is-loading {
+  position: relative;
+  pointer-events: none;
+  cursor: progress;
+
+  > :not(.mud-button-spinner) { visibility: hidden; }
+  > .mud-button-spinner {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    --mud-spinner-size: 1.1em;
+    --mud-spinner-width: 2px;
+    --mud-spinner-color: currentColor;
+  }
+}
+
+// ---------- Page loader: a thin bar at the top of the viewport (pageLoader.start() / done()) ----------
+.mud-page-loader {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline: 0;
+  z-index: 2000;
+  block-size: var(--mud-page-loader-height, 3px);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 250ms ease 150ms;
+
+  &.is-active { opacity: 1; transition-delay: 0s; }
+  > span {
+    display: block;
+    block-size: 100%;
+    inline-size: 100%;
+    background: var(--mud-tone, var(--mud-palette-primary));
+    box-shadow: 0 0 8px var(--mud-tone, var(--mud-palette-primary));
+    transform: scaleX(var(--mud-page-loader-value, 0));
+    transform-origin: left center;
+    transition: transform 300ms ease;
+  }
+}
+[dir="rtl"] .mud-page-loader > span { transform-origin: right center; }
+
+// ---------- Animations ----------
+@keyframes mud-spin { to { transform: rotate(360deg); } }
+@keyframes mud-dot { 0%, 80%, 100% { transform: scale(0.4); opacity: 0.5; } 40% { transform: scale(1); opacity: 1; } }
+@keyframes mud-bar { 0%, 100% { transform: scaleY(0.3); } 50% { transform: scaleY(1); } }
+@keyframes mud-pulse { from { transform: scale(1); opacity: 0.7; } to { transform: scale(2.6); opacity: 0; } }
+@keyframes mud-shimmer { to { transform: translateX(100%); } }
+@keyframes mud-shimmer-rtl { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
+@keyframes mud-fade { from { opacity: 1; } to { opacity: 0.45; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .mud-spinner { animation-duration: 2.4s; }
+  .mud-spinner-dots > span, .mud-spinner-dots::before, .mud-spinner-dots::after,
+  .mud-spinner-bars > i, .mud-spinner-pulse::after, .mud-skeleton::after, .mud-skeleton--pulse { animation: none; }
+}

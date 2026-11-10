@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <!-- Shipped as a .dll (build-modules.* copies soft.square.net.Module.ToDo.dll). The page talks to the Todo host module
+       (/api/v1/todos) through the client's authenticated HttpClient; the host already loads Microsoft.Extensions.Http. -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.*" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>

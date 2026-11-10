@@ -5,8 +5,12 @@ import ide from './ide.js';
 import components from './components.js';
 import forms from './forms.js';
 import site from './site.js';
+import feedback from './feedback.js';
+import tree from './tree.js';
+import statHero from './statHero.js';
+import imageEditor from './imageEditor.js';
 
-const parts = [shell, ide, components, forms, site];
+const parts = [shell, ide, components, forms, site, feedback, tree, statHero, imageEditor];
 
 export const messages = Object.assign({}, ...parts.map((p) => p.messages));
 export const patterns = parts.flatMap((p) => p.patterns ?? []);

@@ -1,5 +1,5 @@
 // Components: editorial (news / sport / art) building blocks and the IDE dock.
-import { MudDock } from 'mudtail';
+import { MudDock, createStatCard, getIconSvg } from 'mudtail';
 import { componentPage } from './page.js';
 import { art } from '../../site/data.js';
 
@@ -244,6 +244,126 @@ export const EDITORIAL_PAGES = [
       api: [
         { title: 'Markup', rows: [['.mud-site-header, .mud-masthead, .mud-logo, .mud-icon-btn', 'Header parts.'], ['.mud-mega-nav (+ __list, __item, __link, __expander, __panel, __columns, __heading, __feature)', 'The nav. Don\'t render <code>aria-expanded</code> or <code>data-open</code>: the script owns them.'], ['[data-mud-nav-toggle][aria-controls]', 'Menu button for small screens.']] },
         BEHAVIOUR('mega-nav'),
+      ],
+    }),
+  },
+  {
+    id: 'stat-hero', label: 'Stat hero card', icon: 'gauge',
+    render: () => componentPage({
+      title: 'Stat hero card', kinds: ['CSS', 'Behaviour', 'JS', 'Blazor'],
+      lead: 'A "how we compare" block for the public site: an eyebrow, a headline and a lead over a card of horizontal bars, one highlighted with a gradient and a large value. The bars grow in when the card scrolls into view. Use it for page speed, reader trust, match statistics, ticket sales or exhibition visitors.',
+      examples: [
+        {
+          title: 'Dark hero (markup)',
+          description: 'The markup a Razor page writes. <code>--mud-stat-value</code> sets each bar; <code>is-highlight</code> marks the one to stand out; <code>data-mud="stat-bars"</code> animates them.',
+          html: `
+            <section class="mud-stat-hero mud-stat-hero--dark" aria-labelledby="sh-title">
+              <header class="mud-stat-hero__head">
+                <p class="mud-stat-hero__eyebrow">Best-in-class speed</p>
+                <h2 class="mud-stat-hero__title" id="sh-title">The fastest front page in the region</h2>
+                <p class="mud-stat-hero__lead">Every page is built from Blazor WebAssembly modules and MudTail, so it opens fast on any phone.</p>
+              </header>
+              <figure class="mud-stat-card" data-mud="stat-bars">
+                <figcaption class="mud-stat-card__caption">% of page visits that load in under two seconds</figcaption>
+                <ol class="mud-stat-bars">
+                  <li class="mud-stat-bar is-highlight" style="--mud-stat-value: 71">
+                    <span class="mud-stat-bar__label">The Daily Mud</span>
+                    <span class="mud-stat-bar__track"><span class="mud-stat-bar__fill"><span class="mud-stat-bar__icon" aria-hidden="true">${getIconSvg('news', 20)}</span></span><span class="mud-stat-bar__value">71%</span></span>
+                  </li>
+                  <li class="mud-stat-bar" style="--mud-stat-value: 48">
+                    <span class="mud-stat-bar__label">Regional dailies</span>
+                    <span class="mud-stat-bar__track"><span class="mud-stat-bar__fill"><span class="mud-stat-bar__icon" aria-hidden="true">${getIconSvg('globe', 20)}</span></span><span class="mud-stat-bar__value">48%</span></span>
+                  </li>
+                  <li class="mud-stat-bar" style="--mud-stat-value: 35">
+                    <span class="mud-stat-bar__label">News aggregators</span>
+                    <span class="mud-stat-bar__track"><span class="mud-stat-bar__fill"><span class="mud-stat-bar__icon" aria-hidden="true">${getIconSvg('dashboard', 20)}</span></span><span class="mud-stat-bar__value">35%</span></span>
+                  </li>
+                </ol>
+                <p class="mud-stat-card__source"><a href="#">View the full dataset</a> · Fictional figures for this showcase.</p>
+              </figure>
+            </section>`,
+        },
+        {
+          title: 'Match statistics (JavaScript, page theme)',
+          description: '<code>createStatCard()</code> builds the same markup from data. <code>dark: false</code> follows the page theme (try dark mode); each bar can take its own gradient (<code>from</code> / <code>to</code>) and colour (<code>fill</code>), and <code>sort</code> puts the largest first.',
+          code: `
+            import { createStatCard } from 'mudtail';
+
+            const { element, dispose } = createStatCard({
+              dark: false,
+              eyebrow: 'Matchday 12', title: 'Northbridge ran the midfield',
+              caption: 'Pass accuracy',
+              items: [
+                { label: 'Northbridge', value: 89, icon: 'trophy', highlight: true, from: '#15803d', to: '#86efac' },
+                { label: 'Harbour City', value: 74, icon: 'trophy', fill: '#93c5fd' },
+                { label: 'League average', value: 79, icon: 'globe' },
+              ],
+              sort: true,
+              source: 'Source: <a href="#">match data</a>',
+            });
+            host.appendChild(element);`,
+          mount(el) {
+            const card = createStatCard({
+              dark: false,
+              eyebrow: 'Matchday 12',
+              title: 'Northbridge ran the midfield',
+              lead: 'Northbridge completed more passes than any side this season, and won 2–1.',
+              caption: 'Pass accuracy',
+              items: [
+                { label: 'Northbridge', value: 89, icon: 'trophy', highlight: true, from: '#15803d', to: '#86efac' },
+                { label: 'Harbour City', value: 74, icon: 'trophy', fill: 'color-mix(in srgb, #3b82f6 35%, var(--mud-palette-surface))' },
+                { label: 'League average', value: 79, icon: 'globe' },
+              ],
+              sort: true,
+              source: 'Source: <a href="#">match data</a>',
+            });
+            card.element.style.border = '1px solid var(--mud-palette-lines-default)';
+            el.appendChild(card.element);
+            return card.dispose;
+          },
+        },
+        {
+          title: 'Compact card, plain numbers',
+          description: 'Without a title it is just the card, for an article or a sidebar. <code>format: \'number\'</code> writes the value as a number; <code>max</code> sets the scale.',
+          code: `
+            createStatCard({
+              compact: true, dark: false, caption: 'Visitors this weekend (thousands)', format: 'number', max: 50,
+              items: [
+                { label: 'City Gallery', value: 42, icon: 'image', highlight: true, from: '#b45309', to: '#fbbf24' },
+                { label: 'Harbour Museum', value: 27, icon: 'image' },
+                { label: 'Sculpture garden', value: 15, icon: 'image' },
+              ],
+            });`,
+          mount(el) {
+            const card = createStatCard({
+              compact: true, dark: false, caption: 'Visitors this weekend (thousands)', format: 'number', max: 50,
+              items: [
+                { label: 'City Gallery', value: 42, icon: 'image', highlight: true, from: '#b45309', to: '#fbbf24' },
+                { label: 'Harbour Museum', value: 27, icon: 'image' },
+                { label: 'Sculpture garden', value: 15, icon: 'image' },
+              ],
+            });
+            card.element.style.padding = '0';
+            card.element.style.maxInlineSize = '640px';
+            el.appendChild(card.element);
+            return card.dispose;
+          },
+        },
+      ],
+      api: [
+        { title: 'Classes', rows: [
+          ['.mud-stat-hero', 'The block; <code>--dark</code> for the deep navy look with a glow (otherwise it follows the page theme). Head: <code>__head</code>, <code>__eyebrow</code>, <code>__title</code>, <code>__lead</code>.'],
+          ['.mud-stat-card', 'The card: <code>__caption</code> (a <code>&lt;figcaption&gt;</code>), <code>.mud-stat-bars</code> (an <code>&lt;ol&gt;</code>), <code>__source</code>; <code>--compact</code>.'],
+          ['.mud-stat-bar', 'A row: <code>__label</code>, <code>__track</code> &gt; <code>__fill</code> (with <code>__icon</code>) + <code>__value</code>. <code>is-highlight</code>: gradient and large value.'],
+          ['Custom properties', '<code>--mud-stat-value</code>, <code>--mud-stat-max</code> (100), <code>--mud-stat-from</code> / <code>--mud-stat-to</code> (the gradient), <code>--mud-stat-fill</code>, <code>--mud-stat-label-width</code>.'],
+        ] },
+        { title: 'createStatCard(options)', rows: [
+          ['eyebrow, title, lead, caption, source', 'Texts; <code>source</code> is trusted HTML (links).'],
+          ['items', '<code>[{ label, value, display?, icon?, highlight?, from?, to?, fill? }]</code>.'],
+          ['max, format, sort, dark, compact, animate, labelWidth', '<code>format</code>: <code>percent</code> (default), <code>number</code> or a function. Returns <code>{ element, dispose }</code>.'],
+        ] },
+        BEHAVIOUR('stat-bars', ' Options: <code>data-delay</code>, <code>data-duration</code>. It only animates <code>--mud-stat-progress</code>; without it (or with reduced motion) bars are full.'),
+        { title: 'Blazor', rows: [['create("statCard", host, options)', 'Handle methods: update, dispose.']] },
       ],
     }),
   },

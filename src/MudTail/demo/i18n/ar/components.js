@@ -4,6 +4,8 @@ const tr = (s) => Object.entries(PAREN).reduce((out, [en, ar]) => out.split(en).
 
 const STARTED_TAIL = {
   '': '',
+  ' Options: <code>data-delay</code>, <code>data-duration</code>. It only animates <code>--mud-stat-progress</code>; without it (or with reduced motion) bars are full.':
+    ' الخيارات: <code>data-delay</code>، <code>data-duration</code>. ولا يحرّك إلا <code>--mud-stat-progress</code>؛ ومن دونه (أو مع تقليل الحركة) تكون الأشرطة ممتلئة.',
   ' It rebuilds when Blazor re-renders the headlines.': ' ويُعاد بناؤه عندما يعيد Blazor عرض العناوين.',
   ' From code: <code>lightbox(items, index)</code> / <code>openLightbox(items, index)</code>.': ' ومن الشيفرة: <code>lightbox(items, index)</code> / <code>openLightbox(items, index)</code>.',
 };
@@ -397,6 +399,73 @@ export default {
     'demo.dt.caption': 'المقالات',
     'demo.dt.captionServer': 'المقالات (من الخادم)',
     'demo.dt.opened': 'تم فتح «{title}»',
+
+    // ── data table: editing ──
+    'demo.dt.titleHelp': 'جرّب «test» لترى خطأ تحقق من الخادم.',
+    'demo.dt.duplicate': 'يوجد مقال بهذا العنوان بالفعل.',
+    'demo.dt.created': 'تم إنشاء «{title}»',
+    'demo.dt.updated': 'تم حفظ «{title}»',
+    'demo.dt.deleted': 'تم حذف «{title}»',
+    'demo.dt.feature': 'تمييز',
+    'demo.dt.featuredToast': 'أصبح «{title}» مميّزًا',
+    'demo.dt.share': 'إرسال إلى النشرة',
+    'demo.dt.archive': 'أرشفة',
+    'demo.dt.sent': 'سيُرسل «{title}» في نشرة الغد',
+    'demo.dt.manage': 'إدارة',
+    'demo.dt.preview': 'معاينة',
+    'demo.dt.write': 'كتابة مقال',
+    'demo.dt.newArticle': 'مقال جديد',
+    'demo.dt.editArticle': 'تعديل المقال',
+    'demo.dt.confirmDelete': 'هل تريد حذف «{title}»؟ لا يمكن التراجع عن ذلك.',
+    'demo.dt.previewing': 'معاينة «{title}»',
+    'demo.form.name': 'الاسم الكامل',
+    'demo.form.email': 'البريد الإلكتروني',
+    'demo.form.team': 'الفريق',
+    'demo.form.age': 'العمر',
+    'demo.form.message': 'الرسالة',
+    'demo.form.terms': 'أوافق على قواعد الموقع',
+    'demo.form.send': 'إرسال',
+    'demo.form.sent': 'شكرًا يا {name}!',
+    'Create, edit and delete': 'الإنشاء والتعديل والحذف',
+    MudEditForm: 'MudEditForm',
+    'A <strong>New</strong> button and an actions column: <strong>Edit</strong> and <strong>New</strong> open an EditForm in a dialog (validated as you type; saving takes half a second here), <strong>Delete</strong> asks first. The extra actions are your own: <em>Feature</em> shows only on rows that are not featured, <em>Archive</em> is disabled on featured rows. Switch how the actions are shown:':
+      'زر <strong>جديد</strong> وعمود إجراءات: <strong>تعديل</strong> و<strong>جديد</strong> يفتحان EditForm في حوار (يُتحقق منه أثناء الكتابة؛ والحفظ يستغرق نصف ثانية هنا)، و<strong>حذف</strong> يطلب التأكيد أولًا. والإجراءات الإضافية من صنعك: <em>تمييز</em> يظهر فقط في الصفوف غير المميّزة، و<em>أرشفة</em> معطّل في الصفوف المميّزة. بدّل طريقة عرض الإجراءات:',
+    'Show actions as': 'عرض الإجراءات كـ',
+    'Icon buttons': 'أزرار أيقونات',
+    'Text buttons': 'أزرار نصية',
+    Menu: 'قائمة',
+    'A custom column with edit and delete icon buttons': 'عمود مخصّص بأزرار أيقونات للتعديل والحذف',
+    'No actions column here: the first column renders its own icon buttons. Any element with <code>data-dt-action="edit"</code>, <code>"delete"</code> or your own id runs that action on its row, so the buttons need no event wiring (and Blazor markup can use the same attribute).':
+      'لا يوجد عمود إجراءات هنا: العمود الأول يعرض أزرار أيقوناته بنفسه. أي عنصر يحمل <code>data-dt-action="edit"</code> أو <code>"delete"</code> أو معرّفًا من اختيارك يشغّل ذلك الإجراء على صفه، فلا تحتاج الأزرار إلى ربط أحداث (ويمكن لعلامات Blazor استخدام الخاصية نفسها).',
+    'EditForm on its own': 'EditForm وحده',
+    '<code>MudEditForm</code> is also a component by itself: fields, a model, rules, and an async submit that can return field errors from the server. <code>openEditDialog()</code> puts one in a dialog.':
+      '<code>MudEditForm</code> مكوّن قائم بذاته أيضًا: حقول، ونموذج بيانات، وقواعد، وإرسال غير متزامن يمكنه إرجاع أخطاء الحقول من الخادم. و<code>openEditDialog()</code> يضعه في حوار.',
+    'Blazor: create, edit and delete': 'Blazor: الإنشاء والتعديل والحذف',
+    "The dialog and its EditForm run in the browser; saving goes to .NET. The table raises <code>create</code>, <code>update</code> or <code>delete</code> with a <code>requestId</code>; answer with <code>completeEdit(requestId, savedRow)</code>, or <code>failEdit(requestId, message, errors)</code> to keep the form open with the server's messages (a ValidationProblemDetails <code>Errors</code> dictionary fits as it is). Custom actions raise <code>action</code>.":
+      'يعمل الحوار ونموذج EditForm في المتصفح، ويذهب الحفظ إلى ‎.NET. يطلق الجدول <code>create</code> أو <code>update</code> أو <code>delete</code> مع <code>requestId</code>؛ فأجب بـ <code>completeEdit(requestId, savedRow)</code>، أو <code>failEdit(requestId, message, errors)</code> لإبقاء النموذج مفتوحًا مع رسائل الخادم (قاموس <code>Errors</code> من ValidationProblemDetails يناسب كما هو). والإجراءات المخصّصة تطلق <code>action</code>.',
+    '<code>true</code> or <code>{ label, icon }</code>: a New button that opens the edit form.': '<code>true</code> أو <code>{ label, icon }</code>: زر «جديد» يفتح نموذج التعديل.',
+    "An actions column: <code>'edit'</code>, <code>'delete'</code> and <code>{ id, label, icon?, color?, show?(row), disabled?(row), onClick?(row, table) }</code>, shown as <code>icons</code>, <code>buttons</code> or a <code>menu</code>.":
+      "عمود إجراءات: <code>'edit'</code> و<code>'delete'</code> و<code>{ id, label, icon?, color?, show?(row), disabled?(row), onClick?(row, table) }</code>، يُعرض كـ <code>icons</code> أو <code>buttons</code> أو <code>menu</code>.",
+    '<code>{ fields?, title?: { create, edit }, columns?, maxWidth? }</code>: MudEditForm fields; by default one per editable column (<code>editable: false</code> leaves a column out; <code>required</code> and <code>editor</code> on a column refine its field).':
+      '<code>{ fields?, title?: { create, edit }, columns?, maxWidth? }</code>: حقول MudEditForm؛ افتراضيًا حقل لكل عمود قابل للتعديل (<code>editable: false</code> يستبعد العمود؛ و<code>required</code> و<code>editor</code> على العمود يضبطان حقله).',
+    'Save (async). Return the saved row, or <code>{ errors }</code> (or throw) to keep the form open. Without them, client mode edits its own rows and <code>server.url</code> calls POST / PUT / DELETE.':
+      'الحفظ (غير متزامن). أرجع الصف المحفوظ، أو <code>{ errors }</code> (أو ارمِ خطأ) لإبقاء النموذج مفتوحًا. ومن دونها يعدّل وضع العميل صفوفه بنفسه، ويستدعي <code>server.url</code> ‏POST / PUT / DELETE.',
+    'A confirmation (or a function giving its text), custom actions without their own <code>onClick</code>, and a callback after every change.':
+      'تأكيد (أو دالة تعطي نصه)، وإجراءات مخصّصة بلا <code>onClick</code> خاص بها، واستدعاء بعد كل تغيير.',
+    'The edit form and delete, from code; <code>runAction(id, row | key)</code> runs any action.': 'نموذج التعديل والحذف من الشيفرة؛ و<code>runAction(id, row | key)</code> يشغّل أي إجراء.',
+    'Change rows in client mode without a form.': 'تغيير الصفوف في وضع العميل دون نموذج.',
+    '<code>[{ key, label, type?, required?, min?, max?, step?, minLength?, maxLength?, pattern?, options?, placeholder?, helper?, span?, validate?(value, model) }]</code>. Types: text, textarea, number, email, url, tel, password, date, datetime-local, time, color, select, radio, checkbox, switch, hidden.':
+      '<code>[{ key, label, type?, required?, min?, max?, step?, minLength?, maxLength?, pattern?, options?, placeholder?, helper?, span?, validate?(value, model) }]</code>. الأنواع: text، textarea، number، email، url، tel، password، date، datetime-local، time، color، select، radio، checkbox، switch، hidden.',
+    '<code>onSubmit(model)</code> may be async; return <code>{ errors }</code> or throw to show server errors.': '<code>onSubmit(model)</code> قد تكون غير متزامنة؛ أرجع <code>{ errors }</code> أو ارمِ خطأ لعرض أخطاء الخادم.',
+    '<code>getModel</code>, <code>setModel</code>, <code>validate</code>, <code>setErrors(errors, message)</code>, <code>clearErrors</code>, <code>reset</code>, <code>submit</code>, <code>isDirty</code>, <code>focus</code>, <code>dispose</code>.':
+      '<code>getModel</code>، <code>setModel</code>، <code>validate</code>، <code>setErrors(errors, message)</code>، <code>clearErrors</code>، <code>reset</code>، <code>submit</code>، <code>isDirty</code>، <code>focus</code>، <code>dispose</code>.',
+    'The form in a dialog (resolves with the saved model, or null), and a yes / no question (resolves true or false).': 'النموذج في حوار (يُرجع النموذج المحفوظ أو null)، وسؤال نعم / لا (يُرجع true أو false).',
+    '<code>query</code>, <code>rowclick</code> (row, when <code>rowClick: true</code>), <code>selection</code> (keys), <code>create</code> / <code>update</code> / <code>delete</code> ({ requestId, model | key }), <code>action</code> ({ action, key, row }), <code>changed</code>.':
+      '<code>query</code>، <code>rowclick</code> (الصف، عند <code>rowClick: true</code>)، <code>selection</code> (المفاتيح)، <code>create</code> / <code>update</code> / <code>delete</code> ({ requestId, model | key })، <code>action</code> ({ action, key, row })، <code>changed</code>.',
+    '<code>setData</code>, <code>setPage</code>, <code>failPage</code>, <code>reload</code>, <code>setQuery</code>, <code>getQuery</code>, <code>getSelection</code>, <code>clearSelection</code>, <code>openCreate</code>, <code>openEdit</code>, <code>deleteRow</code>, <code>completeEdit</code>, <code>failEdit</code>, <code>addRow</code>, <code>updateRow</code>, <code>removeRow</code>, <code>dispose</code>.':
+      '<code>setData</code>، <code>setPage</code>، <code>failPage</code>، <code>reload</code>، <code>setQuery</code>، <code>getQuery</code>، <code>getSelection</code>، <code>clearSelection</code>، <code>openCreate</code>، <code>openEdit</code>، <code>deleteRow</code>، <code>completeEdit</code>، <code>failEdit</code>، <code>addRow</code>، <code>updateRow</code>، <code>removeRow</code>، <code>dispose</code>.',
+    '<code>dotnet</code> (default: saving goes to .NET as above), <code>rest</code> (POST / PUT / DELETE on <code>server.url</code>) or <code>client</code> (rows in the browser only).':
+      '<code>dotnet</code> (افتراضيًا: يذهب الحفظ إلى ‎.NET كما سبق)، أو <code>rest</code> (‏POST / PUT / DELETE على <code>server.url</code>)، أو <code>client</code> (الصفوف في المتصفح فقط).',
   },
   patterns: [
     [/^Handle methods: (.+?)\. Events? \(OnMudEvent\): (.+)\.$/, (_, m, e) => `دوال المقبض: ${m}. الأحداث (OnMudEvent): ${tr(e)}.`],

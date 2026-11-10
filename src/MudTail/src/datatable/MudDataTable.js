@@ -8,12 +8,19 @@
 // Both modes use the same query (see query.js). In server mode it is sent the way the .NET API binds
 // [AsParameters] PaginationFilter, and the endpoint answers with PagedResponse<T> from an Ardalis specification
 // (Query.SearchBy(filter) applies the keyword and the column filters, Query.PaginateBy(filter) orders and pages).
+//
+// Editing: `create: true` adds a "New" button, `actions: ['edit', 'delete', { id, label, icon }]` an actions column.
+// Both open a MudEditForm in a dialog (fields from the columns, or editor.fields). onCreate / onUpdate / onDelete save
+// (async); without them client mode changes its own rows, and server mode with server.url calls REST:
+// POST {url}, PUT {url}/{key}, DELETE {url}/{key}. Any element in a cell with data-dt-action="edit" | "delete" | "<id>"
+// runs that action, so a custom column (icon buttons, links) needs no wiring.
 
 import {
   createQuery, applyQuery, toPaginationFilterParams, fromPagedResponse, getValue, OPERATORS, OPERATORS_BY_TYPE,
 } from './query.js';
 import { getIconSvg } from '../core/icons.js';
 import { t, formatNumber, intlLocale } from '../core/i18n.js';
+import { openEditDialog, confirmDialog } from '../components/MudEditForm.js';
 
 /** The translated name of a filter operator. */
 const opLabel = (op) => t(`datatable.op.${op}`, {}, OPERATORS[op].label);
@@ -46,6 +53,9 @@ function normalizeColumn(c) {
     format: c.format ?? null,
     render: c.render ?? null,
     options,
+    editable: c.editable ?? true, // shown in the edit form
+    required: c.required ?? false,
+    editor: c.editor ?? null, // MudEditForm field overrides, e.g. { type: 'textarea', maxLength: 200 }
   };
 }
 
@@ -54,9 +64,19 @@ export class MudDataTable {
    * @param {object} o
    * @param {Array} o.columns  [{ key, title?, type?: 'string'|'number'|'date'|'boolean'|'enum', field?, sortable?, filterable?,
    *                            searchable?, align?, width?, format?: fn | 'number'|'integer'|'currency:EUR'|'percent'|'date'|'datetime'|'boolean',
-   *                            render?: (value, row) => trusted HTML string | Node, options?: enum values }]
+   *                            render?: (value, row, table) => trusted HTML string | Node, options?: enum values,
+   *                            editable?, required?, editor?: MudEditForm field overrides }]
    * @param {Array} [o.data]   rows (client mode)
    * @param {object} [o.server] { url?, fetch?(query, signal) → Promise<{items,totalCount}|PagedResponse>, headers?, credentials?, mapResponse?, debounce? }
+   * @param {boolean|object} [o.create]   a "New" button in the toolbar: true, or { label?, icon? }
+   * @param {Array} [o.actions]           an actions column: 'edit', 'delete', or { id, label, icon?, color?, show?(row), disabled?(row), onClick?(row, table) }
+   * @param {'icons'|'buttons'|'menu'} [o.actionsDisplay='icons']  icon buttons, text buttons, or one "more" menu per row
+   * @param {object} [o.editor]           { fields?, title?: { create, edit }, columns?: 1|2, maxWidth?, createText? }
+   * @param {Function} [o.onCreate]       (model) => row; [o.onUpdate] (model, row) => row; [o.onDelete] (row). May be async;
+   *                                      throw (with .errors) or return { errors } to keep the form open with messages
+   * @param {boolean|((row) => string)} [o.confirmDelete=true]
+   * @param {(id, row, table) => void} [o.onAction]   custom actions that have no onClick of their own
+   * @param {(change) => void} [o.onRowsChange]     after a create, update or delete: { type, row, key }
    */
   constructor(o = {}) {
     this.columns = (o.columns ?? []).map(normalizeColumn);
@@ -70,6 +90,17 @@ export class MudDataTable {
     this.onRowClick = o.onRowClick ?? null;
     this.onSelectionChange = o.onSelectionChange ?? null;
     this.onQuery = o.onQuery ?? null;
+    this.create = o.create ? { label: null, icon: 'plus', ...(typeof o.create === 'object' ? o.create : {}) } : null;
+    this.actions = (o.actions ?? []).map((a) => (typeof a === 'string' ? { id: a } : { ...a }));
+    this.actionsDisplay = o.actionsDisplay ?? 'icons';
+    this.actionsTitle = o.actionsTitle ?? null;
+    this.editor = o.editor ?? {};
+    this.onCreate = o.onCreate ?? null;
+    this.onUpdate = o.onUpdate ?? null;
+    this.onDelete = o.onDelete ?? null;
+    this.onAction = o.onAction ?? null;
+    this.onRowsChange = o.onRowsChange ?? null;
+    this.confirmDelete = o.confirmDelete ?? true;
     this.query = createQuery({ pageSize: o.pageSize ?? this.pageSizes[0], ...(o.initialQuery ?? {}) });
     this.filterState = new Map(); // field -> { op, value }
     for (const f of this.query.filters) this.filterState.set(f.field, { op: f.op, value: f.value ?? '' });
@@ -117,7 +148,261 @@ export class MudDataTable {
     this._emitSelection();
   }
 
+  // ───────────────────────── editing ─────────────────────────
+
+  /** The edit form's fields: editor.fields, else one per editable column (not the row key). */
+  editorFields() {
+    if (this.editor.fields) return this.editor.fields;
+    const TYPES = { number: 'number', date: 'date', boolean: 'switch', enum: 'select' };
+    return this.columns
+      .filter((c) => c.editable && c.key !== this.rowKey && !c.key.includes('.'))
+      .map((c) => ({
+        key: c.key,
+        label: c.title,
+        type: TYPES[c.type] ?? 'text',
+        required: c.required,
+        options: c.type === 'enum' ? c.options : undefined,
+        ...(c.editor ?? {}),
+      }));
+  }
+
+  /** Opens the form for a new row (optionally pre-filled). Resolves with the created row, or null. */
+  async openCreate(defaults = {}) {
+    let created = null;
+    await openEditDialog({
+      ...this._editorOptions(),
+      title: this.editor.title?.create ?? t('datatable.createTitle', {}, 'New item'),
+      model: defaults,
+      submitText: this.editor.createText ?? t('datatable.createSubmit', {}, 'Create'),
+      onSubmit: async (model) => {
+        const out = await this._save('create', model, null);
+        if (!out?.errors) created = out;
+        return out;
+      },
+    });
+    if (created) this._changed('create', created);
+    return created;
+  }
+
+  /** Opens the form for a row (the row or its key). Resolves with the updated row, or null. */
+  async openEdit(rowOrKey) {
+    const row = this._rowOf(rowOrKey);
+    if (!row) return null;
+    let updated = null;
+    await openEditDialog({
+      ...this._editorOptions(),
+      title: this.editor.title?.edit ?? t('datatable.editTitle', {}, 'Edit item'),
+      model: row,
+      onSubmit: async (model) => {
+        const out = await this._save('update', model, row);
+        if (!out?.errors) updated = out;
+        return out;
+      },
+    });
+    if (updated) this._changed('update', updated);
+    return updated;
+  }
+
+  /** Deletes a row (the row or its key), after a confirmation unless confirm is false. Resolves true when deleted. */
+  async deleteRow(rowOrKey, { confirm = this.confirmDelete } = {}) {
+    const row = this._rowOf(rowOrKey);
+    if (!row) return false;
+    if (confirm) {
+      const message = typeof confirm === 'function' ? confirm(row) : t('datatable.confirmDelete', {}, 'Delete this row? This cannot be undone.');
+      const ok = await confirmDialog({ title: t('datatable.deleteTitle', {}, 'Delete row'), message, confirmText: t('datatable.delete', {}, 'Delete'), color: 'error' });
+      if (!ok) return false;
+    }
+    const key = this._keyOf(row);
+    try {
+      if (this.onDelete) await this.onDelete(row);
+      else if (this.server?.url) await this._rest('DELETE', key);
+    } catch (e) {
+      this.state = { ...this.state, error: e?.message || t('datatable.deleteError', {}, 'The row could not be deleted.') };
+      this._renderBody();
+      return false;
+    }
+    this.selected.delete(key);
+    if (!this.server) this.rows = this.rows.filter((r) => this._keyOf(r) !== key);
+    this.refresh();
+    this._changed('delete', row);
+    return true;
+  }
+
+  /** Runs an action on a row (the row or its key): 'create', 'edit', 'delete', or a custom action's id. */
+  runAction(id, rowOrKey = null) {
+    if (id === 'create') return this.openCreate();
+    const row = rowOrKey == null ? null : this._rowOf(rowOrKey);
+    if (!row) return null;
+    if (id === 'edit') return this.openEdit(row);
+    if (id === 'delete') return this.deleteRow(row);
+    const action = this.actions.find((a) => a.id === id);
+    if (action?.onClick) return action.onClick(row, this);
+    return this.onAction?.(id, row, this);
+  }
+
+  /** Client mode: adds, replaces or removes a row without a form (e.g. after saving it yourself). */
+  addRow(row) { this.rows = [row, ...this.rows]; this.refresh(); }
+  updateRow(row) { const k = this._keyOf(row); this.rows = this.rows.map((r) => (this._keyOf(r) === k ? { ...r, ...row } : r)); this.refresh(); }
+  removeRow(key) { this.rows = this.rows.filter((r) => this._keyOf(r) !== String(key)); this.selected.delete(String(key)); this.refresh(); }
+
+  _editorOptions() {
+    return { fields: this.editorFields(), columns: this.editor.columns ?? 2, maxWidth: this.editor.maxWidth };
+  }
+
+  _rowOf(rowOrKey) {
+    if (rowOrKey && typeof rowOrKey === 'object') return rowOrKey;
+    const key = String(rowOrKey);
+    return this.state.items.find((r) => this._keyOf(r) === key) ?? this.rows.find((r) => this._keyOf(r) === key) ?? null;
+  }
+
+  /** Saves through the hook (or REST), then updates the rows. Returns the saved row, or { errors }. */
+  async _save(kind, model, original) {
+    const hook = kind === 'create' ? this.onCreate : this.onUpdate;
+    let saved;
+    if (hook) saved = await hook(model, original);
+    else if (this.server?.url) saved = await this._rest(kind === 'create' ? 'POST' : 'PUT', kind === 'create' ? null : this._keyOf(original), model);
+    if (saved && typeof saved === 'object' && saved.errors) return saved;
+    const row = { ...(original ?? {}), ...model, ...(saved && typeof saved === 'object' ? saved : {}) };
+    if (!this.server) {
+      if (kind === 'create') {
+        const k = getValue(row, this.rowKey);
+        if (k == null || k === '') row[this.rowKey] = this._nextKey();
+        this.rows = [row, ...this.rows];
+      } else {
+        const k = this._keyOf(original);
+        this.rows = this.rows.map((r) => (this._keyOf(r) === k ? row : r));
+        if (this.selected.has(k)) this.selected.set(k, row);
+      }
+    }
+    this.refresh();
+    return row;
+  }
+
+  _nextKey() {
+    const keys = this.rows.map((r) => Number(getValue(r, this.rowKey))).filter(Number.isFinite);
+    if (keys.length === this.rows.length) return (keys.length ? Math.max(...keys) : 0) + 1;
+    return globalThis.crypto?.randomUUID?.() ?? `new-${Date.now()}`;
+  }
+
+  /** REST calls against server.url (POST / PUT {key} / DELETE {key}); a 400 with ValidationProblemDetails becomes field errors. */
+  async _rest(method, key, body) {
+    const url = key == null ? this.server.url : `${this.server.url.replace(/\/$/, '')}/${encodeURIComponent(key)}`;
+    const res = await fetch(url, {
+      method,
+      headers: { Accept: 'application/json', ...(body ? { 'Content-Type': 'application/json' } : {}), ...(this.server.headers ?? {}) },
+      credentials: this.server.credentials ?? 'same-origin',
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    const json = res.status === 204 ? null : await res.json().catch(() => null);
+    if (res.status === 400 && json?.errors) return { errors: json.errors, message: json.title ?? '' };
+    if (!res.ok) throw new Error(json?.detail ?? json?.title ?? t('datatable.httpError', { status: res.status, text: res.statusText }, 'The server answered {status} {text}').trim());
+    return json;
+  }
+
+  _changed(type, row) {
+    this.onRowsChange?.({ type, row, key: this._keyOf(row) });
+  }
+
+  // ───────────────────────── actions column ─────────────────────────
+
+  _actionLabel(a) {
+    if (a.label) return a.label;
+    if (a.id === 'edit') return t('datatable.edit', {}, 'Edit');
+    if (a.id === 'delete') return t('datatable.delete', {}, 'Delete');
+    return a.id;
+  }
+
+  _actionIcon(a) { return a.icon ?? (a.id === 'edit' ? 'edit' : a.id === 'delete' ? 'delete' : null); }
+
+  _actionColor(a) { return a.color ?? (a.id === 'delete' ? 'error' : 'primary'); }
+
+  _visibleActions(row) { return this.actions.filter((a) => (a.show ? a.show(row) : true)); }
+
+  _actionsCell(row, key) {
+    if (this.actionsDisplay === 'menu') {
+      return `<button type="button" class="mud-datatable__action mud-datatable__action--icon" data-dt="menu" aria-haspopup="menu" aria-expanded="false" aria-label="${esc(t('datatable.actionsFor', { key }, 'Actions for row {key}'))}">${getIconSvg('more', 18)}</button>`;
+    }
+    return this._visibleActions(row).map((a) => {
+      const label = this._actionLabel(a);
+      const icon = this._actionIcon(a);
+      const attrs = `data-dt-action="${esc(a.id)}" data-color="${esc(this._actionColor(a))}"${a.disabled?.(row) ? ' disabled' : ''}`;
+      if (this.actionsDisplay === 'buttons' || !icon) {
+        return `<button type="button" class="mud-datatable__action mud-datatable__action--text" ${attrs}>${icon ? getIconSvg(icon, 14) : ''}<span>${esc(label)}</span></button>`;
+      }
+      return `<button type="button" class="mud-datatable__action mud-datatable__action--icon" ${attrs} title="${esc(label)}" aria-label="${esc(t('datatable.actionOn', { action: label, key }, '{action} row {key}'))}">${getIconSvg(icon, 16)}</button>`;
+    }).join('');
+  }
+
+  _openMenu(button) {
+    this._closeMenu();
+    const row = this._rowOf(button.closest('tr').dataset.key);
+    if (!row) return;
+    const menu = document.createElement('div');
+    menu.className = 'mud-datatable__menu';
+    menu.setAttribute('role', 'menu');
+    menu.dir = getComputedStyle(this.el).direction;
+    menu.innerHTML = this._visibleActions(row).map((a) => {
+      const icon = this._actionIcon(a);
+      return `<button type="button" role="menuitem" data-dt-action="${esc(a.id)}" data-color="${esc(this._actionColor(a))}"${a.disabled?.(row) ? ' disabled' : ''}>${icon ? getIconSvg(icon, 16) : '<span class="mud-datatable__menu-gap"></span>'}<span>${esc(this._actionLabel(a))}</span></button>`;
+    }).join('');
+    document.body.appendChild(menu);
+
+    // Below the button (above when there is no room), aligned to its inline end.
+    const r = button.getBoundingClientRect();
+    const w = menu.offsetWidth;
+    const h = menu.offsetHeight;
+    const left = menu.dir === 'rtl' ? r.left : r.right - w;
+    const top = r.bottom + h + 8 > window.innerHeight ? r.top - h - 4 : r.bottom + 4;
+    menu.style.left = `${Math.max(8, Math.min(left, window.innerWidth - w - 8))}px`;
+    menu.style.top = `${Math.max(8, top)}px`;
+    button.setAttribute('aria-expanded', 'true');
+
+    const items = () => [...menu.querySelectorAll('[role="menuitem"]:not([disabled])')];
+    const onKey = (e) => {
+      const list = items();
+      const i = list.indexOf(document.activeElement);
+      if (e.key === 'Escape' || e.key === 'Tab') { e.preventDefault(); this._closeMenu(true); }
+      else if (e.key === 'ArrowDown') { e.preventDefault(); list[(i + 1) % list.length]?.focus(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); list[(i - 1 + list.length) % list.length]?.focus(); }
+      else if (e.key === 'Home') { e.preventDefault(); list[0]?.focus(); }
+      else if (e.key === 'End') { e.preventDefault(); list[list.length - 1]?.focus(); }
+    };
+    const onOutside = (e) => { if (!menu.contains(e.target) && !button.contains(e.target)) this._closeMenu(); };
+    const onScroll = (e) => { if (!menu.contains(e.target)) this._closeMenu(); };
+    menu.addEventListener('keydown', onKey);
+    menu.addEventListener('click', (e) => {
+      const item = e.target.closest('[data-dt-action]');
+      if (!item || item.disabled) return;
+      this._closeMenu(true);
+      this.runAction(item.dataset.dtAction, row);
+    });
+    document.addEventListener('pointerdown', onOutside, true);
+    window.addEventListener('scroll', onScroll, true);
+    window.addEventListener('resize', onScroll);
+    this._menu = {
+      menu,
+      button,
+      off: () => {
+        document.removeEventListener('pointerdown', onOutside, true);
+        window.removeEventListener('scroll', onScroll, true);
+        window.removeEventListener('resize', onScroll);
+      },
+    };
+    items()[0]?.focus();
+  }
+
+  _closeMenu(focusButton = false) {
+    if (!this._menu) return;
+    const { menu, button, off } = this._menu;
+    this._menu = null;
+    off();
+    menu.remove();
+    button.setAttribute('aria-expanded', 'false');
+    if (focusButton && button.isConnected) button.focus();
+  }
+
   dispose() {
+    this._closeMenu();
     this._abort?.abort();
     this._timers.forEach(clearTimeout);
     this._timers.clear();
@@ -200,6 +485,8 @@ export class MudDataTable {
         </div>
         ${filterable.length ? `<button type="button" class="mud-button-root mud-button-outlined mud-button-surface mud-button-small mud-datatable__filters-btn" aria-expanded="false" aria-controls="${this.id}-filters">
           ${getIconSvg('sliders', 16)} ${esc(t('datatable.filters', {}, 'Filters'))} <span class="mud-datatable__count" hidden></span></button>` : ''}
+        ${this.create ? `<button type="button" class="mud-button-root mud-button-filled mud-button-primary mud-button-small mud-datatable__create" data-dt-action="create">
+          ${this.create.icon ? getIconSvg(this.create.icon, 16) : ''} ${esc(this.create.label ?? t('datatable.create', {}, 'New'))}</button>` : ''}
       </div>
       <div class="mud-datatable__filters" id="${this.id}-filters" hidden>
         <div class="mud-datatable__filter-grid">${filterable.map((c) => this._filterField(c)).join('')}</div>
@@ -252,6 +539,7 @@ export class MudDataTable {
         ? `<button type="button" class="mud-datatable__sort" data-dt="sort" data-field="${esc(c.field)}">${esc(c.title)}<span class="mud-datatable__sort-icon" aria-hidden="true"></span><span class="mud-datatable__sort-rank" aria-hidden="true"></span></button>`
         : esc(c.title)}</th>`;
     }
+    if (this.actions.length) html += `<th scope="col" class="mud-datatable__actions" data-align="end">${esc(this.actionsTitle ?? t('datatable.actions', {}, 'Actions'))}</th>`;
     return html;
   }
 
@@ -313,6 +601,17 @@ export class MudDataTable {
     });
 
     el.addEventListener('click', (e) => {
+      // Actions: the toolbar's New button, the actions column, and any [data-dt-action] in a custom column.
+      const act = e.target.closest('[data-dt-action]');
+      if (act && !act.disabled) {
+        this.runAction(act.dataset.dtAction, act.closest('tbody tr[data-key]')?.dataset.key ?? null);
+        return;
+      }
+      const menuBtn = e.target.closest('[data-dt="menu"]');
+      if (menuBtn) {
+        if (this._menu?.button === menuBtn) this._closeMenu(); else this._openMenu(menuBtn);
+        return;
+      }
       const t = e.target.closest('[data-dt]');
       const action = t?.dataset.dt;
       if (action === 'sort') this._sort(t.dataset.field, e.shiftKey);
@@ -334,6 +633,9 @@ export class MudDataTable {
   }
 
   _keyOf(row) { return String(getValue(row, this.rowKey)); }
+
+  /** A row's key, as a string. */
+  getKeyOf(row) { return this._keyOf(row); }
 
   _activateRow(tr) {
     const row = this.state.items.find((r) => this._keyOf(r) === tr.dataset.key);
@@ -484,7 +786,7 @@ export class MudDataTable {
   _cell(c, row, nodes) {
     const value = getValue(row, c.key);
     if (c.render) {
-      const out = c.render(value, row);
+      const out = c.render(value, row, this);
       if (out instanceof Node) { nodes.push(out); return `<span data-dt-node="${nodes.length - 1}"></span>`; }
       return out ?? ''; // trusted HTML from the column definition
     }
@@ -510,8 +812,9 @@ export class MudDataTable {
   }
 
   _renderBody() {
+    this._closeMenu();
     const { items, error, loading } = this.state;
-    const span = this.columns.length + (this.selection === 'none' ? 0 : 1);
+    const span = this.columns.length + (this.selection === 'none' ? 0 : 1) + (this.actions.length ? 1 : 0);
     const active = this.query.keyword.trim() || this.query.filters.length;
 
     if (error) {
@@ -536,7 +839,8 @@ export class MudDataTable {
         ? `<td class="mud-datatable__select"><input type="checkbox" data-dt="select-row" ${on ? 'checked' : ''} aria-label="${esc(t('datatable.selectRow', { key }, 'Select row {key}'))}"></td>`
         : this.selection === 'single' ? `<td class="mud-datatable__select"><span class="mud-datatable__radio${on ? ' is-on' : ''}" aria-hidden="true"></span></td>` : '';
       return `<tr data-key="${esc(key)}"${clickable ? ' tabindex="0"' : ''}${this.selection !== 'none' ? ` aria-selected="${on}"` : ''}>${select}${this.columns.map((c) =>
-        `<td data-label="${esc(c.title)}" data-align="${c.align}">${this._cell(c, row, nodes)}</td>`).join('')}</tr>`;
+        `<td data-label="${esc(c.title)}" data-align="${c.align}">${this._cell(c, row, nodes)}</td>`).join('')}${this.actions.length
+        ? `<td class="mud-datatable__actions" data-label="${esc(this.actionsTitle ?? t('datatable.actions', {}, 'Actions'))}" data-align="end"><div class="mud-datatable__action-bar">${this._actionsCell(row, key)}</div></td>` : ''}</tr>`;
     }).join('');
     if (nodes.length) this.$.tbody.querySelectorAll('[data-dt-node]').forEach((ph) => ph.replaceWith(nodes[Number(ph.dataset.dtNode)]));
 

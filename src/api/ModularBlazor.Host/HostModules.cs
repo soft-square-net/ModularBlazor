@@ -4,7 +4,9 @@ using soft.square.net.ModularBlazor.Host.Modules.Auth.Infrastructure;
 using soft.square.net.ModularBlazor.Host.Modules.Catalog.Infrastructure;
 using soft.square.net.ModularBlazor.Host.Modules.Catalog.Infrastructure.Packages;
 using soft.square.net.ModularBlazor.Host.Modules.ElsaHost.Infrastructure;
+using soft.square.net.ModularBlazor.Host.Modules.Media.Infrastructure;
 using soft.square.net.ModularBlazor.Host.Modules.Multitenancy.Infrastructure;
+using soft.square.net.ModularBlazor.Host.Modules.Todo.Infrastructure;
 using soft.square.net.ModularBlazor.Infrastructure.Modules;
 
 namespace soft.square.net.ModularBlazor.Host;
@@ -33,7 +35,9 @@ internal static class HostModules
         new AuthModule(),
         new CatalogModule(),
         new MultitenancyModule(),
-        new ElsaHostModule()
+        new ElsaHostModule(),
+        new TodoModule(),
+        new MediaModule()
     ];
 
     public static Type[] CarterModuleTypes() => All

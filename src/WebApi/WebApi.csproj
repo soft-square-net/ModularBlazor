@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!-- TargetFramework, Nullable, ImplicitUsings and the soft.square.net AssemblyName/RootNamespace come from Directory.Build.props. -->
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.13" />
+  </ItemGroup>
+
+</Project>

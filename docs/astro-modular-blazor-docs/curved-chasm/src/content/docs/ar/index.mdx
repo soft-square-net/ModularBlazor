@@ -1,0 +1,45 @@
+---
+title: Astro مع Blazor المعياري
+description: صفحات Astro الثابتة والجزر بجانب عميل Blazor WebAssembly المعياري، بتصميم MudTail.
+template: splash
+hero:
+  tagline: انشر الموقع العام صفحات HTML ثابتة وسريعة باستخدام Astro، وأبق التطبيق الذي يتطلب تسجيل الدخول في Blazor WebAssembly، ووحد مظهرهما باستخدام MudTail.
+  actions:
+    - text: اقرأ النظرة العامة
+      link: /ar/start/overview/
+      icon: left-arrow
+    - text: اختر البنية المناسبة
+      link: /ar/guides/architecture/
+      icon: open-book
+      variant: minimal
+---
+
+import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+## ما الذي يغطيه هذا الدليل
+
+<CardGrid>
+	<Card title="تطبيقان في موقع واحد" icon="puzzle">
+		يبني Astro الصفحات العامة (الأخبار والرياضة والثقافة والتوثيق) بصيغة HTML عادية. ويعمل عميل Blazor
+		المعياري على مساره الخاص للمستخدمين المسجلين، ويحمل وحداته أثناء التشغيل.
+	</Card>
+	<Card title="جزر Blazor" icon="rocket">
+		ضع مكون Blazor داخل صفحة Astro، ولا تشغله إلا عندما يظهر على الشاشة، تماما مثل `client:visible` في
+		Astro.
+	</Card>
+	<Card title="نظام تصميم واحد" icon="seti:css">
+		تعمل متغيرات MudTail ومكوناته وسلوكيات `data-mud` بالطريقة نفسها في صفحة `.astro` وفي قالب Razor.
+	</Card>
+	<Card title="العربية والإنجليزية" icon="translate">
+		كل صفحة هنا متاحة بالعربية أيضا، من اليمين إلى اليسار، تماما مثل MudTail نفسه.
+	</Card>
+</CardGrid>
+
+## إلى أين بعد ذلك
+
+<CardGrid>
+	<LinkCard title="مفاهيم لمطوري Blazor" href="/ar/start/concepts/" description="جزر Astro وموجهات العميل وما يقابلها في Blazor." />
+	<LinkCard title="MudTail في Astro" href="/ar/guides/mudtail-in-astro/" description="ثبت MudTail وحمل أنماطه وشغل سلوكياته." />
+	<LinkCard title="جزر Blazor في Astro" href="/ar/guides/blazor-islands/" description="مكون BlazorIsland قابل لإعادة الاستخدام مع تحميل كسول." />
+	<LinkCard title="الاستضافة" href="/ar/guides/hosting/" description="موقع nginx واحد: Astro على / وBlazor على /app/." />
+</CardGrid>

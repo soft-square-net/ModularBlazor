@@ -2,8 +2,8 @@ bin/
 obj/
 artifacts/
 .vs/
-src/ModularBlazor.Client/wwwroot/modules/*.dll
-src/ModularBlazor.Client/wwwroot/modules/*.nupkg
+/src/apps/blazor/ModularBlazor.Client/wwwroot/modules/*.dll
+/src/apps/blazor/ModularBlazor.Client/wwwroot/modules/*.nupkg
 /src/migrations/MySql/Migrations
 /src/migrations/PostgreSql/Migrations
 /src/migrations/SqlServer/Migrations
@@ -11,6 +11,8 @@ src/ModularBlazor.Client/wwwroot/modules/*.nupkg
 
 # Module store (uploaded packages, generated build inputs)
 /src/api/ModularBlazor.Host/assets/modules/
+# Media store (images uploaded through /api/v1/media/images)
+/src/api/ModularBlazor.Host/assets/media/
 /modules/client/Layouts.Admin/node-app/node_modules
 *.json
 /modules/client/Layouts.Admin/node-app/package-lock.json

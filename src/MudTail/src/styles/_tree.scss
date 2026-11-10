@@ -1,0 +1,197 @@
+// MudTreeView (src/components/MudTreeView.js): levels with indent guides, a grip, expand chevrons, move up / down
+// buttons, and the drag & drop feedback (ghost, drop line, "drop inside" highlight). Logical properties: mirrors in RTL.
+
+.mud-tree {
+  --mud-tree-indent: 1.25rem;
+  --mud-tree-row: 2.25rem;
+  --_line: var(--mud-palette-lines-default);
+  --_hover: color-mix(in srgb, var(--mud-palette-text-primary) 6%, transparent);
+  --_selected: rgba(var(--mud-palette-primary-rgb), 0.12);
+
+  position: relative;
+  font-size: 0.875rem;
+  color: var(--mud-palette-text-primary);
+}
+.mud-tree--dense { --mud-tree-row: 1.85rem; font-size: 0.8125rem; }
+
+.mud-tree__root,
+.mud-tree__group { list-style: none; margin: 0; padding: 0; }
+.mud-tree__group[hidden] { display: none; }
+
+.mud-tree__item { position: relative; outline: none; }
+
+.mud-tree__row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-block-size: var(--mud-tree-row);
+  padding-inline: calc(var(--mud-tree-level, 0) * var(--mud-tree-indent)) 4px;
+  border-radius: var(--mud-default-borderradius, 4px);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: background-color 120ms ease;
+
+  &:hover { background: var(--_hover); }
+}
+
+// Indent guides: one vertical line per ancestor level.
+.mud-tree--lines .mud-tree__group { position: relative; }
+.mud-tree--lines .mud-tree__group::before {
+  content: "";
+  position: absolute;
+  inset-block: 0 6px;
+  inset-inline-start: calc(var(--mud-tree-guide, 0) * var(--mud-tree-indent) + 1.1rem + 4px + 0.625rem); // under the chevron
+  border-inline-start: 1px solid var(--_line);
+  pointer-events: none;
+}
+// Each group's guide sits under its parent's chevron (levels 1–8; deeper trees keep the last offset).
+@for $i from 1 through 8 {
+  #{'.mud-tree__item[aria-level="#{$i}"] > .mud-tree__group'} { --mud-tree-guide: #{$i - 1}; }
+}
+
+.mud-tree__item.is-selected > .mud-tree__row {
+  background: var(--_selected);
+  color: var(--mud-palette-primary);
+  font-weight: 600;
+  .mud-tree__icon { color: var(--mud-palette-primary); }
+}
+.mud-tree__item:focus-visible > .mud-tree__row { outline: 2px solid var(--mud-palette-primary); outline-offset: -2px; }
+.mud-tree__item.is-disabled > .mud-tree__row { opacity: 0.5; cursor: not-allowed; }
+
+.mud-tree__grip {
+  display: grid;
+  place-items: center;
+  flex: none;
+  inline-size: 1.1rem;
+  color: var(--mud-palette-text-disabled);
+  cursor: grab;
+  touch-action: none; // touch drags start here
+  opacity: 0.35;
+  transition: opacity 120ms ease;
+  &.is-empty { visibility: hidden; }
+}
+.mud-tree__row:hover .mud-tree__grip,
+.mud-tree__item:focus-visible > .mud-tree__row .mud-tree__grip { opacity: 1; }
+@media (hover: none) { .mud-tree__grip { opacity: 0.8; } }
+
+.mud-tree__toggle {
+  display: grid;
+  place-items: center;
+  flex: none;
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  border-radius: 50%;
+  color: var(--mud-palette-text-secondary);
+  transition: transform 160ms ease, background-color 120ms ease;
+  &:not(.is-leaf):hover { background: var(--_hover); }
+}
+.mud-tree__item[aria-expanded="true"] > .mud-tree__row .mud-tree__toggle { transform: rotate(90deg); }
+[dir="rtl"] .mud-tree__toggle { transform: scaleX(-1); }
+[dir="rtl"] .mud-tree__item[aria-expanded="true"] > .mud-tree__row .mud-tree__toggle { transform: rotate(90deg); }
+
+.mud-tree__icon { display: grid; place-items: center; flex: none; color: var(--mud-palette-text-secondary); }
+.mud-tree__label { flex: 1 1 auto; min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-inline: 2px; }
+.mud-tree__badge {
+  flex: none;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--mud-palette-text-primary) 8%, transparent);
+  color: var(--mud-palette-text-secondary);
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+// Move up / down: shown on hover, focus and selection (always on touch screens).
+.mud-tree__order { display: inline-flex; flex: none; gap: 1px; opacity: 0; transition: opacity 120ms ease; }
+.mud-tree__row:hover .mud-tree__order,
+.mud-tree__item.is-selected > .mud-tree__row .mud-tree__order,
+.mud-tree__item:focus-visible > .mud-tree__row .mud-tree__order,
+.mud-tree__order:focus-within { opacity: 1; }
+@media (hover: none) { .mud-tree__order { opacity: 1; } }
+
+.mud-tree__btn {
+  display: grid;
+  place-items: center;
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--mud-palette-text-secondary);
+  cursor: pointer;
+  &:hover:not(:disabled) { background: rgba(var(--mud-palette-primary-rgb), 0.12); color: var(--mud-palette-primary); }
+  &:focus-visible { outline: 2px solid var(--mud-palette-primary); outline-offset: 1px; }
+  &:disabled { opacity: 0.3; cursor: default; }
+}
+
+// ───────── drag & drop ─────────
+.mud-tree.is-dragging, .mud-tree.is-dragging * { cursor: grabbing !important; }
+.mud-tree.is-dragging.is-drop-invalid, .mud-tree.is-dragging.is-drop-invalid * { cursor: no-drop !important; }
+.mud-tree.is-dragging .mud-tree__row:hover { background: none; }
+.mud-tree__item.is-dragging > .mud-tree__row { opacity: 0.4; }
+.mud-tree__item.is-dragging > .mud-tree__group { opacity: 0.4; }
+
+.mud-tree__row.is-drop-inside {
+  background: rgba(var(--mud-palette-primary-rgb), 0.14);
+  box-shadow: inset 0 0 0 2px var(--mud-palette-primary);
+}
+
+.mud-tree__drop-line {
+  position: absolute;
+  inset-inline-end: 4px;
+  z-index: 2;
+  block-size: 2px;
+  background: var(--mud-palette-primary);
+  border-radius: 2px;
+  pointer-events: none;
+  &::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: -4px;
+    inset-block-start: -3px;
+    inline-size: 8px;
+    block-size: 8px;
+    border: 2px solid var(--mud-palette-primary);
+    border-radius: 50%;
+    background: var(--mud-palette-surface);
+  }
+  &[hidden] { display: none; }
+}
+
+.mud-tree__ghost {
+  position: fixed;
+  top: 0;
+  left: 0; // the transform is in physical pixels
+  z-index: var(--mud-zindex-tooltip, 1500);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-inline-size: 260px;
+  padding: 6px 12px;
+  border-radius: var(--mud-default-borderradius, 4px);
+  background: var(--mud-palette-surface);
+  color: var(--mud-palette-text-primary);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(var(--mud-palette-primary-rgb), 0.4);
+  font-size: 0.875rem;
+  font-weight: 600;
+  pointer-events: none;
+  white-space: nowrap;
+  > span { overflow: hidden; text-overflow: ellipsis; }
+  .mud-tree__icon { color: var(--mud-palette-primary); }
+}
+
+// The node that just moved flashes once.
+.mud-tree__row.is-moved { animation: mud-tree-moved 900ms ease-out; }
+@keyframes mud-tree-moved {
+  0%, 30% { background: rgba(var(--mud-palette-primary-rgb), 0.22); }
+  100% { background: transparent; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mud-tree__toggle, .mud-tree__row { transition: none; }
+  .mud-tree__row.is-moved { animation: none; }
+}

@@ -16,6 +16,7 @@ import { megaNav } from './megaNav.js';
 import { readingProgress } from './readingProgress.js';
 import { themeToggle } from './themeToggle.js';
 import { passwordToggle } from './passwordToggle.js';
+import { statBars } from './statBars.js';
 
 const registry = new Map([
   ['ticker', ticker],
@@ -25,6 +26,7 @@ const registry = new Map([
   ['reading-progress', readingProgress],
   ['theme-toggle', themeToggle],
   ['password-toggle', passwordToggle],
+  ['stat-bars', statBars],
 ]);
 
 /**

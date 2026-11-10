@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\Media.Domain\Media.Domain.csproj" />
+    <ProjectReference Include="..\Media.Application\Media.Application.csproj" />
+  </ItemGroup>
+</Project>

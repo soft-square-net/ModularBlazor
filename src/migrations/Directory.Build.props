@@ -15,5 +15,7 @@
     <ProjectReference Include="$(MSBuildThisFileDirectory)../../modules/host/Auth/Auth.Infrastructure/Auth.Infrastructure.csproj" />
     <ProjectReference Include="$(MSBuildThisFileDirectory)../../modules/host/Catalog/Catalog.Infrastructure/Catalog.Infrastructure.csproj" />
     <ProjectReference Include="$(MSBuildThisFileDirectory)../../modules/host/Multitenancy/Multitenancy.Infrastructure/Multitenancy.Infrastructure.csproj" />
+    <ProjectReference Include="$(MSBuildThisFileDirectory)../../modules/host/Todo/Todo.Infrastructure/Todo.Infrastructure.csproj" />
+    <ProjectReference Include="$(MSBuildThisFileDirectory)../../modules/host/Media/Media.Infrastructure/Media.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

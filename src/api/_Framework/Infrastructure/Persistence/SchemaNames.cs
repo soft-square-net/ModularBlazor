@@ -11,4 +11,6 @@ public static class SchemaNames
     public const string Catalog = "Catalog";
     public const string Multitenancy = "Multitenancy";
     public const string ElsaHost = "ElsaHost";
+    public const string Todo = "Todo";
+    public const string Media = "Media";
 }

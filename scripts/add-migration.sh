@@ -19,7 +19,7 @@ for provider in $PROVIDERS; do
   dotnet ef migrations add "$NAME" --project "$project" --startup-project "$STARTUP" \
     --context TenantStoreDbContext --output-dir Migrations/TenantStore
   # Host modules (modules/host/*): one DbContext each, kept in its own Migrations/<Module> folder.
-  for module in Auth Catalog Multitenancy; do
+  for module in Auth Catalog Multitenancy Todo Media; do
     dotnet ef migrations add "$NAME" --project "$project" --startup-project "$STARTUP" \
       --context "${module}DbContext" --output-dir "Migrations/$module"
   done

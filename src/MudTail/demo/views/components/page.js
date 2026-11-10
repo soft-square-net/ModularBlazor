@@ -18,6 +18,7 @@ export function dedent(text) {
  * @param {string[]} [page.kinds]      what it is made of: 'CSS', 'JS', 'Behaviour', 'Blazor'
  * @param {Array<{title, description?, html?, code?, language?, mount?}>} page.examples
  *   html: markup rendered live and shown as the code; or mount(previewEl) → optional dispose, with `code` shown.
+ *   code: false hides the code panel (guidance examples).
  * @param {Array<{title, rows: Array<[string, string]>}>} [page.api]
  */
 export function componentPage({ title, lead, trail = ['Components'], kinds = [], examples = [], api = [] }) {
@@ -46,15 +47,16 @@ export function componentPage({ title, lead, trail = ['Components'], kinds = [],
         <pre><code></code></pre>
       </div>`;
     const preview = section.querySelector('.cp-preview');
-    const code = dedent(ex.code ?? ex.html ?? '');
-    section.querySelector('.cp-code pre code').textContent = code; // not the first <code>: descriptions contain some
+    if (ex.code === false) section.querySelector('.cp-code').remove();
+    const code = ex.code === false ? '' : dedent(ex.code ?? ex.html ?? '');
+    if (ex.code !== false) section.querySelector('.cp-code pre code').textContent = code; // not the first <code>: descriptions contain some
     if (ex.html) preview.innerHTML = dedent(ex.html);
     if (ex.mount) {
       const out = ex.mount(preview);
       if (typeof out === 'function') disposers.push(out);
       else if (out?.dispose) disposers.push(() => out.dispose());
     }
-    section.querySelector('.cp-copy').addEventListener('click', async () => {
+    section.querySelector('.cp-copy')?.addEventListener('click', async () => {
       try { await navigator.clipboard.writeText(code); showToast('Copied to the clipboard', 'success'); } catch { showToast('Copy is blocked here', 'error'); }
     });
     root.appendChild(section);

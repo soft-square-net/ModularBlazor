@@ -1,0 +1,47 @@
+// MudEditForm (src/components/MudEditForm.js): a responsive grid of fields, a summary for errors, actions.
+
+.mud-edit-form {
+  display: grid;
+  gap: 4px;
+}
+
+.mud-edit-form__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 16px;
+
+  > .mud-input-control { margin-bottom: 12px; min-inline-size: 0; }
+}
+.mud-edit-form--single .mud-edit-form__grid,
+.mud-edit-form__field--wide { grid-column: 1 / -1; }
+.mud-edit-form--single .mud-edit-form__grid { grid-template-columns: minmax(0, 1fr); }
+
+// Switches and checkboxes sit on the input baseline next to their neighbours.
+.mud-edit-form__field--choice { justify-content: center; padding-block-start: 22px; }
+fieldset.mud-edit-form__field { border: 0; padding: 0; margin-inline: 0; min-inline-size: 0; }
+
+.mud-edit-form__summary {
+  margin-block-end: 12px;
+  padding: 10px 14px;
+  border-inline-start: 4px solid var(--mud-palette-error);
+  border-radius: var(--mud-default-borderradius, 4px);
+  background: color-mix(in srgb, var(--mud-palette-error) 10%, transparent);
+  color: var(--mud-palette-error);
+  font-size: 0.875rem;
+  font-weight: 500;
+  &[hidden] { display: none; }
+}
+
+.mud-edit-form__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-block-start: 4px;
+}
+
+.mud-edit-form[aria-busy="true"] .mud-edit-form__grid { opacity: 0.7; pointer-events: none; }
+
+@media (max-width: 560px) {
+  .mud-edit-form__grid { grid-template-columns: minmax(0, 1fr); }
+  .mud-edit-form__field--choice { padding-block-start: 0; }
+}
