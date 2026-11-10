@@ -1,0 +1,48 @@
+// MudAppBar, MudToolBar & MudSpacer
+
+.mud-appbar {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
+  z-index: var(--mud-zindex-appbar, 1100);
+  background-color: var(--mud-palette-appbar-background);
+  color: var(--mud-palette-text-primary);
+  border-bottom: 1px solid var(--mud-palette-lines-default);
+  transition: box-shadow 200ms ease;
+
+  &.fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+  &.sticky {
+    position: sticky;
+    top: 0;
+  }
+
+  &.color-primary {
+    background-color: var(--mud-palette-primary);
+    color: var(--mud-palette-primary-contrast);
+    border-bottom: none;
+  }
+}
+
+.mud-toolbar {
+  display: flex;
+  position: relative;
+  align-items: center;
+  padding: 0 16px;
+  min-height: 56px;
+  gap: 12px;
+
+  &.dense {
+    min-height: 48px;
+    padding: 0 12px;
+  }
+}
+
+.mud-spacer {
+  flex-grow: 1;
+}

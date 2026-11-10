@@ -1,0 +1,4 @@
+/* Demo stylesheet: Tailwind + the MudTail preset, exactly as a consuming app would set it up. */
+@import "tailwindcss";
+@import "../../src/styles/tailwind.css";
+@source "../";

@@ -1,0 +1,163 @@
+// MudForm Inputs, TextFields, Selects, Switches, Radios & Checkboxes
+
+.mud-input-control {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+.mud-input-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--mud-palette-text-secondary);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mud-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background-color: var(--mud-palette-surface);
+  border: 1px solid var(--mud-palette-lines-inputs);
+  border-radius: var(--mud-input-borderradius, 4px);
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+
+  &:focus-within {
+    border-color: var(--mud-palette-primary);
+    box-shadow: 0 0 0 1px var(--mud-palette-primary);
+  }
+
+  &.mud-input-error {
+    border-color: var(--mud-palette-error) !important;
+    &:focus-within {
+      box-shadow: 0 0 0 1px var(--mud-palette-error) !important;
+    }
+  }
+
+  &.mud-input-success {
+    border-color: var(--mud-palette-success) !important;
+  }
+}
+
+.mud-input-adornment-start,
+.mud-input-adornment-end {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  color: var(--mud-palette-text-secondary);
+}
+
+.mud-input-slot {
+  flex: 1;
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 10px 12px;
+  font-size: 0.875rem;
+  color: var(--mud-palette-text-primary);
+  font-family: inherit;
+
+  &::placeholder {
+    color: var(--mud-palette-text-disabled);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    color: var(--mud-palette-text-disabled);
+  }
+}
+
+.mud-input-helper-text {
+  font-size: 0.75rem;
+  margin-top: 4px;
+  color: var(--mud-palette-text-secondary);
+
+  &.error {
+    color: var(--mud-palette-error);
+    font-weight: 500;
+  }
+  &.success {
+    color: var(--mud-palette-success);
+  }
+}
+
+// Switches
+.mud-switch {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  gap: 10px;
+
+  input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .mud-switch-track {
+    position: relative;
+    width: 38px;
+    height: 20px;
+    background-color: var(--mud-palette-lines-inputs);
+    border-radius: 20px;
+    transition: background-color 200ms ease;
+
+    .mud-switch-thumb {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      background-color: #fff;
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+      transition: transform 200ms ease;
+    }
+  }
+
+  input:checked + .mud-switch-track {
+    background-color: var(--mud-palette-primary);
+    .mud-switch-thumb {
+      transform: translateX(18px);
+    }
+  }
+}
+
+// Checkboxes & Radios
+.mud-checkbox, .mud-radio {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  gap: 8px;
+  font-size: 0.875rem;
+  color: var(--mud-palette-text-primary);
+
+  input {
+    accent-color: var(--mud-palette-primary);
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+  }
+}
+
+// Sliders
+.mud-slider {
+  width: 100%;
+  accent-color: var(--mud-palette-primary);
+  height: 6px;
+  border-radius: 3px;
+  background: var(--mud-palette-lines-default);
+  outline: none;
+  cursor: pointer;
+}

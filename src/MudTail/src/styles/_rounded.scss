@@ -1,0 +1,37 @@
+// MudRounded Border Radius Utility Classes
+
+.mud-rounded-0 { border-radius: 0 !important; }
+.mud-rounded-sm { border-radius: 2px !important; }
+.mud-rounded-base { border-radius: 4px !important; }
+.mud-rounded { border-radius: var(--mud-default-borderradius, 4px) !important; }
+.mud-rounded-md { border-radius: 6px !important; }
+.mud-rounded-lg { border-radius: 8px !important; }
+.mud-rounded-xl { border-radius: 12px !important; }
+.mud-rounded-2xl { border-radius: 16px !important; }
+.mud-rounded-full { border-radius: 9999px !important; }
+
+// Directional
+.mud-rounded-t {
+  border-top-left-radius: var(--mud-default-borderradius, 4px) !important;
+  border-top-right-radius: var(--mud-default-borderradius, 4px) !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+.mud-rounded-b {
+  border-bottom-left-radius: var(--mud-default-borderradius, 4px) !important;
+  border-bottom-right-radius: var(--mud-default-borderradius, 4px) !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+}
+.mud-rounded-l {
+  border-top-left-radius: var(--mud-default-borderradius, 4px) !important;
+  border-bottom-left-radius: var(--mud-default-borderradius, 4px) !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+.mud-rounded-r {
+  border-top-right-radius: var(--mud-default-borderradius, 4px) !important;
+  border-bottom-right-radius: var(--mud-default-borderradius, 4px) !important;
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}

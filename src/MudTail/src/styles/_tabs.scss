@@ -1,0 +1,121 @@
+// MudTabs - 6 Positions with Animated GSAP Slider
+
+.mud-tabs {
+  display: flex;
+  position: relative;
+  width: 100%;
+  background-color: var(--mud-palette-surface);
+  border: 1px solid var(--mud-palette-lines-default);
+  border-radius: var(--mud-default-borderradius, 4px);
+  overflow: hidden;
+
+  &.position-top {
+    flex-direction: column;
+    .mud-tabs-tabbar { border-bottom: 1px solid var(--mud-palette-lines-default); }
+  }
+  &.position-bottom {
+    flex-direction: column-reverse;
+    .mud-tabs-tabbar { border-top: 1px solid var(--mud-palette-lines-default); }
+  }
+  &.position-left, &.position-start {
+    flex-direction: row;
+    .mud-tabs-tabbar {
+      flex-direction: column;
+      border-right: 1px solid var(--mud-palette-lines-default);
+      width: 220px;
+      flex-shrink: 0;
+    }
+  }
+  &.position-right, &.position-end {
+    flex-direction: row-reverse;
+    .mud-tabs-tabbar {
+      flex-direction: column;
+      border-left: 1px solid var(--mud-palette-lines-default);
+      width: 220px;
+      flex-shrink: 0;
+    }
+  }
+}
+
+.mud-tabs-tabbar {
+  display: flex;
+  position: relative;
+  background-color: var(--mud-palette-surface);
+  overflow-x: auto;
+  overflow-y: hidden;
+  user-select: none;
+}
+
+.mud-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 12px 18px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--mud-palette-text-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 200ms ease, background-color 200ms ease;
+  white-space: nowrap;
+  gap: 8px;
+
+  &:hover {
+    color: var(--mud-palette-primary);
+    background-color: rgba(var(--mud-palette-primary-rgb), 0.04);
+  }
+
+  &.active {
+    color: var(--mud-palette-primary);
+    font-weight: 600;
+  }
+}
+
+.mud-tab-slider {
+  position: absolute;
+  background-color: var(--mud-palette-primary);
+  border-radius: 2px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.position-top .mud-tab-slider,
+.position-bottom .mud-tab-slider {
+  bottom: 0;
+  height: 3px;
+}
+
+.position-left .mud-tab-slider,
+.position-start .mud-tab-slider {
+  right: 0;
+  width: 3px;
+}
+
+.position-right .mud-tab-slider,
+.position-end .mud-tab-slider {
+  left: 0;
+  width: 3px;
+}
+
+.mud-tabs-panels {
+  flex: 1 1 auto;
+  padding: 16px;
+  position: relative;
+}
+
+.mud-tab-panel {
+  display: none;
+  &.active { display: block; }
+}
+
+.mud-tab-badge {
+  background-color: var(--mud-palette-primary);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 10px;
+  line-height: 1.2;
+}

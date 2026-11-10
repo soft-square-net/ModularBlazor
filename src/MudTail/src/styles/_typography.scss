@@ -1,0 +1,24 @@
+// Material Typography Hierarchy
+
+.mud-typography {
+  font-family: var(--mud-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  color: var(--mud-palette-text-primary);
+  margin: 0;
+}
+
+.mud-typography-h1 { font-size: 3.5rem; font-weight: 300; line-height: 1.167; letter-spacing: -0.01562em; }
+.mud-typography-h2 { font-size: 2.75rem; font-weight: 300; line-height: 1.2; letter-spacing: -0.00833em; }
+.mud-typography-h3 { font-size: 2.125rem; font-weight: 400; line-height: 1.167; letter-spacing: 0em; }
+.mud-typography-h4 { font-size: 1.75rem; font-weight: 500; line-height: 1.235; letter-spacing: 0.00735em; }
+.mud-typography-h5 { font-size: 1.35rem; font-weight: 500; line-height: 1.334; letter-spacing: 0em; }
+.mud-typography-h6 { font-size: 1.125rem; font-weight: 600; line-height: 1.6; letter-spacing: 0.0075em; }
+
+.mud-typography-subtitle1 { font-size: 1rem; font-weight: 500; line-height: 1.75; letter-spacing: 0.00938em; }
+.mud-typography-subtitle2 { font-size: 0.875rem; font-weight: 600; line-height: 1.57; letter-spacing: 0.00714em; }
+
+.mud-typography-body1 { font-size: 0.95rem; font-weight: 400; line-height: 1.5; letter-spacing: 0.00938em; }
+.mud-typography-body2 { font-size: 0.85rem; font-weight: 400; line-height: 1.43; letter-spacing: 0.01071em; color: var(--mud-palette-text-secondary); }
+
+.mud-typography-button { font-size: 0.875rem; font-weight: 600; line-height: 1.75; letter-spacing: 0.02857em; text-transform: uppercase; }
+.mud-typography-caption { font-size: 0.75rem; font-weight: 400; line-height: 1.66; letter-spacing: 0.03333em; color: var(--mud-palette-text-secondary); }
+.mud-typography-overline { font-size: 0.75rem; font-weight: 600; line-height: 2.66; letter-spacing: 0.08333em; text-transform: uppercase; }

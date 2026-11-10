@@ -1,0 +1,72 @@
+// MudBlazor Material SCSS Framework Variables & Design Tokens
+
+:root {
+  --mud-palette-primary: #594ae2;
+  --mud-palette-primary-rgb: 89, 74, 226;
+  --mud-palette-primary-hover: #4a3cd1;
+  --mud-palette-primary-contrast: #ffffff;
+
+  --mud-palette-secondary: #ff4081;
+  --mud-palette-secondary-rgb: 255, 64, 129;
+  --mud-palette-secondary-hover: #f50057;
+  --mud-palette-secondary-contrast: #ffffff;
+
+  --mud-palette-background: #f8fafc;
+  --mud-palette-surface: #ffffff;
+  --mud-palette-surface-rgb: 255, 255, 255;
+  --mud-palette-appbar-background: #ffffff;
+  --mud-palette-drawer-background: #ffffff;
+
+  --mud-palette-text-primary: #1e293b;
+  --mud-palette-text-secondary: #64748b;
+  --mud-palette-text-disabled: #94a3b8;
+
+  --mud-palette-action-default: #64748b;
+  --mud-palette-action-disabled: #cbd5e1;
+  --mud-palette-action-disabled-background: #e2e8f0;
+
+  --mud-palette-lines-default: #e2e8f0;
+  --mud-palette-lines-inputs: #cbd5e1;
+  --mud-palette-divider: #e2e8f0;
+
+  --mud-palette-info: #2196f3;
+  --mud-palette-success: #10b981;
+  --mud-palette-warning: #f59e0b;
+  --mud-palette-error: #ef4444;
+  --mud-palette-dark: #0f172a;
+
+  --mud-default-borderradius: 4px;
+  --mud-input-borderradius: 4px;
+
+  --mud-zindex-appbar: 1100;
+  --mud-zindex-drawer: 1200;
+  --mud-zindex-dialog: 1300;
+  --mud-zindex-popover: 1400;
+  --mud-zindex-tooltip: 1500;
+  --mud-zindex-snackbar: 1600;
+}
+
+[data-theme="dark"] {
+  --mud-palette-background: #0b0f19;
+  --mud-palette-surface: #111827;
+  --mud-palette-surface-rgb: 17, 24, 39;
+  --mud-palette-appbar-background: #111827;
+  --mud-palette-drawer-background: #111827;
+
+  --mud-palette-text-primary: #f8fafc;
+  --mud-palette-text-secondary: #94a3b8;
+  --mud-palette-text-disabled: #64748b;
+
+  --mud-palette-action-default: #94a3b8;
+  --mud-palette-action-disabled: #475569;
+  --mud-palette-action-disabled-background: #1e293b;
+
+  --mud-palette-lines-default: #1e293b;
+  --mud-palette-lines-inputs: #334155;
+  --mud-palette-divider: #1e293b;
+}
+
+$font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+$font-family-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+$space-unit: 4px;

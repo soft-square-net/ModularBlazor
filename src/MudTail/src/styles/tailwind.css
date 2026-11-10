@@ -1,0 +1,45 @@
+/*
+ * MudTail Tailwind CSS v4 preset.
+ * Import it after Tailwind in the consuming app's stylesheet:
+ *
+ *   @import "tailwindcss";
+ *   @import "mudtail/tailwind.css";
+ *   @source "../**\/*.razor";            (Blazor: let Tailwind scan your Razor markup)
+ *
+ * It maps the runtime --mud-palette-* tokens onto Tailwind's theme, so utilities such as
+ * bg-primary, text-ink-muted, border-line and rounded-mud follow the live MudTail theme
+ * (including dark mode and changes made with updateTheme()).
+ */
+
+/* MudTail switches dark mode with [data-theme="dark"] on <html>, not the OS media query. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+@theme inline {
+  --color-primary: var(--mud-palette-primary);
+  --color-primary-hover: var(--mud-palette-primary-hover);
+  --color-primary-contrast: var(--mud-palette-primary-contrast);
+  --color-secondary: var(--mud-palette-secondary);
+  --color-secondary-hover: var(--mud-palette-secondary-hover);
+  --color-secondary-contrast: var(--mud-palette-secondary-contrast);
+
+  --color-background: var(--mud-palette-background);
+  --color-surface: var(--mud-palette-surface);
+  --color-appbar: var(--mud-palette-appbar-background);
+  --color-drawer: var(--mud-palette-drawer-background);
+
+  --color-ink: var(--mud-palette-text-primary);
+  --color-ink-muted: var(--mud-palette-text-secondary);
+  --color-ink-disabled: var(--mud-palette-text-disabled);
+
+  --color-line: var(--mud-palette-lines-default);
+  --color-line-input: var(--mud-palette-lines-inputs);
+  --color-divider: var(--mud-palette-divider);
+
+  --color-info: var(--mud-palette-info);
+  --color-success: var(--mud-palette-success);
+  --color-warning: var(--mud-palette-warning);
+  --color-error: var(--mud-palette-error);
+
+  --radius-mud: var(--mud-default-borderradius);
+  --radius-mud-input: var(--mud-input-borderradius);
+}

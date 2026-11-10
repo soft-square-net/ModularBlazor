@@ -1,0 +1,32 @@
+// MudTail Material UI Framework: library stylesheet entry (compiled to dist/mudtail.css)
+
+@use "variables" as *;
+@use "mixins" as *;
+@use "elevation" as *;
+@use "rounded" as *;
+@use "typography" as *;
+@use "buttons" as *;
+@use "forms" as *;
+@use "cards" as *;
+@use "dialogs" as *;
+@use "drawers" as *;
+@use "tabs" as *;
+@use "appbar" as *;
+@use "accordion" as *;
+
+// Global resets & typography baseline
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--mud-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  background-color: var(--mud-palette-background);
+  color: var(--mud-palette-text-primary);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
