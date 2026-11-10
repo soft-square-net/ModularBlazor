@@ -1,8 +1,9 @@
 // MudTail Material UI Framework - Vanilla JS Entry Point with Tailwind CSS Flexible Grid Layout
+import './i18n/index.js'; // first: sets the language (and direction) before anything renders
 import '../src/styles/mudtail.scss';
 import './styles/demo.css';
 import './styles/demo.scss';
-import { initTheme, getTheme, updateTheme } from 'mudtail';
+import { initTheme, getTheme, updateTheme, getNumerals } from 'mudtail';
 import { getIconSvg } from 'mudtail';
 import { MudDrawer } from 'mudtail';
 import { createThemeEditorContent } from './views/ThemeEditor.js';
@@ -13,10 +14,29 @@ import { VSDockLayout } from './views/VSDockLayout.js';
 import { createDocumentationView } from './views/Documentation.js';
 import { createDockBar } from './forms/Dock.js';
 import { showToast } from 'mudtail';
+import { findComponentPage } from './views/components/index.js';
+import { languageButton } from './i18n/index.js';
+
+// Every view has a URL, so refresh and the back button work: #/ · #/dock · #/docs · #/components/<id>
+function viewFromHash(hash) {
+  const path = (hash || '').replace(/^#\/?/, '');
+  if (path === 'dock') return 'vsdock';
+  if (path === 'docs') return 'docs';
+  const m = path.match(/^components\/([\w-]+)$/);
+  if (m && findComponentPage(m[1])) return `component:${m[1]}`;
+  return 'dashboard';
+}
+
+function hashFromView(view) {
+  if (view === 'vsdock') return '#/dock';
+  if (view === 'docs') return '#/docs';
+  if (view.startsWith('component:')) return `#/components/${view.slice('component:'.length)}`;
+  return '#/';
+}
 
 class MudApp {
   constructor() {
-    this.currentView = 'dashboard'; // dashboard | vsdock | docs
+    this.currentView = viewFromHash(location.hash); // dashboard | vsdock | docs | component:<id>
     this.currentFormTab = 'auth';
     this.sidebar = null;
     this.layoutGrid = null;
@@ -24,10 +44,14 @@ class MudApp {
     this.searchDialog = null;
     this.mainContainer = null;
     this.vsDockInstance = null;
+    this.pageHandle = null; // the current component page (disposed when it is replaced)
   }
 
   start() {
+    if (this.started) return; // start() is reached from both the readyState check and DOMContentLoaded
+    this.started = true;
     initTheme();
+    window.addEventListener('hashchange', () => this.switchView(viewFromHash(location.hash)));
 
     const appRoot = document.getElementById('root');
     if (!appRoot) return;
@@ -109,6 +133,14 @@ class MudApp {
 
     // 8. Render Initial View
     this.renderView();
+
+    // Digits chosen in the Theme Studio (or setNumerals): render the view again so every number uses them.
+    let numerals = getNumerals();
+    window.addEventListener('mud-locale-changed', (e) => {
+      if (e.detail.numerals === numerals) return;
+      numerals = e.detail.numerals;
+      this.renderView();
+    });
   }
 
   createAppBar() {
@@ -135,7 +167,7 @@ class MudApp {
           </div>
 
           <!-- Top Quick Nav Tabs (Desktop) -->
-          <nav class="hidden md:flex items-center gap-1 ml-4" id="app-nav">
+          <nav class="hidden lg:flex items-center gap-1 ms-4 whitespace-nowrap" id="app-nav">
             <button type="button" class="mud-button-root mud-button-text mud-button-primary mud-button-small nav-link active" data-view="dashboard">
               ${getIconSvg('dashboard', 16)} Dashboard
             </button>
@@ -145,6 +177,9 @@ class MudApp {
             <button type="button" class="mud-button-root mud-button-text mud-button-surface mud-button-small nav-link" data-view="docs">
               ${getIconSvg('docs', 16)} Documentation
             </button>
+            <a class="mud-button-root mud-button-text mud-button-surface mud-button-small" href="./site.html" style="text-decoration:none">
+              ${getIconSvg('sparkles', 16)} Public site
+            </a>
           </nav>
         </div>
 
@@ -197,8 +232,9 @@ class MudApp {
       this.themeDrawer.open();
     });
 
-    // Dark Mode toggle button
+    // Language switch, next to the dark-mode toggle
     const darkBtn = bar.querySelector('#btn-dark-toggle');
+    darkBtn.before(languageButton('mud-button-root mud-button-text mud-button-surface mud-button-small'));
     darkBtn.addEventListener('click', () => {
       const theme = getTheme();
       const newDark = !theme.isDark;
@@ -213,6 +249,8 @@ class MudApp {
   switchView(viewName) {
     if (this.currentView === viewName && this.mainContainer.children.length > 0) return;
     this.currentView = viewName;
+    const hash = hashFromView(viewName);
+    if (location.hash !== hash) history.pushState(null, '', hash);
 
     // Update active nav links in Appbar
     document.querySelectorAll('.nav-link').forEach((link) => {
@@ -231,7 +269,15 @@ class MudApp {
   }
 
   renderView() {
+    // The dock listens on document and saves its layout: dispose it before its view is replaced.
+    this.vsDockInstance?.dispose();
+    this.vsDockInstance = null;
+    this.pageHandle?.dispose();
+    this.pageHandle = null;
     this.mainContainer.innerHTML = '';
+    window.scrollTo(0, 0);
+    this.baseTitle ??= document.title;
+    document.title = this.baseTitle; // component pages set their own below
 
     if (this.currentView === 'dashboard') {
       this.mainContainer.appendChild(createDashboardView({ initialFormTab: this.currentFormTab }));
@@ -240,6 +286,12 @@ class MudApp {
       this.mainContainer.appendChild(this.vsDockInstance.getElement());
     } else if (this.currentView === 'docs') {
       this.mainContainer.appendChild(createDocumentationView());
+    } else if (this.currentView.startsWith('component:')) {
+      const page = findComponentPage(this.currentView.slice('component:'.length));
+      const { element, dispose } = page.render();
+      this.pageHandle = { dispose };
+      this.mainContainer.appendChild(element);
+      document.title = `${element.querySelector('.cp-title')?.textContent ?? 'Component'} · MudTail`;
     }
   }
 }

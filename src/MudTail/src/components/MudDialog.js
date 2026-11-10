@@ -1,10 +1,11 @@
 // Vanilla JS MudDialog Component with GSAP Animations
 import { animateDialog } from '../core/animations.js';
 import { getIconSvg } from '../core/icons.js';
+import { t } from '../core/i18n.js';
 
 export class MudDialog {
   constructor(options = {}) {
-    this.title = options.title || 'Dialog';
+    this.title = options.title || t('dialog.title', {}, 'Dialog');
     this.maxWidth = options.maxWidth || '520px';
     this.content = options.content || '';
     this.actions = options.actions || []; // [{ label, color, variant, onClick }]
@@ -53,7 +54,7 @@ export class MudDialog {
     if (this.actions.length === 0) {
       const okBtn = document.createElement('button');
       okBtn.className = 'mud-button-root mud-button-filled mud-button-primary mud-button-medium';
-      okBtn.innerText = 'OK';
+      okBtn.innerText = t('common.ok', {}, 'OK');
       okBtn.addEventListener('click', () => this.close());
       actionsEl.appendChild(okBtn);
     } else {

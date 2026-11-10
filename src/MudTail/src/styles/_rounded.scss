@@ -35,3 +35,17 @@
   border-top-left-radius: 0 !important;
   border-bottom-left-radius: 0 !important;
 }
+
+// Logical: follow the writing direction (start = left in LTR, right in RTL)
+.mud-rounded-s {
+  border-start-start-radius: var(--mud-default-borderradius, 4px) !important;
+  border-end-start-radius: var(--mud-default-borderradius, 4px) !important;
+  border-start-end-radius: 0 !important;
+  border-end-end-radius: 0 !important;
+}
+.mud-rounded-e {
+  border-start-end-radius: var(--mud-default-borderradius, 4px) !important;
+  border-end-end-radius: var(--mud-default-borderradius, 4px) !important;
+  border-start-start-radius: 0 !important;
+  border-end-start-radius: 0 !important;
+}

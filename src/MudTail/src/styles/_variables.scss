@@ -44,6 +44,17 @@
   --mud-zindex-popover: 1400;
   --mud-zindex-tooltip: 1500;
   --mud-zindex-snackbar: 1600;
+
+  // Writing direction factor: multiply horizontal offsets/translations by it so they flip in RTL.
+  --mud-dir: 1;
+}
+
+[dir="rtl"] {
+  --mud-dir: -1;
+}
+
+[dir="ltr"] {
+  --mud-dir: 1;
 }
 
 [data-theme="dark"] {

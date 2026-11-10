@@ -2,10 +2,7 @@
 
 .mud-drawer-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background-color: rgba(15, 23, 42, 0.5);
   backdrop-filter: blur(2px);
   z-index: calc(var(--mud-zindex-drawer, 1200) - 1);
@@ -28,34 +25,46 @@
   flex-direction: column;
   overflow: hidden;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-  transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  // No CSS transition on transform: GSAP (animateDrawer) drives the slide, and a CSS transition would fight it.
 
-  &.anchor-left, &.anchor-start {
-    top: 0;
-    bottom: 0;
-    left: 0;
-    width: 320px;
+  // left / right are physical sides; start / end follow the writing direction (they swap in RTL).
+  &.anchor-left, &.anchor-right, &.anchor-start, &.anchor-end {
+    inset-block: 0;
     max-width: 85vw;
-    border-right: 1px solid var(--mud-palette-lines-default);
-    transform: translateX(-100%);
     &.open { transform: translateX(0); }
   }
 
-  &.anchor-right, &.anchor-end {
-    top: 0;
-    bottom: 0;
+  &.anchor-left {
+    left: 0;
+    width: 320px;
+    border-right: 1px solid var(--mud-palette-lines-default);
+    transform: translateX(-100%);
+  }
+
+  &.anchor-right {
     right: 0;
     width: 360px;
-    max-width: 85vw;
     border-left: 1px solid var(--mud-palette-lines-default);
     transform: translateX(100%);
-    &.open { transform: translateX(0); }
+  }
+
+  &.anchor-start {
+    inset-inline-start: 0;
+    width: 320px;
+    border-inline-end: 1px solid var(--mud-palette-lines-default);
+    transform: translateX(calc(-100% * var(--mud-dir, 1)));
+  }
+
+  &.anchor-end {
+    inset-inline-end: 0;
+    width: 360px;
+    border-inline-start: 1px solid var(--mud-palette-lines-default);
+    transform: translateX(calc(100% * var(--mud-dir, 1)));
   }
 
   &.anchor-top {
     top: 0;
-    left: 0;
-    right: 0;
+    inset-inline: 0;
     height: 300px;
     max-height: 80vh;
     border-bottom: 1px solid var(--mud-palette-lines-default);
@@ -65,8 +74,7 @@
 
   &.anchor-bottom {
     bottom: 0;
-    left: 0;
-    right: 0;
+    inset-inline: 0;
     height: 320px;
     max-height: 80vh;
     border-top: 1px solid var(--mud-palette-lines-default);

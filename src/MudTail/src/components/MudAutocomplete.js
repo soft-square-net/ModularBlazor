@@ -1,10 +1,11 @@
 // Vanilla JS MudAutocomplete Component
 import { getIconSvg } from '../core/icons.js';
+import { t } from '../core/i18n.js';
 
 export function createAutocomplete(options = {}) {
   const {
-    label = 'Select Country / Region',
-    placeholder = 'Type to search...',
+    label = t('autocomplete.label', {}, 'Select Country / Region'),
+    placeholder = t('autocomplete.placeholder', {}, 'Type to search...'),
     items = [
       'United States',
       'United Kingdom',
@@ -52,7 +53,7 @@ export function createAutocomplete(options = {}) {
     );
 
     if (filteredItems.length === 0) {
-      popover.innerHTML = '<div style="padding:10px 14px;color:var(--mud-palette-text-secondary);font-size:0.8125rem;">No matches found</div>';
+      popover.innerHTML = '<div style="padding:10px 14px;color:var(--mud-palette-text-secondary);font-size:0.8125rem;">' + t('autocomplete.noMatches', {}, 'No matches found') + '</div>';
       popover.classList.add('open');
       return;
     }

@@ -1,0 +1,97 @@
+/*
+ * Default layout shell (DefaultLayout.razor): sidebar + main area.
+ * Logical properties only, so the sidebar moves to the right and everything mirrors under dir="rtl".
+ */
+
+/* The host's own variables (wwwroot/css/app.css) follow the MudTail tokens while this layout is loaded,
+   so host pages and other modules pick up the same palette, dark mode included. */
+:root {
+  --bg: var(--mud-palette-background);
+  --surface: var(--mud-palette-surface);
+  --text: var(--mud-palette-text-primary);
+  --muted: var(--mud-palette-text-secondary);
+  --border: var(--mud-palette-lines-default);
+  --accent: var(--mud-palette-primary);
+  --accent-dark: var(--mud-palette-primary-hover);
+  --danger: var(--mud-palette-error);
+}
+
+.shell-default {
+  display: flex;
+  min-block-size: 100vh;
+  background-color: var(--mud-palette-background);
+  color: var(--mud-palette-text-primary);
+}
+
+.shell-default .shell-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex-shrink: 0;
+  inline-size: 240px;
+  padding-block: 1.25rem;
+  padding-inline: 1rem;
+  background-color: var(--mud-palette-drawer-background);
+  color: var(--mud-palette-text-primary);
+  border-inline-end: 1px solid var(--mud-palette-lines-default);
+}
+
+.shell-default .brand {
+  color: var(--mud-palette-primary);
+  font-weight: 700;
+  font-size: 1.15rem;
+  text-decoration: none;
+}
+
+.shell-default nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.shell-default nav a {
+  color: var(--mud-palette-text-secondary);
+  text-decoration: none;
+  padding-block: 0.5rem;
+  padding-inline: 0.75rem;
+  border-radius: var(--mud-default-borderradius);
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.shell-default nav a:hover {
+  background-color: rgba(var(--mud-palette-primary-rgb), 0.08);
+  color: var(--mud-palette-primary);
+}
+
+.shell-default nav a.active {
+  background-color: var(--mud-palette-primary);
+  color: var(--mud-palette-primary-contrast);
+}
+
+.shell-default .shell-user {
+  font-size: 0.85rem;
+  color: var(--mud-palette-text-secondary);
+  border-block-start: 1px solid var(--mud-palette-lines-default);
+  padding-block-start: 0.75rem;
+}
+
+.shell-default .shell-user a {
+  color: var(--mud-palette-primary);
+}
+
+.shell-default .shell-main {
+  flex: 1;
+  min-inline-size: 0;
+  max-inline-size: 1100px;
+  padding: 2rem;
+}
+
+@media (max-width: 768px) {
+  .shell-default { flex-direction: column; }
+  .shell-default .shell-sidebar {
+    inline-size: auto;
+    border-inline-end: none;
+    border-block-end: 1px solid var(--mud-palette-lines-default);
+  }
+}

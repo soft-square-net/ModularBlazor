@@ -1,0 +1,140 @@
+// Component pages of the demo (demo/views/components): page template only; the components are library CSS.
+
+.cp {
+  max-inline-size: 1100px;
+  margin-inline: auto;
+  padding-block: 24px 64px;
+  padding-inline: 20px;
+  color: var(--mud-palette-text-primary);
+}
+
+.cp-trail {
+  display: flex;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--mud-palette-text-secondary);
+}
+
+.cp-title { margin-block: 6px 8px; font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem); font-weight: 800; letter-spacing: -0.01em; }
+.cp-lead { margin: 0; max-inline-size: 70ch; color: var(--mud-palette-text-secondary); line-height: 1.6; }
+.cp-kinds { display: flex; gap: 6px; margin-block-start: 12px; }
+.cp-kind {
+  padding-block: 2px;
+  padding-inline: 8px;
+  border-radius: 999px;
+  background: rgba(var(--mud-palette-primary-rgb), 0.1);
+  color: var(--mud-palette-primary);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.cp-example { margin-block-start: 32px; }
+.cp-example__title { margin-block: 0 4px; font-size: 1.1rem; font-weight: 700; }
+.cp-example__desc { margin-block: 0 12px; color: var(--mud-palette-text-secondary); font-size: 0.9rem; max-inline-size: 75ch; }
+
+.cp-preview {
+  position: relative;
+  padding: 24px;
+  background: var(--mud-palette-background);
+  border: 1px solid var(--mud-palette-lines-default);
+  border-start-start-radius: 8px;
+  border-start-end-radius: 8px;
+  overflow: auto;
+
+  // Example markup is laid out like a page section: give stacked fields a sensible width.
+  > .cp-stack { display: grid; gap: 4px; max-inline-size: 460px; }
+  > .cp-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+}
+
+.cp-code {
+  border: 1px solid var(--mud-palette-lines-default);
+  border-block-start: 0;
+  border-end-start-radius: 8px;
+  border-end-end-radius: 8px;
+  background: var(--mud-palette-surface);
+  direction: ltr; // code reads left to right on RTL pages too
+
+  pre {
+    margin: 0;
+    padding: 14px 16px;
+    max-block-size: 320px;
+    overflow: auto;
+    font: 12.5px/1.55 ui-monospace, "Cascadia Code", Consolas, monospace;
+    color: var(--mud-palette-text-primary);
+  }
+}
+
+.cp-code__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: 6px;
+  padding-inline: 12px;
+  border-block-end: 1px solid var(--mud-palette-lines-default);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--mud-palette-text-secondary);
+}
+
+.cp-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding-block: 2px;
+  padding-inline: 8px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--mud-palette-text-secondary);
+  font: inherit;
+  cursor: pointer;
+  &:hover { color: var(--mud-palette-primary); background: rgba(var(--mud-palette-primary-rgb), 0.08); }
+}
+
+.cp-api { margin-block-start: 40px; }
+.cp-api__title { margin-block: 16px 8px; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--mud-palette-text-secondary); }
+.cp-api__scroll { overflow-x: auto; border: 1px solid var(--mud-palette-lines-default); border-radius: 8px; }
+.cp-api__table {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  th, td { padding-block: 8px; padding-inline: 12px; text-align: start; vertical-align: top; border-block-end: 1px solid var(--mud-palette-lines-default); }
+  tr:last-child th, tr:last-child td { border-block-end: 0; }
+  th { inline-size: 32%; font-weight: 500; white-space: nowrap; }
+  code { font-size: 0.8rem; color: var(--mud-palette-primary); }
+}
+
+// Small helpers used inside the previews
+.cp-tile {
+  display: grid;
+  place-items: center;
+  block-size: 72px;
+  border-radius: var(--mud-default-borderradius);
+  background: var(--mud-palette-surface);
+  font-size: 0.75rem;
+  color: var(--mud-palette-text-secondary);
+}
+.cp-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+.cp-cell { padding: 10px; border-radius: 4px; background: rgba(var(--mud-palette-primary-rgb), 0.1); color: var(--mud-palette-primary); font-size: 0.75rem; text-align: center; }
+.cp-meter { display: block; block-size: 6px; border-radius: 3px; background: var(--mud-palette-lines-default); overflow: hidden; margin-block-start: 8px;
+  > span { display: block; block-size: 100%; inline-size: 0; transition: inline-size 200ms ease, background-color 200ms ease; } }
+
+// The request line under the server-side data table example
+.cp-request {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: var(--mud-palette-surface);
+  border: 1px dashed var(--mud-palette-lines-default);
+  font: 12px/1.5 ui-monospace, "Cascadia Code", Consolas, monospace;
+  white-space: pre-wrap;
+  word-break: break-all;
+  direction: ltr;
+  color: var(--mud-palette-text-secondary);
+}
+
+// Language switch in the public-site top bar
+.mud-site-lang { border: 0; background: none; padding: 0; color: inherit; font: inherit; cursor: pointer; &:hover { color: var(--mud-palette-primary); } }

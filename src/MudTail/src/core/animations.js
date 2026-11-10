@@ -1,5 +1,6 @@
 // GSAP Animation Utilities for MudBlazor Material Framework
 import gsap from 'gsap';
+import { toPhysicalSide } from './direction.js';
 
 /**
  * Material Ripple effect powered by GSAP
@@ -41,8 +42,10 @@ export function createRipple(event, targetElement) {
 export function animateDrawer(drawerEl, overlayEl, anchor = 'left', open = true, onComplete) {
   if (!drawerEl) return;
 
-  const isHorizontal = anchor === 'left' || anchor === 'start' || anchor === 'right' || anchor === 'end';
-  const isNegative = anchor === 'left' || anchor === 'start' || anchor === 'top';
+  // start / end are logical: in RTL a start drawer sits on the right and slides in from there.
+  const side = toPhysicalSide(anchor, drawerEl);
+  const isHorizontal = side === 'left' || side === 'right';
+  const isNegative = side === 'left' || side === 'top';
 
   if (open) {
     drawerEl.style.display = 'flex';
@@ -212,7 +215,7 @@ export function showToast(message, type = 'info') {
     toastContainer.id = 'mud-toast-container';
     toastContainer.style.position = 'fixed';
     toastContainer.style.bottom = '24px';
-    toastContainer.style.right = '24px';
+    toastContainer.style.insetInlineEnd = '24px'; // bottom-right in LTR, bottom-left in RTL
     toastContainer.style.zIndex = '9999';
     toastContainer.style.display = 'flex';
     toastContainer.style.flexDirection = 'column';
@@ -221,7 +224,8 @@ export function showToast(message, type = 'info') {
   }
 
   const toast = document.createElement('div');
-  const bg = type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#594ae2';
+  const palette = { success: 'success', error: 'error', warning: 'warning', info: 'primary' };
+  const bg = `var(--mud-palette-${palette[type] || 'primary'})`;
   toast.style.backgroundColor = bg;
   toast.style.color = '#ffffff';
   toast.style.padding = '10px 18px';

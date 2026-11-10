@@ -1,0 +1,373 @@
+// Public-site shell: skip link, reading progress, header (top bar, masthead, mega-nav), main and footer.
+// Used by the Blazor PublicLayout and the demo site page; see the README for the full markup.
+
+.mud-site {
+  display: flex;
+  flex-direction: column;
+  min-block-size: 100vh;
+  background: var(--mud-palette-background);
+  color: var(--mud-palette-text-primary);
+}
+
+.mud-site-main {
+  flex: 1;
+  padding-block: 1.5rem 3rem;
+}
+
+.mud-skip-link {
+  position: absolute;
+  inset-block-start: 0.5rem;
+  inset-inline-start: 0.5rem;
+  z-index: calc(var(--mud-zindex-appbar, 1100) + 10);
+  padding-block: 0.5rem;
+  padding-inline: 1rem;
+  border-radius: var(--mud-default-borderradius);
+  background: var(--mud-palette-primary);
+  color: var(--mud-palette-primary-contrast);
+  font-weight: 700;
+  text-decoration: none;
+  transform: translateY(-200%);
+
+  &:focus { transform: none; }
+}
+
+// ---------- Reading progress ----------
+// <div class="mud-reading-progress" data-mud="reading-progress" data-target="#article" aria-hidden="true"></div>
+
+.mud-reading-progress {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline: 0;
+  z-index: calc(var(--mud-zindex-appbar, 1100) + 1);
+  block-size: 3px;
+  background: var(--mud-accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+  pointer-events: none;
+}
+
+[dir="rtl"] .mud-reading-progress { transform-origin: right center; }
+
+// In-page links (#sport) and focus scrolling stop below the sticky header instead of under it.
+:root:has(.mud-site-header) { scroll-padding-block-start: var(--mud-header-offset, 9.5rem); }
+
+// ---------- Header ----------
+
+.mud-site-header {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: var(--mud-zindex-appbar, 1100);
+  background: var(--mud-palette-appbar-background);
+  border-block-end: 1px solid var(--mud-palette-lines-default);
+}
+
+.mud-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-block-size: 2rem;
+  font-size: 0.75rem;
+  color: var(--mud-palette-text-secondary);
+  border-block-end: 1px solid var(--mud-palette-lines-default);
+
+  a { color: inherit; text-decoration: none; &:hover { color: var(--mud-palette-primary); } }
+
+  nav { display: flex; gap: 1rem; }
+
+  @media (max-width: 640px) { display: none; }
+}
+
+.mud-masthead {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-block-size: 4rem;
+}
+
+.mud-logo {
+  font-family: var(--mud-font-headline);
+  font-size: clamp(1.25rem, 1rem + 1.2vw, 1.6rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: var(--mud-palette-text-primary);
+  text-decoration: none;
+  white-space: nowrap;
+
+  b, strong { color: var(--mud-palette-primary); }
+}
+
+.mud-masthead__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-inline-start: auto;
+  font-size: 0.85rem;
+
+  a { color: var(--mud-palette-text-secondary); text-decoration: none; font-weight: 600; white-space: nowrap; }
+  a:hover { color: var(--mud-palette-primary); }
+}
+
+.mud-masthead__user {
+  color: var(--mud-palette-text-secondary);
+  font-weight: 600;
+  white-space: nowrap;
+  @media (max-width: 640px) { display: none; }
+}
+
+.mud-icon-btn {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 2.4rem;
+  block-size: 2.4rem;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--mud-palette-text-secondary);
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+
+  &:hover { background: rgba(var(--mud-palette-primary-rgb), 0.08); color: var(--mud-palette-primary); }
+  &:focus-visible { outline: 2px solid var(--mud-palette-primary); outline-offset: 2px; }
+
+  svg { inline-size: 1.25rem; block-size: 1.25rem; }
+}
+
+// Theme toggle shows a moon in light mode and a sun in dark mode.
+.mud-theme-toggle .mud-icon-sun { display: none; }
+[data-theme="dark"] .mud-theme-toggle .mud-icon-sun { display: block; }
+[data-theme="dark"] .mud-theme-toggle .mud-icon-moon { display: none; }
+
+.mud-nav-toggle {
+  @media (min-width: 1024px) { display: none; }
+}
+
+// ---------- Mega-nav ----------
+// <nav class="mud-mega-nav" data-mud="mega-nav" id="site-nav" aria-label="Main">
+//   <ul class="mud-mega-nav__list mud-container">
+//     <li class="mud-mega-nav__item">
+//       <a class="mud-mega-nav__link" href="news">News</a>
+//       <button type="button" class="mud-mega-nav__expander" aria-controls="nav-news" aria-label="News sections"></button>
+//       <div class="mud-mega-nav__panel" id="nav-news"> <div class="mud-mega-nav__columns"> … </div> </div>
+//     </li>
+//   </ul>
+// </nav>
+// The script owns aria-expanded and the data-open attributes: don't render them from Razor.
+
+.mud-mega-nav {
+  position: relative;
+  border-block-start: 1px solid var(--mud-palette-lines-default);
+}
+
+.mud-mega-nav__list {
+  display: flex;
+  align-items: stretch;
+  margin-block: 0;
+  list-style: none;
+}
+
+.mud-mega-nav__item {
+  display: flex;
+  align-items: center;
+}
+
+.mud-mega-nav__link {
+  display: flex;
+  align-items: center;
+  min-block-size: 2.9rem;
+  padding-inline: 0.8rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--mud-palette-text-primary);
+  text-decoration: none;
+  border-block-end: 3px solid transparent;
+  transition: color 150ms ease, border-color 150ms ease;
+
+  &:hover, &.active { color: var(--mud-accent); }
+  &.active { border-block-end-color: var(--mud-accent); }
+}
+
+.mud-mega-nav__expander {
+  display: grid;
+  place-items: center;
+  inline-size: 1.6rem;
+  block-size: 1.6rem;
+  margin-inline-start: -0.5rem;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--mud-palette-text-secondary);
+  cursor: pointer;
+
+  &::before {
+    content: "";
+    inline-size: 0.4rem;
+    block-size: 0.4rem;
+    // physical sides on purpose: a down-pointing chevron must not mirror in RTL
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: translateY(-2px) rotate(45deg);
+    transition: transform 200ms ease;
+  }
+
+  &:hover { color: var(--mud-palette-primary); background: rgba(var(--mud-palette-primary-rgb), 0.08); }
+  &:focus-visible { outline: 2px solid var(--mud-palette-primary); outline-offset: 1px; }
+  &[aria-expanded="true"]::before { transform: translateY(1px) rotate(225deg); }
+}
+
+.mud-mega-nav__panel {
+  display: none;
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 100%;
+  background: var(--mud-palette-surface);
+  border-block: 1px solid var(--mud-palette-lines-default);
+  box-shadow: 0 18px 30px -12px rgba(0, 0, 0, 0.18);
+}
+
+.mud-mega-nav__item[data-open] > .mud-mega-nav__panel { display: block; }
+
+// Before the script runs (or without it) hover and keyboard focus still open the panels on desktop.
+@media (min-width: 1024px) {
+  .mud-mega-nav:not([data-enhanced]) .mud-mega-nav__item:is(:hover, :focus-within) > .mud-mega-nav__panel { display: block; }
+}
+
+.mud-mega-nav__columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 1.5rem 2rem;
+  max-inline-size: var(--mud-container-max, 1280px);
+  margin-inline: auto;
+  padding-block: 1.5rem 1.75rem;
+  padding-inline: 1rem;
+
+  ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.15rem; }
+
+  a {
+    display: block;
+    padding-block: 0.3rem;
+    color: var(--mud-palette-text-primary);
+    font-size: 0.9rem;
+    text-decoration: none;
+    &:hover { color: var(--mud-accent); text-decoration: underline; }
+  }
+}
+
+.mud-mega-nav__heading {
+  margin-block: 0 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mud-palette-text-secondary);
+}
+
+.mud-mega-nav__feature { // a highlighted story inside a panel
+  grid-column: span 2;
+  @media (max-width: 1023px) { display: none; }
+}
+
+// Small screens: the nav collapses behind the menu button and panels open inline, like an accordion.
+@media (max-width: 1023px) {
+  .mud-mega-nav {
+    display: none;
+    max-block-size: calc(100vh - 4rem);
+    overflow-y: auto;
+    border-block-start: 1px solid var(--mud-palette-lines-default);
+
+    &[data-open] { display: block; }
+  }
+
+  .mud-mega-nav__list { flex-direction: column; padding-block: 0.5rem; }
+
+  .mud-mega-nav__item {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    border-block-end: 1px solid var(--mud-palette-lines-default);
+  }
+
+  .mud-mega-nav__link { border-block-end: none; flex: 1; padding-inline: 0; }
+  .mud-mega-nav__expander { inline-size: 2.5rem; block-size: 2.5rem; }
+
+  .mud-mega-nav__panel {
+    position: static;
+    flex-basis: 100%;
+    min-inline-size: 0; // a flex item would otherwise take the full min-content width of its auto-fit grid
+    box-shadow: none;
+    border-block-end: none;
+    background: transparent;
+  }
+
+  .mud-mega-nav__columns { padding-inline: 0.5rem; padding-block: 0.25rem 1rem; gap: 1rem; }
+}
+
+// ---------- Footer ----------
+
+.mud-site-footer {
+  margin-block-start: auto;
+  background: var(--mud-palette-surface);
+  border-block-start: 1px solid var(--mud-palette-lines-default);
+  color: var(--mud-palette-text-secondary);
+  font-size: 0.875rem;
+}
+
+.mud-site-footer__columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 2rem;
+  padding-block: 2.5rem;
+
+  h2, h3 {
+    margin-block: 0 0.75rem;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--mud-palette-text-primary);
+  }
+
+  ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.45rem; }
+
+  a:not(.mud-logo) { color: inherit; text-decoration: none; &:hover { color: var(--mud-palette-primary); } }
+  p { margin-block: 0.75rem 0; }
+}
+
+.mud-site-footer__bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-block: 1rem;
+  border-block-start: 1px solid var(--mud-palette-lines-default);
+  font-size: 0.8rem;
+}
+
+// ---------- Scroll reveal ----------
+// Hidden only once the script has confirmed it will animate them (mud-reveal-ready on <html>),
+// so content never stays invisible without JavaScript or with reduced motion.
+.mud-reveal-ready [data-mud-reveal]:not([data-mud-revealed]) { opacity: 0; }
+
+// ---------- Prose (article body) ----------
+
+.mud-prose {
+  max-inline-size: 42rem;
+  font-size: 1.075rem;
+  line-height: 1.75;
+
+  > * + * { margin-block-start: 1.1em; }
+  h2, h3 { font-family: var(--mud-font-headline); line-height: 1.25; margin-block-start: 1.8em; }
+  a { color: var(--mud-palette-primary); }
+  blockquote {
+    margin-inline: 0;
+    padding-inline-start: 1.25rem;
+    border-inline-start: 3px solid var(--mud-accent);
+    font-family: var(--mud-font-headline);
+    font-size: 1.3rem;
+    font-style: italic;
+    color: var(--mud-palette-text-primary);
+  }
+  figure { margin-inline: 0; }
+  figcaption { font-size: 0.85rem; color: var(--mud-palette-text-secondary); margin-block-start: 0.5rem; }
+  img { max-inline-size: 100%; block-size: auto; border-radius: var(--mud-default-borderradius); }
+}

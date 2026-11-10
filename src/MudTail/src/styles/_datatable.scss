@@ -1,0 +1,343 @@
+// MudDataTable (src/datatable/MudDataTable.js): toolbar, filter panel, chips, sortable table, footer pager.
+// Tokens only, logical properties only (mirrors in RTL); on phones rows stack into labelled cards.
+
+.mud-sr-only {
+  position: absolute !important;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.mud-datatable {
+  --dt-line: var(--mud-palette-lines-default);
+  --dt-head: color-mix(in srgb, var(--mud-palette-surface) 94%, var(--mud-palette-text-primary));
+  --dt-hover: rgba(var(--mud-palette-primary-rgb), 0.05);
+  --dt-selected: rgba(var(--mud-palette-primary-rgb), 0.1);
+  --dt-pad-block: 10px;
+  --dt-pad-inline: 14px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-inline-size: 0;
+  color: var(--mud-palette-text-primary);
+  font-size: 0.875rem;
+}
+
+.mud-datatable--dense { --dt-pad-block: 6px; --dt-pad-inline: 10px; }
+
+// ───────── toolbar ─────────
+
+.mud-datatable__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.mud-datatable__search { flex: 1 1 240px; max-inline-size: 420px; }
+
+.mud-datatable__count {
+  display: inline-grid;
+  place-items: center;
+  min-inline-size: 1.25rem;
+  block-size: 1.25rem;
+  padding-inline: 4px;
+  border-radius: 999px;
+  background: var(--mud-palette-primary);
+  color: var(--mud-palette-primary-contrast);
+  font-size: 0.7rem;
+  font-weight: 700;
+  &[hidden] { display: none; }
+}
+
+// ───────── filter panel + chips ─────────
+
+.mud-datatable__filters {
+  display: grid;
+  gap: 12px;
+  justify-items: start;
+  padding: 14px;
+  border: 1px solid var(--dt-line);
+  border-radius: var(--mud-default-borderradius);
+  background: var(--mud-palette-surface);
+  &[hidden] { display: none; }
+}
+
+.mud-datatable__filter-grid {
+  display: grid;
+  gap: 12px 16px;
+  inline-size: 100%;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+}
+
+.mud-datatable__filter {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+  .mud-input-label { margin-block-end: 4px; }
+}
+
+.mud-datatable__op { flex: 0 0 auto; max-inline-size: 48%; }
+.mud-datatable__op .mud-input-slot { padding-inline-end: 30px; }
+
+.mud-datatable__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  &[hidden] { display: none; }
+}
+
+.mud-datatable__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding-block: 3px;
+  padding-inline: 10px 4px;
+  border-radius: 999px;
+  background: rgba(var(--mud-palette-primary-rgb), 0.1);
+  color: var(--mud-palette-primary);
+  font-size: 0.78rem;
+  font-weight: 600;
+
+  button {
+    display: grid;
+    place-items: center;
+    inline-size: 20px;
+    block-size: 20px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+    &:hover { background: rgba(var(--mud-palette-primary-rgb), 0.18); }
+    &:focus-visible { outline: 2px solid var(--mud-palette-primary); }
+  }
+}
+
+// ───────── table ─────────
+
+.mud-datatable__scroll {
+  position: relative;
+  overflow-x: auto;
+  border: 1px solid var(--dt-line);
+  border-radius: var(--mud-default-borderradius);
+  background: var(--mud-palette-surface);
+}
+
+.mud-datatable__progress {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  z-index: 2;
+  block-size: 3px;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 150ms ease;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    inline-size: 35%;
+    background: var(--mud-palette-primary);
+    animation: mud-dt-progress 1s ease-in-out infinite;
+  }
+}
+.mud-datatable.is-loading .mud-datatable__progress { opacity: 1; }
+.mud-datatable.is-loading tbody { opacity: 0.55; transition: opacity 150ms ease; }
+
+@keyframes mud-dt-progress {
+  from { inset-inline-start: -35%; }
+  to { inset-inline-start: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mud-datatable__progress::after { animation: none; inline-size: 100%; opacity: 0.5; }
+}
+
+.mud-datatable__table {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+
+  th, td {
+    padding-block: var(--dt-pad-block);
+    padding-inline: var(--dt-pad-inline);
+    text-align: start;
+    vertical-align: middle;
+    border-block-end: 1px solid var(--dt-line);
+  }
+  [data-align="end"] { text-align: end; }
+  [data-align="center"] { text-align: center; }
+
+  thead th {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 1;
+    background: var(--dt-head);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--mud-palette-text-secondary);
+    white-space: nowrap;
+  }
+
+  tbody tr:last-child td { border-block-end: 0; }
+  tbody tr:hover { background: var(--dt-hover); }
+  tbody tr[aria-selected="true"] { background: var(--dt-selected); }
+  tbody tr[tabindex] { cursor: pointer; }
+  tbody tr:focus-visible { outline: 2px solid var(--mud-palette-primary); outline-offset: -2px; }
+}
+
+.mud-datatable--striped tbody tr:nth-child(even):not([aria-selected="true"]) { background: rgba(var(--mud-palette-primary-rgb), 0.025); }
+
+.mud-datatable__caption {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.mud-datatable__select { inline-size: 1%; white-space: nowrap; }
+.mud-datatable__select input { accent-color: var(--mud-palette-primary); inline-size: 16px; block-size: 16px; cursor: pointer; }
+.mud-datatable__radio {
+  display: inline-block;
+  inline-size: 14px;
+  block-size: 14px;
+  border: 2px solid var(--mud-palette-lines-inputs);
+  border-radius: 50%;
+  &.is-on { border-color: var(--mud-palette-primary); box-shadow: inset 0 0 0 3px var(--mud-palette-surface); background: var(--mud-palette-primary); }
+}
+
+.mud-datatable__sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+  &:hover { color: var(--mud-palette-text-primary); }
+  &:focus-visible { outline: 2px solid var(--mud-palette-primary); outline-offset: 2px; border-radius: 2px; }
+}
+th[data-align="end"] .mud-datatable__sort { flex-direction: row-reverse; }
+
+// Sort arrow: faint both-ways when unsorted, up for ascending, down for descending.
+.mud-datatable__sort-icon {
+  display: inline-block;
+  inline-size: 0;
+  block-size: 0;
+  border-inline: 4px solid transparent;
+  border-block-end: 5px solid currentColor;
+  opacity: 0.25;
+  transition: transform 150ms ease, opacity 150ms ease;
+}
+th[aria-sort] { color: var(--mud-palette-primary); }
+th[aria-sort] .mud-datatable__sort-icon { opacity: 1; }
+th[aria-sort="descending"] .mud-datatable__sort-icon { transform: rotate(180deg); }
+.mud-datatable__sort-rank { font-size: 0.65rem; min-inline-size: 0.5em; }
+
+.mud-datatable__empty { color: var(--mud-palette-text-disabled); }
+
+.mud-datatable__message td {
+  padding-block: 32px;
+  text-align: center;
+  color: var(--mud-palette-text-secondary);
+}
+.mud-datatable__error { color: var(--mud-palette-error); margin-inline-end: 8px; }
+
+// ───────── footer ─────────
+
+.mud-datatable__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  font-size: 0.8125rem;
+  color: var(--mud-palette-text-secondary);
+}
+
+.mud-datatable__size {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-inline-start: auto;
+  .mud-input-wrapper { inline-size: auto; }
+  .mud-input-slot { padding-inline-end: 30px; }
+}
+
+.mud-datatable__pager { display: flex; align-items: center; gap: 2px; }
+
+.mud-datatable__page {
+  display: inline-grid;
+  place-items: center;
+  min-inline-size: 32px;
+  block-size: 32px;
+  padding-inline: 6px;
+  border: 1px solid transparent;
+  border-radius: var(--mud-default-borderradius);
+  background: none;
+  color: var(--mud-palette-text-primary);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+
+  &:hover:not(:disabled) { background: var(--dt-hover); }
+  &:focus-visible { outline: 2px solid var(--mud-palette-primary); outline-offset: 1px; }
+  &:disabled { opacity: 0.35; cursor: default; }
+  &.is-current { border-color: var(--mud-palette-primary); color: var(--mud-palette-primary); font-weight: 700; }
+}
+.mud-datatable__gap { padding-inline: 4px; }
+
+// Previous / next chevrons point the reading direction.
+.mud-datatable__chev { display: grid; }
+.mud-datatable__chev.is-prev { transform: scaleX(-1); }
+[dir="rtl"] .mud-datatable__chev { transform: scaleX(-1); }
+[dir="rtl"] .mud-datatable__chev.is-prev { transform: none; }
+
+// ───────── phones: each row becomes a labelled card ─────────
+
+@media (max-width: 640px) {
+  .mud-datatable--stack {
+    .mud-datatable__scroll { border: 0; background: none; overflow: visible; }
+    .mud-datatable__table thead { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); }
+    .mud-datatable__table, .mud-datatable__table tbody, .mud-datatable__table tr, .mud-datatable__table td { display: block; inline-size: 100%; }
+    .mud-datatable__table tbody tr:not(.mud-datatable__message) {
+      margin-block-end: 10px;
+      border: 1px solid var(--dt-line);
+      border-radius: var(--mud-default-borderradius);
+      background: var(--mud-palette-surface);
+    }
+    .mud-datatable__table td {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      text-align: end;
+      border-block-end: 1px solid var(--dt-line);
+      &::before {
+        content: attr(data-label);
+        flex: none;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        color: var(--mud-palette-text-secondary);
+        text-align: start;
+      }
+    }
+    .mud-datatable__table td.mud-datatable__select::before { content: none; }
+    .mud-datatable__table tr td:last-child { border-block-end: 0; }
+    .mud-datatable__size { margin-inline-start: 0; }
+  }
+}

@@ -2,9 +2,9 @@ import { defineConfig } from 'vite';
 import { resolve, relative } from 'path';
 import { globSync } from 'glob';
 
-// 1. Grab style entries (global architecture and separate component tokens)
-const scssInputs = globSync(['src/framework/**/*.scss'], {
-  ignore: ['**/_*.scss', '**/node_modules/**'],
+// 1. Grab style entries: every src/framework/*.css or *.scss that is not a partial (_name)
+const scssInputs = globSync(['src/framework/**/*.{css,scss}'], {
+  ignore: ['**/_*', '**/node_modules/**'],
   cwd: import.meta.dirname // Scope safely to current directory
 });
 
@@ -16,7 +16,7 @@ const inputs = {
 scssInputs.forEach(file => {
   const absolutePath = resolve(import.meta.dirname, file);
   // Creates clean relative structural naming matching your src/ framework layout
-  const relativePath = relative(resolve(import.meta.dirname, 'src'), absolutePath).replace(/\.scss$/, '');
+  const relativePath = relative(resolve(import.meta.dirname, 'src'), absolutePath).replace(/\.s?css$/, '');
   inputs[relativePath] = absolutePath;
 });
 
@@ -31,6 +31,9 @@ export default defineConfig({
     
     rollupOptions: {
       input: inputs,
+      // moduleHost calls the entry's exports (default/init, dispose). An app build drops entry exports by
+      // default, which tree-shakes module.js down to nothing.
+      preserveEntrySignatures: 'exports-only',
       output: {
         // Formats your TypeScript interop module for Blazor's IJSRuntime (IJSObjectReference)
         format: 'es',

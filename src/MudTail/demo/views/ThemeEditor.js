@@ -1,5 +1,5 @@
 // Vanilla JS Theme & Radius Editor Drawer Component
-import { getTheme, updateTheme, generateScssExport, generateCssExport } from 'mudtail';
+import { getTheme, updateTheme, generateScssExport, generateCssExport, getNumerals } from 'mudtail';
 import { getIconSvg } from 'mudtail';
 import { showToast } from 'mudtail';
 
@@ -25,6 +25,12 @@ export function createThemeEditorContent() {
     { name: 'Violet', hex: '#8b5cf6' },
     { name: 'Cyan', hex: '#06b6d4' },
     { name: 'Crimson', hex: '#dc2626' },
+  ];
+
+  const NUMERAL_PRESETS = [
+    { value: 'auto', label: 'Auto' },
+    { value: 'latn', label: 'Western 1 2 3' },
+    { value: 'arab', label: 'Arabic-Indic ١ ٢ ٣' },
   ];
 
   const RADIUS_PRESETS = [
@@ -91,6 +97,19 @@ export function createThemeEditorContent() {
         <span id="radius-slider-label" style="font-weight:700;color:var(--mud-palette-primary);">${current.borderRadius}px</span>
       </div>
       <input type="range" class="mud-slider" id="radius-slider" min="0" max="24" value="${current.borderRadius}" />
+    </div>
+
+    <!-- Digits (numbers and dates) -->
+    <div class="theme-section">
+      <div class="theme-section-title">
+        ${getIconSvg('sliders', 16)} Digits
+      </div>
+      <div class="radius-presets" id="numeral-presets">
+        ${NUMERAL_PRESETS.map(
+          (n) => `<button type="button" class="radius-btn ${n.value === (current.numerals ?? getNumerals()) ? 'active' : ''}" data-val="${n.value}">${n.label}</button>`
+        ).join('')}
+      </div>
+      <p style="margin:8px 0 0 0;font-size:0.75rem;color:var(--mud-palette-text-secondary);">Auto uses the browser's default for the language (Western digits for Arabic).</p>
     </div>
 
     <!-- Live SCSS Export -->
@@ -164,6 +183,15 @@ export function createThemeEditorContent() {
       updateTheme({ borderRadius: val });
       refreshExport();
       showToast(`Global border radius set to ${val}px`, 'info');
+    });
+  });
+
+  // Digits: saved with the theme; i18n raises mud-locale-changed and the demo re-renders its view.
+  const numeralBtns = container.querySelectorAll('#numeral-presets .radius-btn');
+  numeralBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      numeralBtns.forEach((b) => b.classList.toggle('active', b === btn));
+      updateTheme({ numerals: btn.dataset.val });
     });
   });
 

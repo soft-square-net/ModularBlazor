@@ -1,0 +1,28 @@
+/*
+ * Default layout stylesheet -> wwwroot/css/main.min.css
+ *
+ * One token set: every colour, radius and z-index comes from MudTail's --mud-palette-* tokens
+ * (light and [data-theme="dark"]). Nothing here defines its own palette.
+ *
+ * Tailwind's preflight reset is deliberately left out: this sheet is loaded into a page that other
+ * modules share, and preflight would strip their headings, lists and buttons.
+ */
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+/* MudTail tokens -> Tailwind utilities (bg-primary, text-ink-muted, border-line, rounded-mud, dark: on [data-theme]) */
+@import "mudtail/tailwind.css";
+
+/* MudTail tokens, components, editorial / sports / gallery / site styles, grid and RTL support.
+   Unlayered on purpose, like _shell.css below: the host's app.css is unlayered, and unlayered rules always beat
+   layered ones, so a layered MudTail would lose to plain host rules such as `a { color }` and `h1 { margin }`.
+   (Tailwind utilities stay layered, so a utility on a mud-* element loses to the component's own rule.) */
+@import "mudtail/mudtail.css";
+
+/* The admin-style shell (DefaultLayout.razor). PublicLayout.razor uses MudTail's .mud-site classes directly. */
+@import "./_shell.css";
+
+/* Let Tailwind find the utilities used in this module's Razor markup */
+@source "../../../**/*.razor";

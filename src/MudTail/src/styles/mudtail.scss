@@ -13,6 +13,13 @@
 @use "tabs" as *;
 @use "appbar" as *;
 @use "accordion" as *;
+@use "grid" as *;
+@use "editorial" as *;
+@use "sports" as *;
+@use "gallery" as *;
+@use "site" as *;
+@use "dock" as *;
+@use "datatable" as *;
 
 // Global resets & typography baseline
 *, *::before, *::after {

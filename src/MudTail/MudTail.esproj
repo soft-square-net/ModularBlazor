@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/1.0.7204101">
+  <!-- MudTail UI framework (Node.js / Vite). Visual Studio shows it in Solution Explorer, runs `npm install`
+       on build when node_modules is missing, and builds the library with `npm run build` (output in dist/). -->
+  <PropertyGroup>
+    <StartupCommand>npm run dev</StartupCommand>
+    <BuildCommand>npm run build</BuildCommand>
+    <TestCommand>npm test</TestCommand>
+    <BuildOutputFolder>$(MSBuildProjectDirectory)\dist</BuildOutputFolder>
+    <ShouldRunBuildScript>true</ShouldRunBuildScript>
+  </PropertyGroup>
+</Project>

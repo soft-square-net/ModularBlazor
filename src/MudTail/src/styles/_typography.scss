@@ -22,3 +22,12 @@
 .mud-typography-button { font-size: 0.875rem; font-weight: 600; line-height: 1.75; letter-spacing: 0.02857em; text-transform: uppercase; }
 .mud-typography-caption { font-size: 0.75rem; font-weight: 400; line-height: 1.66; letter-spacing: 0.03333em; color: var(--mud-palette-text-secondary); }
 .mud-typography-overline { font-size: 0.75rem; font-weight: 600; line-height: 2.66; letter-spacing: 0.08333em; text-transform: uppercase; }
+
+// Arabic-script languages: letter-spacing breaks the joins of cursive letters, so it is reset; and the font stack
+// starts with faces that have good Arabic glyphs.
+:root:is([lang|="ar"], [lang|="fa"], [lang|="ur"], [lang|="ps"], [lang|="ckb"]) {
+  --mud-font-family: "Segoe UI", Tahoma, "Noto Sans Arabic", "Geeza Pro", "Arabic UI Text", Arial, sans-serif;
+  --mud-font-headline: "Segoe UI", Tahoma, "Noto Naskh Arabic", "Geeza Pro", serif;
+
+  body, * { letter-spacing: normal !important; }
+}

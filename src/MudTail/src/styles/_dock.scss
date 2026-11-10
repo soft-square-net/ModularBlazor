@@ -1,0 +1,405 @@
+// MudDock: IDE docking layout (see src/dock/MudDock.js). Same structure and behaviour as VsDock's dock.css,
+// themed entirely with MudTail tokens, so it follows light / dark mode and the live palette, and mirrors in RTL.
+
+.mud-dock {
+  --dock-bg: var(--mud-palette-background);
+  --dock-surface: var(--mud-palette-surface);
+  --dock-header: color-mix(in srgb, var(--mud-palette-surface) 93%, var(--mud-palette-text-primary));
+  --dock-hover: color-mix(in srgb, var(--mud-palette-surface) 86%, var(--mud-palette-text-primary));
+  --dock-line: var(--mud-palette-lines-default);
+  --dock-text: var(--mud-palette-text-primary);
+  --dock-muted: var(--mud-palette-text-secondary);
+  --dock-accent: var(--mud-palette-primary);
+  --dock-accent-soft: rgba(var(--mud-palette-primary-rgb), 0.16);
+  --dock-radius: var(--mud-default-borderradius, 4px);
+  --dock-header-h: 32px;
+
+  position: relative;
+  display: flex;
+  block-size: 100%;
+  min-block-size: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--dock-text);
+}
+
+.mud-dock__main {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-inline-size: 0;
+  min-block-size: 0;
+
+  > * { flex: 1; min-inline-size: 0; min-block-size: 0; }
+}
+
+.mud-dock__empty {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 10px;
+  block-size: 100%;
+  border: 1px dashed var(--dock-line);
+  border-radius: var(--dock-radius);
+  text-align: center;
+}
+.mud-dock__empty-title { font-size: 16px; font-weight: 600; }
+.mud-dock__empty-sub { color: var(--dock-muted); }
+
+// ───────── recursive split: each child's flex-grow is its weight, so sizes stay proportional ─────────
+
+.mud-dock-split { display: flex; inline-size: 100%; block-size: 100%; min-inline-size: 0; min-block-size: 0; }
+.mud-dock-split--row { flex-direction: row; }
+.mud-dock-split--column { flex-direction: column; }
+
+.mud-dock-node {
+  position: relative;
+  display: flex;
+  min-inline-size: 0;
+  min-block-size: 0;
+  > * { flex: 1; min-inline-size: 0; min-block-size: 0; }
+}
+
+// ───────── splitter: invisible until hovered or dragged ─────────
+
+.mud-dock-splitter {
+  flex: none;
+  position: relative;
+  z-index: 5;
+  touch-action: none;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    border-radius: 2px;
+    background: var(--dock-accent);
+    opacity: 0;
+    transition: opacity 120ms ease;
+  }
+  &:hover::after, &.is-active::after { opacity: 1; }
+}
+.mud-dock-splitter--row { inline-size: 6px; cursor: col-resize; &::after { inline-size: 2px; block-size: 100%; } }
+.mud-dock-splitter--column { block-size: 6px; cursor: row-resize; &::after { block-size: 2px; inline-size: 100%; } }
+
+body.mud-dock-resizing-row, body.mud-dock-resizing-row * { cursor: col-resize !important; user-select: none !important; }
+body.mud-dock-resizing-col, body.mud-dock-resizing-col * { cursor: row-resize !important; user-select: none !important; }
+
+// ───────── block (group) ─────────
+
+.mud-dock-group {
+  display: flex;
+  flex-direction: column;
+  block-size: 100%;
+  min-inline-size: 0;
+  min-block-size: 0;
+  background: var(--dock-surface);
+  border: 1px solid var(--dock-line);
+  border-radius: var(--dock-radius);
+  overflow: hidden;
+}
+
+.mud-dock-group__header,
+.mud-dock-group__toolbar {
+  display: flex;
+  align-items: stretch;
+  flex: none;
+  block-size: var(--dock-header-h);
+  background: var(--dock-header);
+  border-block-end: 1px solid var(--dock-line);
+}
+
+// The toolbar only shows when the tabs sit at the bottom: the buttons then stay on top of the block.
+.mud-dock-group__toolbar { display: none; }
+.mud-dock-group.tabs-bottom {
+  .mud-dock-group__toolbar { display: flex; order: 0; }
+  .mud-dock-group__body { order: 1; }
+  .mud-dock-group__header { order: 2; border-block-end: 0; border-block-start: 1px solid var(--dock-line); }
+  .mud-dock-group__header .mud-dock-actions { display: none; }
+  .mud-dock-tab.is-active { box-shadow: inset 0 -2px 0 var(--dock-accent); }
+}
+
+.mud-dock-tabs { display: flex; min-inline-size: 0; overflow: hidden; }
+
+.mud-dock-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-inline-size: 190px;
+  padding-inline: 10px 6px;
+  color: var(--dock-muted);
+  border-inline-end: 1px solid var(--dock-line);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+
+  &:hover { background: var(--dock-hover); color: var(--dock-text); }
+  &:focus-visible { outline: 2px solid var(--dock-accent); outline-offset: -2px; }
+  &.is-active { background: var(--dock-surface); color: var(--dock-text); box-shadow: inset 0 2px 0 var(--dock-accent); }
+  &.is-dragging { opacity: 0.4; }
+}
+
+.mud-dock-tab__icon {
+  display: inline-grid;
+  place-items: center;
+  color: var(--dock-accent);
+  svg { inline-size: 14px; block-size: 14px; }
+}
+
+.mud-dock-tab__title { overflow: hidden; text-overflow: ellipsis; }
+
+.mud-dock-tab__close {
+  display: grid;
+  place-items: center;
+  inline-size: 18px;
+  block-size: 18px;
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 4px;
+  color: var(--dock-muted);
+  cursor: pointer;
+  visibility: hidden;
+
+  &:hover { background: var(--dock-hover); color: var(--dock-text); }
+  svg { inline-size: 11px; block-size: 11px; }
+}
+.mud-dock-tab.is-active .mud-dock-tab__close,
+.mud-dock-tab:hover .mud-dock-tab__close { visibility: visible; }
+
+// The empty part of the bar: a handle to drag the whole block.
+.mud-dock-grip { flex: 1; min-inline-size: 20px; cursor: grab; &:active { cursor: grabbing; } }
+
+.mud-dock-actions { display: flex; align-items: center; gap: 2px; padding-inline: 4px; }
+
+.mud-dock-btn {
+  display: grid;
+  place-items: center;
+  inline-size: 24px;
+  block-size: 24px;
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 5px;
+  color: var(--dock-muted);
+  cursor: pointer;
+
+  &:hover { background: var(--dock-hover); color: var(--dock-text); }
+  &:focus-visible { outline: 2px solid var(--dock-accent); outline-offset: 1px; }
+}
+
+.mud-dock-pin { display: block; }
+.mud-dock-pin.is-unpinned { transform: rotate(90deg); }
+
+.mud-dock-group__body { position: relative; flex: 1; min-block-size: 0; }
+.mud-dock-panel { position: absolute; inset: 0; overflow: auto; &[hidden] { display: none; } }
+
+// Maximized block fills the workspace; the layout underneath is untouched, so nothing is rebuilt.
+.mud-dock__main.has-max .mud-dock-node { position: static; }
+.mud-dock-group.is-max { position: absolute; inset: 0; z-index: 40; }
+
+// ───────── drag & drop feedback ─────────
+
+.mud-dock-overlay {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  pointer-events: none;
+  background: rgba(var(--mud-palette-primary-rgb), 0.18);
+  border: 2px solid var(--mud-palette-primary);
+  border-radius: 6px;
+  transition: left 80ms, top 80ms, width 80ms, height 80ms;
+}
+
+.mud-dock-group.is-dragging { opacity: 0.5; }
+body.mud-dock-dragging .mud-dock-panel iframe { pointer-events: none; }
+
+// ───────── auto-hide strips + flyouts ─────────
+
+.mud-dock-side {
+  position: relative;
+  z-index: 60;
+  flex: none;
+  &[hidden] { display: none; }
+}
+
+.mud-dock-side__strip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  inline-size: 28px;
+  block-size: 100%;
+  padding-block: 6px;
+  overflow: hidden;
+}
+.mud-dock-side--left .mud-dock-side__strip { margin-inline-end: 4px; }
+.mud-dock-side--right .mud-dock-side__strip { margin-inline-start: 4px; }
+
+.mud-dock-side__group { display: flex; flex-direction: column; gap: 2px; }
+
+// Titles run top to bottom; the tab is plain inline-level so vertical writing isn't fought by flexbox.
+.mud-dock-side__tab {
+  writing-mode: vertical-lr;
+  padding: 8px 5px;
+  background: none;
+  border: 0;
+  border-radius: 5px;
+  color: var(--dock-muted);
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+
+  &:hover, &.is-active { background: var(--dock-hover); color: var(--dock-text); }
+  &:focus-visible { outline: 2px solid var(--dock-accent); outline-offset: -2px; }
+}
+.mud-dock-side__icon {
+  display: inline-block;
+  writing-mode: horizontal-tb;
+  margin-block-end: 6px;
+  color: var(--dock-accent);
+  svg { inline-size: 14px; block-size: 14px; vertical-align: middle; }
+}
+
+.mud-dock-flyout {
+  position: absolute;
+  inset-block: 0;
+  display: none;
+  flex-direction: column;
+  min-inline-size: 180px;
+  background: var(--dock-surface);
+  border: 1px solid var(--dock-line);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+
+  &.is-open { display: flex; animation: mud-dock-fly-in 140ms ease-out; }
+}
+.mud-dock-flyout--left {
+  inset-inline-start: 100%;
+  border-start-end-radius: var(--dock-radius);
+  border-end-end-radius: var(--dock-radius);
+  --fly-from: -14px;
+}
+.mud-dock-flyout--right {
+  inset-inline-end: 100%;
+  border-start-start-radius: var(--dock-radius);
+  border-end-start-radius: var(--dock-radius);
+  --fly-from: 14px;
+}
+[dir="rtl"] .mud-dock-flyout--left { --fly-from: 14px; }
+[dir="rtl"] .mud-dock-flyout--right { --fly-from: -14px; }
+@keyframes mud-dock-fly-in { from { opacity: 0; transform: translateX(var(--fly-from, 0)); } }
+
+.mud-dock-flyout__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  block-size: var(--dock-header-h);
+  padding-inline: 10px 6px;
+  background: var(--dock-header);
+  border-block-end: 1px solid var(--dock-line);
+}
+.mud-dock-flyout__title { flex: 1; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.mud-dock-flyout__resizer {
+  position: absolute;
+  inset-block: 0;
+  inline-size: 6px;
+  z-index: 3;
+  cursor: col-resize;
+  touch-action: none;
+  &:hover, &.is-active { background: var(--dock-accent-soft); }
+}
+.mud-dock-flyout--left .mud-dock-flyout__resizer { inset-inline-end: -3px; }
+.mud-dock-flyout--right .mud-dock-flyout__resizer { inset-inline-start: -3px; }
+
+// ───────── block menu (appended to <body>) ─────────
+
+.mud-dock-menu-backdrop { position: fixed; inset: 0; z-index: 1990; }
+
+.mud-dock-menu {
+  position: fixed;
+  z-index: 1991;
+  min-inline-size: 220px;
+  max-block-size: calc(100vh - 16px);
+  overflow-y: auto;
+  padding: 5px;
+  background: var(--mud-palette-surface);
+  color: var(--mud-palette-text-primary);
+  border: 1px solid var(--mud-palette-lines-default);
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+  font-size: 13px;
+}
+
+.mud-dock-menu__item,
+.mud-dock-menu__fold {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  inline-size: 100%;
+  padding-block: 6px;
+  padding-inline: 10px;
+  background: none;
+  border: 0;
+  border-radius: 5px;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+
+  &:hover, &:focus-visible { background: rgba(var(--mud-palette-primary-rgb), 0.12); outline: none; }
+}
+.mud-dock-menu__item.is-danger:hover, .mud-dock-menu__item.is-danger:focus-visible { background: rgba(239, 68, 68, 0.14); color: var(--mud-palette-error); }
+
+.mud-dock-menu__fold {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--mud-palette-text-secondary);
+}
+.mud-dock-menu__caret {
+  inline-size: 0;
+  block-size: 0;
+  border-block: 4px solid transparent;
+  border-inline-start: 5px solid currentColor;
+  transition: transform 150ms ease;
+}
+.mud-dock-menu__fold[aria-expanded="true"] .mud-dock-menu__caret { transform: rotate(90deg); }
+[dir="rtl"] .mud-dock-menu__fold[aria-expanded="true"] .mud-dock-menu__caret { transform: rotate(-90deg); }
+
+.mud-dock-menu__icon {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 16px;
+  color: var(--mud-palette-text-secondary);
+  svg { inline-size: 14px; block-size: 14px; }
+}
+.mud-dock-menu__sep { block-size: 1px; margin-block: 5px; margin-inline: 4px; background: var(--mud-palette-lines-default); }
+
+// ───────── touch / pen dragging ─────────
+
+// Let a finger drag tabs and block handles instead of panning the page.
+.mud-dock-tab, .mud-dock-grip { touch-action: none; }
+
+.mud-dock-ghost {
+  position: fixed;
+  inset-block-start: 0;
+  left: 0; // physical: positioned by a translate from the pointer
+  z-index: 2001;
+  max-inline-size: 220px;
+  padding-block: 4px;
+  padding-inline: 10px;
+  border-radius: 999px;
+  background: var(--mud-palette-primary);
+  color: var(--mud-palette-primary-contrast);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}

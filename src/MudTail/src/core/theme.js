@@ -1,5 +1,7 @@
 // Theme & CSS/SCSS Exporter Utility in Vanilla JS
 
+import { setNumerals } from './i18n.js';
+
 const STORAGE_KEY = 'mud_vanilla_theme_config';
 
 export const DEFAULT_THEME = {
@@ -7,6 +9,10 @@ export const DEFAULT_THEME = {
   secondary: '#ff4081',
   borderRadius: 4,
   isDark: false,
+  // Digits for numbers and dates: 'auto' (the browser's default for the language), 'latn' (1 2 3),
+  // 'arab' (Arabic-Indic ١ ٢ ٣) or 'arabext' (۱ ۲ ۳). Saved with the theme; see i18n setNumerals().
+  // null = no preference: whatever setLocale(…, { numerals }) / setNumerals() chose stays.
+  numerals: null,
 };
 
 let currentTheme = { ...DEFAULT_THEME };
@@ -68,6 +74,9 @@ export function applyTheme(theme) {
   } else {
     root.removeAttribute('data-theme');
   }
+
+  // Digits are part of the theme: an explicit choice is applied to i18n (raises mud-locale-changed when it changes).
+  if (theme.numerals) setNumerals(theme.numerals);
 }
 
 /**

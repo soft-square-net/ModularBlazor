@@ -41,6 +41,12 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: path.resolve(root, 'dist-demo'),
       emptyOutDir: true,
+      rolldownOptions: {
+        input: {
+          index: path.resolve(root, 'demo/index.html'), // framework dashboard
+          site: path.resolve(root, 'demo/site.html'), // public-site showcase
+        },
+      },
     },
     server: {
       port: 3000,

@@ -1,0 +1,148 @@
+@inherits LayoutComponentBase
+@attribute [LayoutKey("public")]
+@implements IDisposable
+@inject IModuleNavigation Navigation
+@inject ICurrentUserService Users
+@inject IAuthenticationService Auth
+
+@*
+  Public-site layout (news, sport, culture): masthead, mega-nav, footer, all from MudTail.
+  Behaviour comes from data-mud attributes, which this module's js/module.js wires up (MudTail.autoInit), so
+  there is no JS interop here. MudTail owns aria-expanded and data-open on the nav: don't render them.
+  Pages pick it with Layout = "public" in their module settings.
+*@
+
+<div class="mud-site">
+  <a class="mud-skip-link" href="#main">Skip to content</a>
+  <div class="mud-reading-progress" data-mud="reading-progress" aria-hidden="true"></div>
+
+  <header class="mud-site-header">
+    <div class="mud-masthead mud-container">
+      <button type="button" class="mud-icon-btn mud-nav-toggle" data-mud-nav-toggle aria-controls="site-nav" aria-label="Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
+      </button>
+
+      <a class="mud-logo" href="">Modular <b>Blazor</b></a>
+
+      <div class="mud-masthead__actions">
+        <button type="button" class="mud-icon-btn mud-theme-toggle" data-mud="theme-toggle" aria-label="Dark mode">
+          <svg class="mud-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" /></svg>
+          <svg class="mud-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></svg>
+        </button>
+        @if (_user is not null)
+        {
+          <span class="mud-masthead__user">@_user.Name</span>
+          <a href="login" @onclick="SignOutAsync" @onclick:preventDefault>Sign out</a>
+        }
+        else
+        {
+          <a href="login">Sign in</a>
+        }
+      </div>
+    </div>
+
+    <nav class="mud-mega-nav" id="site-nav" data-mud="mega-nav" aria-label="Main">
+      <ul class="mud-mega-nav__list mud-container">
+        <li class="mud-mega-nav__item">
+          <NavLink class="mud-mega-nav__link" href="" Match="NavLinkMatch.All">Home</NavLink>
+        </li>
+        @foreach (var section in _sections)
+        {
+          var panelId = $"nav-{PanelId(section.Href)}";
+          <li class="mud-mega-nav__item" @key="section.Href">
+            <NavLink class="mud-mega-nav__link" href="@section.Href">@section.Title</NavLink>
+            @if (section.Children.Count > 0)
+            {
+              <button type="button" class="mud-mega-nav__expander" aria-controls="@panelId" aria-label="@($"{section.Title} sections")"></button>
+              <div class="mud-mega-nav__panel" id="@panelId">
+                <div class="mud-mega-nav__columns">
+                  <div>
+                    <h3 class="mud-mega-nav__heading">@section.Title</h3>
+                    <ul>
+                      @foreach (var link in section.Children)
+                      {
+                        <li @key="link.Href"><NavLink href="@link.Href">@link.Title</NavLink></li>
+                      }
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            }
+          </li>
+        }
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main" class="mud-site-main mud-container" tabindex="-1">@Body</main>
+
+  <footer class="mud-site-footer">
+    <div class="mud-container mud-site-footer__columns">
+      <div>
+        <a class="mud-logo" href="">Modular <b>Blazor</b></a>
+        <p>News, sport and culture.</p>
+      </div>
+      @if (_sections.Count > 0)
+      {
+        <div>
+          <h2>Sections</h2>
+          <ul>
+            @foreach (var section in _sections)
+            {
+              <li @key="section.Href"><a href="@section.Href">@section.Title</a></li>
+            }
+          </ul>
+        </div>
+      }
+      <div>
+        <h2>Account</h2>
+        <ul>
+          @if (_user is not null)
+          {
+            <li><a href="login" @onclick="SignOutAsync" @onclick:preventDefault>Sign out</a></li>
+          }
+          else
+          {
+            <li><a href="login">Sign in</a></li>
+          }
+        </ul>
+      </div>
+    </div>
+    <div class="mud-container mud-site-footer__bottom">
+      <span>© @DateTime.Now.Year Modular Blazor</span>
+      <span>Built with MudTail</span>
+    </div>
+  </footer>
+</div>
+
+@code {
+  private UserInfo? _user;
+  private IReadOnlyList<NavSection> _sections = [];
+
+  protected override async Task OnInitializedAsync()
+  {
+    Navigation.Changed += OnChanged;
+    Users.Changed += OnChanged;
+    _sections = PublicNavigation.Build(Navigation.Items);
+    _user = await Users.GetUserInfoAsync();
+  }
+
+  // Modules add menu items as they load; never block on the async user lookup (.Result freezes WebAssembly).
+  private void OnChanged() => _ = InvokeAsync(async () =>
+  {
+    _sections = PublicNavigation.Build(Navigation.Items);
+    _user = await Users.GetUserInfoAsync();
+    StateHasChanged();
+  });
+
+  private static string PanelId(string href) =>
+    string.Concat(href.Select(c => char.IsLetterOrDigit(c) ? char.ToLowerInvariant(c) : '-'));
+
+  private Task SignOutAsync() => Auth.LogoutAsync();
+
+  public void Dispose()
+  {
+    Navigation.Changed -= OnChanged;
+    Users.Changed -= OnChanged;
+  }
+}

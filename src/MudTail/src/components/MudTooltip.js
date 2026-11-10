@@ -1,5 +1,6 @@
 // Vanilla JS MudTooltip Helper with GSAP
 import gsap from 'gsap';
+import { toPhysicalSide } from '../core/direction.js';
 
 /**
  * Shows a tooltip while the pointer is over `element`.
@@ -7,6 +8,7 @@ import gsap from 'gsap';
  */
 export function attachTooltip(element, text, position = 'top') {
   if (!element || !text) return () => {};
+  const requested = position; // 'start' / 'end' are resolved against the direction each time it shows
 
   let tooltipEl = null;
 
@@ -19,6 +21,7 @@ export function attachTooltip(element, text, position = 'top') {
 
   const onEnter = () => {
     removeTip();
+    const position = toPhysicalSide(requested, element);
     tooltipEl = document.createElement('div');
     tooltipEl.className = 'mud-tooltip';
     tooltipEl.setAttribute('role', 'tooltip');

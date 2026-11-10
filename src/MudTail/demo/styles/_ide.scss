@@ -1,0 +1,206 @@
+// IDE shell and sample panels for the VS 2026 Dock demo view (the dock itself is library CSS: _dock.scss).
+// Same structure as VsDock's app.css, themed with MudTail tokens.
+
+.ide-shell {
+  display: flex;
+  flex-direction: column;
+  block-size: calc(100vh - 56px); // below the demo's app bar
+  min-block-size: 480px;
+  background: var(--mud-palette-background);
+  color: var(--mud-palette-text-primary);
+  font-size: 13px;
+}
+
+.ide-titlebar, .ide-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+  padding-inline: 10px;
+  background: var(--mud-palette-appbar-background);
+}
+.ide-titlebar { block-size: 36px; }
+.ide-toolbar { block-size: 34px; border-block-end: 1px solid var(--mud-palette-lines-default); }
+
+.ide-logo { color: var(--mud-palette-primary); font-size: 18px; }
+.ide-menubar { display: flex; gap: 2px; }
+
+.ide-menu-btn, .ide-tool {
+  padding-block: 3px;
+  padding-inline: 9px;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  &:hover, &.is-open { background: rgba(var(--mud-palette-primary-rgb), 0.08); }
+  &:focus-visible { outline: 2px solid var(--mud-palette-primary); outline-offset: 1px; }
+}
+.ide-tool.is-run { color: var(--mud-palette-success); font-weight: 600; }
+
+.ide-search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-inline-start: 18px;
+  inline-size: min(340px, 30vw);
+  padding-block: 4px;
+  padding-inline: 12px;
+  border: 1px solid var(--mud-palette-lines-default);
+  border-radius: 6px;
+  background: var(--mud-palette-surface);
+  color: var(--mud-palette-text-secondary);
+}
+.ide-title { margin-inline-start: auto; color: var(--mud-palette-text-secondary); }
+
+.ide-sep { inline-size: 1px; block-size: 18px; margin-inline: 4px; background: var(--mud-palette-lines-default); }
+.ide-select {
+  padding-block: 3px;
+  padding-inline: 10px;
+  border: 1px solid var(--mud-palette-lines-default);
+  border-radius: 5px;
+  background: var(--mud-palette-surface);
+}
+
+.ide-main { flex: 1; min-block-size: 0; padding: 6px; }
+
+.ide-status {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: none;
+  block-size: 24px;
+  padding-inline: 12px;
+  background: var(--mud-palette-primary);
+  color: var(--mud-palette-primary-contrast);
+  font-size: 12px;
+}
+.ide-grow { flex: 1; }
+
+@media (max-width: 760px) {
+  .ide-search, .ide-title, .ide-select { display: none; }
+}
+
+// ───────── sample panel contents ─────────
+
+.ide-pad { padding-block: 8px; padding-inline: 10px; }
+.ide-hint { margin-block: 8px 0; color: var(--mud-palette-text-secondary); font-size: 12px; }
+
+.ide-input {
+  display: block;
+  inline-size: 100%;
+  margin-block-end: 8px;
+  padding-block: 4px;
+  padding-inline: 8px;
+  background: var(--mud-palette-background);
+  color: inherit;
+  border: 1px solid var(--mud-palette-lines-inputs);
+  border-radius: 5px;
+  font: inherit;
+  resize: vertical;
+  &:focus { outline: 2px solid rgba(var(--mud-palette-primary-rgb), 0.4); border-color: var(--mud-palette-primary); }
+}
+
+.ide-tree { padding-block: 4px; user-select: none; margin-inline: -10px; }
+.ide-tree__row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-block: 2px;
+  padding-inline-end: 8px;
+  white-space: nowrap;
+  cursor: default;
+  &:hover { background: rgba(var(--mud-palette-primary-rgb), 0.06); }
+  &.is-selected { background: rgba(var(--mud-palette-primary-rgb), 0.16); }
+  &:focus-visible { outline: 2px solid var(--mud-palette-primary); outline-offset: -2px; }
+}
+.ide-tree__caret { inline-size: 12px; color: var(--mud-palette-text-secondary); font-size: 10px; }
+.ide-tree__icon { display: inline-grid; &.is-dir { color: var(--mud-palette-warning); } &.is-file { color: var(--mud-palette-info); } }
+
+.ide-prop-head { font-weight: 600; margin-block-end: 8px; }
+.ide-props { inline-size: 100%; border-collapse: collapse; }
+.ide-props td { padding-block: 3px; padding-inline: 6px; border-block-end: 1px solid var(--mud-palette-lines-default); }
+.ide-props td:first-child { inline-size: 45%; color: var(--mud-palette-text-secondary); }
+
+.ide-toolbox__group { margin-block-start: 8px; color: var(--mud-palette-text-secondary); font-weight: 600; }
+.ide-toolbox__item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-block: 3px;
+  padding-inline: 18px 4px;
+  border-radius: 4px;
+  svg { color: var(--mud-palette-primary); }
+  &:hover { background: rgba(var(--mud-palette-primary-rgb), 0.06); }
+}
+
+.ide-out-head { display: flex; align-items: center; gap: 8px; margin-block-end: 6px; color: var(--mud-palette-text-secondary); }
+.ide-chip { padding-inline: 8px; border: 1px solid var(--mud-palette-lines-default); border-radius: 4px; color: var(--mud-palette-text-primary); }
+.ide-link { margin-inline-start: auto; background: none; border: 0; color: var(--mud-palette-primary); cursor: pointer; font: inherit; }
+.ide-log { margin: 0; font: 12px/1.5 ui-monospace, "Cascadia Code", Consolas, monospace; white-space: pre-wrap; color: var(--mud-palette-text-primary); }
+
+.ide-pills { display: flex; gap: 8px; margin-block-end: 8px; flex-wrap: wrap; }
+.ide-pill { padding-block: 2px; padding-inline: 9px; border-radius: 999px; background: rgba(var(--mud-palette-primary-rgb), 0.08); font-size: 12px; }
+.ide-shell {
+  .is-err { color: var(--mud-palette-error); }
+  .is-warn { color: var(--mud-palette-warning); }
+  .is-info { color: var(--mud-palette-info); }
+  .is-ok { color: var(--mud-palette-success); }
+}
+
+.ide-grid { inline-size: 100%; border-collapse: collapse; font-size: 12px; }
+.ide-grid th { text-align: start; color: var(--mud-palette-text-secondary); font-weight: 500; padding-block: 4px; padding-inline: 8px; border-block-end: 1px solid var(--mud-palette-lines-default); }
+.ide-grid td { padding-block: 4px; padding-inline: 8px; border-block-end: 1px solid var(--mud-palette-lines-default); }
+
+.ide-test { padding-block: 3px; padding-inline: 2px; }
+
+.ide-note {
+  display: grid;
+  gap: 2px;
+  padding: 8px;
+  margin-block-end: 6px;
+  border: 1px solid var(--mud-palette-lines-default);
+  border-radius: 6px;
+  span { color: var(--mud-palette-text-secondary); }
+}
+
+.ide-chat { display: flex; flex-direction: column; block-size: 100%; }
+.ide-chat__log { flex: 1; min-block-size: 0; overflow: auto; padding-block: 8px; padding-inline: 10px; }
+.ide-chat__msg { margin-block-end: 8px; b { display: block; font-size: 11px; color: var(--mud-palette-text-secondary); } }
+.ide-chat__msg.is-me b { color: var(--mud-palette-primary); }
+.ide-chat__input { display: flex; gap: 6px; padding: 8px; border-block-start: 1px solid var(--mud-palette-lines-default); .ide-input { margin: 0; } }
+
+.ide-editor { display: flex; block-size: 100%; background: var(--mud-palette-surface); font: 13px/20px ui-monospace, "Cascadia Code", Consolas, monospace; }
+.ide-editor__gutter {
+  flex: none;
+  inline-size: 48px;
+  padding-block: 8px;
+  padding-inline-end: 10px;
+  overflow: hidden;
+  text-align: end;
+  white-space: pre;
+  color: var(--mud-palette-text-disabled);
+  user-select: none;
+}
+.ide-editor__text {
+  flex: 1;
+  min-inline-size: 0;
+  padding-block: 8px;
+  padding-inline-end: 12px;
+  resize: none;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--mud-palette-text-primary);
+  font: inherit;
+  white-space: pre;
+  overflow: auto;
+  tab-size: 2;
+}
+
+.ide-note-panel { padding-block: 16px; padding-inline: 20px; max-inline-size: 640px; li { margin-block: 5px; } }
+.ide-note-panel__title { font-size: 18px; font-weight: 600; margin-block-end: 8px; }
+
+// Code reads left to right even on an RTL page.
+.ide-editor, .ide-log { direction: ltr; unicode-bidi: isolate; text-align: left; }

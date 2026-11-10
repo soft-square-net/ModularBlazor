@@ -1,0 +1,431 @@
+// Live content: breaking-news ticker, live score strip, match card and league table.
+
+// ---------- Breaking-news ticker ----------
+// <div class="mud-ticker" data-mud="ticker" data-speed="70">
+//   <span class="mud-ticker__label">Breaking</span>
+//   <div class="mud-ticker__viewport"><ul class="mud-ticker__track"><li><a href="…">…</a></li></ul></div>
+//   <button type="button" class="mud-ticker__toggle" aria-label="Pause ticker"></button>   (optional)
+// </div>
+
+.mud-ticker {
+  display: flex;
+  align-items: stretch;
+  min-block-size: 2.5rem;
+  background: var(--mud-palette-surface);
+  border-block: 1px solid var(--mud-palette-lines-default);
+  font-size: 0.875rem;
+  overflow: hidden;
+}
+
+.mud-ticker__label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  padding-inline: 0.9rem;
+  background: var(--mud-live);
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.mud-ticker__viewport {
+  position: relative;
+  flex: 1;
+  min-inline-size: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  mask-image: linear-gradient(to right, transparent, #000 2rem, #000 calc(100% - 2rem), transparent);
+}
+
+.mud-ticker__track {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  inline-size: max-content;
+  margin: 0;
+  padding-inline: 1rem;
+  list-style: none;
+  white-space: nowrap;
+  will-change: transform;
+
+  li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+
+    &::before {
+      content: "";
+      inline-size: 0.35rem;
+      block-size: 0.35rem;
+      border-radius: 50%;
+      background: var(--mud-live);
+    }
+  }
+
+  a {
+    color: var(--mud-palette-text-primary);
+    text-decoration: none;
+    font-weight: 500;
+    &:hover { color: var(--mud-accent); text-decoration: underline; }
+  }
+
+  time { color: var(--mud-palette-text-secondary); font-variant-numeric: tabular-nums; }
+}
+
+// Without motion (reduced motion, or before the script runs) the headlines scroll by hand.
+.mud-ticker[data-state="static"] .mud-ticker__viewport,
+.mud-ticker:not([data-state]) .mud-ticker__viewport {
+  overflow-x: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+.mud-ticker__toggle {
+  flex-shrink: 0;
+  inline-size: 2.5rem;
+  border: none;
+  border-inline-start: 1px solid var(--mud-palette-lines-default);
+  background: transparent;
+  color: var(--mud-palette-text-secondary);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+
+  &::before { // pause glyph; play glyph when paused
+    content: "";
+    inline-size: 0.6rem;
+    block-size: 0.7rem;
+    border-inline: 3px solid currentColor;
+  }
+
+  &[aria-pressed="true"]::before {
+    border: none;
+    inline-size: 0;
+    block-size: 0;
+    border-block: 0.4rem solid transparent;
+    border-inline-start: 0.65rem solid currentColor;
+  }
+
+  &:hover { color: var(--mud-palette-primary); }
+}
+
+.mud-ticker[data-state="static"] .mud-ticker__toggle { display: none; }
+
+// ---------- Scroller (horizontal, snapping) ----------
+
+.mud-scroller {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 1rem;
+  padding-block: 0.25rem;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+  > * { scroll-snap-align: start; flex-shrink: 0; }
+}
+
+// ---------- Live score strip ----------
+// <div class="mud-score-strip mud-scroller" data-mud="score-strip">
+//   <a class="mud-score-chip" data-status="live" href="…">
+//     <span class="mud-score-chip__status">72'</span>
+//     <span class="mud-score-chip__team"><img class="mud-crest" alt=""> ARS <b class="mud-score">2</b></span>
+//     <span class="mud-score-chip__team"><img class="mud-crest" alt=""> CHE <b class="mud-score">1</b></span>
+//   </a>
+// </div>
+// data-status: live | ht | ft | upcoming. When a .mud-score changes, the script flashes it.
+
+.mud-score-strip {
+  padding-block: 0.6rem;
+  padding-inline: 1rem;
+  background: var(--mud-palette-surface);
+  border-block-end: 1px solid var(--mud-palette-lines-default);
+}
+
+.mud-score-chip {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.2rem;
+  min-inline-size: 9.5rem;
+  padding-block: 0.5rem;
+  padding-inline: 0.75rem;
+  border: 1px solid var(--mud-palette-lines-default);
+  border-radius: var(--mud-default-borderradius);
+  color: var(--mud-palette-text-primary);
+  text-decoration: none;
+  font-size: 0.82rem;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+
+  &:hover { border-color: var(--mud-accent); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); }
+}
+
+.mud-score-chip__status {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--mud-palette-text-secondary);
+}
+
+.mud-score-chip[data-status="live"] .mud-score-chip__status,
+.mud-match[data-status="live"] .mud-match__status {
+  color: var(--mud-live);
+
+  &::before {
+    content: "";
+    display: inline-block;
+    inline-size: 0.4rem;
+    block-size: 0.4rem;
+    margin-inline-end: 0.35rem;
+    border-radius: 50%;
+    background: currentColor;
+    vertical-align: 0.1em;
+    animation: mud-live-pulse 1.4s ease-in-out infinite;
+  }
+}
+
+.mud-score-chip__team {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 600;
+
+  .mud-score { margin-inline-start: auto; }
+}
+
+.mud-score {
+  display: inline-block;
+  min-inline-size: 1ch;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  border-radius: 3px;
+}
+
+.mud-score.is-updated { // set briefly by the score-strip behaviour
+  background: rgba(var(--mud-palette-primary-rgb), 0.18);
+}
+
+.mud-crest {
+  inline-size: 1.1rem;
+  block-size: 1.1rem;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.mud-crest--lg {
+  inline-size: 3rem;
+  block-size: 3rem;
+}
+
+// ---------- Match card ----------
+
+.mud-match {
+  display: flex;
+  flex-direction: column;
+  background: var(--mud-palette-surface);
+  border: 1px solid var(--mud-palette-lines-default);
+  border-radius: var(--mud-default-borderradius);
+  overflow: hidden;
+}
+
+.mud-match__header,
+.mud-match__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-block: 0.6rem;
+  padding-inline: 1rem;
+  font-size: 0.75rem;
+  color: var(--mud-palette-text-secondary);
+}
+
+.mud-match__header { border-block-end: 1px solid var(--mud-palette-lines-default); }
+.mud-match__footer { border-block-start: 1px solid var(--mud-palette-lines-default); }
+
+.mud-match__competition { font-weight: 700; color: var(--mud-palette-text-primary); }
+.mud-match__status { font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; }
+
+.mud-match__teams {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 0.75rem;
+  padding-block: 1.1rem;
+  padding-inline: 1rem;
+}
+
+.mud-match__team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.92rem;
+  min-inline-size: 0;
+}
+
+.mud-match__score {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--mud-font-headline);
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1;
+
+  > span { color: var(--mud-palette-text-disabled); font-weight: 400; }
+}
+
+.mud-match__kickoff { // instead of a score for upcoming games
+  font-size: 1.1rem;
+  font-weight: 800;
+  padding-block: 0.35rem;
+  padding-inline: 0.7rem;
+  border-radius: var(--mud-default-borderradius);
+  background: rgba(var(--mud-palette-primary-rgb), 0.08);
+  color: var(--mud-palette-primary);
+}
+
+.mud-match__events {
+  list-style: none;
+  margin: 0;
+  padding-block: 0 0.9rem;
+  padding-inline: 1rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.3rem 1.5rem;
+  font-size: 0.78rem;
+  color: var(--mud-palette-text-secondary);
+
+  li[data-side="away"] { grid-column: 2; text-align: end; }
+  li[data-side="home"] { grid-column: 1; }
+}
+
+// ---------- League table ----------
+// <div class="mud-table-scroll"><table class="mud-league-table">…</table></div>
+// Row zones: <tr data-zone="champions|europe|playoff|relegation">; the followed team: <tr aria-current="true">.
+// Form guide: <span class="mud-form"><span class="mud-form__result" data-result="W">W</span>…</span>
+
+.mud-table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--mud-palette-lines-default);
+  border-radius: var(--mud-default-borderradius);
+  background: var(--mud-palette-surface);
+}
+
+.mud-league-table {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+
+  caption {
+    caption-side: top;
+    padding-block: 0.75rem;
+    padding-inline: 1rem;
+    text-align: start;
+    font-weight: 800;
+    font-size: 0.95rem;
+  }
+
+  th, td {
+    padding-block: 0.55rem;
+    padding-inline: 0.5rem;
+    text-align: center;
+    white-space: nowrap;
+    border-block-end: 1px solid var(--mud-palette-lines-default);
+  }
+
+  thead th {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--mud-palette-text-secondary);
+    background: rgba(var(--mud-palette-primary-rgb), 0.03);
+  }
+
+  tbody tr:last-child td, tbody tr:last-child th { border-block-end: none; }
+  tbody tr:hover { background: rgba(var(--mud-palette-primary-rgb), 0.04); }
+
+  .mud-league-table__pos {
+    inline-size: 2.5rem;
+    font-weight: 700;
+    border-inline-start: 3px solid transparent;
+  }
+
+  .mud-league-table__team {
+    text-align: start;
+    font-weight: 600;
+    // the team column stays visible while the numbers scroll on small screens
+    position: sticky;
+    inset-inline-start: 0;
+    background: var(--mud-palette-surface);
+
+    > span { display: inline-flex; align-items: center; gap: 0.5rem; }
+  }
+
+  .mud-league-table__pts { font-weight: 800; }
+
+  tr[data-zone="champions"] .mud-league-table__pos { border-inline-start-color: var(--mud-palette-success); }
+  tr[data-zone="europe"] .mud-league-table__pos { border-inline-start-color: var(--mud-palette-info); }
+  tr[data-zone="playoff"] .mud-league-table__pos { border-inline-start-color: var(--mud-palette-warning); }
+  tr[data-zone="relegation"] .mud-league-table__pos { border-inline-start-color: var(--mud-palette-error); }
+
+  tr[aria-current="true"] {
+    background: rgba(var(--mud-palette-primary-rgb), 0.08);
+    .mud-league-table__team { background: transparent; color: var(--mud-palette-primary); }
+  }
+
+  @media (max-width: 640px) {
+    .mud-league-table__optional { display: none; }
+  }
+}
+
+.mud-form {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.mud-form__result {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  border-radius: 3px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #fff;
+  background: var(--mud-palette-text-disabled);
+
+  &[data-result="W"] { background: var(--mud-palette-success); }
+  &[data-result="D"] { background: var(--mud-palette-text-secondary); }
+  &[data-result="L"] { background: var(--mud-palette-error); }
+}
+
+.mud-zone-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  margin-block-start: 0.6rem;
+  font-size: 0.75rem;
+  color: var(--mud-palette-text-secondary);
+
+  span::before {
+    content: "";
+    display: inline-block;
+    inline-size: 0.6rem;
+    block-size: 0.6rem;
+    margin-inline-end: 0.35rem;
+    border-radius: 2px;
+    background: var(--zone, currentColor);
+  }
+}

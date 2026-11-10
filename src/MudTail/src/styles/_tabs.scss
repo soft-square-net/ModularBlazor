@@ -17,24 +17,36 @@
     flex-direction: column-reverse;
     .mud-tabs-tabbar { border-top: 1px solid var(--mud-palette-lines-default); }
   }
-  &.position-left, &.position-start {
+  &.position-left, &.position-right, &.position-start, &.position-end {
+    .mud-tabs-tabbar {
+      flex-direction: column;
+      width: 220px;
+      flex-shrink: 0;
+    }
+  }
+
+  // start / end follow the writing direction: a flex row already runs right-to-left in RTL.
+  &.position-start {
     flex-direction: row;
-    .mud-tabs-tabbar {
-      flex-direction: column;
-      border-right: 1px solid var(--mud-palette-lines-default);
-      width: 220px;
-      flex-shrink: 0;
-    }
+    .mud-tabs-tabbar { border-inline-end: 1px solid var(--mud-palette-lines-default); }
   }
-  &.position-right, &.position-end {
+  &.position-end {
     flex-direction: row-reverse;
-    .mud-tabs-tabbar {
-      flex-direction: column;
-      border-left: 1px solid var(--mud-palette-lines-default);
-      width: 220px;
-      flex-shrink: 0;
-    }
+    .mud-tabs-tabbar { border-inline-start: 1px solid var(--mud-palette-lines-default); }
   }
+
+  // left / right are physical sides, so their row order is undone in RTL.
+  &.position-left {
+    flex-direction: row;
+    .mud-tabs-tabbar { border-right: 1px solid var(--mud-palette-lines-default); }
+  }
+  &.position-right {
+    flex-direction: row-reverse;
+    .mud-tabs-tabbar { border-left: 1px solid var(--mud-palette-lines-default); }
+  }
+  // [dir] rather than :dir(): CSS minifiers lower :dir() to a :lang() list, which misses dir="rtl" without lang.
+  [dir="rtl"] &.position-left { flex-direction: row-reverse; }
+  [dir="rtl"] &.position-right { flex-direction: row; }
 }
 
 .mud-tabs-tabbar {
@@ -87,15 +99,23 @@
   height: 3px;
 }
 
-.position-left .mud-tab-slider,
-.position-start .mud-tab-slider {
+.position-left .mud-tab-slider {
   right: 0;
   width: 3px;
 }
 
-.position-right .mud-tab-slider,
-.position-end .mud-tab-slider {
+.position-right .mud-tab-slider {
   left: 0;
+  width: 3px;
+}
+
+.position-start .mud-tab-slider {
+  inset-inline-end: 0;
+  width: 3px;
+}
+
+.position-end .mud-tab-slider {
+  inset-inline-start: 0;
   width: 3px;
 }
 

@@ -16,7 +16,7 @@ public sealed class CatalogDbInitializer(CatalogDbContext dbContext) : DbInitial
         db.Modules.AddRange(
             new ModuleRegistration("Layouts.Default", "Default layout", "1.0.0", ModuleKind.Dll,
                 "modules/soft.square.net.Layouts.Default.dll")
-            { LoadOnStartup = true, Hidden = true, SortOrder = 1 },
+            { LoadOnStartup = true, Hidden = true, Styles = ["css/main.min.css"], SortOrder = 1 },
 
             new ModuleRegistration("Module.Auth", "Authentication (login page + auth layout)", "1.0.0", ModuleKind.Dll,
                 "modules/soft.square.net.Module.Auth.dll")

@@ -8,6 +8,36 @@ public class BaseFilter
 
     /// <summary>Restricts the keyword search to these properties. Empty: every text property.</summary>
     public string[]? SearchFields { get; set; }
+
+    /// <summary>
+    /// Column filters, all of which must match. Each is <c>Field|operator|value</c>, e.g. <c>Views|gte|1000</c>,
+    /// <c>Section|in|Sport,Culture</c>, <c>PublishedOnUtc|lt|2026-01-01</c>, <c>DeletedOnUtc|isnull|</c>.
+    /// Operators: eq, neq, contains, startswith, endswith, gt, gte, lt, lte, in, isnull, notnull.
+    /// Text comparisons ignore case. Unknown fields, unsupported operators and values that do not convert are ignored,
+    /// like unknown OrderBy fields. Sent by MudTail's DataTable; see <see cref="FilterClause"/>.
+    /// </summary>
+    public string[]? Filters { get; set; }
+}
+
+/// <summary>One parsed entry of <see cref="BaseFilter.Filters"/>.</summary>
+public sealed record FilterClause(string Field, string Operator, string Value)
+{
+    public static readonly string[] Operators =
+        ["eq", "neq", "contains", "startswith", "endswith", "gt", "gte", "lt", "lte", "in", "isnull", "notnull"];
+
+    /// <summary>"Field|op|value" (the value may itself contain '|'). False for anything malformed.</summary>
+    public static bool TryParse(string? text, out FilterClause clause)
+    {
+        clause = default!;
+        if (string.IsNullOrWhiteSpace(text)) return false;
+        var parts = text.Split('|', 3);
+        if (parts.Length < 2) return false;
+        var field = parts[0].Trim();
+        var op = parts[1].Trim().ToLowerInvariant();
+        if (field.Length == 0 || !Operators.Contains(op)) return false;
+        clause = new FilterClause(field, op, parts.Length > 2 ? parts[2] : "");
+        return true;
+    }
 }
 
 /// <summary>Paging and ordering on top of the keyword search. Bindable from the query string with [AsParameters].</summary>
@@ -35,6 +65,9 @@ public class PaginationFilter : BaseFilter
         {
             Keyword = Keyword,
             SearchFields = search is { Length: > 0 } ? search : fields,
+            // Column filters on anything else (a password hash, a connection string) are dropped, not just ignored later.
+            Filters = Filters?.Where(f => FilterClause.TryParse(f, out var c)
+                                          && (c.Field.Equals("Id", StringComparison.OrdinalIgnoreCase) || Allowed(c.Field))).ToArray(),
             PageNumber = PageNumber,
             PageSize = PageSize,
             OrderBy = OrderBy?.Where(clause =>

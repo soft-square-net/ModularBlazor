@@ -1,0 +1,356 @@
+// Editorial building blocks for news, sports and art sites:
+// kicker, meta line, badges, section headers, article cards and the hero / card grids.
+// Every card is plain markup (Razor-friendly); only logical properties are used, so it all mirrors in RTL.
+
+:root {
+  // Headline face; set it to a serif for an arts / magazine feel.
+  --mud-font-headline: var(--mud-font-family, inherit);
+  // Section accent: override per element, e.g. style="--mud-accent: #e11d48" on a sport section.
+  --mud-accent: var(--mud-palette-primary);
+  --mud-live: #e11d48;
+  --mud-card-gap: 1.25rem;
+  --mud-media-ratio: 16 / 9;
+}
+
+// ---------- Kicker, meta, badges ----------
+
+.mud-kicker {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--mud-accent);
+  text-decoration: none;
+
+  &:hover { text-decoration: underline; }
+}
+
+.mud-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.75rem;
+  font-size: 0.78rem;
+  color: var(--mud-palette-text-secondary);
+
+  > * + *::before {
+    content: "";
+    display: inline-block;
+    inline-size: 3px;
+    block-size: 3px;
+    margin-inline-end: 0.75rem;
+    border-radius: 50%;
+    background: currentColor;
+    vertical-align: middle;
+    opacity: 0.6;
+  }
+}
+
+.mud-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding-block: 0.15rem;
+  padding-inline: 0.5rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--mud-accent);
+  color: #fff;
+}
+
+.mud-badge--live {
+  background: var(--mud-live);
+
+  &::before {
+    content: "";
+    inline-size: 0.45rem;
+    block-size: 0.45rem;
+    border-radius: 50%;
+    background: currentColor;
+    animation: mud-live-pulse 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes mud-live-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.75); }
+}
+
+// ---------- Section header ----------
+
+.mud-section {
+  margin-block: 2.5rem;
+}
+
+.mud-section__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-block-end: 1.25rem;
+  padding-block-end: 0.6rem;
+  border-block-end: 1px solid var(--mud-palette-lines-default);
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset-block-end: -1px;
+    inset-inline-start: 0;
+    inline-size: 3.5rem;
+    block-size: 3px;
+    background: var(--mud-accent);
+  }
+}
+
+.mud-section__title {
+  margin: 0;
+  font-family: var(--mud-font-headline);
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--mud-palette-text-primary);
+}
+
+.mud-section__more {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--mud-accent);
+  text-decoration: none;
+
+  &:hover { text-decoration: underline; }
+}
+
+// ---------- Article card ----------
+// <article class="mud-article [mud-article--row|--overlay|--lead]">
+//   <a class="mud-article__media" href="…"><img …></a>
+//   <div class="mud-article__body">
+//     <a class="mud-kicker" href="…">Politics</a>
+//     <h3 class="mud-article__title"><a href="…">Headline</a></h3>
+//     <p class="mud-article__excerpt">…</p>
+//     <div class="mud-meta"><span>By …</span><time>2h ago</time></div>
+//   </div>
+// </article>
+// The title link is stretched over the whole card; the kicker and other links stay clickable above it.
+
+.mud-article {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+  background: var(--mud-palette-surface);
+  color: var(--mud-palette-text-primary);
+  border-radius: var(--mud-default-borderradius);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.mud-article__media {
+  position: relative;
+  display: block;
+  aspect-ratio: var(--mud-media-ratio);
+  overflow: hidden;
+  background: var(--mud-palette-lines-default);
+
+  img, video, picture {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    transition: transform 450ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  .mud-badge {
+    position: absolute;
+    inset-block-start: 0.6rem;
+    inset-inline-start: 0.6rem;
+  }
+}
+
+.mud-article:hover .mud-article__media img,
+.mud-article:focus-within .mud-article__media img {
+  transform: scale(1.04);
+}
+
+.mud-article__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding-block: 0.85rem 1rem;
+  padding-inline: 0.15rem;
+  flex: 1;
+}
+
+.mud-article__title {
+  margin: 0;
+  font-family: var(--mud-font-headline);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.005em;
+
+  a {
+    color: inherit;
+    text-decoration: none;
+
+    &::after { // stretched link: the whole card is clickable
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+    }
+
+    &:hover { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+    &:focus-visible { outline: none; }
+  }
+}
+
+.mud-article:has(.mud-article__title a:focus-visible) {
+  outline: 2px solid var(--mud-palette-primary);
+  outline-offset: 3px;
+}
+
+// Links other than the title sit above the stretched link.
+.mud-article .mud-kicker,
+.mud-article .mud-meta a {
+  position: relative;
+  z-index: 2;
+}
+
+.mud-article__excerpt {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--mud-palette-text-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.mud-article__meta-end { margin-block-start: auto; }
+
+// Lead: the big story of a hero grid.
+.mud-article--lead {
+  .mud-article__title { font-size: clamp(1.4rem, 1rem + 1.6vw, 2.2rem); line-height: 1.15; }
+  .mud-article__excerpt { font-size: 1rem; -webkit-line-clamp: 4; }
+}
+
+// Row: media beside the text (start side), for lists and sidebars.
+.mud-article--row {
+  display: grid;
+  grid-template-columns: minmax(6rem, 38%) 1fr;
+  gap: 0.9rem;
+  align-items: start;
+
+  .mud-article__body { padding: 0; }
+  .mud-article__title { font-size: 0.98rem; }
+  .mud-article__excerpt { -webkit-line-clamp: 2; }
+}
+
+// Overlay: text over the image on a gradient (heroes, photo stories).
+.mud-article--overlay {
+  justify-content: flex-end;
+  min-block-size: 18rem;
+  color: #fff;
+  background: #0b0f19;
+
+  .mud-article__media {
+    position: absolute;
+    inset: 0;
+    aspect-ratio: auto;
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.35) 45%, rgba(0, 0, 0, 0) 75%);
+    }
+  }
+
+  .mud-article__body {
+    position: relative;
+    z-index: 1;
+    padding: 1.25rem;
+    flex: 0 0 auto;
+  }
+
+  .mud-kicker { color: #fff; }
+  .mud-meta, .mud-article__excerpt { color: rgba(255, 255, 255, 0.82); }
+}
+
+// ---------- Numbered list ("Most read") ----------
+
+.mud-article-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: mud-rank;
+
+  > li {
+    counter-increment: mud-rank;
+    display: grid;
+    grid-template-columns: 2.4rem 1fr;
+    gap: 0.75rem;
+    padding-block: 0.85rem;
+    border-block-end: 1px solid var(--mud-palette-lines-default);
+
+    &::before {
+      content: counter(mud-rank);
+      font-family: var(--mud-font-headline);
+      font-size: 1.9rem;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--mud-accent);
+      opacity: 0.85;
+    }
+
+    &:last-child { border-block-end: none; }
+  }
+
+  .mud-article { background: transparent; }
+  .mud-article__body { padding: 0; }
+  .mud-article__title { font-size: 0.95rem; }
+}
+
+// ---------- Grids ----------
+
+// Hero: the first child is the lead story (2x2), the rest fill around it.
+.mud-hero-grid {
+  display: grid;
+  gap: var(--mud-card-gap);
+  grid-template-columns: 1fr;
+
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    > :first-child { grid-column: 1 / -1; }
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    > :first-child { grid-column: span 2; grid-row: span 2; }
+    > .mud-article--overlay:first-child { min-block-size: 100%; }
+  }
+}
+
+// Auto-filling card grid; tune with --mud-card-min.
+.mud-card-grid {
+  display: grid;
+  gap: var(--mud-card-gap);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--mud-card-min, 260px)), 1fr));
+}
+
+// Main column + sidebar (sidebar on the inline end; stacks below on small screens).
+.mud-split {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: 1fr;
+
+  @media (min-width: 1024px) {
+    grid-template-columns: minmax(0, 1fr) var(--mud-split-aside, 320px);
+  }
+}

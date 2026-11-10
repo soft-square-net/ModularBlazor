@@ -115,7 +115,7 @@
     .mud-switch-thumb {
       position: absolute;
       top: 2px;
-      left: 2px;
+      inset-inline-start: 2px;
       width: 16px;
       height: 16px;
       background-color: #fff;
@@ -128,7 +128,7 @@
   input:checked + .mud-switch-track {
     background-color: var(--mud-palette-primary);
     .mud-switch-thumb {
-      transform: translateX(18px);
+      transform: translateX(calc(18px * var(--mud-dir, 1)));
     }
   }
 }
@@ -161,3 +161,168 @@
   outline: none;
   cursor: pointer;
 }
+
+// ───────── more field types, states and groups (logical properties: they mirror in RTL) ─────────
+
+.mud-input-label .mud-required { color: var(--mud-palette-error); }
+
+// Disabled / read-only fields
+.mud-input-wrapper:has(.mud-input-slot:disabled) {
+  background-color: var(--mud-palette-action-disabled-background);
+  border-color: var(--mud-palette-lines-default);
+}
+
+// Dense (compact) fields
+.mud-input-wrapper--dense .mud-input-slot { padding-block: 6px; padding-inline: 10px; font-size: 0.8125rem; }
+
+// Text area: <textarea class="mud-input-slot" rows="4"></textarea> inside .mud-input-wrapper
+textarea.mud-input-slot {
+  min-block-size: 5.5rem;
+  resize: vertical;
+  line-height: 1.5;
+}
+.mud-input-wrapper:has(textarea) { align-items: stretch; }
+
+// Select: <div class="mud-input-wrapper mud-input-wrapper--select"><select class="mud-input-slot">…</select></div>
+.mud-input-wrapper--select {
+  &::after { // chevron, pointing down in any direction
+    content: "";
+    position: absolute;
+    inset-inline-end: 14px;
+    inset-block-start: 50%;
+    inline-size: 7px;
+    block-size: 7px;
+    border-right: 2px solid var(--mud-palette-text-secondary);
+    border-bottom: 2px solid var(--mud-palette-text-secondary);
+    transform: translateY(-70%) rotate(45deg);
+    pointer-events: none;
+  }
+  select.mud-input-slot {
+    appearance: none;
+    padding-inline-end: 36px;
+    cursor: pointer;
+    background: transparent;
+    option { color: var(--mud-palette-text-primary); background: var(--mud-palette-surface); }
+  }
+  select[multiple].mud-input-slot { padding-inline-end: 12px; }
+  &:has(select[multiple])::after { display: none; }
+}
+
+// Date, time and colour pickers use the native control, themed
+.mud-input-slot[type="date"], .mud-input-slot[type="time"], .mud-input-slot[type="datetime-local"], .mud-input-slot[type="month"] {
+  color-scheme: light;
+  [data-theme="dark"] & { color-scheme: dark; }
+  min-block-size: 2.6rem;
+}
+.mud-input-slot[type="color"] { padding: 4px; block-size: 2.6rem; cursor: pointer; }
+
+// File input: the native button becomes a MudTail button
+.mud-input-slot[type="file"] {
+  padding-block: 6px;
+  cursor: pointer;
+  &::file-selector-button {
+    margin-inline-end: 12px;
+    padding-block: 6px;
+    padding-inline: 12px;
+    border: none;
+    border-radius: var(--mud-input-borderradius, 4px);
+    background: rgba(var(--mud-palette-primary-rgb), 0.1);
+    color: var(--mud-palette-primary);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  &::file-selector-button:hover { background: rgba(var(--mud-palette-primary-rgb), 0.18); }
+}
+
+// Number: tabular figures so values line up
+.mud-input-slot[type="number"] { font-variant-numeric: tabular-nums; }
+
+// Choice groups: radios / checkboxes in a row (default) or a column
+.mud-choice-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  &.mud-choice-group--column { flex-direction: column; gap: 10px; }
+  legend { padding: 0; margin-block-end: 8px; }
+}
+
+// Slider with a live value: <div class="mud-slider-field"><input type="range" class="mud-slider"><output>50</output></div>
+.mud-slider-field {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  output {
+    min-inline-size: 3ch;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--mud-palette-primary);
+    text-align: end;
+  }
+}
+
+// Password reveal button (data-mud="password-toggle" on the wrapper)
+.mud-input-toggle {
+  display: grid;
+  place-items: center;
+  margin-inline-end: 6px;
+  padding: 4px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--mud-palette-text-secondary);
+  cursor: pointer;
+  &:hover { color: var(--mud-palette-primary); background: rgba(var(--mud-palette-primary-rgb), 0.08); }
+  &:focus-visible { outline: 2px solid var(--mud-palette-primary); outline-offset: 1px; }
+}
+
+// ───────── input group: text, fields, selects and buttons joined into one control ─────────
+// <div class="mud-input-group">
+//   <span class="mud-input-addon">https://</span>
+//   <div class="mud-input-wrapper"><input class="mud-input-slot"></div>
+//   <button class="mud-button-root mud-button-filled mud-button-primary mud-button-medium">Go</button>
+// </div>
+
+.mud-input-group {
+  display: flex;
+  align-items: stretch;
+  inline-size: 100%;
+
+  > * {
+    border-radius: 0 !important;
+    margin: 0;
+  }
+  > * + * { margin-inline-start: -1px; } // share borders
+  > :first-child {
+    border-start-start-radius: var(--mud-input-borderradius, 4px) !important;
+    border-end-start-radius: var(--mud-input-borderradius, 4px) !important;
+  }
+  > :last-child {
+    border-start-end-radius: var(--mud-input-borderradius, 4px) !important;
+    border-end-end-radius: var(--mud-input-borderradius, 4px) !important;
+  }
+  > .mud-input-wrapper { flex: 1 1 auto; min-inline-size: 0; }
+  > .mud-input-wrapper:focus-within { z-index: 1; } // the focus ring sits above its neighbours
+  > .mud-button-root { flex: none; white-space: nowrap; }
+}
+
+.mud-input-addon {
+  display: flex;
+  align-items: center;
+  flex: none;
+  gap: 6px;
+  padding-inline: 12px;
+  border: 1px solid var(--mud-palette-lines-inputs);
+  background: color-mix(in srgb, var(--mud-palette-surface) 92%, var(--mud-palette-text-primary));
+  color: var(--mud-palette-text-secondary);
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+// Eye icons for the password toggle: show one or the other by state
+.mud-input-toggle .mud-icon-hide { display: none; }
+[data-revealed] .mud-input-toggle .mud-icon-show { display: none; }
+[data-revealed] .mud-input-toggle .mud-icon-hide { display: block; }
