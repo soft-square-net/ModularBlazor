@@ -20,7 +20,22 @@ upload ─► Install ─► Activate ─────────► Deactivate 
           └ read manifest in a throw-away load context, register it (modules.json)
 ```
 
-The desired state is persisted. On startup, every module marked `Active` is activated again (`ModuleReconciler`).
+The desired state is persisted in the catalog (`modules.json` plus packages, under a cross-process lock). Every replica
+converges on it in `ModuleRuntime.SyncAsync`:
+
+- on startup
+- after each of its own lifecycle calls
+- when another replica publishes `ModuleStateChanged`
+
+The broadcast runs over the RabbitMQ fanout exchange `modules.state`, enabled when `ConnectionStrings:broker` is set (`ModuleStateBus.cs`).
+
+Pool configuration:
+
+- `Modules:Pool`: the pool name.
+- `Modules:Role`: `Api` maps routes; `Worker` only loads modules.
+- `Modules:Enabled`: which modules this pool applies.
+
+A re-install or a settings change swaps to a fresh copy without a 404 window. See `src/Aspire/Hybird` for the multi-pool lab.
 
 | Endpoint | |
 |---|---|
@@ -77,7 +92,6 @@ honestly.
 
 - **Database:** a real modules schema (DB table) instead of `modules.json`.
 - **Security:** authorization on the admin API; package signing and verification.
-- **Replicas:** broadcasting state changes so all replicas converge (`ModuleStateChanged` over the broker).
 - **Migrations:** per-module EF Core migrations on activation (once, behind a lock).
 - **DI:** keyed services inside modules.
 - **Packages:** `.nupkg` dependency restore. Ship dependencies in the `.zip` form instead.

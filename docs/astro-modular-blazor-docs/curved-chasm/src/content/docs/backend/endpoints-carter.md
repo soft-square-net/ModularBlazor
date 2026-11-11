@@ -2,7 +2,7 @@
 title: "Endpoints: Minimal API + Carter"
 description: Why the API uses Minimal API with Carter modules, and not FastEndpoints, when modules are loaded while the app runs.
 sidebar:
-  order: 6
+  order: 7
 ---
 
 **Decision:** keep **Minimal API + Carter**. Every module exposes its endpoints as `ICarterModule` classes. Do not

@@ -2,7 +2,7 @@
 title: Unloading runtime modules
 description: What keeps an unloaded module in memory, how each holder was found with heap dumps and fixed, and what is still open.
 sidebar:
-  order: 8
+  order: 9
 ---
 
 Removing a module's routes is easy. **Freeing its memory** means the runtime must collect its
@@ -45,6 +45,7 @@ garbage-collection passes instead of spinning.
 | Activate, call GET and POST endpoints, unload | Collected after 4 passes |
 | Repeated unload and activate cycles | Collected every time |
 | `/openapi/v1.json` generated while the module was active, then unload | **Not collected** within the test window. The last heap dump shows no managed roots left, only the runtime's internal loader handles. The context is listed under `GET /api/admin/modules/unloading` |
+| Upgrades and settings changes across 8 replicas ([lab](/backend/hybrid-lab/)) | Swapped-out copies often stay under `/unloading` for a while; later heap dumps showed only the active copy in each replica |
 
 The unload result reports what really happened (`unloaded`, `gcPasses`), so the admin is never told memory was
 freed when it was not.
@@ -61,5 +62,6 @@ freed when it was not.
 | Operation | Treat as |
 | --- | --- |
 | Install, activate, deactivate | Fully live: no restart |
-| Unload, upgrade | Routes gone immediately; memory reclaimed best-effort |
+| Upgrade, settings change | Live swap with no 404 window; the old copy's memory is reclaimed best-effort |
+| Unload | Routes gone immediately; memory reclaimed best-effort |
 | Guaranteed memory reclamation | A rolling restart, which the [replicated deployment](/backend/deployment-scenarios/) does anyway |

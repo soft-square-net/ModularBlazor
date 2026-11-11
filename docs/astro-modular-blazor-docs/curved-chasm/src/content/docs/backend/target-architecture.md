@@ -31,23 +31,31 @@ Observability: OpenTelemetry traces, metrics and logs, tagged with tenant and co
 
 ## Pools from one image
 
-Each deployment of the image reads two settings:
+Each deployment of the image reads three settings (implemented in the `src/WebApi` prototype):
 
 | Setting | Values | Effect |
 | --- | --- | --- |
-| `EnabledModules` | `Identity,Workflow,Inventory` or `*` | Which modules this pool loads, maps and registers |
-| `Role` | `Api`, `Worker`, or both | `Api` maps HTTP endpoints; `Worker` runs message consumers and scheduled jobs |
+| `Modules:Pool` | `core`, `sales`, `worker`, … | The pool's name, shown in status, logs and broadcast messages |
+| `Modules:Enabled` | module ids, e.g. `identity`, `workflow`, `inventory`; empty means all | Which modules this pool loads, maps and registers |
+| `Modules:Role` | `Api` or `Worker` | `Api` maps HTTP endpoints; `Worker` loads modules for their message consumers and scheduled jobs, without routes |
 
 ```text
-Scenario A           Core  = EnabledModules: *      Role: Api,Worker   ×N
-Extract one module   Core  = everything but Sales   Role: Api          ×2
-                     Sales = Sales                  Role: Api          ×4
-                     Worker= *                      Role: Worker       ×2
+Scenario A           all    = Enabled: (all)              Role: Api      ×N
+Extract one module   core   = Enabled: all but sales      Role: Api      ×2
+                     sales  = Enabled: sales              Role: Api      ×4
+                     worker = Enabled: (all)              Role: Worker   ×2
 ```
 
-To move a module into its own pool: add a deployment with its `EnabledModules`, add a YARP cluster for its path,
+To move a module into its own pool: add a deployment with its `Modules:Enabled`, add a YARP cluster for its path,
 and switch its contract registration in the other pools from in-process to the gRPC client. No module code
 changes. The host's module registry (`HostModules`) is where the switch belongs.
+
+Every pool reads the **same module catalog**. A lifecycle change made through any replica is written to the
+catalog and broadcast on the broker, and each replica applies it according to its own `Enabled` list and `Role`;
+see [Runtime modules](/backend/runtime-modules/#pools-and-replicas).
+
+The [Hybrid architecture lab](/backend/hybrid-lab/) runs this design locally with .NET Aspire: a YARP gateway, a
+core, a sales and a worker pool, RabbitMQ, Redis and PostgreSQL.
 
 ## How a request flows
 
@@ -84,7 +92,7 @@ Migrations run once per release as a pre-deploy job, never at startup on every r
 | Common diagram mistake | Here |
 | --- | --- |
 | CDN drawn behind the load balancer | The client loads static files from the CDN directly |
-| A load balancer in front of the gateway *and* the gateway balancing again | One edge layer; YARP balances across a pool's replicas |
+| A load balancer in front of the gateway *and* the gateway balancing again | One edge layer; YARP balances across a pool's replicas, with one destination per replica (a single virtual IP pinned all traffic to one replica in the lab) |
 | Services calling each other through the public gateway | Direct internal calls only |
 | Two brokers for two groups of services | One logical bus |
 | A queue "writing" to storage | Consumers read the queue and write to storage |

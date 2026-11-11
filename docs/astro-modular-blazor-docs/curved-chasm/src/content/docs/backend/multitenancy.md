@@ -2,7 +2,7 @@
 title: Multitenancy across pools
 description: Resolve the tenant once at the gateway, carry it through every call and message, and choose where each tenant's data lives.
 sidebar:
-  order: 5
+  order: 6
 ---
 
 ## Resolve once, carry everywhere

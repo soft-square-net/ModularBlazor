@@ -69,7 +69,7 @@ UI shows "pending" states), contracts need versioning, and every pool needs its 
 | Traffic | Mechanism | Watch out for |
 | --- | --- | --- |
 | Client → gateway | Edge load balancer or ingress | Terminate TLS and run the WAF here |
-| Gateway → pool | YARP cluster per pool, by path prefix (`/sales/*`) | Health-check every destination |
+| Gateway → pool | YARP cluster per pool, by path prefix (`/sales/*`) | One destination per replica, health-checked. Behind a single connection-balanced address (a ClusterIP service), YARP's keep-alive connection pinned 100 % of traffic to one replica in the [lab](/backend/hybrid-lab/) |
 | Service → service (gRPC) | Client-side balancing or a service mesh | gRPC keeps long-lived HTTP/2 connections: a plain L4 Kubernetes Service sends every call to one pod. Use `Grpc.Net.Client` with a DNS resolver and a headless service, or Linkerd/Istio |
 | Messages | Competing consumers | See [load balancing messages](/backend/communication/#load-balancing-messages) |
 

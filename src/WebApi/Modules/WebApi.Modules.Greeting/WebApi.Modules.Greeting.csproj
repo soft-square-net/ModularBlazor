@@ -14,9 +14,12 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <!-- Shared with the host: compile against them, never ship them. -->
     <PackageReference Include="Carter" Version="10.0.0" ExcludeAssets="runtime" />
-    <ProjectReference Include="..\WebApi.Contracts\WebApi.Contracts.csproj" Private="false" ExcludeAssets="runtime" />
     <!-- Private dependency: loads into the module's own load context. -->
     <PackageReference Include="Humanizer.Core" Version="2.14.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\WebApi.Contracts\WebApi.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

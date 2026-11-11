@@ -1,0 +1,71 @@
+# Hybird: hybrid architecture lab (Aspire)
+
+A runnable model of the research **combined target architecture**. One image (`src/WebApi`) is deployed as several
+**module pools**, each configured by `Modules__Pool`, `Modules__Role` and `Modules__Enabled__N`. The pools sit behind a
+**YARP gateway** and share **RabbitMQ**, **Redis** and **PostgreSQL** (tenant store plus per-tenant databases). Every
+replica exports OpenTelemetry to the Aspire dashboard.
+
+```bash
+dotnet run --project src/Aspire/Hybird --launch-profile http
+```
+
+| Resource | What it is |
+|---|---|
+| `gateway` (http://localhost:5080) | YARP. `/api/sales/**` and `/api/greeting/**` go to the sales pool; everything else goes to core. `/pools/{core\|sales\|worker}/**` reaches one pool directly (lab only). |
+| `core-1..2` | Core pool, Role=Api, modules: identity, workflow, inventory |
+| `sales-1..4` | Sales pool, Role=Api, modules: sales, greeting (the sample module stands in for Sales) |
+| `worker-1..2` | Worker pool, Role=Worker: modules load (services, consumers) but get no routes, and there is no public route |
+| `broker` | RabbitMQ with the management UI |
+| `redis` | Cache, locks, Data Protection keys, rate-limit counters |
+| `tenant-data` | PostgreSQL: `TenantStore` (HybirdTenants), `tenant-acme`, `tenant-globex`, plus pgAdmin |
+
+`GET /api/pool`, or `GET /pools/{pool}/api/pool`, shows which pool, role and replica answered, and which
+connections it was wired to.
+
+## Verified
+
+- **Gateway balancing (L7):** the gateway balances **per request** across replicas. With 12 requests each: core 6/6, sales 3/3/3/3, worker 6/6.
+- **Wiring:** every replica receives `broker`, `redis` and `TenantStore` connection strings.
+- **Pool rules:** each pool applies only the modules it enables. Activating `greeting` through a core replica made all 4 sales replicas load it and map routes, made both workers load it without routes, and left core unloaded.
+- **Broadcast convergence:** install, activate, deactivate, settings, unload and uninstall made through **one** replica converged on all 8 replicas. Every replica binds its own queue to `modules.state` (8 bindings).
+- **Zero-downtime swap:** a re-install (upgrade) plus a settings change under load gave **300 of 300 requests 200**. The new settings were live on every replica afterwards.
+
+## Module state across replicas
+
+Module state uses one shared catalog plus a broadcast:
+
+```
+admin call ─► any replica ─► catalog (modules.json + packages, cross-process lock): desired state per module
+                    │
+                    ├─► SyncAsync here
+                    └─► RabbitMQ fanout "modules.state" ─► every other replica ─► SyncAsync
+```
+
+- **Desired state:**
+  - `Active`: loaded, with routes in Api pools.
+  - `Inactive`: loaded, no routes.
+  - `Installed`: unloaded.
+  - Removed: unloaded.
+- **Only enabled modules:** a pool applies only the modules in `Modules__Enabled`.
+- **Swap instead of restart:** a newer `InstalledAt` (re-install) or changed settings makes a replica load a fresh copy. The fresh copy's routes replace the old ones in one update, and only then is the old copy released, so there is no 404 window.
+- **The catalog is the source of truth:** the message only says "something changed", so a lost message is repaired by the next one, or by the sync on startup and on subscribe.
+- **Released copies collect late:** old copies often appear under `/api/admin/modules/unloading` for a while after the swap. Heap dumps later showed only the active copy in each replica.
+
+The production version is the same shape, with the catalog in the modules table instead of `modules.json`.
+
+## Design notes found while building it
+
+- **Replicas are separate resources, not `WithReplicas`.**
+  - Behind Aspire's replica proxy (like a Kubernetes ClusterIP service), YARP sees one address. Its pooled keep-alive connection then pinned **100 %** of traffic to a single replica, which was measured.
+  - Aspire doesn't allow replicas without that proxy.
+  - Addressing each replica directly is what the production setup should do as well: YARP or the mesh gets pod endpoints (a headless service or service discovery), not a connection-balanced VIP. This is the same rule as for gRPC.
+- **Admin calls reach one replica, so state must be broadcast.**
+  - Before the broadcast, an install or activate through the gateway reached one replica, and `/api/greeting` returned 404 on 3 of 4 sales replicas.
+  - Hence the shared catalog plus `ModuleStateChanged` above.
+
+## Not modelled locally
+
+- **Client:** the CDN for the Blazor WASM `_framework` files, and the client itself (see `src/Aspire/Host`).
+- **Edge:** TLS and the WAF.
+- **Gateway:** JWT validation, rate limiting and tenant resolution are described in the research but not configured yet.
+- **Scaling:** autoscaling (the sales HPA) and scaling the worker pool on queue lag (KEDA).

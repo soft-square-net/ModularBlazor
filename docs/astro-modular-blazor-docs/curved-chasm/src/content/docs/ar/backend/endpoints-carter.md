@@ -2,7 +2,7 @@
 title: "نقاط النهاية: Minimal API مع Carter"
 description: لماذا تستخدم الواجهة Minimal API مع وحدات Carter، وليس FastEndpoints، حين تحمل الوحدات والتطبيق يعمل.
 sidebar:
-  order: 6
+  order: 7
 ---
 
 **القرار:** نبقي على **Minimal API مع Carter**. كل وحدة تعرض نقاط نهايتها في أصناف `ICarterModule`. ولا نضيف

@@ -30,23 +30,30 @@ Observability: OpenTelemetry traces, metrics and logs, tagged with tenant and co
 
 ## مجموعات من صورة واحدة
 
-يقرأ كل نشر للصورة إعدادين:
+يقرأ كل نشر للصورة ثلاثة إعدادات (مطبقة في النموذج الأولي `src/WebApi`):
 
 | الإعداد | القيم | الأثر |
 | --- | --- | --- |
-| `EnabledModules` | `Identity,Workflow,Inventory` أو `*` | الوحدات التي تحملها هذه المجموعة وتربط مساراتها وتسجل خدماتها |
-| `Role` | `Api` أو `Worker` أو كلاهما | `Api` يربط نقاط نهاية HTTP؛ و`Worker` يشغل مستهلكي الرسائل والمهام المجدولة |
+| `Modules:Pool` | `core` أو `sales` أو `worker` أو غيرها | اسم المجموعة، ويظهر في الحالة والسجلات ورسائل البث |
+| `Modules:Enabled` | معرفات وحدات، مثل `identity` و`workflow` و`inventory`؛ والفارغة تعني الكل | الوحدات التي تحملها هذه المجموعة وتربط مساراتها وتسجل خدماتها |
+| `Modules:Role` | `Api` أو `Worker` | `Api` يربط نقاط نهاية HTTP؛ و`Worker` يحمل الوحدات لمستهلكي رسائلها ومهامها المجدولة، دون مسارات |
 
 ```text
-Scenario A           Core  = EnabledModules: *      Role: Api,Worker   ×N
-Extract one module   Core  = everything but Sales   Role: Api          ×2
-                     Sales = Sales                  Role: Api          ×4
-                     Worker= *                      Role: Worker       ×2
+Scenario A           all    = Enabled: (all)              Role: Api      ×N
+Extract one module   core   = Enabled: all but sales      Role: Api      ×2
+                     sales  = Enabled: sales              Role: Api      ×4
+                     worker = Enabled: (all)              Role: Worker   ×2
 ```
 
-لنقل وحدة إلى مجموعتها الخاصة: أضف نشرا بقيمة `EnabledModules` الخاصة بها، وأضف عنقود YARP لمسارها، وبدل تسجيل
+لنقل وحدة إلى مجموعتها الخاصة: أضف نشرا بقيمة `Modules:Enabled` الخاصة بها، وأضف عنقود YARP لمسارها، وبدل تسجيل
 عقدها في المجموعات الأخرى من التنفيذ الداخلي إلى عميل gRPC. لا تتغير شيفرة الوحدة. ومكان هذا التبديل هو سجل
 وحدات المضيف (`HostModules`).
+
+تقرأ كل المجموعات **فهرس الوحدات نفسه**. أي تغيير في دورة الحياة عبر أي نسخة يكتب في الفهرس ويبث على الوسيط، وتطبقه
+كل نسخة بحسب قائمة `Enabled` و`Role` الخاصين بها؛ انظر [وحدات أثناء التشغيل](/ar/backend/runtime-modules/).
+
+يشغل [مختبر البنية الهجينة](/ar/backend/hybrid-lab/) هذا التصميم محليا عبر .NET Aspire: بوابة YARP، ومجموعات core
+وsales والعمال، وRabbitMQ وRedis وPostgreSQL.
 
 ## مسار الطلب
 
@@ -83,7 +90,7 @@ Extract one module   Core  = everything but Sales   Role: Api          ×2
 | خطأ شائع في المخططات | هنا |
 | --- | --- |
 | رسم CDN خلف موازن الحمل | يحمل العميل الملفات الثابتة من CDN مباشرة |
-| موازن حمل أمام البوابة *و*بوابة توازن مرة أخرى | طبقة طرفية واحدة؛ ويوازن YARP بين نسخ المجموعة |
+| موازن حمل أمام البوابة *و*بوابة توازن مرة أخرى | طبقة طرفية واحدة؛ ويوازن YARP بين نسخ المجموعة، بوجهة لكل نسخة (العنوان الافتراضي الواحد ثبت كل الحركة على نسخة واحدة في المختبر) |
 | خدمات تستدعي بعضها عبر البوابة العامة | استدعاءات داخلية مباشرة فقط |
 | وسيطان لمجموعتين من الخدمات | ناقل منطقي واحد |
 | طابور "يكتب" إلى التخزين | المستهلكون يقرؤون الطابور ويكتبون إلى التخزين |

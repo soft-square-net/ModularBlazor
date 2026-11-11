@@ -1,6 +1,6 @@
 ---
 title: Runtime modules API
-description: Admin endpoints, manifest fields and packaging rules for modules loaded while the API runs.
+description: Admin endpoints, pool configuration, manifest fields and packaging rules for modules loaded while the API runs.
 sidebar:
   order: 3
 ---
@@ -9,29 +9,68 @@ The runtime module prototype lives in `src/WebApi`. How it works: [Runtime modul
 
 ## Admin endpoints
 
+A lifecycle call can reach any replica. It changes the module's desired state in the shared catalog, applies it on
+that replica, and broadcasts the change so every replica of every pool converges. **The response describes the
+replica that answered.**
+
 | Method and path | Does |
 | --- | --- |
-| `GET /api/admin/modules` | Lists registered modules: desired state, loaded or not, live routes |
-| `POST /api/admin/modules` | **Install**: multipart form field `package` with a `.dll`, `.zip` or `.nupkg` |
-| `POST /api/admin/modules/{id}/activate` | Load if needed, build services, map routes |
-| `POST /api/admin/modules/{id}/deactivate` | Remove routes; the module stays loaded |
-| `POST /api/admin/modules/{id}/unload` | Remove routes, dispose services, unload assemblies |
-| `PUT /api/admin/modules/{id}/settings` | Replace settings (JSON object); applied on the next load |
-| `DELETE /api/admin/modules/{id}` | Unload, delete the package, remove the registration |
-| `GET /api/admin/modules/unloading` | Unloaded modules whose memory is not freed yet |
+| `GET /api/admin/modules` | Lists registered modules as this replica sees them |
+| `POST /api/admin/modules` | **Install**: multipart form field `package` with a `.dll`, `.zip` or `.nupkg`. Re-installing an existing id is an upgrade: it keeps the state and swaps every replica to the new version |
+| `POST /api/admin/modules/{id}/activate` | Desired state `Active`: load, build services, map routes (routes only in `Api` pools) |
+| `POST /api/admin/modules/{id}/deactivate` | Desired state `Inactive`: remove routes; loaded modules stay loaded |
+| `POST /api/admin/modules/{id}/unload` | Desired state `Installed`: remove routes, dispose services, unload assemblies everywhere |
+| `PUT /api/admin/modules/{id}/settings` | Replace settings (JSON object); replicas that have the module loaded swap to a reconfigured copy |
+| `DELETE /api/admin/modules/{id}` | Unload everywhere, delete the package, remove the registration |
+| `GET /api/admin/modules/unloading` | Unloaded or swapped-out copies on this replica whose memory is not freed yet |
 
-Errors are problem details: `400` for an invalid package or manifest, `404` for an unknown module, `409` when a
-module is still loaded or its route prefix is taken.
+Errors are problem details: `400` for an invalid package or manifest, `404` for an unknown module, `409` when the
+route prefix is used by another module, `500` when a package's files are missing.
 
 Module endpoints are served under `/api/{RoutePrefix}`.
 
+### Status response
+
+`GET /api/admin/modules`, activate and deactivate return `ModuleStatus`:
+
+| Field | Meaning |
+| --- | --- |
+| `module` | The catalog record: id, name, version, route prefix, entry assembly, settings, `desiredState`, `installedAt` |
+| `pool` | `Modules:Pool` of the replica that answered |
+| `instance` | `machine:process` of that replica |
+| `enabledInPool` | Whether that pool applies this module (`Modules:Enabled`) |
+| `loaded` | Whether the module is loaded on that replica |
+| `routes` | Its live routes on that replica, e.g. `GET /api/greeting/{name}` |
+
+Unload and uninstall return `{ id, unloaded, gcPasses, note }` for the answering replica.
+
+## Other host endpoints
+
+| Path | Does |
+| --- | --- |
+| `GET /api/pool` | Pool, role, enabled modules and instance of the replica that answered, plus the names (never the values) of its connection strings |
+| `GET /health` | Health check used by the gateway and the orchestrator |
+| `GET /openapi/v1.json` | OpenAPI document (Development), including active module routes |
+
 ## States
 
-| State | Meaning | Restored on startup |
+| State | Meaning | On startup |
 | --- | --- | --- |
-| `Installed` | Package stored, manifest registered, nothing loaded | No |
-| `Active` | Loaded, services built, routes live | Yes, activated again |
-| `Inactive` | Routes removed; may still be loaded until unloaded | No |
+| `Installed` | Package stored, manifest registered, nothing loaded | Stays unloaded |
+| `Active` | Loaded, services built, routes live in `Api` pools | Loaded and routed again |
+| `Inactive` | Routes removed; stays loaded where it was loaded | Not loaded |
+
+## Configuration
+
+| Key | Default | Meaning |
+| --- | --- | --- |
+| `Modules:Path` | `App_Data/modules` | Catalog folder (`modules.json`, lock file, packages). Every replica of every pool must point to the same folder |
+| `Modules:RoutePrefix` | `/api` | Base route for module endpoints |
+| `Modules:Pool` | `all` | Pool name |
+| `Modules:Role` | `Api` | `Api` maps routes; `Worker` loads modules without routes |
+| `Modules:Enabled` | empty (all) | Module ids this pool applies, e.g. `Modules__Enabled__0=sales` |
+| `ConnectionStrings:broker` | none | RabbitMQ connection; when set, lifecycle changes are broadcast on the `modules.state` fanout exchange |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | none | When set, traces, metrics and logs are exported over OTLP (the Aspire dashboard sets it) |
 
 ## Contract
 
@@ -54,7 +93,7 @@ public sealed record ModuleManifest(string Id, string Name, string Version, stri
 | `Id` | Lowercase `a-z`, `0-9`, `.`, `-`; stable across versions |
 | `Version` | Letters, digits, `.`, `+`, `-` |
 | `RoutePrefix` | Same rule as `Id`; unique among installed modules |
-| `DefaultSettings` | Flat configuration keys (`Section:Key`); copied into the registration on install |
+| `DefaultSettings` | Flat configuration keys (`Section:Key`); copied into the catalog on install |
 
 A package contains **exactly one** public, non-abstract `IRuntimeModule` with a parameterless constructor.
 Endpoints come from its `ICarterModule` classes. Keyed services are not supported yet.
@@ -89,6 +128,8 @@ was built against.
 
 ## Try it
 
+**Single instance:**
+
 ```bash
 dotnet build src/WebApi.Modules.Greeting
 dotnet run --project src/WebApi --launch-profile http
@@ -103,3 +144,6 @@ curl http://localhost:5298/api/greeting/john_doe
 ```
 
 `src/WebApi/WebApi.http` has every request.
+
+**Pools and replicas:** run the [Hybrid architecture lab](/backend/hybrid-lab/) and send the same requests to the
+gateway, `http://localhost:5080`.

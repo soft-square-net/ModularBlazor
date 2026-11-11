@@ -61,6 +61,7 @@
   </Folder>
   <Folder Name="/src/Aspire/">
     <Project Path="src/Aspire/Host/Host.csproj" />
+    <Project Path="src/Aspire/Hybird/Hybird.csproj" />
   </Folder>
   <Folder Name="/src/migrations/">
     <Project Path="src/migrations/MySql/MySql.csproj" />
@@ -78,9 +79,12 @@
     <Project Path="modules/client/Module.Reports/Module.Reports.csproj" />
     <Project Path="modules/client/Module.ToDo/Module.ToDo.csproj" />
   </Folder>
-  <Folder Name="/src/web/">
-    <Project Path="src/WebApi.Contracts/WebApi.Contracts.csproj" />
-    <Project Path="src/WebApi.Modules.Greeting/WebApi.Modules.Greeting.csproj" />
-    <Project Path="src/WebApi/WebApi.csproj" />
+  <Folder Name="/src/WebApi/">
+    <Project Path="src/WebApi/WebApi.Contracts/WebApi.Contracts.csproj" />
+    <Project Path="src/WebApi/WebApi/WebApi.csproj" />
   </Folder>
+  <Folder Name="/src/WebApi/Modules/">
+    <Project Path="src/WebApi/Modules/WebApi.Modules.Greeting/WebApi.Modules.Greeting.csproj" />
+  </Folder>
+  <Folder Name="/src/WebApi/Modules/Core/" />
 </Solution>

@@ -31,6 +31,16 @@ Edge load balancer + YARP gateway        TLS, JWT, rate limit, tenant resolution
    OpenTelemetry: traces, metrics, logs (tenant + correlation ids) across everything
 ```
 
+## أين تعيش في المستودع
+
+| المسار | ما هو |
+| --- | --- |
+| `src/api/ModularBlazor.Host` | مضيف الواجهة الإنتاجي ووحداته المدمجة (`HostModules`) |
+| `src/WebApi` | النموذج الأولي لوحدات التشغيل: صورة واحدة تعمل كأي مجموعة |
+| `src/WebApi.Contracts` | `IRuntimeModule` و`ModuleManifest`، مشتركان بين المضيف وكل وحدة تشغيل |
+| `src/WebApi.Modules.Greeting` | وحدة تشغيل نموذجية، ترفع كحزمة |
+| `src/Aspire/Hybird` | مختبر Aspire: بوابة، وثلاث مجموعات، وRabbitMQ وRedis وPostgreSQL |
+
 ## اقرأ بهذا الترتيب
 
 | الصفحة | تجيب عن |
@@ -38,9 +48,10 @@ Edge load balancer + YARP gateway        TLS, JWT, rate limit, tenant resolution
 | [التواصل](/ar/backend/communication/) | متى تستدعي ومتى ترسل رسالة، وكيف تجعل الرسائل موثوقة |
 | [سيناريوهات النشر](/ar/backend/deployment-scenarios/) | تطبيق موحد بنسخ متعددة أم خدمات منفصلة، وما يحتاجه كل منهما ليكون آمنا |
 | [البنية المستهدفة](/ar/backend/target-architecture/) | التصميم المجمع: البوابة ومجموعات الوحدات والوسيط وRedis والمراقبة |
+| [مختبر البنية الهجينة](/ar/backend/hybrid-lab/) | البنية المستهدفة تعمل محليا عبر .NET Aspire، وما قاسته |
 | [تعدد المستأجرين](/ar/backend/multitenancy/) | كيف ينتقل المستأجر عبر الاستدعاءات والرسائل، وأين تعيش بياناته |
 | [نقاط النهاية: Minimal API مع Carter](/ar/backend/endpoints-carter/) | لماذا Minimal API مع Carter وليس FastEndpoints |
-| [وحدات أثناء التشغيل](/ar/backend/runtime-modules/) | كيف تثبت وحدة وتفعل وتخدم والواجهة تعمل |
+| [وحدات أثناء التشغيل](/ar/backend/runtime-modules/) | كيف تثبت وحدة وتفعل وتخدم والواجهة تعمل، على كل نسخة في كل مجموعة |
 | [تفريغ وحدات التشغيل](/ar/backend/runtime-module-unloading/) | ما يلزم لتحرير ذاكرة وحدة، مقيسا بتفريغات الذاكرة |
 
 نقاط نهاية الإدارة وقواعد التحزيم في [مرجع واجهة وحدات التشغيل](/ar/reference/runtime-modules-api/).

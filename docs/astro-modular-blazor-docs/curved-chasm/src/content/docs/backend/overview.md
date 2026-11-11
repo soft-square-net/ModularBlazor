@@ -33,6 +33,16 @@ Edge load balancer + YARP gateway        TLS, JWT, rate limit, tenant resolution
    OpenTelemetry: traces, metrics, logs (tenant + correlation ids) across everything
 ```
 
+## Where it lives in the repository
+
+| Path | What |
+| --- | --- |
+| `src/api/ModularBlazor.Host` | The production API host and its built-in modules (`HostModules`) |
+| `src/WebApi` | Runtime module prototype: one image that runs as any pool |
+| `src/WebApi.Contracts` | `IRuntimeModule` and `ModuleManifest`, shared by the host and every runtime module |
+| `src/WebApi.Modules.Greeting` | Sample runtime module, uploaded as a package |
+| `src/Aspire/Hybird` | Aspire lab: gateway, three pools, RabbitMQ, Redis, PostgreSQL |
+
 ## Read in this order
 
 | Page | Answers |
@@ -40,9 +50,10 @@ Edge load balancer + YARP gateway        TLS, JWT, rate limit, tenant resolution
 | [Communication](/backend/communication/) | When to call, when to send a message, and how to make messages reliable |
 | [Deployment scenarios](/backend/deployment-scenarios/) | Replicated monolith or separate services, and what each needs to be safe |
 | [Target architecture](/backend/target-architecture/) | The combined design: gateway, module pools, broker, Redis, observability |
+| [Hybrid architecture lab](/backend/hybrid-lab/) | The target architecture running locally with .NET Aspire, and what it measured |
 | [Multitenancy](/backend/multitenancy/) | How the tenant travels through calls and messages, and where tenant data lives |
 | [Endpoints: Minimal API + Carter](/backend/endpoints-carter/) | Why Minimal API + Carter, and not FastEndpoints |
-| [Runtime modules](/backend/runtime-modules/) | How a module is installed, activated and served while the API runs |
+| [Runtime modules](/backend/runtime-modules/) | How a module is installed, activated and served while the API runs, on every replica of every pool |
 | [Unloading runtime modules](/backend/runtime-module-unloading/) | What it takes to free a module's memory, measured with heap dumps |
 
 The admin endpoints and packaging rules are in the [runtime modules API reference](/reference/runtime-modules-api/).

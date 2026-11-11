@@ -1,0 +1,26 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.6.4">
+
+  <!--
+    Hybrid architecture lab: the research target architecture as a runnable Aspire model.
+    Gateway (YARP) -> module pools (one WebApi image, EnabledModules + Role per pool, replicas)
+    -> broker (RabbitMQ), Redis, tenant data (PostgreSQL); OpenTelemetry into the Aspire dashboard.
+  -->
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <UserSecretsId>modularblazor-hybird-apphost</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Keep these in step with the Aspire SDK version above. -->
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.6.5" />
+    <PackageReference Include="Aspire.Hosting.RabbitMQ" Version="13.6.5" />
+    <PackageReference Include="Aspire.Hosting.Redis" Version="13.6.5" />
+    <PackageReference Include="Aspire.Hosting.Yarp" Version="13.6.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\WebApi\WebApi\WebApi.csproj" />
+  </ItemGroup>
+
+</Project>
