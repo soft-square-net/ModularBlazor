@@ -51,7 +51,7 @@ registerMessages('ar', arabic); // MudTail's own UI in Arabic
 export { getDirection, isRtl, setDirection, toPhysicalSide } from './core/direction.js';
 
 // Declarative behaviours for rendered markup (data-mud="…", data-mud-reveal)
-export { autoInit, registerBehavior, attachBehavior, behaviorNames } from './behaviors/autoInit.js';
+export { autoInit, registerBehavior, unregisterBehavior, attachBehavior, behaviorNames } from './behaviors/autoInit.js';
 export { openLightbox } from './behaviors/lightbox.js';
 export { prefersReducedMotion } from './behaviors/motion.js';
 
@@ -66,7 +66,7 @@ export {
 } from './datatable/query.js';
 
 // Icons
-export { getIconSvg } from './core/icons.js';
+export { getIconSvg, registerIcons, unregisterIcons, hasIcon } from './core/icons.js';
 
 // Components
 export { createMudButton } from './components/MudButton.js';
@@ -102,3 +102,13 @@ export {
   createRecipe, normalizeRecipe, scaleEdit, matchSource, fingerprint, RecipeError, RECIPE_TYPE, RECIPE_VERSION,
 } from './image-editor/recipe.js';
 export { renderRecipe, renderOutputs } from './image-editor/outputs.js';
+
+// Plugins: your own components, behaviours, icons, texts, styles and tokens, for vanilla JS and Blazor alike
+export {
+  MUDTAIL_VERSION, PluginError, definePlugin, use, usePlugins, loadPlugin, removePlugin, getPlugin, hasPlugin, listPlugins,
+  registerComponent, createComponent, hasComponent, componentNames as pluginComponentNames, pluginTailwindCss,
+  setPluginStyleLayer, satisfies,
+} from './core/plugins.js';
+import { setPluginHost } from './core/plugins.js';
+import * as mudtail from './index.js';
+setPluginHost(mudtail); // runtime-loaded plugins get the whole API as ctx.mudtail

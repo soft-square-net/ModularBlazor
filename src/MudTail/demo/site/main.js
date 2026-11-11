@@ -3,7 +3,9 @@
 import '../i18n/index.js'; // first: sets the language (and direction) before anything renders
 import '../../src/styles/mudtail.scss';
 import '../styles/demo.css';
-import { initTheme, autoInit, setDirection, getDirection, getLocale, getIconSvg } from 'mudtail';
+import { initTheme, autoInit, setDirection, getDirection, getLocale, getIconSvg, use } from 'mudtail';
+import animator from 'mudtail/animator/player'; // player-only edition: a site plays scenes, it does not edit them
+import { sceneFromTemplate, serializeScene } from '../../src/animator/index.js'; // demo only: builds the sample scene
 import { languageButton } from '../i18n/index.js';
 import { art, SITE_NAME, NAV, BREAKING, HERO, LATEST, MOST_READ, MATCHES, TABLE, GALLERY, SPEED } from './data.js';
 
@@ -180,6 +182,8 @@ function page() {
         ${HERO.slice(1).map((a, i) => articleCard(a, i + 1)).join('')}
       </section>
 
+      ${animatedFeature()}
+
       <div class="mud-split mud-section" id="latest">
         <section>
           <div class="mud-section__header"><h2 class="mud-section__title">Latest</h2><a class="mud-section__more" href="#">All news</a></div>
@@ -236,9 +240,20 @@ function page() {
   </div>`;
 }
 
+// Animated feature: a scene made in the Animator Studio, played by data-mud="animator-scene" (inline JSON here; a
+// Razor page would point data-src at the saved .mudscene.json). The player picks Desktop / Tablet / Mobile by width.
+function animatedFeature() {
+  const scene = serializeScene(sceneFromTemplate('slideshow'), { pretty: false }).replace(/</g, '\\u003c');
+  return `
+      <section class="mud-section" aria-label="Animated feature">
+        <div data-mud="animator-scene" data-label="Today in pictures"><script type="application/json">${scene}</script></div>
+      </section>`;
+}
+
 // ---------- Boot ----------
 
 initTheme();
+use(animator); // adds the animator-scene behaviour before autoInit runs
 const root = document.getElementById('root');
 root.innerHTML = page();
 autoInit(document.body);

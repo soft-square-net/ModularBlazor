@@ -197,10 +197,18 @@ export class NavigationSidebar {
       </button>`;
   }
 
-  /** A collapsible sub-group (e.g. Components ▸ Forms). It opens by itself when one of its pages is shown. */
+  /**
+   * A collapsible sub-group (e.g. Components ▸ Forms, Plugins). It opens by itself when navigation shows one of its
+   * pages, once per page, so the reader can still collapse it while that page is open.
+   */
   renderGroup(group, isMini) {
-    const hasActive = group.children.some((c) => this.isItemActive(c));
-    if (hasActive) this.expandedGroups.add(group.id);
+    const active = group.children.find((c) => this.isItemActive(c));
+    const hasActive = !!active;
+    this.autoOpened ??= new Map(); // group id -> the page it was opened for
+    if (active && this.autoOpened.get(group.id) !== active.id) {
+      this.expandedGroups.add(group.id);
+      this.autoOpened.set(group.id, active.id);
+    } else if (!active) this.autoOpened.delete(group.id);
     const open = this.expandedGroups.has(group.id) && !isMini;
     const listId = `nav-group-${group.id}`;
     return `

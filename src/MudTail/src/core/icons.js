@@ -23,6 +23,8 @@ import {
   ArrowUpRight,
   Pipette,
   Layers,
+  Puzzle,
+  Timer,
   Palette,
   LoaderCircle,
   GripVertical,
@@ -158,13 +160,45 @@ const ICON_MAP = {
   arrowUpRight: ArrowUpRight,
   pipette: Pipette,
   layers: Layers,
+  plugin: Puzzle,
+  timer: Timer,
 };
+
+/**
+ * Adds icons (or replaces them): { name: lucideIconNode | '<path d="…"/>…' }. A string is the inner SVG markup of a
+ * 24×24 stroke icon, like Lucide's. Returns the names that were added. Plugins use it through ctx.icons().
+ */
+export function registerIcons(icons) {
+  const names = [];
+  for (const [name, def] of Object.entries(icons ?? {})) {
+    if (!Array.isArray(def) && typeof def !== 'string') throw new Error(`MudTail: icon "${name}" must be a Lucide icon node or SVG markup`);
+    ICON_MAP[name] = def;
+    names.push(name);
+  }
+  return names;
+}
+
+/** Removes icons added with registerIcons (or restores the given previous definitions). */
+export function unregisterIcons(names, previous = {}) {
+  for (const name of names) {
+    if (previous[name]) ICON_MAP[name] = previous[name];
+    else delete ICON_MAP[name];
+  }
+}
+
+/** True when an icon with this name exists. */
+export function hasIcon(name) {
+  return Object.prototype.hasOwnProperty.call(ICON_MAP, name);
+}
 
 /**
  * Returns an SVG element for the requested icon name
  */
 export function getIconSvg(name, size = 18, className = '') {
   const iconDef = ICON_MAP[name];
+  if (typeof iconDef === 'string') {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-${name} ${className}">${iconDef}</svg>`;
+  }
   if (!iconDef || !Array.isArray(iconDef)) {
     return `<span class="icon-fallback">${name}</span>`;
   }

@@ -34,7 +34,32 @@ const registry = new Map([
  * factory(element) returns an object with dispose(), or null when the markup does not fit.
  */
 export function registerBehavior(name, factory) {
+  if (typeof factory !== 'function') throw new Error(`MudTail: behaviour "${name}" needs a factory function`);
+  const replaced = registry.has(name);
   registry.set(name, factory);
+  // Elements already on the page (e.g. rendered before a plugin loaded) get it too; a replaced one is re-attached.
+  for (const controller of running) {
+    if (replaced) controller.detach(name);
+    controller.refresh();
+  }
+}
+
+/**
+ * Removes a behaviour (or puts back `previous`, the factory it replaced). Its live instances are disposed; with
+ * `previous`, the elements get the previous behaviour again.
+ */
+export function unregisterBehavior(name, previous = null) {
+  if (previous) registry.set(name, previous);
+  else registry.delete(name);
+  for (const controller of running) {
+    controller.detach(name);
+    if (previous) controller.refresh();
+  }
+}
+
+/** The factory registered for a name, or null. */
+export function getBehavior(name) {
+  return registry.get(name) ?? null;
 }
 
 /** Names of the registered behaviours. */
@@ -55,6 +80,7 @@ export function attachBehavior(name, element) {
 }
 
 const controllers = new WeakMap();
+const running = new Set(); // live controllers, refreshed when a behaviour is registered later
 
 /** Attaches behaviours under `root` (default: document.body) and keeps them in sync. Returns { refresh, dispose }. */
 export function autoInit(root = document.body) {
@@ -118,15 +144,26 @@ export function autoInit(root = document.body) {
   const controller = {
     /** Re-scans root, e.g. after markup was inserted outside MutationObserver's reach. */
     refresh() { scan(root); },
+    /** Disposes every instance of one behaviour (used when it is unregistered or replaced). */
+    detach(name) {
+      for (const [el, byName] of instances) {
+        if (!byName.has(name)) continue;
+        safeDispose(byName.get(name));
+        byName.delete(name);
+        if (!byName.size) instances.delete(el);
+      }
+    },
     dispose() {
       observer.disconnect();
       for (const byName of instances.values()) for (const instance of byName.values()) safeDispose(instance);
       instances.clear();
       reveal.dispose();
       controllers.delete(root);
+      running.delete(controller);
     },
   };
   controllers.set(root, controller);
+  running.add(controller);
   return controller;
 }
 

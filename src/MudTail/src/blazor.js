@@ -47,7 +47,14 @@ import {
   createStatCard,
   MudImageEditor,
   renderRecipe,
+  loadPlugin as libLoadPlugin,
+  removePlugin as libRemovePlugin,
+  getPlugin,
+  hasPlugin,
+  listPlugins,
+  pluginComponentNames,
 } from './index.js';
+import { buildComponent, hasComponent, setHandleTracker, reserveComponentNames } from './core/plugins.js';
 
 export * from './index.js';
 
@@ -85,6 +92,9 @@ function track(handle) {
   live.add(handle);
   return handle;
 }
+
+// Handles plugins create with ctx.handle() join this module's lifecycle: dispose() and activeCount() include them.
+setHandleTracker((handle) => { live.add(handle); const inner = handle.dispose; handle.dispose = () => { live.delete(handle); inner(); }; });
 
 /** Disposes everything created through this module (components, behaviours, observers). Returns how many. */
 export function dispose() {
@@ -558,11 +568,75 @@ export function pageLoading(state = true) {
  */
 export function create(name, host, options = {}, dotNetRef = null) {
   const factory = factories[name];
-  if (!factory) throw new Error(`MudTail: unknown component "${name}". Known: ${Object.keys(factories).join(', ')}`);
-  return track(factory(host, options || {}, emitter(dotNetRef)));
+  if (factory) return track(factory(host, options || {}, emitter(dotNetRef)));
+  if (hasComponent(name)) return track(buildComponent(name, host, options || {}, emitter(dotNetRef))); // from a plugin
+  throw new Error(`MudTail: unknown component "${name}". Known: ${componentNames().join(', ')}`);
 }
 
-/** Names create() accepts. */
+/** Names create() accepts: the built-in components, then those plugins added. */
 export function componentNames() {
-  return Object.keys(factories);
+  return [...Object.keys(factories), ...pluginComponentNames()];
+}
+
+reserveComponentNames(Object.keys(factories));
+
+// ───────────── plugins ─────────────
+//
+//   var info = await mud.InvokeAsync<PluginInfo>("loadPlugin", "./_content/My.Plugins/countdown.plugin.js", new { locale = "ar" });
+//   var countdown = await mud.InvokeAsync<IJSObjectReference>("create", "countdown", host, options, dotNetRef);
+//   var api = await mud.InvokeAsync<IJSObjectReference>("plugin", "countdown");   // the plugin's own API
+//   await api.InvokeVoidAsync("pauseAll");
+
+/**
+ * Loads a plugin module from a URL (resolved against the page: "./_content/<Assembly>/x.plugin.js") and installs it
+ * with `options`. Resolves to { name, version, description, components, behaviors } once its setup has finished.
+ * Loading the same plugin again is harmless.
+ */
+export async function loadPlugin(url, options = null) {
+  const record = await libLoadPlugin(url, options ?? {});
+  return describePlugin(record.name);
+}
+
+/** Loads several plugins in order: [{ url, options }] (or plain URLs). Resolves to their descriptions. */
+export async function loadPlugins(list) {
+  const out = [];
+  for (const entry of list ?? []) out.push(typeof entry === 'string' ? await loadPlugin(entry) : await loadPlugin(entry.url, entry.options));
+  return out;
+}
+
+/** The plugin's API object (what its setup() returned), for C# to call: InvokeAsync<IJSObjectReference>("plugin", name). */
+export function plugin(name) {
+  if (!hasPlugin(name)) throw new Error(`MudTail: plugin "${name}" is not installed`);
+  return getPlugin(name) ?? {};
+}
+
+/** Calls one method of a plugin's API: InvokeAsync<T>("invokePlugin", "countdown", "remaining", "match-1"). */
+export function invokePlugin(name, method, ...args) {
+  const target = plugin(name);
+  if (typeof target[method] !== 'function') throw new Error(`MudTail: plugin "${name}" has no method "${method}"`);
+  return target[method](...args);
+}
+
+/** The installed plugins: [{ name, version, description, components, behaviors }]. */
+export function plugins() {
+  return listPlugins();
+}
+
+/** Removes a plugin and everything it registered (its live components too). force also removes plugins that need it. */
+export function removePlugin(name, force = false) {
+  return libRemovePlugin(name, { force: !!force });
+}
+
+/** Raises OnMudEvent("plugin", { action: 'installed' | 'removed', name, version }). Returns a handle with dispose(). */
+export function observePlugins(dotNetRef) {
+  const emit = emitter(dotNetRef);
+  const installed = (e) => emit('plugin', { action: 'installed', ...e.detail });
+  const removed = (e) => emit('plugin', { action: 'removed', ...e.detail });
+  window.addEventListener('mud-plugin-installed', installed);
+  window.addEventListener('mud-plugin-removed', removed);
+  return track({ dispose: () => { window.removeEventListener('mud-plugin-installed', installed); window.removeEventListener('mud-plugin-removed', removed); } });
+}
+
+function describePlugin(name) {
+  return listPlugins().find((p) => p.name === name) ?? null;
 }

@@ -27,6 +27,11 @@ export default defineConfig({
 					items: [{ autogenerate: { directory: 'guides' } }],
 				},
 				{
+					label: 'Backend architecture',
+					translations: { ar: 'البنية الخلفية' },
+					items: [{ autogenerate: { directory: 'backend' } }],
+				},
+				{
 					label: 'Reference',
 					translations: { ar: 'المرجع' },
 					items: [{ autogenerate: { directory: 'reference' } }],

@@ -1,0 +1,56 @@
+// Arabic: Plugins ▸ Countdown page (the plugin's own texts, Days, Hours…, come from the plugin's messages).
+export default {
+  messages: {
+    Overview: 'نظرة عامة',
+    Countdown: 'العدّ التنازلي',
+    Plugin: 'إضافة',
+    'A kick-off countdown from the sample <code>countdown</code> plugin (<code>demo/plugins/countdown.plugin.js</code>): a component, a <code>data-mud</code> behaviour and an API. Digits follow the language and the numerals setting, and change with a short GSAP animation (none with reduced motion).':
+      'عدّ تنازلي لضربة البداية من إضافة المثال <code>countdown</code> ‏(<code>demo/plugins/countdown.plugin.js</code>): مكوّن، وسلوك <code>data-mud</code>، وواجهة برمجية. تتبع الأرقام اللغة وإعداد الأرقام، وتتغير بحركة GSAP قصيرة (دون حركة عند تقليل الحركة).',
+    'Match header': 'رأس المباراة',
+    'Days, hours, minutes and seconds. <code>tick</code> fires every second with the time left, <code>done</code> once when it reaches zero.':
+      'أيام وساعات ودقائق وثوانٍ. يُطلق <code>tick</code> كل ثانية مع الوقت المتبقي، و<code>done</code> مرة واحدة عند الوصول إلى الصفر.',
+    'demo.cd.waiting': 'تظهر الأحداث هنا.',
+    'demo.cd.tick': 'tick رقم {count}: بقي {total} ثانية',
+    'demo.cd.doneEvent': 'done: المباراة مباشرة الآن.',
+    'Compact, in a fixtures list': 'مضغوط، في قائمة المباريات',
+    "<code>size: 'sm'</code> and the <code>units</code> to show. Every countdown on the page shares one clock.":
+      "<code>size: 'sm'</code> و<code>units</code> المعروضة. وتتشارك كل العدّادات في الصفحة ساعة واحدة.",
+    'Ridgeway v Old Town': 'ريدجواي ضد أولد تاون',
+    'Coastal United v Northbridge': 'كوستال يونايتد ضد نورثبريدج',
+    'Harbour City v Ridgeway': 'هاربر سيتي ضد ريدجواي',
+    'demo.cd.kickoffIn': 'الانطلاق بعد',
+    'Kick-off in': 'الانطلاق بعد',
+    'Moving the kick-off': 'تغيير موعد الانطلاق',
+    '<code>setTarget(date)</code> restarts it; <code>remaining()</code> returns the time left.': 'يعيد <code>setTarget(date)</code> تشغيله؛ ويعيد <code>remaining()</code> الوقت المتبقي.',
+    'demo.cd.plus15': '+15 دقيقة',
+    'demo.cd.in10': 'بعد 10 ثوانٍ',
+    'demo.cd.delayed': 'انطلاق مؤجَّل',
+    'Delayed kick-off': 'انطلاق مؤجَّل',
+    'demo.cd.targetHint': 'غيّر موعد الانطلاق، أو اجعله بعد 10 ثوانٍ وشاهده يبدأ مباشرة.',
+    'demo.cd.moved': 'setTarget({time})',
+    'Behaviour on a rendered match card': 'السلوك على بطاقة مباراة جاهزة',
+    "Markup from the server or Blazor: the behaviour only sets <code>data-value</code> on the <code>[data-unit]</code> spans, and CSS shows it. The card uses Tailwind utilities made from the plugin's tokens.":
+      'ترميز من الخادم أو Blazor: يضبط السلوك <code>data-value</code> فقط على عناصر <code>[data-unit]</code>، ويعرضه CSS. وتستخدم البطاقة أدوات Tailwind مصنوعة من رموز الإضافة.',
+    "The plugin's API": 'واجهة الإضافة البرمجية',
+    "<code>getPlugin('countdown')</code> returns what the plugin's <code>setup()</code> returned.": "يعيد <code>getPlugin('countdown')</code> ما أعاده <code>setup()</code> في الإضافة.",
+    'Load the plugin once, then use it like a built-in component.': 'حمّل الإضافة مرة واحدة، ثم استخدمها كمكوّن مدمج.',
+    'Razor / C#': 'Razor / C#',
+    'Options': 'الخيارات',
+    'The target: an ISO date, a <code>Date</code> or a timestamp.': 'الموعد: تاريخ ISO أو <code>Date</code> أو طابع زمني.',
+    'The text above the digits (default: <em>Kick-off</em>, translated).': 'النص فوق الأرقام (افتراضيًا: <em>ضربة البداية</em>، مترجمًا).',
+    'Which of <code>days</code>, <code>hours</code>, <code>minutes</code>, <code>seconds</code> to show (default: all four). A hidden larger unit is folded into the largest one shown.':
+      'أيٌّ من <code>days</code> و<code>hours</code> و<code>minutes</code> و<code>seconds</code> يُعرض (افتراضيًا: الأربعة). وتُضمّ الوحدة الأكبر المخفية إلى أكبر وحدة معروضة.',
+    "<code>'sm'</code> for the compact version.": "<code>'sm'</code> للنسخة المضغوطة.",
+    'Events and methods': 'الأحداث والدوال',
+    'Every second: <code>{ days, hours, minutes, seconds, total }</code> (<code>total</code> in milliseconds).': 'كل ثانية: <code>{ days, hours, minutes, seconds, total }</code> (و<code>total</code> بالملّي ثانية).',
+    'Once, when it reaches zero; the label changes to <em>Live now</em>.': 'مرة واحدة عند الوصول إلى الصفر؛ ويتغير العنوان إلى <em>مباشر الآن</em>.',
+    'Move the target; the time left.': 'تغيير الموعد؛ والوقت المتبقي.',
+    'The root element; remove it and stop its clock.': 'العنصر الجذري؛ وإزالته وإيقاف ساعته.',
+    'On any element with <code>[data-unit="days|hours|minutes|seconds"]</code> children; their <code>data-value</code> is set, and <code>data-done</code> on the element at zero.':
+      'على أي عنصر له أبناء <code>[data-unit="days|hours|minutes|seconds"]</code>؛ يُضبط <code>data-value</code> فيها، و<code>data-done</code> على العنصر عند الصفر.',
+    '<code>animate: false</code> turns the digit animation off.': '<code>animate: false</code> يوقف حركة الأرقام.',
+    '<code>remaining(to)</code>, <code>format(to)</code>, <code>pauseAll()</code>, <code>resumeAll()</code>, <code>count()</code>.': '<code>remaining(to)</code>، <code>format(to)</code>، <code>pauseAll()</code>، <code>resumeAll()</code>، <code>count()</code>.',
+    '<code>--mud-countdown-digit-bg</code>, <code>--mud-countdown-digit-fg</code>, <code>--mud-countdown-accent</code>, <code>--mud-countdown-gap</code>.': '<code>--mud-countdown-digit-bg</code>، <code>--mud-countdown-digit-fg</code>، <code>--mud-countdown-accent</code>، <code>--mud-countdown-gap</code>.',
+    Tokens: 'الرموز',
+  },
+};

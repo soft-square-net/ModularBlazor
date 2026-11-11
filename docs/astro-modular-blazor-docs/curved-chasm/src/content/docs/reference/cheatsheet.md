@@ -56,3 +56,19 @@ sidebar:
 | `/app/modules/…` | module files, no fallback |
 | `/islands/…` | islands host (optional) |
 | `http://localhost:5100/api/…` | ModularBlazor.Host |
+
+## Keeping backend modules separable
+
+Check these before merging a module change, so the module can later move to its own pool
+([deployment scenarios](/backend/deployment-scenarios/#build-for-b-deploy-as-a)):
+
+| Rule | Check |
+| --- | --- |
+| Contracts only | References other modules only through their `*.Contracts` assemblies (architecture test in CI) |
+| Own data | Own schema and `DbContext`; no joins or transactions across modules |
+| Remote-ready calls | Async signatures, DTOs only, no entities or shared state across the contract |
+| Reliable messages | State changes publish through the outbox; consumers are idempotent (inbox) |
+| Real broker | Messages go through the broker even when both modules share a process |
+| Tenant everywhere | Tenant id in gRPC metadata and message headers |
+| Nothing local | No in-memory caches, timers or files that another replica would need |
+| Endpoints | `ICarterModule` classes; nothing registered only by startup scanning |

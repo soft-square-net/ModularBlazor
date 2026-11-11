@@ -9,8 +9,10 @@ import feedback from './feedback.js';
 import tree from './tree.js';
 import statHero from './statHero.js';
 import imageEditor from './imageEditor.js';
+import plugins from './plugins.js';
+import countdown from './countdown.js';
 
-const parts = [shell, ide, components, forms, site, feedback, tree, statHero, imageEditor];
+const parts = [shell, ide, components, forms, site, feedback, tree, statHero, imageEditor, plugins, countdown];
 
 export const messages = Object.assign({}, ...parts.map((p) => p.messages));
 export const patterns = parts.flatMap((p) => p.patterns ?? []);

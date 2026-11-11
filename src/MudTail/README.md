@@ -91,7 +91,7 @@ formatDate('2026-11-10', { dateStyle: 'long' });
 
 **Adding a language:** copy `src/locales/ar.js`, translate the values, and register it with `addMessages('<code>', pack)`.
 
-**The demo** has a language switch in the app bar and on the public site. It covers every page in English and Arabic: the dashboard, docs, IDE, all 38 component pages and the public site. Its pages are English HTML templates, so `demo/i18n` uses a catalog keyed by the English source text. Rendered views are translated as they appear, whole sentences at a time when they contain inline markup, so Arabic word order stays natural. Code samples and editors are never touched. Values built in code (column titles, sample data, dates) are localized where they are built. The Theme Studio drawer has a **Digits** choice (Auto, Western, Arabic-Indic). The demo applies it to its static numbers too, but leaves codes such as "P99" alone. Run `__i18nMissing()` in the browser console to list any text on the current page that is still untranslated.
+**The demo** has a language switch in the app bar and on the public site. It covers every page in English and Arabic: the dashboard, docs, IDE, all 40 component pages and the public site. Its pages are English HTML templates, so `demo/i18n` uses a catalog keyed by the English source text. Rendered views are translated as they appear, whole sentences at a time when they contain inline markup, so Arabic word order stays natural. Code samples and editors are never touched. Values built in code (column titles, sample data, dates) are localized where they are built. The Theme Studio drawer has a **Digits** choice (Auto, Western, Arabic-Indic). The demo applies it to its static numbers too, but leaves codes such as "P99" alone. Run `__i18nMissing()` in the browser console to list any text on the current page that is still untranslated.
 
 ## Right-to-left (RTL)
 
@@ -553,6 +553,101 @@ await _dock.InvokeVoidAsync("dispose");   // in DisposeAsync: also disposes the 
 
 The handle's methods are `addPanel(key, groupId?, zone?)`, `show`, `openDocument`, `close`, `activate`, `getPanelState`, `setPanelState`, `resetLayout`, `clearSaved`, `serialize`, `load` and `dispose`.
 
+## Plugins
+
+You can extend MudTail with your own components, `data-mud` behaviours, icons, texts, styles and design tokens, written in plain JavaScript with GSAP and Tailwind. A plugin is one object:
+- `use(plugin)` installs it.
+- `removePlugin(name)` undoes everything it registered and disposes its live components.
+
+A plugin's components work in plain JavaScript (`createComponent`) and in Blazor (`create`, with `OnMudEvent`), just like the built-in ones. The demo's Plugins page runs a complete example, a kick-off countdown (`demo/plugins/countdown.plugin.js`).
+
+```js
+// countdown.plugin.js imports nothing, so a bundler and a runtime loadPlugin(url) can both use it
+export default {
+  name: 'countdown',
+  version: '1.0.0',
+  requires: { mudtail: '^0.1.0' },                        // also: plugins: { other: '^2.0.0' } or ['other']
+  tokens: {                                               // --mud-countdown-* for the light and dark themes
+    'countdown-digit-bg': { light: '#1f2937', dark: '#e5e7eb' },
+    'countdown-accent': 'var(--mud-palette-primary)',
+    'countdown-gap': { value: '.375rem', tailwind: 'spacing' },
+  },
+  styles: '.mud-countdown__cell { background: var(--mud-countdown-digit-bg); }',   // goes in @layer components
+  icons: { stopwatch: '<circle cx="12" cy="14" r="8"/><path d="M12 10v4l2 2"/>' },
+  messages: { ar: { 'countdown.kickoff': 'ضربة البداية' } },
+  setup(ctx, options) {
+    const { mudtail, gsap } = ctx;                        // the whole API and GSAP
+    ctx.component('countdown', (host, opts, emit) => ({ setTarget() {}, dispose() {} }));
+    ctx.behavior('countdown', (el) => ({ dispose() {} })); // data-mud="countdown"
+    ctx.on('locale', () => {});                            // removed with the plugin
+    return { pauseAll() {}, resumeAll() {} };              // the plugin's API: getPlugin('countdown')
+  },
+};
+```
+
+```js
+import { use, createComponent, getPlugin, removePlugin } from 'mudtail';
+use(countdown, { animate: true });
+const match = createComponent('countdown', host, { to: kickOff }, { done: () => showToast('Kick-off!') });
+getPlugin('countdown').pauseAll();
+removePlugin('countdown');
+```
+
+- **Context:** `setup(ctx, options)` gets these:
+  - Registration: `component`, `behavior`, `icons`, `messages`, `styles`, `tokens`.
+  - Events: `on('theme' | 'locale' | 'direction' | anyWindowEvent, fn)` and `emit(event, detail)`, which raises `mud-plugin:<name>:<event>`.
+  - Shared services: `mudtail` (the whole API), `gsap`, `t`, and `plugin(name)` (another plugin's API).
+  - Clean-up: `signal`, an `AbortSignal` aborted when the plugin is removed, and `track(cleanup)`.
+  - For .NET: `emitter(dotNetRef)` and `handle(obj)`, whose handles the Blazor module's `dispose()` and `activeCount()` also cover.
+- **No `import 'mudtail'` in runtime plugins:** a plugin loaded from a URL can't resolve `'mudtail'`, because the browser has no bundler. Build plugins against `ctx.mudtail` and `ctx.gsap`, and the same file works in both setups.
+- **Async setup:** `setup` may return a promise. `use()` then returns at once, and `record.ready` resolves once setup finishes. `loadPlugin(url | module, options)` waits for that. If setup fails, everything the plugin had registered is rolled back.
+- **Safety rails:**
+  - `definePlugin` checks a definition when it is written, so unknown keys and bad names fail early.
+  - Built-in component names are reserved.
+  - A plugin that replaces a behaviour or icon puts the original back when removed.
+  - A plugin that others require can't be removed first unless you pass `{ force: true }`.
+- **Behaviours and existing markup:** a behaviour registered later also starts on elements already on the page. When it is removed, its live instances are disposed.
+- **Events:** `mud-plugin-installed` and `mud-plugin-removed` fire on `window`, with `{ name, version }` as the detail.
+
+### Plugins and Tailwind
+
+Plugin styles go inside `@layer components`, so Tailwind utilities still override them. You can change the layer with `setPluginStyleLayer`.
+
+Tailwind runs when the app is built, so an app adds each plugin's theme to its stylesheet once:
+
+```bash
+npx mudtail-plugin-css ./plugins/countdown.plugin.js --source ./plugins --out ./styles/plugins.css
+```
+
+```css
+@import "tailwindcss";
+@import "mudtail/tailwind.css";
+@import "./plugins.css";      /* @theme inline { --color-countdown-digit-bg: var(--mud-countdown-digit-bg); … } */
+```
+
+- **Colours:** colour tokens become Tailwind colours, such as `bg-countdown-digit-bg` and `text-countdown-accent`. They follow dark mode and runtime changes.
+- **Other namespaces:** give a token `tailwind: 'spacing' | 'radius' | 'shadow' | 'font' | 'text' | 'ease' | 'animate' | 'blur'`, or `false` to leave it out of Tailwind.
+- **`--source`:** adds an `@source` line, so Tailwind also scans the plugin's own files for the classes they use.
+- **In code:** `pluginTailwindCss(plugin, { source })` returns the same CSS.
+
+### Plugins from Blazor
+
+Ship the plugin file in a Razor class library's `wwwroot` and load it at runtime. The URL is resolved against the page.
+
+```csharp
+var mud = await JS.InvokeAsync<IJSObjectReference>("moduleHost.get", "Layouts.Default");
+await mud.InvokeAsync<JsonElement>("loadPlugin", "./_content/MyCompany.Plugins/countdown.plugin.js", new { animate = true });
+
+_countdown = await mud.InvokeAsync<IJSObjectReference>("create", "countdown", host,
+    new { to = Match.KickOff, label = Match.Title }, DotNetObjectReference.Create(this));   // OnMudEvent("tick" | "done", …)
+
+var api = await mud.InvokeAsync<IJSObjectReference>("plugin", "countdown");            // the plugin's API
+await api.InvokeVoidAsync("pauseAll");
+var left = await mud.InvokeAsync<string>("invokePlugin", "countdown", "format", Match.KickOff);
+```
+
+The Blazor plugin functions are listed in the Lifecycle table under "Using it from Blazor".
+
 ## Using it from Blazor
 
 The Default layout module bundles MudTail's Blazor interop (`mudtail/blazor`) into its `js/module.js` and `css/main.min.css`. Once that layout is active, every module can use this one shared runtime instead of shipping its own:
@@ -604,6 +699,10 @@ Every function that sets something up returns a **handle with `dispose()`**. Cal
 | `buttonLoading(element, bool)`, `pageLoading(true | false | percent)` | nothing | A busy state on a Blazor-rendered button; the page-top loader (calls nest). |
 | `dispose()` | count | Disposes every handle still alive. The Default layout calls it when moduleHost deactivates it. |
 | `activeCount()` | number | Handles still alive: a quick leak check. |
+| `loadPlugin(url, options)`, `loadPlugins([{ url, options }])` | plugin description | Loads and installs plugins at runtime (URL resolved against the page). Their components then work with `create`. |
+| `plugin(name)` | the plugin's API | Use it as an `IJSObjectReference`. `invokePlugin(name, method, …args)` calls one method. |
+| `plugins()`, `removePlugin(name, force)` | list, bool | Lists the installed plugins, or removes one with everything it registered. |
+| `observePlugins(dotNetRef)` | handle | Raises `OnMudEvent("plugin", { action: "installed" \| "removed", name, version })`. |
 
 | `create` name | Events | Handle methods |
 | --- | --- | --- |

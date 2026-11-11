@@ -45,9 +45,6 @@
       <Deploy />
     </Project>
     <Project Path="src/Share.All/Share.All.csproj" Id="1e77fb8d-d73a-4160-b58a-b98df7a9e673" />
-    <Project Path="src/WebApi/WebApi.csproj" />
-    <Project Path="src/WebApi.Contracts/WebApi.Contracts.csproj" />
-    <Project Path="src/WebApi.Modules.Greeting/WebApi.Modules.Greeting.csproj" />
   </Folder>
   <Folder Name="/src/api/">
     <File Path="PACKIGINGMODULE.md" />
@@ -80,5 +77,10 @@
     <Project Path="modules/client/Module.Dashboard/Module.Dashboard.csproj" />
     <Project Path="modules/client/Module.Reports/Module.Reports.csproj" />
     <Project Path="modules/client/Module.ToDo/Module.ToDo.csproj" />
+  </Folder>
+  <Folder Name="/src/web/">
+    <Project Path="src/WebApi.Contracts/WebApi.Contracts.csproj" />
+    <Project Path="src/WebApi.Modules.Greeting/WebApi.Modules.Greeting.csproj" />
+    <Project Path="src/WebApi/WebApi.csproj" />
   </Folder>
 </Solution>
