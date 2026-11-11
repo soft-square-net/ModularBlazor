@@ -29,6 +29,15 @@ public sealed class ModuleRecord
     public Dictionary<string, string?> Settings { get; set; } = new();
     public ModuleState DesiredState { get; set; }
     public DateTimeOffset InstalledAt { get; init; }
+
+    /// <summary>
+    /// Core module: shipped with the WebApi release (CoreModules folder) and seeded into the catalog on startup.
+    /// It can be deactivated, unloaded and configured, but not uninstalled or replaced by an upload.
+    /// </summary>
+    public bool Core { get; init; }
+
+    /// <summary>Content hash of the shipped core package; a different hash on startup re-seeds the module.</summary>
+    public string? PackageHash { get; init; }
 }
 
 /// <summary>A module as seen by the replica that answered.</summary>

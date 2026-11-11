@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Data layer shared by the WebApi host and every runtime module: EF Core + Npgsql, the TenantDbContext base class
+    for module DbContexts, the tenant store (registry of tenants) and the per-tenant connection and migration helpers.
+    The host references it, so it (and EF Core / Npgsql) always loads from the default AssemblyLoadContext: modules
+    reference it with Private="false" and compile against the host's EF Core version.
+  -->
+
+  <PropertyGroup>
+    <!-- Writes a runtimeconfig.json so dotnet-ef can use this project as its own startup project (design time only). -->
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.14" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.14" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.14" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WebApi.Contracts\WebApi.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -11,6 +11,7 @@
 
 using Aspire.Hosting.Yarp;
 using Aspire.Hosting.Yarp.Transforms;
+using Yarp.ReverseProxy.Transforms;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
@@ -26,6 +27,8 @@ var redis = builder.AddRedis("redis")
     .WithDataVolume("hybird-redis-data");
 
 // Tenant data: one server holding the tenant store and a database per tenant (database-per-tenant model).
+// Replicas get ConnectionStrings:TenantStore (the registry of tenants, schema "platform") and ConnectionStrings:tenant-data
+// (the server: a tenant row names this server plus its database, and new tenants' databases are created on it).
 var tenantData = builder.AddPostgres("tenant-data")
     .WithDataVolume("hybird-tenant-data")
     .WithPgAdmin();
@@ -35,8 +38,9 @@ tenantData.AddDatabase("tenant-globex");
 
 // ---------------------------------------------------------------- module pools (same image, different config)
 
-// Core pool: every module except the extracted ones.
-var core = AddPool("core", role: "Api", replicas: 2, "identity", "workflow", "inventory");
+// Core pool: every module except the extracted ones. "identity" and "tenancy" are core modules: they ship with every
+// WebApi release (CoreModules folder) and are seeded into the catalog as Active on first start.
+var core = AddPool("core", role: "Api", replicas: 2, "identity", "tenancy", "workflow", "inventory");
 
 // Sales pool: the module that needed independent scaling. The sample "greeting" module stands in for Sales here.
 var sales = AddPool("sales", role: "Api", replicas: 4, "sales", "greeting");
@@ -63,10 +67,18 @@ var gateway = builder.AddYarp("gateway")
         yarp.AddRoute("/api/greeting/{**catch-all}", salesCluster);
         yarp.AddRoute("/{**catch-all}", coreCluster);
 
-        // Lab only: reach one pool directly (its admin API, /api/pool, /openapi) through the gateway.
-        yarp.AddRoute("/pools/core/{**catch-all}", coreCluster).WithTransformPathRemovePrefix("/pools/core");
-        yarp.AddRoute("/pools/sales/{**catch-all}", salesCluster).WithTransformPathRemovePrefix("/pools/sales");
-        yarp.AddRoute("/pools/worker/{**catch-all}", workerCluster).WithTransformPathRemovePrefix("/pools/worker");
+        // Lab only: reach one pool directly (its admin API, /api/pool, /openapi, /scalar) through the gateway.
+        // X-Forwarded-Prefix tells the pool which path it was reached through, so its Scalar and OpenAPI URLs keep it.
+        PoolRoute("core", coreCluster);
+        PoolRoute("sales", salesCluster);
+        PoolRoute("worker", workerCluster);
+
+        void PoolRoute(string pool, YarpCluster cluster) =>
+            yarp.AddRoute($"/pools/{pool}/{{**catch-all}}", cluster)
+                .WithTransformPathRemovePrefix($"/pools/{pool}")
+                // The default X-Forwarded transforms would overwrite the prefix with the (empty) PathBase.
+                .WithTransformXForwarded(xPrefix: ForwardedTransformActions.Off)
+                .WithTransformRequestHeader("X-Forwarded-Prefix", $"/pools/{pool}", append: false);
     });
 // The clusters name each replica by service-discovery name (http://core-1, ...); referencing the replicas gives
 // the gateway the matching discovery entries.
@@ -92,6 +104,7 @@ IResourceBuilder<ProjectResource>[] AddPool(string name, string role, int replic
             .WithReference(broker).WaitFor(broker)
             .WithReference(redis).WaitFor(redis)
             .WithReference(tenantStore).WaitFor(tenantStore)
+            .WithReference(tenantData)
             .WithHttpHealthCheck("/health");
 
         for (var i = 0; i < modules.Length; i++)

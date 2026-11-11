@@ -11,11 +11,44 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.11.0" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.11.0" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.11.0" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.20.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\WebApi.Contracts\WebApi.Contracts.csproj" />
+    <!-- Shared data layer (EF Core, Npgsql, TenantDbContext, tenant store): host-shipped, so modules share its types. -->
+    <ProjectReference Include="..\WebApi.Data\WebApi.Data.csproj" />
   </ItemGroup>
+
+  <!--
+    Core modules: runtime modules that ship with every release. They are built with the host but NOT referenced
+    (no compile-time types, so they stay unloadable and upgradeable); each one's build output is copied to
+    CoreModules/<AssemblyName>/ in the build and publish output. On startup the host seeds them into the catalog.
+  -->
+  <ItemGroup>
+    <CoreModuleProject Include="..\Modules\Core\*\*.csproj" />
+    <ProjectReference Include="@(CoreModuleProject)" ReferenceOutputAssembly="false" Private="false" />
+  </ItemGroup>
+
+  <Target Name="CopyCoreModules" AfterTargets="Build" Condition="'@(CoreModuleProject)' != ''">
+    <MSBuild Projects="@(CoreModuleProject)" Targets="GetTargetPath" Properties="Configuration=$(Configuration)">
+      <Output TaskParameter="TargetOutputs" ItemName="_CoreModuleTarget" />
+    </MSBuild>
+    <ItemGroup>
+      <_CoreModuleFile Include="%(_CoreModuleTarget.RootDir)%(_CoreModuleTarget.Directory)**\*">
+        <ModuleFolder>%(_CoreModuleTarget.Filename)</ModuleFolder>
+      </_CoreModuleFile>
+    </ItemGroup>
+    <RemoveDir Directories="$(OutDir)CoreModules" />
+    <Copy SourceFiles="@(_CoreModuleFile)" DestinationFiles="@(_CoreModuleFile->'$(OutDir)CoreModules\%(ModuleFolder)\%(RecursiveDir)%(Filename)%(Extension)')" />
+  </Target>
+
+  <Target Name="PublishCoreModules" AfterTargets="Publish">
+    <ItemGroup>
+      <_CoreModulePublishFile Include="$(OutDir)CoreModules\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_CoreModulePublishFile)" DestinationFiles="@(_CoreModulePublishFile->'$(PublishDir)CoreModules\%(RecursiveDir)%(Filename)%(Extension)')" />
+  </Target>
 
   <ItemGroup>
     <!-- Module store (uploaded packages + modules.json) is runtime data. -->

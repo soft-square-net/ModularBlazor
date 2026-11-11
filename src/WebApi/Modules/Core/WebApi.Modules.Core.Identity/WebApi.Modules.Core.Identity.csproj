@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Core module "identity": current principal and the user directory. Shared setup in ../Directory.Build.props. -->
+
+</Project>

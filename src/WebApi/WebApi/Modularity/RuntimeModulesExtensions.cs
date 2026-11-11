@@ -46,10 +46,19 @@ public static class RuntimeModulesExtensions
         return app;
     }
 
-    /// <summary>Startup: converge on the catalog (modules marked Active come back online).</summary>
+    /// <summary>
+    /// Startup: seed the core modules this release ships, then converge on the catalog (modules marked Active come
+    /// back online). If seeding changed the catalog, replicas that are already running are told to re-sync.
+    /// </summary>
     private sealed class ModuleReconciler(ModuleRuntime runtime) : IHostedService
     {
-        public Task StartAsync(CancellationToken cancellationToken) => runtime.SyncAsync(cancellationToken);
+        public async Task StartAsync(CancellationToken cancellationToken)
+        {
+            var seeded = await runtime.SeedCoreModulesAsync(cancellationToken);
+            await runtime.SyncAsync(cancellationToken);
+            if (seeded.Count > 0) await runtime.PublishCoreSeededAsync(seeded, cancellationToken);
+        }
+
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
     }
 }

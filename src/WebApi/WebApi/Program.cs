@@ -3,12 +3,18 @@ using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using soft.square.net.WebApi.Modularity;
+using soft.square.net.WebApi.OpenApi;
+using soft.square.net.WebApi.Tenancy;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddOpenApi();
+// OpenAPI: /openapi/webapi.json (host endpoints) + /openapi/modules/{id}.json (one per routed module), Scalar at /scalar.
+builder.Services.AddModularOpenApi();
 builder.Services.AddCarter();
 builder.Services.AddHealthChecks();
+// Tenancy on every replica: tenant directory (TenantStore, refreshed over the broker), ITenantContext per request,
+// tenant databases and per-tenant module initialization. Before the runtime modules, so tenants load first.
+builder.AddPlatformTenancy("broker");
 // Runtime modules: install (upload + manifest) -> activate (load + services + routes) -> deactivate / unload / uninstall.
 builder.Services.AddRuntimeModules(builder.Configuration);
 // Several replicas: broadcast lifecycle changes over the broker so every replica converges (needs ConnectionStrings:broker).
@@ -30,9 +36,13 @@ if (!string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOIN
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+// Resolves the tenant of every request (header, host, token claim) once routing has picked the endpoint.
+app.UseRouting();
+app.UseTenancy();
+
+if (ModularOpenApi.IsEnabled(app.Configuration, app.Environment))
 {
-    app.MapOpenApi();
+    app.MapModularOpenApi();
 }
 
 app.MapHealthChecks("/health");
