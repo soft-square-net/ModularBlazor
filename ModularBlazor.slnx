@@ -81,10 +81,16 @@
   </Folder>
   <Folder Name="/src/WebApi/">
     <Project Path="src/WebApi/WebApi.Contracts/WebApi.Contracts.csproj" />
+    <Project Path="src/WebApi/WebApi.Data/WebApi.Data.csproj" />
     <Project Path="src/WebApi/WebApi/WebApi.csproj" />
   </Folder>
   <Folder Name="/src/WebApi/Modules/">
     <Project Path="src/WebApi/Modules/WebApi.Modules.Greeting/WebApi.Modules.Greeting.csproj" />
+    <Project Path="src/WebApi/Modules/WebApi.Modules.Inventory/WebApi.Modules.Inventory.csproj" />
   </Folder>
-  <Folder Name="/src/WebApi/Modules/Core/" />
+  <Folder Name="/src/WebApi/Modules/Core/">
+    <File Path="src/WebApi/Modules/Core/Directory.Build.props" />
+    <Project Path="src/WebApi/Modules/Core/WebApi.Modules.Core.Identity/WebApi.Modules.Core.Identity.csproj" />
+    <Project Path="src/WebApi/Modules/Core/WebApi.Modules.Core.Tenancy/WebApi.Modules.Core.Tenancy.csproj" />
+  </Folder>
 </Solution>

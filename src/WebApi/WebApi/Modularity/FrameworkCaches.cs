@@ -12,6 +12,7 @@ namespace soft.square.net.WebApi.Modularity;
 /// <item>ParameterBindingMethodCache (Minimal API parameter binding; also used by OpenAPI) — private statics, evicted by reflection.</item>
 /// <item>TypeDescriptor / reflection caches — cleared through the framework's own hot-reload [MetadataUpdateHandler] ClearCache hooks.</item>
 /// <item>OpenAPI singletons (OpenApiSchemaService keeps a Type → schema id map per document) — Type-keyed fields evicted.</item>
+/// <item>TypeDescriptor providers' per-type data (ReflectTypeDescriptionProvider._typeData) — evicted through the provider chain.</item>
 /// </list>
 /// The host's JSON metadata cache is avoided rather than evicted: each module gets its own JsonOptions (see ModuleRuntime.Load).
 /// These are framework internals: best-effort, re-verify after each .NET upgrade (the unload result reports success).
@@ -57,6 +58,66 @@ internal static class FrameworkCaches
             try { clearCache.Invoke(null, [moduleTypes]); }
             catch (TargetInvocationException) { } // a handler failing must not fail the unload
         }
+
+        EvictTypeDescriptionProviders(context);
+        ClearIdleLogRecords();
+    }
+
+    /// <summary>
+    /// OpenTelemetry's shared LogRecord pool (used when logs are exported in batches, e.g. OTLP to the Aspire dashboard)
+    /// keeps each idle record's last data — exception, state, attributes, scopes — until its slot is rented again,
+    /// which on a quiet replica can take thousands of log calls (2048 slots). Found with gcroot: a DbUpdateException that
+    /// EF Core logged once (its entries → change tracker → the module's DbContext) kept the module from unloading.
+    /// Idle records were already exported, so their data is dropped. A record rented in the same instant could lose its
+    /// exception or attributes: one log entry, at admin time.
+    /// </summary>
+    private static void ClearIdleLogRecords()
+    {
+        var poolType = AppDomain.CurrentDomain.GetAssemblies()
+            .Where(a => a.GetName().Name == "OpenTelemetry")
+            .Select(a => a.GetType("OpenTelemetry.Logs.LogRecordSharedPool", throwOnError: false))
+            .FirstOrDefault(t => t is not null);
+        var pool = poolType?.GetField("Current", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)?.GetValue(null);
+        if (pool is null || poolType!.GetField("pool", BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(pool) is not Array records) return;
+
+        foreach (var record in records)
+        {
+            if (record is null) continue; // rented right now: in use, not idle
+            var type = record.GetType();
+            foreach (var name in (string[])["Exception", "Attributes", "State"])
+            {
+                try { type.GetProperty(name, BindingFlags.Instance | BindingFlags.Public)?.SetValue(record, null); }
+                catch (TargetInvocationException) { }
+            }
+            foreach (var name in (string[])["AttributeStorage", "ScopeStorage"])
+                (type.GetField(name, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)?.GetValue(record) as IList)?.Clear();
+        }
+    }
+
+    /// <summary>
+    /// TypeDescriptor's providers cache per-type data in instance fields, e.g. ReflectTypeDescriptionProvider._typeData
+    /// (ReflectedTypeData by Type). Neither the ClearCache hook nor the static eviction reaches it: it sits behind
+    /// TypeDescriptor.s_providerTable → TypeDescriptionNode (Next chain) → Provider. Any TypeDescriptor.GetConverter on a
+    /// module type fills it, and ApiExplorer does that for every parameter and response type (ModelMetadata.IsComplexType),
+    /// so generating any OpenAPI document pinned every routed module. gcroot did not report this path; a reflection walk
+    /// of the statics did.
+    /// </summary>
+    private static void EvictTypeDescriptionProviders(AssemblyLoadContext context)
+    {
+        const BindingFlags statics = BindingFlags.Static | BindingFlags.NonPublic;
+        var descriptor = typeof(System.ComponentModel.TypeDescriptor);
+        if (descriptor.GetField("s_providerTable", statics)?.GetValue(null) is not IDictionary table) return;
+
+        object[] nodes;
+        lock (descriptor.GetField("s_commonSyncObject", statics)?.GetValue(null) ?? table)
+            nodes = table.Values.Cast<object>().ToArray();
+
+        foreach (var first in nodes)
+        for (var node = first; node is not null; node = Field(node, "Next"))
+            EvictDictionaries(Field(node, "Provider"), context);
+
+        static object? Field(object owner, string name) =>
+            owner.GetType().GetField(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)?.GetValue(owner);
     }
 
     /// <summary>Static ClearCache(Type[]?) methods of the framework's hot-reload metadata update handlers.</summary>
@@ -73,7 +134,8 @@ internal static class FrameworkCaches
     private static readonly string[] CacheTypeNames =
     [
         "Microsoft.AspNetCore.Http.ParameterBindingMethodCache", // Minimal API parameter binding, ApiExplorer, OpenAPI
-        "System.ComponentModel.TypeDescriptor"                    // s_defaultProviderInitialized; not covered by its ClearCache hook
+        "System.ComponentModel.TypeDescriptor",                   // s_defaultProviderInitialized; not covered by its ClearCache hook
+        "System.ComponentModel.ReflectTypeDescriptionProvider"    // s_attributeCache, s_propertyCache, ... (Type-keyed Hashtables)
     ];
 
     // Looked up on every eviction: assemblies such as ApiExplorer load lazily.

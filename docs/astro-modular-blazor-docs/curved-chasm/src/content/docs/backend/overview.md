@@ -38,9 +38,9 @@ Edge load balancer + YARP gateway        TLS, JWT, rate limit, tenant resolution
 | Path | What |
 | --- | --- |
 | `src/api/ModularBlazor.Host` | The production API host and its built-in modules (`HostModules`) |
-| `src/WebApi` | Runtime module prototype: one image that runs as any pool |
-| `src/WebApi.Contracts` | `IRuntimeModule` and `ModuleManifest`, shared by the host and every runtime module |
-| `src/WebApi.Modules.Greeting` | Sample runtime module, uploaded as a package |
+| `src/WebApi/WebApi` | Runtime module prototype: one image that runs as any pool |
+| `src/WebApi/WebApi.Contracts` | `IRuntimeModule` and `ModuleManifest`, shared by the host and every runtime module |
+| `src/WebApi/Modules/WebApi.Modules.Greeting` | Sample runtime module, uploaded as a package |
 | `src/Aspire/Hybird` | Aspire lab: gateway, three pools, RabbitMQ, Redis, PostgreSQL |
 
 ## Read in this order
@@ -55,6 +55,7 @@ Edge load balancer + YARP gateway        TLS, JWT, rate limit, tenant resolution
 | [Endpoints: Minimal API + Carter](/backend/endpoints-carter/) | Why Minimal API + Carter, and not FastEndpoints |
 | [Runtime modules](/backend/runtime-modules/) | How a module is installed, activated and served while the API runs, on every replica of every pool |
 | [Unloading runtime modules](/backend/runtime-module-unloading/) | What it takes to free a module's memory, measured with heap dumps |
+| [Authentication and authorization](/backend/auth-design/) | Design note (not implemented): identity service, tenant memberships, scoped grants, module permissions, newsroom workflow |
 
 The admin endpoints and packaging rules are in the [runtime modules API reference](/reference/runtime-modules-api/).
 

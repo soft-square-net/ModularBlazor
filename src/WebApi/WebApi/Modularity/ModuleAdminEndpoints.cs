@@ -43,6 +43,6 @@ public sealed class ModuleAdminEndpoints : ICarterModule
             .WithSummary("Replace the module's settings; applied on its next load.");
 
         modules.MapDelete("/{id}", (string id, ModuleRuntime runtime, CancellationToken ct) => runtime.UninstallAsync(id, ct))
-            .WithSummary("Unload, delete the package and remove the registration.");
+            .WithSummary("Unload, delete the package and remove the registration. Core modules: 409 (deactivate or unload them instead).");
     }
 }

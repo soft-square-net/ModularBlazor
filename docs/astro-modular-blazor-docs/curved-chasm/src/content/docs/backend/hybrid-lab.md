@@ -6,7 +6,7 @@ sidebar:
 ---
 
 `src/Aspire/Hybird` runs the [target architecture](/backend/target-architecture/) on one machine. One image
-(`src/WebApi`) is deployed as three **module pools** behind a **YARP gateway**, sharing **RabbitMQ**, **Redis** and
+(`src/WebApi/WebApi`) is deployed as three **module pools** behind a **YARP gateway**, sharing **RabbitMQ**, **Redis** and
 **PostgreSQL**. Every replica exports OpenTelemetry to the Aspire dashboard.
 
 ```bash
@@ -21,7 +21,7 @@ for the broker, Redis and PostgreSQL containers.
 | Resource | What it is |
 | --- | --- |
 | `gateway` (port 5080) | YARP. `/api/sales/**` and `/api/greeting/**` go to the sales pool; everything else goes to core. `/pools/{core\|sales\|worker}/**` reaches one pool directly (lab only) |
-| `core-1`, `core-2` | Core pool, `Role=Api`, modules: identity, workflow, inventory |
+| `core-1`, `core-2` | Core pool, `Role=Api`, modules: identity, tenancy (core modules, active by default), workflow, inventory |
 | `sales-1` … `sales-4` | Sales pool, `Role=Api`, modules: sales, greeting (the sample module stands in for Sales) |
 | `worker-1`, `worker-2` | Worker pool, `Role=Worker`: modules load (services, consumers) but get no routes, and no public route reaches it |
 | `broker` | RabbitMQ with the management UI |
@@ -56,6 +56,21 @@ curl http://localhost:5080/pools/core/api/admin/modules     # enabledInPool: fal
 curl http://localhost:5080/pools/sales/api/admin/modules    # loaded, routes mapped
 curl http://localhost:5080/pools/worker/api/admin/modules   # loaded, no routes
 ```
+
+## OpenAPI and Scalar per pool
+
+OpenAPI documents are generated per replica, so each pool's Scalar shows what that pool routes
+([how it works](/backend/runtime-modules/#openapi-and-scalar)):
+
+| URL (gateway, port 5080) | Shows |
+| --- | --- |
+| `/scalar` | The core pool: `webapi`, `identity` and `tenancy` |
+| `/pools/sales/scalar` | The sales pool: `webapi`, plus `greeting` while it is active |
+| `/pools/{pool}/openapi` | The list of documents that pool serves right now |
+
+The `/pools/{pool}/**` routes send `X-Forwarded-Prefix: /pools/{pool}` and turn off YARP's default prefix transform,
+which would overwrite that header. Document URLs and server URLs are built from the header, so "Try it" stays on the
+same `/pools/{pool}/...` path.
 
 ## What it verified
 

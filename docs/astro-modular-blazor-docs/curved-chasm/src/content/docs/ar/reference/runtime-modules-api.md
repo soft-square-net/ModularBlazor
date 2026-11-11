@@ -5,7 +5,7 @@ sidebar:
   order: 3
 ---
 
-يعيش النموذج الأولي لوحدات التشغيل في `src/WebApi`. كيف يعمل: [وحدات أثناء التشغيل](/ar/backend/runtime-modules/).
+يعيش النموذج الأولي لوحدات التشغيل في `src/WebApi/WebApi`. كيف يعمل: [وحدات أثناء التشغيل](/ar/backend/runtime-modules/).
 
 ## نقاط نهاية الإدارة
 
@@ -49,7 +49,14 @@ sidebar:
 | --- | --- |
 | `GET /api/pool` | المجموعة والدور والوحدات المفعلة ومعرف النسخة التي أجابت، مع أسماء سلاسل اتصالها (لا قيمها أبدا) |
 | `GET /health` | فحص الصحة الذي تستخدمه البوابة والمنسق |
-| `GET /openapi/v1.json` | مستند OpenAPI (في بيئة التطوير)، ويشمل مسارات الوحدات المفعلة |
+| `GET /openapi/webapi.json` | مستند OpenAPI لنقاط النهاية المدمجة في المضيف (الإدارة و`/api/pool` و`/health`) |
+| `GET /openapi/modules/{id}.json` | مستند OpenAPI لوحدة واحدة؛ و`404` ما لم تكن مساراتها مربوطة على هذه النسخة |
+| `GET /openapi` | المستندات المتاحة الآن: `[{name, title, url, isDefault}]` |
+| `GET /scalar` (ويحول `/` إليه) | مرجع واجهة Scalar، مع مبدل للمستندات نفسها |
+
+توجد نقاط نهاية OpenAPI وScalar في بيئة التطوير، أو حين يضبط `OpenApi:Enabled=true`. وخلف مسارات البوابة
+`/pools/{pool}/` تحمل عناوين المستندات تلك البادئة (من `X-Forwarded-Prefix`). كيف يعمل:
+[وحدات أثناء التشغيل](/ar/backend/runtime-modules/).
 
 ## الحالات
 
@@ -69,6 +76,7 @@ sidebar:
 | `Modules:Role` | `Api` | `Api` يربط المسارات؛ و`Worker` يحمل الوحدات دون مسارات |
 | `Modules:Enabled` | فارغ (الكل) | معرفات الوحدات التي تطبقها المجموعة، مثل `Modules__Enabled__0=sales` |
 | `ConnectionStrings:broker` | لا شيء | اتصال RabbitMQ؛ حين يضبط، تبث تغييرات دورة الحياة على مبادلة البث `modules.state` |
+| `OpenApi:Enabled` | `false` (مفعل في بيئة التطوير) | يخدم مستندات OpenAPI وScalar خارج بيئة التطوير |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | لا شيء | حين يضبط، تصدر التتبعات والمقاييس والسجلات عبر OTLP (تضبطه لوحة Aspire) |
 
 ## العقد
@@ -109,12 +117,15 @@ public sealed record ModuleManifest(string Id, string Name, string Version, stri
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <!-- Shared with the host: compile against them, never ship them. -->
     <PackageReference Include="Carter" Version="10.0.0" ExcludeAssets="runtime" />
-    <ProjectReference Include="..\WebApi.Contracts\WebApi.Contracts.csproj" Private="false" ExcludeAssets="runtime" />
+    <ProjectReference Include="..\..\WebApi.Contracts\WebApi.Contracts.csproj" Private="false" ExcludeAssets="runtime" />
     <!-- Private dependency: loads into the module's own load context. -->
     <PackageReference Include="Humanizer.Core" Version="2.14.1" />
   </ItemGroup>
 </Project>
 ```
+
+تعيش وحدات التشغيل في `src/WebApi/Modules/<Module>/`، بجوار المضيف في `src/WebApi/WebApi/` والعقود في
+`src/WebApi/WebApi.Contracts/`، ولهذا يصعد مرجع العقود مجلدين.
 
 | صيغة الحزمة | المحتوى |
 | --- | --- |
@@ -129,11 +140,11 @@ public sealed record ModuleManifest(string Id, string Name, string Version, stri
 **نسخة واحدة:**
 
 ```bash
-dotnet build src/WebApi.Modules.Greeting
-dotnet run --project src/WebApi --launch-profile http
+dotnet build src/WebApi/Modules/WebApi.Modules.Greeting
+dotnet run --project src/WebApi/WebApi --launch-profile http
 ```
 
-اضغط محتويات `src/WebApi.Modules.Greeting/bin/Debug/net10.0` باسم `greeting.zip`، ثم:
+اضغط محتويات `src/WebApi/Modules/WebApi.Modules.Greeting/bin/Debug/net10.0` باسم `greeting.zip`، ثم:
 
 ```bash
 curl -F "package=@greeting.zip" http://localhost:5298/api/admin/modules
@@ -141,7 +152,7 @@ curl -X POST http://localhost:5298/api/admin/modules/greeting/activate
 curl http://localhost:5298/api/greeting/john_doe
 ```
 
-يحوي `src/WebApi/WebApi.http` كل الطلبات.
+يحوي `src/WebApi/WebApi/WebApi.http` كل الطلبات.
 
 **المجموعات والنسخ:** شغل [مختبر البنية الهجينة](/ar/backend/hybrid-lab/) وأرسل الطلبات نفسها إلى البوابة،
 `http://localhost:5080`.

@@ -1,0 +1,24 @@
+<Project>
+
+  <!--
+    Shared setup for WebApi core modules: runtime modules that ship with every WebApi release.
+    WebApi builds them (ProjectReference without the assembly) and copies each one's output to CoreModules/<name>/;
+    on startup the host seeds them into the module catalog as Active (ModuleRuntime.SeedCoreModulesAsync).
+  -->
+
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+
+  <PropertyGroup>
+    <!-- Copies private package dependencies into the output and writes the .deps.json the loader resolves with. -->
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <IsWebApiCoreModule>true</IsWebApiCoreModule>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <!-- Shared with the host: compile against them, never ship them. -->
+    <PackageReference Include="Carter" Version="10.0.0" ExcludeAssets="runtime" />
+    <ProjectReference Include="$(MSBuildThisFileDirectory)../../WebApi.Contracts/WebApi.Contracts.csproj" Private="false" />
+  </ItemGroup>
+
+</Project>

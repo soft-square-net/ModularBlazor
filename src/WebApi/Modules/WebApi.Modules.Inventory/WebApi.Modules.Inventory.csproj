@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Sample runtime module with tenant data: a stock list per tenant, in the tenant's own database (schema "inventory"),
+    through TenantDbContext. NOT referenced by WebApi: zip the build output (bin/<Configuration>/net10.0) and upload it
+    to POST /api/admin/modules (in the Hybird lab: http://localhost:5080/pools/core/api/admin/modules).
+  -->
+
+  <PropertyGroup>
+    <!-- Copies private dependencies into the output, writes the .deps.json the loader resolves with and a runtimeconfig for dotnet-ef. -->
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <EfDesignExclude Condition="'$(EfDesignAssets)' != 'all'">runtime</EfDesignExclude>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <!-- Shared with the host: compile against them, never ship them. -->
+    <PackageReference Include="Carter" Version="10.0.0" ExcludeAssets="$(SharedDataExclude)" />
+    <ProjectReference Include="..\..\WebApi.Contracts\WebApi.Contracts.csproj" Private="$(SharedDataPrivate)" />
+    <!-- Design time only (see EfDesignAssets in WebApi.Data/SharedData.props). -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.14" PrivateAssets="all" ExcludeAssets="$(EfDesignExclude)" />
+  </ItemGroup>
+
+  <Import Project="..\..\WebApi.Data\SharedData.props" />
+
+</Project>

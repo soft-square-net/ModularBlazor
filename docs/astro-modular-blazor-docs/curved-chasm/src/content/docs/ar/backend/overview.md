@@ -36,9 +36,9 @@ Edge load balancer + YARP gateway        TLS, JWT, rate limit, tenant resolution
 | المسار | ما هو |
 | --- | --- |
 | `src/api/ModularBlazor.Host` | مضيف الواجهة الإنتاجي ووحداته المدمجة (`HostModules`) |
-| `src/WebApi` | النموذج الأولي لوحدات التشغيل: صورة واحدة تعمل كأي مجموعة |
-| `src/WebApi.Contracts` | `IRuntimeModule` و`ModuleManifest`، مشتركان بين المضيف وكل وحدة تشغيل |
-| `src/WebApi.Modules.Greeting` | وحدة تشغيل نموذجية، ترفع كحزمة |
+| `src/WebApi/WebApi` | النموذج الأولي لوحدات التشغيل: صورة واحدة تعمل كأي مجموعة |
+| `src/WebApi/WebApi.Contracts` | `IRuntimeModule` و`ModuleManifest`، مشتركان بين المضيف وكل وحدة تشغيل |
+| `src/WebApi/Modules/WebApi.Modules.Greeting` | وحدة تشغيل نموذجية، ترفع كحزمة |
 | `src/Aspire/Hybird` | مختبر Aspire: بوابة، وثلاث مجموعات، وRabbitMQ وRedis وPostgreSQL |
 
 ## اقرأ بهذا الترتيب
@@ -53,6 +53,7 @@ Edge load balancer + YARP gateway        TLS, JWT, rate limit, tenant resolution
 | [نقاط النهاية: Minimal API مع Carter](/ar/backend/endpoints-carter/) | لماذا Minimal API مع Carter وليس FastEndpoints |
 | [وحدات أثناء التشغيل](/ar/backend/runtime-modules/) | كيف تثبت وحدة وتفعل وتخدم والواجهة تعمل، على كل نسخة في كل مجموعة |
 | [تفريغ وحدات التشغيل](/ar/backend/runtime-module-unloading/) | ما يلزم لتحرير ذاكرة وحدة، مقيسا بتفريغات الذاكرة |
+| [المصادقة والتفويض](/ar/backend/auth-design/) | مذكرة تصميم (غير منفذة): خدمة الهوية، وعضويات المستأجرين، والمنح محددة النطاق، وصلاحيات الوحدات، وسير عمل غرفة الأخبار |
 
 نقاط نهاية الإدارة وقواعد التحزيم في [مرجع واجهة وحدات التشغيل](/ar/reference/runtime-modules-api/).
 

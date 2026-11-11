@@ -6,7 +6,7 @@ sidebar:
 ---
 
 يشغل `src/Aspire/Hybird` [البنية المستهدفة](/ar/backend/target-architecture/) على جهاز واحد. تنشر صورة واحدة
-(`src/WebApi`) كثلاث **مجموعات وحدات** خلف **بوابة YARP**، وتتشارك **RabbitMQ** و**Redis** و**PostgreSQL**.
+(`src/WebApi/WebApi`) كثلاث **مجموعات وحدات** خلف **بوابة YARP**، وتتشارك **RabbitMQ** و**Redis** و**PostgreSQL**.
 وتصدر كل نسخة بيانات OpenTelemetry إلى لوحة Aspire.
 
 ```bash
@@ -21,7 +21,7 @@ dotnet run --project src/Aspire/Hybird --launch-profile http
 | المورد | ما هو |
 | --- | --- |
 | `gateway` (المنفذ 5080) | YARP. يذهب `/api/sales/**` و`/api/greeting/**` إلى مجموعة sales؛ وكل ما عداهما إلى core. ويصل `/pools/{core\|sales\|worker}/**` إلى مجموعة واحدة مباشرة (للمختبر فقط) |
-| `core-1`، `core-2` | مجموعة core، `Role=Api`، الوحدات: identity وworkflow وinventory |
+| `core-1`، `core-2` | مجموعة core، `Role=Api`، الوحدات: identity وtenancy (وحدات أساسية، مفعلة افتراضيا) وworkflow وinventory |
 | `sales-1` … `sales-4` | مجموعة sales، `Role=Api`، الوحدات: sales وgreeting (الوحدة النموذجية تقوم مقام Sales) |
 | `worker-1`، `worker-2` | مجموعة العمال، `Role=Worker`: تحمل الوحدات (خدمات ومستهلكون) دون مسارات، ولا يصل إليها أي مسار عام |
 | `broker` | RabbitMQ مع واجهة الإدارة |
@@ -55,6 +55,21 @@ curl http://localhost:5080/pools/core/api/admin/modules     # enabledInPool: fal
 curl http://localhost:5080/pools/sales/api/admin/modules    # loaded, routes mapped
 curl http://localhost:5080/pools/worker/api/admin/modules   # loaded, no routes
 ```
+
+## OpenAPI وScalar لكل مجموعة
+
+تولد مستندات OpenAPI لكل نسخة، فيعرض Scalar في كل مجموعة ما تربطه تلك المجموعة
+([كيف يعمل](/ar/backend/runtime-modules/)):
+
+| العنوان (البوابة، المنفذ 5080) | يعرض |
+| --- | --- |
+| `/scalar` | مجموعة core: `webapi` و`identity` و`tenancy` |
+| `/pools/sales/scalar` | مجموعة sales: `webapi`، ومعها `greeting` ما دامت مفعلة |
+| `/pools/{pool}/openapi` | قائمة المستندات التي تخدمها تلك المجموعة الآن |
+
+ترسل مسارات `/pools/{pool}/**` الترويسة `X-Forwarded-Prefix: /pools/{pool}` وتعطل تحويل البادئة الافتراضي في YARP،
+الذي كان سيكتب فوق تلك الترويسة. وتبنى عناوين المستندات وعناوين الخوادم من الترويسة، فيبقى "Try it" على المسار
+`/pools/{pool}/...` نفسه.
 
 ## ما الذي تحقق منه
 

@@ -31,7 +31,7 @@ Observability: OpenTelemetry traces, metrics and logs, tagged with tenant and co
 
 ## Pools from one image
 
-Each deployment of the image reads three settings (implemented in the `src/WebApi` prototype):
+Each deployment of the image reads three settings (implemented in the `src/WebApi/WebApi` prototype):
 
 | Setting | Values | Effect |
 | --- | --- | --- |
@@ -66,6 +66,9 @@ core, a sales and a worker pool, RabbitMQ, Redis and PostgreSQL.
    in another pool is a direct gRPC call, never a trip back through the gateway.
 4. State changes write to the module's own database and its outbox in one transaction; the relay publishes to the
    broker; consumers in any pool that hosts the subscribing module process the message.
+
+How tokens, tenant membership and permissions are checked along this path is in the
+[authentication and authorization design note](/backend/auth-design/) (a design decision, not implemented yet).
 
 ## Shared infrastructure
 

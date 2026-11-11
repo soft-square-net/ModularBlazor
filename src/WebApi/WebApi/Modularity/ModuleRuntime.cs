@@ -27,6 +27,9 @@ public sealed class ModuleRuntimeOptions
     /// <summary>Module ids this pool may activate; empty = every module.</summary>
     public string[] Enabled { get; set; } = [];
 
+    /// <summary>Core module packages shipped with this release (one folder per module), relative to the app base directory.</summary>
+    public string CorePath { get; set; } = "CoreModules";
+
     public bool IsEnabled(string moduleId) =>
         Enabled.Length == 0 || Enabled.Contains(moduleId, StringComparer.OrdinalIgnoreCase);
 }
@@ -109,6 +112,8 @@ internal sealed partial class ModuleRuntime
                 using (await _store.LockAsync(ct))
                 {
                     ReloadRecords();
+                    if (_records.TryGetValue(manifest.Id, out var existing) && existing.Core)
+                        throw new ModuleException($"'{manifest.Id}' is a core module; it is upgraded only by a WebApi release.", StatusCodes.Status409Conflict);
                     var clash = _records.Values.FirstOrDefault(r => r.Id != manifest.Id && r.RoutePrefix.Equals(manifest.RoutePrefix.Trim('/'), StringComparison.OrdinalIgnoreCase));
                     if (clash is not null)
                         throw new ModuleException($"Route prefix '{manifest.RoutePrefix}' is already used by module '{clash.Id}'.", StatusCodes.Status409Conflict);
@@ -205,7 +210,10 @@ internal sealed partial class ModuleRuntime
             using (await _store.LockAsync(ct))
             {
                 ReloadRecords();
-                moduleId = Get(id).Id;
+                var record = Get(id);
+                if (record.Core)
+                    throw new ModuleException($"'{record.Id}' is a core module and ships with the release; deactivate or unload it instead.", StatusCodes.Status409Conflict);
+                moduleId = record.Id;
                 _records.Remove(moduleId);
                 _store.Save(_records.Values);
             }
@@ -241,6 +249,101 @@ internal sealed partial class ModuleRuntime
         if (result.Errors.TryGetValue(record.Id, out var error)) throw error;
         return record;
     }
+
+    /// <summary>
+    /// Registers the core modules shipped with this release (<see cref="ModuleRuntimeOptions.CorePath"/>) in the catalog.
+    /// Runs on startup before the first sync, under the store lock, so concurrent replicas seed each module once.
+    /// <list type="bullet">
+    /// <item>Not in the catalog: installed as <see cref="ModuleState.Active"/>.</item>
+    /// <item>In the catalog with another package hash and a version not newer than the shipped one: upgraded in place,
+    /// keeping the admin's desired state and settings (like a re-install).</item>
+    /// <item>The catalog holds a newer version (an older replica during a rolling release): left alone.</item>
+    /// </list>
+    /// Returns the ids that changed; the caller broadcasts so running replicas converge.
+    /// </summary>
+    public async Task<IReadOnlyList<string>> SeedCoreModulesAsync(CancellationToken ct)
+    {
+        var source = Path.GetFullPath(_options.CorePath, AppContext.BaseDirectory);
+        if (!Directory.Exists(source)) return [];
+
+        var changed = new List<string>();
+        foreach (var folder in Directory.EnumerateDirectories(source).Order(StringComparer.OrdinalIgnoreCase))
+        {
+            string entry;
+            ModuleManifest manifest;
+            try
+            {
+                (entry, manifest) = Inspect(folder);
+                Validate(manifest);
+            }
+            catch (Exception e) when (e is ModuleException or IOException or BadImageFormatException or TypeLoadException)
+            {
+                _log.LogError(e, "Core module package {Folder} is invalid; skipped", Path.GetFileName(folder));
+                continue;
+            }
+            var hash = HashFolder(folder);
+
+            await _gate.WaitAsync(ct);
+            try
+            {
+                using (await _store.LockAsync(ct))
+                {
+                    ReloadRecords();
+                    _records.TryGetValue(manifest.Id, out var previous);
+                    if (previous is { Core: true } && previous.PackageHash == hash) continue;
+                    if (previous is { Core: true } && CompareVersions(manifest.Version, previous.Version) < 0)
+                    {
+                        _log.LogInformation("Core module {Id}: catalog has {Catalog}, this release ships {Shipped}; keeping the newer one",
+                            manifest.Id, previous.Version, manifest.Version);
+                        continue;
+                    }
+                    if (previous is { Core: false })
+                        _log.LogWarning("Uploaded module {Id} is replaced by the core module this release ships", manifest.Id);
+
+                    var prefix = manifest.RoutePrefix.Trim('/');
+                    var clash = _records.Values.FirstOrDefault(r => r.Id != manifest.Id && r.RoutePrefix.Equals(prefix, StringComparison.OrdinalIgnoreCase));
+                    if (clash is not null)
+                    {
+                        _log.LogError("Core module {Id} not seeded: route prefix '{Prefix}' is used by module {Other}", manifest.Id, prefix, clash.Id);
+                        continue;
+                    }
+
+                    var moduleFolder = Path.Combine(_root, manifest.Id);
+                    if (Directory.Exists(moduleFolder)) Directory.Delete(moduleFolder, recursive: true); // replicas load from bytes
+                    CopyFolder(folder, Path.Combine(moduleFolder, manifest.Version));
+
+                    var settings = new Dictionary<string, string?>(manifest.DefaultSettings);
+                    if (previous is not null)
+                        foreach (var (key, value) in previous.Settings)
+                            if (settings.ContainsKey(key)) settings[key] = value;
+
+                    _records[manifest.Id] = new ModuleRecord
+                    {
+                        Id = manifest.Id,
+                        Name = manifest.Name,
+                        Version = manifest.Version,
+                        RoutePrefix = prefix,
+                        Description = manifest.Description,
+                        EntryAssembly = entry,
+                        Settings = settings,
+                        DesiredState = previous?.DesiredState ?? ModuleState.Active,
+                        InstalledAt = DateTimeOffset.UtcNow,
+                        Core = true,
+                        PackageHash = hash
+                    };
+                    _store.Save(_records.Values);
+                    changed.Add(manifest.Id);
+                    _log.LogInformation("Seeded core module {Id} {Version} ({Mode})", manifest.Id, manifest.Version, previous is null ? "new" : "upgrade");
+                }
+            }
+            finally { _gate.Release(); }
+        }
+        return changed;
+    }
+
+    /// <summary>Tells every other replica that core modules were seeded (startup, after the first sync).</summary>
+    public Task PublishCoreSeededAsync(IReadOnlyList<string> ids, CancellationToken ct) =>
+        _bus.PublishAsync(new ModuleStateChanged(string.Join(',', ids), "core-seeded", _options.Pool, ModuleInstance.Id, DateTimeOffset.UtcNow), ct);
 
     /// <summary>
     /// Converges this replica on the catalog. Runs on startup, after each local lifecycle call and whenever another
@@ -451,7 +554,10 @@ internal sealed partial class ModuleRuntime
             var routeModules = LoadableTypes(assembly)
                 .Where(t => t is { IsClass: true, IsAbstract: false } && typeof(ICarterModule).IsAssignableFrom(t))
                 .ToArray();
-            return new LoadedModule(context, container, routeModules, record);
+            var loaded = new LoadedModule(context, container, routeModules, record);
+            // Tenancy (per-tenant initialization) and other host observers; they let go in ReleaseAsync.
+            foreach (var observer in _hostRoot.GetServices<IModuleLifecycleObserver>()) observer.Loaded(record.Id, container.Root);
+            return loaded;
         }
         catch
         {
@@ -494,6 +600,8 @@ internal sealed partial class ModuleRuntime
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static async Task<WeakReference> ReleaseAsync(LoadedModule module, IServiceProvider hostRoot, IServiceCollection hostServices)
     {
+        foreach (var observer in hostRoot.GetServices<IModuleLifecycleObserver>())
+            await observer.ReleasingAsync(module.Id, module.Container.Root);
         await module.Container.DisposeAsync();
         FrameworkCaches.Evict(module.Context, hostRoot, hostServices);
         var context = new WeakReference(module.Context);
@@ -573,6 +681,37 @@ internal sealed partial class ModuleRuntime
         if (!VersionText().IsMatch(manifest.Version)) throw new ModuleException($"Invalid version '{manifest.Version}'.");
     }
 
+    /// <summary>SHA-256 over every file's relative path and content, in a stable order.</summary>
+    private static string HashFolder(string folder)
+    {
+        using var hash = System.Security.Cryptography.IncrementalHash.CreateHash(System.Security.Cryptography.HashAlgorithmName.SHA256);
+        foreach (var file in Directory.EnumerateFiles(folder, "*", SearchOption.AllDirectories)
+                     .Select(f => Path.GetRelativePath(folder, f).Replace('\\', '/'))
+                     .Order(StringComparer.Ordinal))
+        {
+            hash.AppendData(System.Text.Encoding.UTF8.GetBytes(file + "\n"));
+            hash.AppendData(File.ReadAllBytes(Path.Combine(folder, file)));
+        }
+        return Convert.ToHexStringLower(hash.GetHashAndReset());
+    }
+
+    private static void CopyFolder(string source, string target)
+    {
+        foreach (var file in Directory.EnumerateFiles(source, "*", SearchOption.AllDirectories))
+        {
+            var destination = Path.Combine(target, Path.GetRelativePath(source, file));
+            Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
+            File.Copy(file, destination, overwrite: true);
+        }
+    }
+
+    /// <summary>Numeric comparison of the leading x.y.z part ("1.10.0" &gt; "1.9.0"); falls back to ordinal text.</summary>
+    private static int CompareVersions(string left, string right)
+    {
+        static Version? Parse(string text) => Version.TryParse(text.Split('-', '+')[0], out var version) ? version : null;
+        return Parse(left) is { } l && Parse(right) is { } r ? l.CompareTo(r) : string.CompareOrdinal(left, right);
+    }
+
     private static Type? FindModuleType(Assembly assembly)
     {
         var types = LoadableTypes(assembly)
@@ -606,6 +745,7 @@ internal sealed partial class ModuleRuntime
 
     private sealed class LoadedModule(ModuleLoadContext context, ModuleContainer container, Type[] routeModules, ModuleRecord record)
     {
+        public string Id { get; } = record.Id;
         public ModuleLoadContext Context { get; } = context;
         public ModuleContainer Container { get; } = container;
         public Type[] RouteModules { get; } = routeModules;

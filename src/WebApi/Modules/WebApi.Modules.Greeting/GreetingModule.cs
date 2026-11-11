@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using soft.square.net.WebApi.Contracts;
+using soft.square.net.WebApi.Contracts.Tenancy;
 
 namespace soft.square.net.WebApi.Modules.Greeting;
 
@@ -60,6 +61,9 @@ public sealed class GreetingEndpoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
+        // Not tenant data (yet): works with or without a tenant.
+        app = app.MapGroup("").TenantOptional();
+
         app.MapGet("/", (GreetingService greetings) => greetings.Greet("world"));
         app.MapGet("/{name}", (string name, GreetingService greetings) => greetings.Greet(name));
         app.MapPost("/echo", (EchoRequest request) => Results.Ok(request with { Text = request.Text.Pascalize() }));

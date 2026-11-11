@@ -5,7 +5,7 @@ sidebar:
   order: 3
 ---
 
-The runtime module prototype lives in `src/WebApi`. How it works: [Runtime modules](/backend/runtime-modules/).
+The runtime module prototype lives in `src/WebApi/WebApi`. How it works: [Runtime modules](/backend/runtime-modules/).
 
 ## Admin endpoints
 
@@ -50,7 +50,14 @@ Unload and uninstall return `{ id, unloaded, gcPasses, note }` for the answering
 | --- | --- |
 | `GET /api/pool` | Pool, role, enabled modules and instance of the replica that answered, plus the names (never the values) of its connection strings |
 | `GET /health` | Health check used by the gateway and the orchestrator |
-| `GET /openapi/v1.json` | OpenAPI document (Development), including active module routes |
+| `GET /openapi/webapi.json` | OpenAPI document of the host's built-in endpoints (admin, `/api/pool`, `/health`) |
+| `GET /openapi/modules/{id}.json` | OpenAPI document of one module; `404` unless it is routed on this replica |
+| `GET /openapi` | The documents available right now: `[{name, title, url, isDefault}]` |
+| `GET /scalar` (`/` redirects there) | Scalar API reference, with a switcher for the same documents |
+
+The OpenAPI and Scalar endpoints exist in Development, or when `OpenApi:Enabled=true`. Behind the gateway's
+`/pools/{pool}/` routes, document URLs carry that prefix (from `X-Forwarded-Prefix`). How it works:
+[OpenAPI and Scalar](/backend/runtime-modules/#openapi-and-scalar).
 
 ## States
 
@@ -70,6 +77,7 @@ Unload and uninstall return `{ id, unloaded, gcPasses, note }` for the answering
 | `Modules:Role` | `Api` | `Api` maps routes; `Worker` loads modules without routes |
 | `Modules:Enabled` | empty (all) | Module ids this pool applies, e.g. `Modules__Enabled__0=sales` |
 | `ConnectionStrings:broker` | none | RabbitMQ connection; when set, lifecycle changes are broadcast on the `modules.state` fanout exchange |
+| `OpenApi:Enabled` | `false` (on in Development) | Serves the OpenAPI documents and Scalar outside Development |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | none | When set, traces, metrics and logs are exported over OTLP (the Aspire dashboard sets it) |
 
 ## Contract
@@ -110,12 +118,15 @@ Endpoints come from its `ICarterModule` classes. Keyed services are not supporte
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <!-- Shared with the host: compile against them, never ship them. -->
     <PackageReference Include="Carter" Version="10.0.0" ExcludeAssets="runtime" />
-    <ProjectReference Include="..\WebApi.Contracts\WebApi.Contracts.csproj" Private="false" ExcludeAssets="runtime" />
+    <ProjectReference Include="..\..\WebApi.Contracts\WebApi.Contracts.csproj" Private="false" ExcludeAssets="runtime" />
     <!-- Private dependency: loads into the module's own load context. -->
     <PackageReference Include="Humanizer.Core" Version="2.14.1" />
   </ItemGroup>
 </Project>
 ```
+
+Runtime modules live in `src/WebApi/Modules/<Module>/`, next to the host in `src/WebApi/WebApi/` and the contracts in
+`src/WebApi/WebApi.Contracts/`, which is why the contracts reference goes up two folders.
 
 | Package form | Contents |
 | --- | --- |
@@ -131,11 +142,11 @@ was built against.
 **Single instance:**
 
 ```bash
-dotnet build src/WebApi.Modules.Greeting
-dotnet run --project src/WebApi --launch-profile http
+dotnet build src/WebApi/Modules/WebApi.Modules.Greeting
+dotnet run --project src/WebApi/WebApi --launch-profile http
 ```
 
-Zip the contents of `src/WebApi.Modules.Greeting/bin/Debug/net10.0` as `greeting.zip`, then:
+Zip the contents of `src/WebApi/Modules/WebApi.Modules.Greeting/bin/Debug/net10.0` as `greeting.zip`, then:
 
 ```bash
 curl -F "package=@greeting.zip" http://localhost:5298/api/admin/modules
@@ -143,7 +154,7 @@ curl -X POST http://localhost:5298/api/admin/modules/greeting/activate
 curl http://localhost:5298/api/greeting/john_doe
 ```
 
-`src/WebApi/WebApi.http` has every request.
+`src/WebApi/WebApi/WebApi.http` has every request.
 
 **Pools and replicas:** run the [Hybrid architecture lab](/backend/hybrid-lab/) and send the same requests to the
 gateway, `http://localhost:5080`.

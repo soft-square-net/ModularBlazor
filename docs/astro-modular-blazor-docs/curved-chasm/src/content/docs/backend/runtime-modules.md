@@ -5,7 +5,7 @@ sidebar:
   order: 8
 ---
 
-The prototype in `src/WebApi` shows that a module can be uploaded, activated and served **while the API runs**, and
+The prototype in `src/WebApi/WebApi` shows that a module can be uploaded, activated and served **while the API runs**, and
 that every replica of every pool converges on the same module state. It is research code: it proves the mechanism
 and measures its limits.
 
@@ -75,8 +75,9 @@ public sealed class GreetingEndpoints : ICarterModule
 }
 ```
 
-Its endpoints are served under `/api/{RoutePrefix}` (here `/api/greeting/...`) and appear in `/openapi/v1.json`
-while the module is active.
+Its endpoints are served under `/api/{RoutePrefix}` (here `/api/greeting/...`). While the module is routed, it has
+its own OpenAPI document, `/openapi/modules/greeting.json`, listed in Scalar at `/scalar`; see
+[OpenAPI and Scalar](#openapi-and-scalar).
 
 ## Pools and replicas
 
@@ -154,6 +155,35 @@ Each module loads into its own **collectible `AssemblyLoadContext`** (`ModuleLoa
 The data source is also registered as an `IActionDescriptorChangeProvider`, and the app's DI-level
 `EndpointDataSource` is subscribed at startup. Without that subscription it keeps its first list of endpoints:
 OpenAPI goes stale and the old endpoints stay in memory.
+
+## OpenAPI and Scalar
+
+OpenAPI is on in Development, or anywhere with `OpenApi:Enabled=true` (`OpenApi/ModularOpenApi.cs`). Every routed
+module gets **its own document**, and Scalar lists the documents that exist right now.
+
+| URL | Content |
+| --- | --- |
+| `/openapi/webapi.json` | The host's built-in endpoints: module admin, `/api/pool`, `/health` |
+| `/openapi/modules/{id}.json` | One module's endpoints; **404** unless the module is routed on this replica |
+| `/openapi` | The documents available right now: `[{name, title, url, isDefault}]` |
+| `/scalar` (`/` redirects there) | Scalar; its document switcher lists the same documents and is rebuilt on every page load |
+
+- **One slot, many modules.** Modules arrive after the DI container is built, so they cannot be registered as named
+  OpenAPI documents. The host registers two: `webapi`, which filters out every endpoint carrying
+  `RuntimeModuleMetadata` (so it never touches module types), and an internal `modules` slot.
+  `/openapi/modules/{id}.json` sets the requested module in an `AsyncLocal`, and the slot's `ShouldInclude` keeps only
+  that module's endpoints. The document is generated on demand through `IOpenApiDocumentProvider` and is not cached.
+- **The list follows the routes.** It is read from the live module endpoints, so a module drops out of Scalar as soon
+  as it is deactivated or unloaded.
+- **Module services are not request bodies.** ApiExplorer asks the host container whether a parameter is a service, and
+  the host does not know module services. `ModuleServiceParameterFilter` drops the inferred body of module endpoints
+  whose request delegate declared none.
+- **Behind the gateway**, documents are per replica, so they show what that pool routes. The gateway's
+  `/pools/{pool}/**` routes send `X-Forwarded-Prefix: /pools/{pool}`; document URLs and each document's server URL are
+  built from it (routing ignores it). So `/pools/sales/scalar` lists `greeting`, and "Try it" stays on
+  `/pools/sales/...`. See the [Hybrid architecture lab](/backend/hybrid-lab/#openapi-and-scalar-per-pool).
+
+`/openapi/v1.json` no longer exists.
 
 ## Settings
 
