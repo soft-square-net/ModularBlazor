@@ -29,4 +29,10 @@ public sealed record ModuleManifest(string Id, string Name, string Version, stri
 
     /// <summary>Default settings copied into the module store on install; the admin can override them.</summary>
     public IReadOnlyDictionary<string, string?> DefaultSettings { get; init; } = new Dictionary<string, string?>();
+
+    /// <summary>
+    /// Permissions the module's endpoints require (<c>RequirePermission</c>), listed in the permission catalog. Activation
+    /// fails when an endpoint requires a permission that is neither declared here nor a platform permission.
+    /// </summary>
+    public IReadOnlyList<Security.PermissionDefinition> Permissions { get; init; } = [];
 }

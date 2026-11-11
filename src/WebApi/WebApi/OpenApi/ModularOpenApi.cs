@@ -82,7 +82,8 @@ internal static partial class ModularOpenApi
 
     public static IEndpointRouteBuilder MapModularOpenApi(this IEndpointRouteBuilder app)
     {
-        var docs = app.MapGroup("/openapi").ExcludeFromDescription();
+        // Documentation is public where it is enabled (see IsEnabled); the APIs it describes are not.
+        var docs = app.MapGroup("/openapi").ExcludeFromDescription().AllowAnonymous();
 
         docs.MapGet("/", (HttpContext context, ModuleEndpointDataSource modules) =>
             Documents(DocsBase(context), modules).Select(d => new { d.Name, d.Title, Url = d.RoutePattern, d.IsDefault }));
@@ -118,9 +119,9 @@ internal static partial class ModularOpenApi
             // Runs per request on a fresh copy of the options: lists what this replica routes right now. No prefix here:
             // Scalar resolves document URLs against the path its own page was served from (/pools/sales/scalar → /pools/sales/).
             options.AddDocuments(Documents("", context.RequestServices.GetRequiredService<ModuleEndpointDataSource>()));
-        }).ExcludeFromDescription();
+        }).ExcludeFromDescription().AllowAnonymous();
 
-        app.MapGet("/", (HttpContext context) => Results.Redirect($"{DocsBase(context)}/scalar")).ExcludeFromDescription();
+        app.MapGet("/", (HttpContext context) => Results.Redirect($"{DocsBase(context)}/scalar")).ExcludeFromDescription().AllowAnonymous();
         return app;
     }
 

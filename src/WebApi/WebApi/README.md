@@ -133,7 +133,7 @@ request ─► host middleware (Tenancy/): X-Tenant header, then host name (X-Fo
 
 - **Resolution rules:**
   - The `X-Tenant` header wins. If the host name names a different tenant, the request gets 400.
-  - Once tokens exist, the `tenant` claim must match the request's tenant (403), or is the tenant when the request names none.
+  - With a token, the `tenant` claim must match the request's tenant (403), or is the tenant when the request names none. See [Authentication and authorization](#authentication-and-authorization).
   - An unknown tenant gets 404, a suspended one 403.
   - Module endpoints need a tenant (400 without one) unless they are `.TenantOptional()`. Host endpoints never need one.
   - `greeting`, `identity` and `tenancy` are tenant-optional for now.
@@ -287,11 +287,79 @@ honestly.
 - Install, activate and deactivate: treat as fully hot.
 - Unload and upgrade: treat as "routes gone now, memory reclaimed best-effort". Schedule a rolling restart for guaranteed reclamation, which is normal in the replicated deployment anyway.
 
+## Authentication and authorization
+
+Foundation of the agreed auth design (docs site: Backend → Authentication and authorization). Every replica checks
+tokens and has the final say; permissions are looked up on the server, never carried in the token.
+
+```
+request ─► UseRouting ─► UseAuthentication (JwtBearer) ─► UseTenancy (tenant + claim check) ─► UseAuthorization ─► endpoint
+                                                                                                 │
+              PermissionRequirement ─► IAccessScopes ─► GrantCache (per tenant+user, 5 min, cleared via "access.grants.changed")
+                                                            └─► platform.access_grants (tenant store) │ in memory without a store
+```
+
+| Piece | Where | What |
+|---|---|---|
+| `RequirePermission(...)`, `PermissionRequirement`, `PlatformClaims`, `PlatformRoles`, `PlatformPermissions`, `AccessScope`, `GrantSources`, `IAccessScopes`, `IGrantStore`, `IPermissionCatalog`, `ModuleManifest.Permissions` | `WebApi.Contracts/Security`, `IRuntimeModule.cs` | Everything a module sees. Host types only: nothing in the authorization pipeline can pin a module. |
+| JwtBearer, fallback policy, permission handler, grant cache and store, broker invalidation | `WebApi/Security` | `builder.AddPlatformSecurity("broker")`, `app.UseRouting(); app.UsePlatformSecurity();` |
+| Activation checks | `Modularity/ModuleAuthorization.cs` | Fails activation (400) on an undeclared permission, a requirement type defined by the module, or a named policy. |
+| Grant admin, permission catalog, `/me` with permissions | `identity` core module 1.1.0 | `GET/POST /api/identity/grants`, `DELETE /grants/{id}` (`access.grants.manage`), `GET /permissions`. |
+
+- **Tokens:**
+  - `Auth:Authority` points at the identity service (OIDC discovery and JWKS); `Auth:Audience` defaults to `modular-webapi`.
+  - Inbound claim mapping is off, so the host reads `sub`, `tenant` and `role` exactly as issued.
+  - Without an authority, the standard `Authentication:Schemes:Bearer` section applies. That is what `dotnet user-jwts` writes for development; the signing key sits in the project's user secrets.
+- **Secure by default:** every endpoint needs a signed-in caller unless it calls `AllowAnonymous()`. Anonymous today: `/health`, the OpenAPI documents and Scalar (where enabled), and `/api/identity/me`.
+- **Permissions:**
+  - The endpoint check is coarse: the caller holds the permission in some scope of the request's tenant, or through a platform role.
+  - Per-resource checks are module code: `IAccessScopes.HasPermissionAsync(permission, [AccessScope.Press(p), AccessScope.Category(c)])`.
+  - List filters use `ScopesAsync(permission)`.
+  - The rights of another user (an assignee, say) come from `UserHasPermissionAsync`.
+- **Grants:**
+  - A grant is a tenant × user × permission × scope (`tenant`, `press:{id}`, `category:{id}`) with an optional `validFrom`/`validTo` (UTC) and a source (`standing`, `shift:{id}`).
+  - Windows are evaluated at check time, so a shift grant starts and ends on the clock without any cache event.
+  - `IGrantStore.ReplaceSourceAsync` publishes a rota in one transaction; `EndAsync` ends a user's grants of a source early (check-out).
+  - Platform permissions can't be granted (400). `access.grants.manage` is the exception, because tenant admins need it.
+- **Platform roles:** `platform-admin` holds every platform permission (`platform.modules.manage`, `platform.tenants.manage`, `access.grants.manage`) in any tenant and without one. Other mappings come from `Access:Roles:{role}:N`.
+- **Protected host and core endpoints:**
+  - `/api/admin/modules` needs `platform.modules.manage`.
+  - Tenant create and update need `platform.tenants.manage`.
+  - The grant API needs `access.grants.manage`.
+- **Without a tenant store**, grants are in memory, seeded from `Access:Grants:N:{Tenant,UserId,Permission,Scope}`.
+
+**Development tokens:**
+
+```bash
+dotnet user-jwts create --project src/WebApi/WebApi --name admin --role platform-admin
+dotnet user-jwts create --project src/WebApi/WebApi --name editor1 --claim tenant=acme
+```
+
+`user-jwts` tokens have `aud` set to the launch-profile URLs (`http://localhost:5298`, `https://localhost:7276`).
+Replicas on other ports need `--audience` or `Authentication:Schemes:Bearer:ValidAudiences`. The Hybird lab gets real
+tokens once the identity service exists.
+
+**Verified** (standalone host on :5298; grants both in memory and in Postgres):
+- **Protection:** the admin API returns 401 anonymous, 403 for an editor and 200 for `platform-admin`. Tenant writes return 403 for an editor.
+- **Tenant match:** a token for `acme` with `X-Tenant: globex` gets 403.
+- **Grants:**
+  - Added and revoked grants take effect on the next request.
+  - A grant whose `validFrom` is in the future is not yet effective.
+  - Granting a platform permission returns 400.
+- **Activation checks:** a test module was refused (400) for an undeclared permission, and again for its own requirement type. The declared version served 403, then 200 after the grant.
+- **Unload:** that module unloaded, but only after the synchronous 20-pass check. `/unloading` was empty a little later. The variants that never served requests behaved the same, so the delay isn't specific to authorization.
+- **Postgres:** the `AddAccessGrants` migration ran there (migrations exist for all four engines; SQL Server, MySQL and Oracle weren't run).
+
 ## Not covered yet
 
 - **Database:** a real modules schema (DB table) instead of `modules.json`.
-- **Security:** authorization on the admin API; package signing and verification.
-- **Tenancy:** token validation (the `tenant` claim check is in place but no JwtBearer yet), membership checks, per-tenant module enablement (plans), per-tenant module settings, dropping a module's schema on uninstall.
+- **Security:** package signing and verification.
+- **Auth:**
+  - The identity service (OpenIddict) is not built yet.
+  - Membership checks per request: revocation over the broker from the identity service.
+  - Gateway token checks.
+  - Grant templates for the shifts module and Elsa.
+- **Tenancy:** per-tenant module enablement (plans), per-tenant module settings, dropping a module's schema on uninstall.
 - **Workers:** module consumers and hosted services (the tenant scope primitive exists).
 - **DI:** keyed services inside modules.
 - **Packages:** `.nupkg` dependency restore. Ship dependencies in the `.zip` form instead.

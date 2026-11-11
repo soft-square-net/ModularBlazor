@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using soft.square.net.WebApi.Contracts;
+using soft.square.net.WebApi.Contracts.Security;
 using soft.square.net.WebApi.Contracts.Tenancy;
 using soft.square.net.WebApi.Data;
 
@@ -21,11 +22,12 @@ namespace soft.square.net.WebApi.Modules.Core.Tenancy;
 /// <item>Creating a tenant provisions its database; modules then migrate their schema in it (ITenantInitializer).</item>
 /// <item>On activation it seeds the tenants listed in its settings (the lab's acme and globex) when they are missing.</item>
 /// </list>
-/// Platform-level endpoints: they work without a tenant (and need platform rights once authentication is in).
+/// Platform-level endpoints: they work without a tenant. Reading needs a signed-in caller; writing needs
+/// <see cref="PlatformPermissions.TenantsManage"/>.
 /// </summary>
 public sealed class TenancyModule : IRuntimeModule
 {
-    public ModuleManifest Manifest { get; } = new("tenancy", "Tenancy", "2.0.0", "tenancy")
+    public ModuleManifest Manifest { get; } = new("tenancy", "Tenancy", "2.1.0", "tenancy")
     {
         Description = "Core module: tenant directory admin (tenant store), tenant database provisioning and the current tenant.",
         DefaultSettings = new Dictionary<string, string?>
@@ -145,6 +147,7 @@ public sealed partial class TenancyEndpoints : ICarterModule
                     ? Results.Created($"tenants/{tenant.Id}", tenant)
                     : Results.Conflict(new { error = $"Tenant '{tenant.Id}' exists already." });
             })
+            .RequirePermission(PlatformPermissions.TenantsManage)
             .WithSummary("Creates a tenant: provisions its database, writes the tenant store, and every replica reloads; modules then migrate their schemas for it.");
 
         platform.MapPatch("/tenants/{id}", async (string id, UpdateTenantRequest request, HttpContext http, ITenantDirectory tenants, CancellationToken ct) =>
@@ -156,6 +159,7 @@ public sealed partial class TenancyEndpoints : ICarterModule
                 await tenants.NotifyChangedAsync(id, ct);
                 return Results.Ok(updated);
             })
+            .RequirePermission(PlatformPermissions.TenantsManage)
             .WithSummary("Renames a tenant, changes its host names, or suspends / re-activates it (status Active or Suspended).");
     }
 
