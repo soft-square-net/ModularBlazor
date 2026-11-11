@@ -38,8 +38,15 @@ Edge load balancer + YARP gateway        TLS, JWT, rate limit, tenant resolution
 | `src/api/ModularBlazor.Host` | مضيف الواجهة الإنتاجي ووحداته المدمجة (`HostModules`) |
 | `src/WebApi/WebApi` | النموذج الأولي لوحدات التشغيل: صورة واحدة تعمل كأي مجموعة |
 | `src/WebApi/WebApi.Contracts` | `IRuntimeModule` و`ModuleManifest`، مشتركان بين المضيف وكل وحدة تشغيل |
-| `src/WebApi/Modules/WebApi.Modules.Greeting` | وحدة تشغيل نموذجية، ترفع كحزمة |
+| `src/WebApi/Modules/Core/` | **الوحدات الأساسية** (`Identity` و`Tenancy`): تبنى مع كل إصدار من WebApi وتفعل افتراضيا |
+| `src/WebApi/Modules/Custom/` | **الوحدات المخصصة**: تبنى وحدها وترفع والتطبيق يعمل |
+| `src/WebApi/Modules/Custom/WebApi.Modules.Greeting` | وحدة مخصصة نموذجية، ترفع كحزمة |
+| `src/WebApi/Modules/Custom/Inventory` | وحدة مخصصة نموذجية بطبقات (Domain وApplication وInfrastructure) |
 | `src/Aspire/Hybird` | مختبر Aspire: بوابة، وثلاث مجموعات، وRabbitMQ وRedis وPostgreSQL |
+
+يحمل `src/WebApi/Modules/Directory.Build.props` الإعدادات المشتركة للوحدات ذات الطبقات؛ ويضيف كل من `Core/` و`Custom/`
+ملف `Directory.Build.props` خاصا به فوقه. والنوعان وحدات تشغيل عادية: لا يختلفان إلا في طريقة وصولهما (مع الإصدار، أو
+برفع من المسؤول). انظر [وحدات أثناء التشغيل](/ar/backend/runtime-modules/).
 
 ## اقرأ بهذا الترتيب
 

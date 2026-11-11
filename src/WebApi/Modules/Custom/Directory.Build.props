@@ -1,0 +1,11 @@
+<Project>
+
+  <!--
+    Custom modules: runtime modules that are NOT part of a WebApi release. Each one is built on its own, zipped and
+    uploaded at runtime (POST /api/admin/modules), unlike Core/ modules, which WebApi builds and seeds by default.
+    Layered modules (<Name>.Domain / .Application / .Infrastructure) get their setup from ../Directory.Build.props.
+  -->
+
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+
+</Project>

@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Inventory use cases and specifications. References: Domain, plus WebApi.Contracts and the shared kernel (../../../Directory.Build.props). -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\WebApi.Modules.Inventory.Domain\WebApi.Modules.Inventory.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

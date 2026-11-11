@@ -17,6 +17,12 @@
     <PackageReference Include="Aspire.Hosting.RabbitMQ" Version="13.6.5" />
     <PackageReference Include="Aspire.Hosting.Redis" Version="13.6.5" />
     <PackageReference Include="Aspire.Hosting.Yarp" Version="13.6.5" />
+    <!-- Optional tenant database servers (Lab:Engines): SQL Server, MySQL, Oracle. -->
+    <PackageReference Include="Aspire.Hosting.SqlServer" Version="13.6.5" />
+    <PackageReference Include="Aspire.Hosting.MySql" Version="13.6.5" />
+    <PackageReference Include="Aspire.Hosting.Oracle" Version="13.6.5" />
+    <!-- Transitive (Aspire.Hosting.MySql health check) 2.3.1 has a known vulnerability: pin the patched version. -->
+    <PackageReference Include="MySqlConnector" Version="2.6.2" />
   </ItemGroup>
 
   <ItemGroup>

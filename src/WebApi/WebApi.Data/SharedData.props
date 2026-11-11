@@ -1,28 +1,29 @@
 <Project>
 
   <!--
-    Import in a runtime module that uses the shared data layer (TenantDbContext, the tenant store):
-      <Import Project="..\..\WebApi.Data\SharedData.props" />   (path relative to the module project)
-    The host ships WebApi.Data, EF Core and Npgsql, and modules always use the host's copies (one type identity, and
-    EF Core's caches stay controllable). So: compile against them, never copy them into the module package.
-    Keep the versions in step with WebApi.Data.csproj.
+    Import in a runtime module project that uses the shared data layer (TenantDbContext, EfRepository, the tenant store):
+      <Import Project="...\WebApi.Data\SharedData.props" />
+    It also imports the shared kernel (SharedKernel.props), which defines HostSharedExclude / HostSharedPrivate
+    (see there for EfDesignAssets=all and dotnet-ef).
+    The host ships WebApi.Data, EF Core with all four engine providers (PostgreSQL, SQL Server, MySQL, Oracle) and Ardalis.Specification, and modules always use the host's copies (one
+    type identity, and EF Core's caches stay controllable). So: compile against them, never copy them into the module
+    package. Keep the versions in step with WebApi.Data.csproj.
   -->
 
-  <PropertyGroup>
-    <!-- dotnet-ef runs the module itself and needs these assemblies next to it: set the environment variable
-         EfDesignAssets=all for "dotnet ef migrations add", then build again without it before packaging. -->
-    <SharedDataExclude Condition="'$(EfDesignAssets)' != 'all'">runtime</SharedDataExclude>
-    <SharedDataPrivate Condition="'$(EfDesignAssets)' != 'all'">false</SharedDataPrivate>
-    <SharedDataPrivate Condition="'$(EfDesignAssets)' == 'all'">true</SharedDataPrivate>
-  </PropertyGroup>
+  <Import Project="$(MSBuildThisFileDirectory)..\WebApi.SharedKernel\SharedKernel.props" />
 
   <ItemGroup>
-    <ProjectReference Include="$(MSBuildThisFileDirectory)WebApi.Data.csproj" Private="$(SharedDataPrivate)" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.14" ExcludeAssets="$(SharedDataExclude)" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="10.0.14" ExcludeAssets="$(SharedDataExclude)" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.14" ExcludeAssets="$(SharedDataExclude)" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" ExcludeAssets="$(SharedDataExclude)" />
-    <PackageReference Include="Npgsql" Version="10.0.3" ExcludeAssets="$(SharedDataExclude)" />
+    <ProjectReference Include="$(MSBuildThisFileDirectory)WebApi.Data.csproj" Private="$(HostSharedPrivate)" ExcludeAssets="$(HostSharedExclude)" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.14" ExcludeAssets="$(HostSharedExclude)" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="10.0.14" ExcludeAssets="$(HostSharedExclude)" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.14" ExcludeAssets="$(HostSharedExclude)" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" ExcludeAssets="$(HostSharedExclude)" />
+    <PackageReference Include="Npgsql" Version="10.0.3" ExcludeAssets="$(HostSharedExclude)" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.14" ExcludeAssets="$(HostSharedExclude)" />
+    <PackageReference Include="MySql.EntityFrameworkCore" Version="10.0.12" ExcludeAssets="$(HostSharedExclude)" />
+    <PackageReference Include="Oracle.EntityFrameworkCore" Version="10.23.26400" ExcludeAssets="$(HostSharedExclude)" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.15" ExcludeAssets="$(HostSharedExclude)" />
+    <PackageReference Include="Ardalis.Specification.EntityFrameworkCore" Version="9.3.1" ExcludeAssets="$(HostSharedExclude)" />
   </ItemGroup>
 
 </Project>

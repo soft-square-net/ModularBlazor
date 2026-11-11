@@ -32,9 +32,11 @@ public static class TenancyHostExtensions
         services.AddSingleton<ModuleTenantInitializer>();
         services.AddSingleton<IModuleLifecycleObserver>(sp => sp.GetRequiredService<ModuleTenantInitializer>());
 
-        var store = builder.Configuration.GetConnectionString(StoreConnectionName);
-        if (!string.IsNullOrWhiteSpace(store))
+        var databases = new TenantDatabases(builder.Configuration);
+        if (databases.IsConfigured(StoreConnectionName))
         {
+            // On the store's own engine (DatabaseServers:TenantStore:Provider; PostgreSql when not set).
+            var store = databases.Store;
             services.AddDbContext<TenantStoreDbContext>(options => TenantStoreDbContext.Configure(options, store));
             services.AddScoped<TenantRegistry>();
         }

@@ -9,7 +9,7 @@ using soft.square.net.WebApi.Data;
 
 #nullable disable
 
-namespace soft.square.net.WebApi.Data.Migrations.TenantStore
+namespace soft.square.net.WebApi.Data.TenantStore.Migrations.PostgreSql
 {
     [DbContext(typeof(TenantStoreDbContext))]
     partial class TenantStoreDbContextModelSnapshot : ModelSnapshot

@@ -36,6 +36,35 @@ var tenantStore = tenantData.AddDatabase("TenantStore", databaseName: "HybirdTen
 tenantData.AddDatabase("tenant-acme");
 tenantData.AddDatabase("tenant-globex");
 
+// Optional tenant database servers on the other engines, switched on by Lab:Engines (comma-separated: sqlserver,
+// mysql, oracle; e.g. dotnet run --project src/Aspire/Hybird --launch-profile http -- --Lab:Engines=sqlserver,mysql,oracle).
+// Each is one more server a tenant can be created on, e.g. POST /api/tenancy/tenants {"id":"contoso","databaseServer":"tenant-sql"}.
+// Replicas get ConnectionStrings:<server> and DatabaseServers:<server>:Provider; modules migrate their schema there
+// from the engine's migration set in their own assembly.
+var engines = (builder.Configuration["Lab:Engines"] ?? "")
+    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+    .Select(e => e.ToLowerInvariant()).ToHashSet();
+var databaseServers = new List<Action<IResourceBuilder<ProjectResource>>>
+{
+    replica => replica.WithReference(tenantData).WithEnvironment("DatabaseServers__tenant-data__Provider", "PostgreSql")
+};
+if (engines.Contains("sqlserver"))
+{
+    var sql = builder.AddSqlServer("tenant-sql").WithDataVolume("hybird-tenant-sql");
+    databaseServers.Add(replica => replica.WithReference(sql).WaitFor(sql).WithEnvironment("DatabaseServers__tenant-sql__Provider", "SqlServer"));
+}
+if (engines.Contains("mysql"))
+{
+    var mysql = builder.AddMySql("tenant-mysql").WithDataVolume("hybird-tenant-mysql");
+    databaseServers.Add(replica => replica.WithReference(mysql).WaitFor(mysql).WithEnvironment("DatabaseServers__tenant-mysql__Provider", "MySql"));
+}
+if (engines.Contains("oracle"))
+{
+    // Oracle Database Free: tenants are schemas in the FREEPDB1 pluggable database, created by SYSTEM.
+    var oracle = builder.AddOracle("oracle").WithDataVolume("hybird-tenant-oracle").AddDatabase("tenant-oracle", "FREEPDB1");
+    databaseServers.Add(replica => replica.WithReference(oracle).WaitFor(oracle).WithEnvironment("DatabaseServers__tenant-oracle__Provider", "Oracle"));
+}
+
 // ---------------------------------------------------------------- module pools (same image, different config)
 
 // Core pool: every module except the extracted ones. "identity" and "tenancy" are core modules: they ship with every
@@ -104,9 +133,10 @@ IResourceBuilder<ProjectResource>[] AddPool(string name, string role, int replic
             .WithReference(broker).WaitFor(broker)
             .WithReference(redis).WaitFor(redis)
             .WithReference(tenantStore).WaitFor(tenantStore)
-            .WithReference(tenantData)
+            .WithEnvironment("DatabaseServers__TenantStore__Provider", "PostgreSql")
             .WithHttpHealthCheck("/health");
 
+        foreach (var server in databaseServers) server(replica); // tenant-data plus the Lab:Engines servers
         for (var i = 0; i < modules.Length; i++)
             replica.WithEnvironment($"Modules__Enabled__{i}", modules[i]);
         return replica;

@@ -126,7 +126,8 @@ request ─► host middleware (Tenancy/): X-Tenant header, then host name (X-Fo
 | Piece | Where | What |
 |---|---|---|
 | `ITenantContext`, `TenantInfo`, `ITenantDirectory`, `ITenantInitializer`, `IModuleActivation`, `.TenantOptional()`, `CreateTenantScope(...)`, `TenancyNames` | `WebApi.Contracts/Tenancy` | Everything a module sees. Host-shipped, so one type identity and nothing that pins a module. |
-| `TenantDbContext`, `ITenantOwned`, `AddTenantDbContext<T>()`, `TenantStoreDbContext`, `TenantRegistry`, `TenantDatabases` | `WebApi.Data` (new, host-shipped: EF Core 10 + Npgsql) | The data layer modules share. Modules import `WebApi.Data/SharedData.props`: compile against it, never ship it. |
+| `TenantDbContext`, `AddTenantDbContext<T>()`, `EfRepository<T>`, `TenantStoreDbContext`, `TenantRegistry`, `TenantDatabases`, `DatabaseProviderAdapter`, `ProviderMigrationsAssembly` | `WebApi.Data` (host-shipped: EF Core 10 with the PostgreSQL, SQL Server, MySQL and Oracle providers, Ardalis.Specification.EntityFrameworkCore) | The data layer modules share. Modules import `WebApi.Data/SharedData.props`: compile against it, never ship it. See [Database engines](#database-engines-and-per-engine-migrations). |
+| `ITenantOwned`, entity bases, `IRepository<T>` / `IReadRepository<T>` | `WebApi.SharedKernel` (host-shipped, no EF) | See [Layered modules](#layered-modules-specifications-and-repositories). |
 | Middleware, directory cache, `tenants.changed` bus, per-tenant module initialization | `WebApi/Tenancy` | `builder.AddPlatformTenancy("broker")`, `app.UseRouting(); app.UseTenancy();` in `Program.cs`. |
 | Directory admin, provisioning, seeding (acme, globex) | `tenancy` core module | Writes the tenant store, then `ITenantDirectory.NotifyChangedAsync`. |
 
@@ -136,29 +137,87 @@ request ─► host middleware (Tenancy/): X-Tenant header, then host name (X-Fo
   - An unknown tenant gets 404, a suspended one 403.
   - Module endpoints need a tenant (400 without one) unless they are `.TenantOptional()`. Host endpoints never need one.
   - `greeting`, `identity` and `tenancy` are tenant-optional for now.
-- **Database per tenant.** A tenant row names a server (a connection string name, e.g. `tenant-data`) and a database; no secrets in the store.
-  - A module's `TenantDbContext` connects to the current tenant's database, inside the module's own schema, with its own `__EFMigrationsHistory`.
+- **Database per tenant.** A tenant row names a server (a connection string name, e.g. `tenant-data`) and a database; no secrets in the store. The server's engine can be PostgreSQL, SQL Server, MySQL or Oracle (see below).
+  - A module's `TenantDbContext` connects to the current tenant's database. The module's tables are kept apart in it (its own schema, or a table prefix on MySQL and Oracle), with their own migrations history table.
   - `ITenantOwned` rows are stamped with the tenant, filtered by it (global query filter), and refused for another tenant on save. That is defence in depth now, and keeps the shared-database option open.
 - **Migrations on activation.** `AddTenantDbContext<T>()` registers an `ITenantInitializer` that migrates the module's schema:
   - for every active tenant when the module loads on a replica;
   - for a tenant when it is created or re-activated.
-  It runs behind a Postgres advisory lock per (tenant database, context), so replicas migrate once at a time. A module request waits up to 30 s for its tenant's initialization; a failure gives 503 and is retried on the next request.
+  It runs behind the engine's own lock per (tenant database, context), so replicas migrate once at a time. A module request waits up to 30 s for its tenant's initialization; a failure gives 503 and is retried on the next request.
 - **Unload safety with EF Core.** Each module gets its own EF internal service provider (`TenantEfServices`, disposed with the module), so EF's model and query caches, which are keyed by the module's types, never enter EF's process-wide provider cache. Lifecycle hook: `IModuleLifecycleObserver` (`Loaded` / `ReleasingAsync`, called by `ModuleRuntime`); the initializer cancels and awaits its work and drops the module before the container is disposed.
 - **Work outside a request** (worker pool, consumers, jobs): `moduleServices.CreateTenantScope(tenantId)` gives a module scope bound to that tenant. Messages carry the tenant in the `tenant` header (`TenancyNames.MessageHeader`); platform jobs loop over `ITenantDirectory.All`. Module consumers and hosted services themselves are not supported by the runtime yet.
 - **Elsa (future workflow module):** Elsa's tenant id is the platform tenant id. An Elsa `ITenantResolver` reads `ITenantContext`, an `ITenantsProvider` reads `ITenantDirectory`, and the module refreshes Elsa's tenants on `tenants.changed`, so the tenant store stays the only source. Elsa keeps its own shared database with `TenantId` columns, not `TenantDbContext`. It must run on the host's EF Core version.
 - **No Finbuckle:** the in-house layer is small, and Finbuckle's startup-registered stores, per-tenant options and shared-database focus fit this runtime poorly. Modules only see `ITenantContext`, so it could be swapped in later.
 - **Without a tenant store** (a single local instance, no `ConnectionStrings:TenantStore`), the directory reads `Tenancy:Tenants` from the host configuration and the tenancy write endpoints return 503.
 
-**Adding tenant data to a module:** see `Modules/WebApi.Modules.Inventory` (the sample).
-1. Import `SharedData.props`.
+**Adding tenant data to a module:** see `Modules/Custom/Inventory` (the sample).
+1. Import `SharedData.props`, or name the project `*.Infrastructure` (see below).
 2. Derive from `TenantDbContext` (set `Schema`, configure in `ConfigureModel`).
-3. Call `services.AddTenantDbContext<T>()`.
-4. Add an `IDesignTimeDbContextFactory` with `TenantDbDesignTime`.
-5. Add migrations. dotnet-ef needs the shared assemblies next to the module only at design time, so set `EfDesignAssets=all` for the command and build again without it before packaging:
+3. Call `services.AddTenantDbContext<T>()`. That also registers `IRepository<T>` and `IReadRepository<T>`.
+4. Add an `IDesignTimeDbContextFactory` that returns `new MyContext(TenantDbDesignTime.Options<MyContext>(args), TenantDbDesignTime.Tenant)`.
+5. Add migrations, one set per engine, with the script (see below):
 
-```bash
-EfDesignAssets=all dotnet ef migrations add <Name> --project src/WebApi/Modules/WebApi.Modules.Inventory --output-dir Migrations
+```powershell
+./src/WebApi/scripts/Add-Migration.ps1 -Project src/WebApi/Modules/Custom/Inventory/WebApi.Modules.Inventory.Infrastructure -Name <Name>
 ```
+
+## Database engines and per-engine migrations
+
+Tenant databases, and the tenant store, can live on any of four engines, each with an EF Core 10 provider shipped by the host:
+
+| Engine | Provider (version) | A tenant's database | A module's tables | Migration lock |
+|---|---|---|---|---|
+| PostgreSQL | `Npgsql.EntityFrameworkCore.PostgreSQL` 10.0.3 | a database | schema `<module>` | `pg_advisory_lock` |
+| SQL Server | `Microsoft.EntityFrameworkCore.SqlServer` 10.0.14 | a database | schema `<module>` | `sp_getapplock` (session) |
+| MySQL | `MySql.EntityFrameworkCore` 10.0.12 (Oracle's) | a database | prefix `<module>_` | `GET_LOCK` |
+| Oracle | `Oracle.EntityFrameworkCore` 10.23.26400 | a schema-only user (`NO AUTHENTICATION`), selected with `CURRENT_SCHEMA` per connection | prefix `<module>_` | `DBMS_LOCK` |
+
+- **Why these packages:** Pomelo's MySQL provider stops at EF Core 9 (9.0.0), so MySQL uses Oracle's `MySql.EntityFrameworkCore`, as the old host did. `System.Security.Cryptography.Pkcs` (from the MySQL and Oracle clients) is pinned to 10.0.15 because the transitive 9.0.11 has known vulnerabilities.
+- **Servers are configuration:** `ConnectionStrings:<server>` plus `DatabaseServers:<server>:Provider` (`PostgreSql` when not set). The tenant store uses `DatabaseServers:TenantStore:Provider`.
+  - A tenant names a server, so tenants of one deployment can sit on different engines. A dedicated customer deployment can use its own SQL Server or Oracle for everything.
+  - `POST /api/tenancy/tenants {"id":"contoso","databaseServer":"tenant-sql"}` provisions the tenant on that server: it creates the database (on Oracle, the schema user) and every active module then migrates into it. An unknown server gets 400.
+- **Engine differences live in one place:** `DatabaseProviderAdapter` handles connection strings, EF registration, creating the database, the lock and module isolation. `ModuleIsolation` applies the schema or prefix and the history table name (`<module>.__EFMigrationsHistory`, or `__EFMigrationsHistory_<module>`).
+- **Migrations ship inside the module assembly, one set per engine:** `Migrations/<Provider>/` with the namespace `….Migrations.<Provider>`.
+  - `ProviderMigrationsAssembly` replaces EF's `IMigrationsAssembly` and keeps only the set (and model snapshot) of the engine the tenant's database runs on.
+  - They apply on activation: when the module loads on a replica (for every active tenant), and when a tenant is created or re-activated.
+  - Installing a module only stores the package; nothing runs until it is activated.
+  - An assembly without per-engine namespaces works as before, with a single set.
+- **EF internal providers:** each module gets one per engine it is used with (`TenantEfServices.For(provider)`), so each engine has its own model cache. All are disposed with the module.
+- **Adding a migration:** `scripts/Add-Migration.ps1` runs `dotnet ef migrations add` once per engine (`-- --provider <Provider>` selects the engine in the design-time factory). It handles two dotnet-ef behaviours that break several sets in one project:
+  - dotnet-ef updates the snapshot it finds by file name anywhere in the project, so the other engines' snapshots are hidden while one engine is scaffolded;
+  - a set's first snapshot is written to a folder derived from the namespace, so the script moves it into the set.
+  The script also sets `EfDesignAssets=all` and rebuilds without it afterwards. Tenant store: `-Project src/WebApi/WebApi.Data -Context TenantStoreDbContext -MigrationsDir Migrations/TenantStore -Namespace soft.square.net.WebApi.Data.TenantStore.Migrations`.
+- **Packages stay small:** module references to the host-shipped projects carry `ExcludeAssets="runtime;native"`. Otherwise the providers' client libraries (SqlClient, MySql.Data, ODP.NET, Azure.Identity and their native files) were copied into every module package. A module package is its own assemblies only.
+- **Production notes:**
+  - Oracle provisioning needs an account with `CREATE USER`, the `ANY` table and index privileges, and `EXECUTE` on `DBMS_LOCK`; the lab uses SYSTEM.
+  - SQL Server provisioning needs `CREATE DATABASE`.
+  - Run provisioning with a privileged account and serve tenants with a least-privilege one (not modelled yet).
+
+## Layered modules, specifications and repositories
+
+Business modules (content, shifts, sales) use clean-architecture layers. Small glue modules (`identity`, `tenancy`,
+`greeting`) stay single projects: three projects there add build and packaging overhead without protecting any domain logic.
+
+```
+Modules/<Name>/
+  WebApi.Modules.<Name>.Domain          aggregates, rules, DomainException      → WebApi.SharedKernel
+  WebApi.Modules.<Name>.Application     use cases, specifications, DTOs         → Domain, WebApi.Contracts
+  WebApi.Modules.<Name>.Infrastructure  IRuntimeModule, endpoints, DbContext,   → Application, WebApi.Data, Carter
+                                        migrations (the entry assembly)
+```
+
+- **Build setup:** `Modules/Directory.Build.props` picks each layer's references by project-name suffix, so a layer project only references the layer below it.
+  - Every host-shipped assembly (SharedKernel, Contracts, Data, EF Core, Ardalis, Carter) is compiled against and never shipped.
+  - The package is the Infrastructure output: the module's three assemblies and nothing else.
+  - Other project names are not affected.
+- **Endpoints live in the entry assembly:** the runtime maps only the `ICarterModule` types of the assembly that holds `IRuntimeModule`.
+- **`WebApi.SharedKernel`** (host-shipped, no EF): `IAggregateRoot`, `EntityBase<TId>`, `AggregateRoot<TId>`, `ITenantOwned`, `DomainException`, and `IRepository<T>` / `IReadRepository<T>` (Ardalis.Specification, aggregate roots only).
+- **Repositories:** `AddTenantDbContext<T>()` registers `EfRepository<T>` as open generics in the module's container, over its first DbContext. A module with several contexts binds aggregates with `AddTenantRepository<TContext, T>()`.
+  - Repositories read and write the current tenant's database.
+  - `Add`, `Update` and `Delete` save immediately (Ardalis semantics).
+- **Specifications:** reads go through `Specification<T>` / `Specification<T, TResult>`. Lists project to DTOs with `Select` and use `AsNoTracking`.
+- **No MediatR:** application services instead. Mediator handler and pipeline caches are keyed by module types and would need the same unload work.
+- **Versions:** Ardalis.Specification(.EntityFrameworkCore) 9.3.1 targets EF Core 9 and runs on the host's EF Core 10; this was verified in the lab.
 
 ## How each problem is solved
 
@@ -187,6 +246,7 @@ module types forever (found with `dotnet-dump gcroot`):
 | `ReflectTypeDescriptionProvider._typeData` (per-type data of TypeDescriptor's default provider, behind `TypeDescriptor.s_providerTable`) | Evicted by walking the provider chain (`FrameworkCaches.EvictTypeDescriptionProviders`), plus that type's static Type-keyed Hashtables |
 | EF Core's static internal service provider cache (model cache keyed by the module's DbContext type) | Avoided: each module has its own EF internal provider (`TenantEfServices` in `WebApi.Data`), disposed with the module |
 | OpenTelemetry `LogRecordSharedPool` (2048 slots): idle records keep their last exception, state and attributes. Found with gcroot after EF logged a `DbUpdateException` (→ change tracker → module DbContext) | Idle records' data cleared on unload (`FrameworkCaches.ClearIdleLogRecords`) |
+| System.Linq.Expressions interpreter: `InstructionList.s_loadFields` (Dictionary by `FieldInfo`), filled when EF evaluates a closure sub-expression such as `Where(i => i.Sku == sku.Trim())`; it kept the specification's closure `FieldInfo`, hence the module. Related caches: `Expression.s_lambdaFactories` / `s_lambdaDelegateCache`, `CallInstruction.s_cache`, `DelegateHelpers._DelegateCache`. gcroot showed only the module's own handles; found by bisecting request kinds, then a reflection walk of every static from a throw-away diagnostic module | All cleared on unload, under their own locks where they have them (`FrameworkCaches.ClearExpressionCaches`) |
 
 **Result (sample module):**
 
@@ -240,8 +300,8 @@ honestly.
 ## Try it
 
 ```bash
-dotnet build src/WebApi/Modules/WebApi.Modules.Greeting
+dotnet build src/WebApi/Modules/Custom/WebApi.Modules.Greeting
 ```
 
-Zip the *contents* of `src/WebApi/Modules/WebApi.Modules.Greeting/bin/Debug/net10.0`, run the host
+Zip the *contents* of `src/WebApi/Modules/Custom/WebApi.Modules.Greeting/bin/Debug/net10.0`, run the host
 (`dotnet run --project src/WebApi/WebApi --launch-profile http`), then use `WebApi.http`.

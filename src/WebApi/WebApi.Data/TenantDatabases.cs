@@ -1,85 +1,64 @@
 using Microsoft.Extensions.Configuration;
-using Npgsql;
 using soft.square.net.WebApi.Contracts.Tenancy;
 
 namespace soft.square.net.WebApi.Data;
 
 /// <summary>
-/// Connection details of tenant databases (host singleton). A tenant names a server, which is a connection string in
-/// the host's configuration (ConnectionStrings:&lt;server&gt;, e.g. the lab's "tenant-data" Postgres server), and a
-/// database on that server. Secrets stay in configuration; the tenant store only holds names.
+/// The database servers the host knows and the tenant databases on them (host singleton).
+/// A server is a connection string (ConnectionStrings:&lt;server&gt;) plus its engine (DatabaseServers:&lt;server&gt;:Provider:
+/// PostgreSql, SqlServer, MySql or Oracle; PostgreSql when not set). A tenant names a server and a database on it, so
+/// every tenant can live on a different engine. Secrets stay in configuration; the tenant store only holds names.
 /// </summary>
 public sealed class TenantDatabases(IConfiguration configuration)
 {
-    public string ConnectionString(TenantInfo tenant) => ConnectionString(tenant.DatabaseServer, tenant.DatabaseName);
+    /// <summary>Connection string name of the tenant store (registry of tenants).</summary>
+    public const string StoreServerName = "TenantStore";
 
-    public string ConnectionString(string server, string database)
+    public DatabaseServer Server(string name)
     {
-        var serverConnection = configuration.GetConnectionString(server);
-        if (string.IsNullOrWhiteSpace(serverConnection))
-            throw new InvalidOperationException($"Tenant database server '{server}' is not configured (ConnectionStrings:{server}).");
-        return new NpgsqlConnectionStringBuilder(serverConnection) { Database = database }.ConnectionString;
+        var connection = configuration.GetConnectionString(name);
+        if (string.IsNullOrWhiteSpace(connection))
+            throw new InvalidOperationException($"Database server '{name}' is not configured (ConnectionStrings:{name}).");
+        return new DatabaseServer(name, ProviderOf(name), connection);
     }
 
-    /// <summary>Creates the tenant's database when the server does not have it yet (provisioning a new tenant).</summary>
-    public async Task<bool> EnsureDatabaseAsync(TenantInfo tenant, CancellationToken ct)
+    public bool IsConfigured(string name) => !string.IsNullOrWhiteSpace(configuration.GetConnectionString(name));
+
+    /// <summary>The configured engine of a server.</summary>
+    public DatabaseProvider ProviderOf(string name)
     {
-        await using var connection = new NpgsqlConnection(ConnectionString(tenant.DatabaseServer, "postgres"));
-        await connection.OpenAsync(ct);
+        var value = configuration[$"DatabaseServers:{name}:Provider"];
+        if (string.IsNullOrWhiteSpace(value)) return DatabaseProvider.PostgreSql;
+        return Enum.TryParse<DatabaseProvider>(value, ignoreCase: true, out var provider)
+            ? provider
+            : throw new InvalidOperationException($"DatabaseServers:{name}:Provider '{value}' is not one of {string.Join(", ", Enum.GetNames<DatabaseProvider>())}.");
+    }
 
-        await using (var exists = new NpgsqlCommand("SELECT 1 FROM pg_database WHERE datname = @name", connection))
-        {
-            exists.Parameters.AddWithValue("name", tenant.DatabaseName);
-            if (await exists.ExecuteScalarAsync(ct) is not null) return false;
-        }
+    /// <summary>The tenant store itself (its connection string names its database).</summary>
+    public DatabaseServer Store => Server(StoreServerName);
 
-        // CREATE DATABASE takes no parameters: quote the identifier.
-        var quoted = "\"" + tenant.DatabaseName.Replace("\"", "\"\"") + "\"";
-        await using var create = new NpgsqlCommand($"CREATE DATABASE {quoted}", connection);
-        try { await create.ExecuteNonQueryAsync(ct); }
-        catch (PostgresException e) when (e.SqlState == PostgresErrorCodes.DuplicateDatabase) { return false; } // another replica won
-        return true;
+    public DatabaseServer ServerOf(TenantInfo tenant) => Server(tenant.DatabaseServer);
+
+    public string ConnectionString(TenantInfo tenant)
+    {
+        var server = ServerOf(tenant);
+        return server.Adapter.ConnectionString(server.ConnectionString, tenant.DatabaseName);
+    }
+
+    /// <summary>Creates the tenant's database (Oracle: its schema) when the server does not have it yet.</summary>
+    public Task<bool> EnsureDatabaseAsync(TenantInfo tenant, CancellationToken ct)
+    {
+        var server = ServerOf(tenant);
+        return server.Adapter.EnsureDatabaseAsync(server.ConnectionString, tenant.DatabaseName, ct);
     }
 
     /// <summary>
-    /// A Postgres session-level advisory lock in the tenant's database, held until the result is disposed. Every
-    /// replica of every pool that loads a module tries to migrate it; the lock makes the migration run once at a time.
+    /// An exclusive lock on the tenant's server, held until disposed. Every replica of every pool that loads a module
+    /// tries to migrate it; the lock makes the migration run once at a time. The key names the tenant's database.
     /// </summary>
-    public Task<IAsyncDisposable> LockAsync(TenantInfo tenant, string key, CancellationToken ct) =>
-        AdvisoryLock.AcquireAsync(ConnectionString(tenant), key, ct);
-}
-
-public static class AdvisoryLock
-{
-    public static async Task<IAsyncDisposable> AcquireAsync(string connectionString, string key, CancellationToken ct)
+    public Task<IAsyncDisposable> LockAsync(TenantInfo tenant, string key, CancellationToken ct)
     {
-        var connection = new NpgsqlConnection(connectionString);
-        try
-        {
-            await connection.OpenAsync(ct);
-            await using var command = new NpgsqlCommand("SELECT pg_advisory_lock(hashtext(@key))", connection);
-            command.Parameters.AddWithValue("key", key);
-            await command.ExecuteNonQueryAsync(ct);
-            return new Held(connection, key);
-        }
-        catch
-        {
-            await connection.DisposeAsync();
-            throw;
-        }
-    }
-
-    private sealed class Held(NpgsqlConnection connection, string key) : IAsyncDisposable
-    {
-        public async ValueTask DisposeAsync()
-        {
-            try
-            {
-                await using var command = new NpgsqlCommand("SELECT pg_advisory_unlock(hashtext(@key))", connection);
-                command.Parameters.AddWithValue("key", key);
-                await command.ExecuteNonQueryAsync();
-            }
-            finally { await connection.DisposeAsync(); } // closing the session releases the lock anyway
-        }
+        var server = ServerOf(tenant);
+        return server.Adapter.LockAsync(ConnectionString(tenant), $"{tenant.DatabaseName}:{key}", ct);
     }
 }

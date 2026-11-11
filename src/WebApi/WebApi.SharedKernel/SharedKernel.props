@@ -1,0 +1,24 @@
+<Project>
+
+  <!--
+    Import in a module project that uses the shared kernel (entities, ITenantOwned, IRepository/IReadRepository, specifications):
+      <Import Project="...\WebApi.SharedKernel\SharedKernel.props" />
+    The host ships WebApi.SharedKernel and Ardalis.Specification; modules compile against them and never copy them.
+
+    HostSharedExclude / HostSharedPrivate: dotnet-ef runs a module project itself and needs the host-shipped assemblies
+    next to it. Set the environment variable EfDesignAssets=all for "dotnet ef migrations add", then build again
+    without it before packaging. Every "compile against, never ship" reference of a module uses these two properties.
+  -->
+
+  <PropertyGroup>
+    <HostSharedExclude Condition="'$(EfDesignAssets)' != 'all'">runtime;native</HostSharedExclude>
+    <HostSharedPrivate Condition="'$(EfDesignAssets)' != 'all'">false</HostSharedPrivate>
+    <HostSharedPrivate Condition="'$(EfDesignAssets)' == 'all'">true</HostSharedPrivate>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$(MSBuildThisFileDirectory)WebApi.SharedKernel.csproj" Private="$(HostSharedPrivate)" ExcludeAssets="$(HostSharedExclude)" />
+    <PackageReference Include="Ardalis.Specification" Version="9.3.1" ExcludeAssets="$(HostSharedExclude)" />
+  </ItemGroup>
+
+</Project>

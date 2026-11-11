@@ -3,15 +3,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using soft.square.net.WebApi.Modules.Inventory;
+using soft.square.net.WebApi.Modules.Inventory.Infrastructure;
 
 #nullable disable
 
-namespace soft.square.net.WebApi.Modules.Inventory.Migrations
+namespace soft.square.net.WebApi.Modules.Inventory.Infrastructure.Migrations.MySql
 {
     [DbContext(typeof(InventoryDbContext))]
-    [Migration("20261111125012_InitialInventory")]
+    [Migration("20261111175720_InitialInventory")]
     partial class InitialInventory
     {
         /// <inheritdoc />
@@ -19,37 +18,32 @@ namespace soft.square.net.WebApi.Modules.Inventory.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("inventory")
                 .HasAnnotation("ProductVersion", "10.0.14")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("soft.square.net.WebApi.Modules.Inventory.StockItem", b =>
+            modelBuilder.Entity("soft.square.net.WebApi.Modules.Inventory.Domain.StockItem", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                        .HasColumnType("varchar(200)");
 
                     b.Property<int>("Quantity")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.Property<string>("Sku")
                         .IsRequired()
                         .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
+                        .HasColumnType("varchar(64)");
 
                     b.Property<string>("TenantId")
                         .IsRequired()
                         .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
+                        .HasColumnType("varchar(64)");
 
                     b.HasKey("Id");
 
@@ -58,7 +52,7 @@ namespace soft.square.net.WebApi.Modules.Inventory.Migrations
                     b.HasIndex("TenantId", "Sku")
                         .IsUnique();
 
-                    b.ToTable("stock_items", "inventory");
+                    b.ToTable("inventory_stock_items", (string)null);
                 });
 #pragma warning restore 612, 618
         }

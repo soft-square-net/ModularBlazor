@@ -61,6 +61,44 @@ internal static class FrameworkCaches
 
         EvictTypeDescriptionProviders(context);
         ClearIdleLogRecords();
+        ClearExpressionCaches();
+    }
+
+    /// <summary>
+    /// System.Linq.Expressions keeps process-wide caches keyed by delegate types, methods and parameter types:
+    /// Expression.s_lambdaFactories / s_lambdaDelegateCache, the interpreter's CallInstruction.s_cache (CacheDict arrays)
+    /// and DelegateHelpers._DelegateCache (a tree of Type → TypeInfo). EF Core fills them when it evaluates a closure
+    /// expression in a query, e.g. Where(i => i.Sku == sku.Trim()): it interprets the sub-expression, and the interpreter's
+    /// InstructionList.s_loadFields then keeps the closure's FieldInfo, hence the module. Found by bisecting and a
+    /// reflection walk of all statics (gcroot showed only the module's own handles).
+    /// All of them are rebuildable caches, so they are cleared outright.
+    /// </summary>
+    private static void ClearExpressionCaches()
+    {
+        var assembly = typeof(System.Linq.Expressions.Expression).Assembly;
+        const BindingFlags statics = BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public;
+
+        foreach (var (typeName, fieldName) in (ReadOnlySpan<(string, string)>)[
+                     ("System.Linq.Expressions.Expression", "s_lambdaFactories"),
+                     ("System.Linq.Expressions.Expression", "s_lambdaDelegateCache"),
+                     ("System.Linq.Expressions.Interpreter.CallInstruction", "s_cache")])
+        {
+            // CacheDict<TKey, TValue>: a fixed array of immutable entries; readers check each entry, so null is a miss.
+            var cache = assembly.GetType(typeName)?.GetField(fieldName, statics)?.GetValue(null);
+            if (cache?.GetType().GetField("_entries", BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(cache) is Array entries)
+                Array.Clear(entries);
+        }
+
+        // The interpreter's LoadField instructions by FieldInfo, used under lock(s_loadFields). This one held the module:
+        // the FieldInfo of a closure field (the captured value of a specification) keeps its declaring type alive.
+        if (assembly.GetType("System.Linq.Expressions.Interpreter.InstructionList")?.GetField("s_loadFields", statics)?.GetValue(null) is IDictionary loadFields)
+            lock (loadFields) loadFields.Clear();
+
+        // DelegateHelpers walks and grows this tree under lock(_DelegateCache); dropping the chain makes it start over.
+        var delegateCache = assembly.GetType("System.Linq.Expressions.Compiler.DelegateHelpers")?.GetField("_DelegateCache", statics)?.GetValue(null);
+        var chain = delegateCache?.GetType().GetField("TypeChain", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        if (delegateCache is not null && chain is not null)
+            lock (delegateCache) chain.SetValue(delegateCache, null);
     }
 
     /// <summary>

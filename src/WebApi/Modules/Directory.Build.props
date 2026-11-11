@@ -1,0 +1,40 @@
+<Project>
+
+  <!--
+    Shared setup for runtime modules split into clean-architecture layers, picked by project-name suffix:
+      <Name>.Domain          entities, aggregates, domain rules            → WebApi.SharedKernel only
+      <Name>.Application     use cases, specifications, DTOs               → Domain, WebApi.Contracts, SharedKernel
+      <Name>.Infrastructure  IRuntimeModule, Carter endpoints, DbContext,  → Application, WebApi.Data (EF Core), Carter
+                             migrations: the module's entry assembly (the runtime maps ICarterModule types of this assembly only)
+    Each layer project then only references the layer below it. Host-shipped assemblies are compiled against and never
+    shipped (see WebApi.SharedKernel/SharedKernel.props). Projects with other names (single-project modules, core
+    modules) are not affected.
+  -->
+
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+
+  <PropertyGroup>
+    <ModuleLayer Condition="$(MSBuildProjectName.EndsWith('.Domain'))">Domain</ModuleLayer>
+    <ModuleLayer Condition="$(MSBuildProjectName.EndsWith('.Application'))">Application</ModuleLayer>
+    <ModuleLayer Condition="$(MSBuildProjectName.EndsWith('.Infrastructure'))">Infrastructure</ModuleLayer>
+    <!-- The entry assembly: copies private dependencies into the output, writes the .deps.json the loader resolves
+         with, and a runtimeconfig.json for dotnet-ef. -->
+    <EnableDynamicLoading Condition="'$(ModuleLayer)' == 'Infrastructure'">true</EnableDynamicLoading>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildThisFileDirectory)..\WebApi.SharedKernel\SharedKernel.props"
+          Condition="'$(ModuleLayer)' == 'Domain' Or '$(ModuleLayer)' == 'Application'" />
+  <Import Project="$(MSBuildThisFileDirectory)..\WebApi.Data\SharedData.props" Condition="'$(ModuleLayer)' == 'Infrastructure'" />
+
+  <ItemGroup Condition="'$(ModuleLayer)' == 'Application' Or '$(ModuleLayer)' == 'Infrastructure'">
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="$(MSBuildThisFileDirectory)..\WebApi.Contracts\WebApi.Contracts.csproj" Private="$(HostSharedPrivate)" ExcludeAssets="$(HostSharedExclude)" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(ModuleLayer)' == 'Infrastructure'">
+    <PackageReference Include="Carter" Version="10.0.0" ExcludeAssets="$(HostSharedExclude)" />
+    <!-- Design time only (dotnet ef migrations add, with EfDesignAssets=all). -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.14" PrivateAssets="all" ExcludeAssets="$(HostSharedExclude)" />
+  </ItemGroup>
+
+</Project>

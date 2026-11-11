@@ -40,8 +40,15 @@ Edge load balancer + YARP gateway        TLS, JWT, rate limit, tenant resolution
 | `src/api/ModularBlazor.Host` | The production API host and its built-in modules (`HostModules`) |
 | `src/WebApi/WebApi` | Runtime module prototype: one image that runs as any pool |
 | `src/WebApi/WebApi.Contracts` | `IRuntimeModule` and `ModuleManifest`, shared by the host and every runtime module |
-| `src/WebApi/Modules/WebApi.Modules.Greeting` | Sample runtime module, uploaded as a package |
+| `src/WebApi/Modules/Core/` | **Core modules** (`Identity`, `Tenancy`): built with every WebApi release and enabled by default |
+| `src/WebApi/Modules/Custom/` | **Custom modules**: built on their own and uploaded while the app runs |
+| `src/WebApi/Modules/Custom/WebApi.Modules.Greeting` | Sample custom module, uploaded as a package |
+| `src/WebApi/Modules/Custom/Inventory` | Sample layered custom module (Domain, Application, Infrastructure) |
 | `src/Aspire/Hybird` | Aspire lab: gateway, three pools, RabbitMQ, Redis, PostgreSQL |
+
+`src/WebApi/Modules/Directory.Build.props` holds the shared settings for layered modules; `Core/` and `Custom/` each
+add their own `Directory.Build.props` on top. Both kinds are ordinary runtime modules: they differ only in how they
+arrive (with the release, or by an admin upload). See [Core and custom modules](/backend/runtime-modules/#core-and-custom-modules).
 
 ## Read in this order
 

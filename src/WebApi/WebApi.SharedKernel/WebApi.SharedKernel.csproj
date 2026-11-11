@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Shared kernel for module domain and application layers: entity and aggregate base types, ITenantOwned, the
+    repository interfaces (Ardalis.Specification) and DomainException. No EF Core, no ASP.NET Core.
+    The host ships it (through WebApi.Data), so its types keep one identity across modules: modules reference it
+    through SharedKernel.props (compile against it, never ship it).
+  -->
+
+  <ItemGroup>
+    <PackageReference Include="Ardalis.Specification" Version="9.3.1" />
+  </ItemGroup>
+
+</Project>

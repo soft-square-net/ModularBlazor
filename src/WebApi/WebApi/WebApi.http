@@ -3,7 +3,7 @@
 ### Registered modules
 GET {{WebApi_HostAddress}}/api/admin/modules
 
-### Install: upload the zipped build output of src/WebApi.Modules.Greeting (bin/Debug/net10.0/*)
+### Install: upload the zipped build output of src/WebApi/Modules/Custom/WebApi.Modules.Greeting (bin/Debug/net10.0/*)
 POST {{WebApi_HostAddress}}/api/admin/modules
 Content-Type: multipart/form-data; boundary=module
 

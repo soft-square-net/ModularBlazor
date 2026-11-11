@@ -118,15 +118,19 @@ Endpoints come from its `ICarterModule` classes. Keyed services are not supporte
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <!-- Shared with the host: compile against them, never ship them. -->
     <PackageReference Include="Carter" Version="10.0.0" ExcludeAssets="runtime" />
-    <ProjectReference Include="..\..\WebApi.Contracts\WebApi.Contracts.csproj" Private="false" ExcludeAssets="runtime" />
+    <ProjectReference Include="..\..\..\WebApi.Contracts\WebApi.Contracts.csproj" Private="false" ExcludeAssets="runtime" />
     <!-- Private dependency: loads into the module's own load context. -->
     <PackageReference Include="Humanizer.Core" Version="2.14.1" />
   </ItemGroup>
 </Project>
 ```
 
-Runtime modules live in `src/WebApi/Modules/<Module>/`, next to the host in `src/WebApi/WebApi/` and the contracts in
-`src/WebApi/WebApi.Contracts/`, which is why the contracts reference goes up two folders.
+Custom modules live in `src/WebApi/Modules/Custom/<Module>/`; the contracts are in `src/WebApi/WebApi.Contracts/`, which
+is why the reference goes up three folders. `Modules/Custom/Directory.Build.props` applies to every custom module.
+Layered modules (`<Name>.Domain`, `.Application`, `.Infrastructure`, like `Custom/Inventory`) get their references
+from `Modules/Directory.Build.props` by project-name suffix, so their project files stay almost empty. Core modules
+live in `Modules/Core/` and ship with the WebApi release instead; see
+[Core and custom modules](/backend/runtime-modules/#core-and-custom-modules).
 
 | Package form | Contents |
 | --- | --- |
@@ -142,11 +146,11 @@ was built against.
 **Single instance:**
 
 ```bash
-dotnet build src/WebApi/Modules/WebApi.Modules.Greeting
+dotnet build src/WebApi/Modules/Custom/WebApi.Modules.Greeting
 dotnet run --project src/WebApi/WebApi --launch-profile http
 ```
 
-Zip the contents of `src/WebApi/Modules/WebApi.Modules.Greeting/bin/Debug/net10.0` as `greeting.zip`, then:
+Zip the contents of `src/WebApi/Modules/Custom/WebApi.Modules.Greeting/bin/Debug/net10.0` as `greeting.zip`, then:
 
 ```bash
 curl -F "package=@greeting.zip" http://localhost:5298/api/admin/modules

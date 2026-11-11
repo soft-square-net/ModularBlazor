@@ -9,6 +9,31 @@ replica exports OpenTelemetry to the Aspire dashboard.
 dotnet run --project src/Aspire/Hybird --launch-profile http
 ```
 
+Tenant database servers on the other engines are opt-in, because their images are large and Oracle is slow to start:
+
+```bash
+dotnet run --project src/Aspire/Hybird --launch-profile http -- --Lab:Engines=sqlserver,mysql,oracle
+```
+
+On the first run Aspire can give up on these large images while they are still downloading: the resource shows
+"Failed to start" with "context deadline exceeded". Pull them once, then start the resources from the dashboard (or
+restart the lab):
+
+```bash
+docker pull mcr.microsoft.com/mssql/server:2022-latest
+```
+
+```bash
+docker pull docker.io/library/mysql:9.7
+```
+
+```bash
+docker pull container-registry.oracle.com/database/free:23.26.1.0
+```
+
+**Stopping the lab:** use Ctrl+C in its terminal, which removes the containers. Killing the AppHost process leaves them
+running; they then keep the data volumes in use, and the next run needs them stopped first.
+
 | Resource | What it is |
 |---|---|
 | `gateway` (http://localhost:5080) | YARP. `/api/sales/**` and `/api/greeting/**` go to the sales pool; everything else goes to core. `/pools/{core\|sales\|worker}/**` reaches one pool directly (lab only). |
@@ -18,6 +43,7 @@ dotnet run --project src/Aspire/Hybird --launch-profile http
 | `broker` | RabbitMQ with the management UI |
 | `redis` | Cache, locks, Data Protection keys, rate-limit counters |
 | `tenant-data` | PostgreSQL: `TenantStore` (HybirdTenants: the tenant registry, schema `platform`), `tenant-acme`, `tenant-globex` (one database per tenant; each module gets its own schema in it), plus pgAdmin. Replicas get `ConnectionStrings:TenantStore` and the server itself as `ConnectionStrings:tenant-data`, which tenant rows name and new tenants' databases are created on. |
+| `tenant-sql`, `tenant-mysql`, `tenant-oracle` (`Lab:Engines`) | Optional SQL Server, MySQL and Oracle Database Free (pluggable database `FREEPDB1`) servers for tenants. Replicas get `ConnectionStrings:<server>` and `DatabaseServers:<server>:Provider`. Create a tenant on one with `POST /api/tenancy/tenants {"id":"contoso","databaseServer":"tenant-sql"}`. |
 
 `GET /api/pool`, or `GET /pools/{pool}/api/pool`, shows which pool, role and replica answered, and which
 connections it was wired to.
@@ -36,6 +62,7 @@ connections it was wired to.
   - **Provisioning:** `POST /api/tenancy/tenants {"id":"initech","hosts":["initech.localhost"]}` created `tenant-initech`. Both core replicas migrated inventory into it and served `Host: initech.localhost` from it. All 4 sales replicas, which don't load `tenancy`, knew initech through `tenants.changed`.
   - **Lifecycle unchanged:** `greeting` install, activate (200 on all sales replicas), deactivate (404 everywhere), unload and uninstall all converged over `modules.state`. Greeting was collected on every sales replica.
   - **Unload with EF Core:** in the first run one core replica kept inventory, rooted by an OpenTelemetry pooled log record holding an EF `DbUpdateException` (from a duplicate-SKU 409). After `FrameworkCaches.ClearIdleLogRecords`, the same scenario on a fresh lab collected inventory on both core replicas within about 10 s, in two cycles. As with the other modules, the unload's own GC passes aren't enough, so it shows under `/unloading` first.
+  - **Layered module with specifications and repositories:** inventory 1.1.1 (Domain / Application / Infrastructure, Ardalis on EF Core 10), uploaded to the core pool, picked up its existing schema and data without re-migrating. Create 201, duplicate SKU 409 (domain rule), issuing more than in stock 409, list with a spec 200, for acme and initech. Two full cycles (activate, requests, deactivate, unload) were collected on both core replicas within a few seconds, after the `s_loadFields` fix in `FrameworkCaches.ClearExpressionCaches`. Without the fix, every copy that ran the SKU specification stayed loaded.
   - **Suspend:** `PATCH /api/tenancy/tenants/initech {"status":"Suspended"}` gave 403 on both core and all 4 sales replicas, by header and by host name. `{"status":"Active"}` restored 200 everywhere.
   - **Restart:** tenants (including the provisioned initech) survived a lab restart (Postgres volume).
 

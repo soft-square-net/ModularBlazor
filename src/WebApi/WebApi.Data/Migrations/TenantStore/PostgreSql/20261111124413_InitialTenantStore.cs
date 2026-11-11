@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace soft.square.net.WebApi.Data.Migrations.TenantStore
+namespace soft.square.net.WebApi.Data.TenantStore.Migrations.PostgreSql
 {
     /// <inheritdoc />
     public partial class InitialTenantStore : Migration

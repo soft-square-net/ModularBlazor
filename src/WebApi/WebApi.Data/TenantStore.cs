@@ -29,9 +29,15 @@ public sealed class TenantStoreDbContext(DbContextOptions<TenantStoreDbContext> 
 
     public DbSet<TenantRecord> Tenants => Set<TenantRecord>();
 
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
+        ModuleIsolation.ConfigureHistoryTable(optionsBuilder, Schema);
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.HasDefaultSchema(Schema);
+        var provider = DatabaseProviderAdapter.ForEfProvider(Database.ProviderName)?.Provider ?? DatabaseProvider.PostgreSql;
+        var schemas = ModuleIsolation.UsesSchemas(Database.ProviderName);
+        if (schemas) modelBuilder.HasDefaultSchema(Schema);
+
         modelBuilder.Entity<TenantRecord>(tenant =>
         {
             tenant.ToTable("tenants");
@@ -41,11 +47,39 @@ public sealed class TenantStoreDbContext(DbContextOptions<TenantStoreDbContext> 
             tenant.Property(t => t.Status).HasConversion<string>().HasMaxLength(20);
             tenant.Property(t => t.DatabaseServer).HasMaxLength(100);
             tenant.Property(t => t.DatabaseName).HasMaxLength(63);
+
+            // PostgreSQL stores host names as text[]; elsewhere one column of newline-separated names.
+            if (provider != DatabaseProvider.PostgreSql)
+            {
+                tenant.Property(t => t.Hosts)
+                    .HasConversion(
+                        hosts => string.Join('\n', hosts),
+                        value => value.Split('\n', StringSplitOptions.RemoveEmptyEntries).ToList(),
+                        new Microsoft.EntityFrameworkCore.ChangeTracking.ValueComparer<List<string>>(
+                            (a, b) => a!.SequenceEqual(b!), list => list.Aggregate(0, (h, s) => HashCode.Combine(h, s)), list => list.ToList()))
+                    .HasMaxLength(2000);
+            }
+
+            // MySQL has no offset-aware type: store UTC.
+            if (provider == DatabaseProvider.MySql)
+            {
+                tenant.Property(t => t.CreatedAt).HasConversion(v => v.UtcDateTime, v => new DateTimeOffset(DateTime.SpecifyKind(v, DateTimeKind.Utc)));
+                tenant.Property(t => t.UpdatedAt).HasConversion(v => v.UtcDateTime, v => new DateTimeOffset(DateTime.SpecifyKind(v, DateTimeKind.Utc)));
+            }
         });
+
+        if (!schemas) ModuleIsolation.PrefixTables(modelBuilder, Schema);
     }
 
-    public static void Configure(DbContextOptionsBuilder options, string connectionString) =>
-        options.UseNpgsql(connectionString, npgsql => npgsql.MigrationsHistoryTable("__EFMigrationsHistory", Schema));
+    /// <summary>
+    /// Configures the tenant store on its server's engine (DatabaseServers:TenantStore:Provider), with the per-engine
+    /// migration sets of this assembly (Migrations/TenantStore/&lt;Provider&gt;).
+    /// </summary>
+    public static void Configure(DbContextOptionsBuilder options, DatabaseServer store)
+    {
+        store.Adapter.Use(options, store.ConnectionString, "");
+        options.ReplaceService<Microsoft.EntityFrameworkCore.Migrations.IMigrationsAssembly, ProviderMigrationsAssembly>();
+    }
 }
 
 /// <summary>Writes to the tenant store (scoped). Callers then call <see cref="ITenantDirectory.NotifyChangedAsync"/>.</summary>
@@ -94,13 +128,16 @@ public sealed class TenantRegistry(TenantStoreDbContext db)
     }
 }
 
-/// <summary>For <c>dotnet ef migrations add ... --project src/WebApi/WebApi.Data</c>.</summary>
+/// <summary>
+/// For <c>dotnet ef migrations add &lt;Name&gt; --project src/WebApi/WebApi.Data --context TenantStoreDbContext
+/// --output-dir Migrations/TenantStore/&lt;Provider&gt; --namespace soft.square.net.WebApi.Data.TenantStore.Migrations.&lt;Provider&gt;
+/// -- --provider &lt;Provider&gt;</c>.
+/// </summary>
 internal sealed class TenantStoreDesignTimeFactory : IDesignTimeDbContextFactory<TenantStoreDbContext>
 {
     public TenantStoreDbContext CreateDbContext(string[] args)
     {
-        var options = new DbContextOptionsBuilder<TenantStoreDbContext>();
-        TenantStoreDbContext.Configure(options, "Host=localhost;Database=design_time");
+        var options = TenantDbDesignTime.Builder<TenantStoreDbContext>(TenantDbDesignTime.ProviderFrom(args));
         return new TenantStoreDbContext(options.Options);
     }
 }

@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Inventory domain: the StockItem aggregate and its rules. References: WebApi.SharedKernel (../../../Directory.Build.props). -->
+
+</Project>

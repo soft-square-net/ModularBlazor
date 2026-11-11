@@ -13,8 +13,28 @@ and measures its limits.
 | --- | --- |
 | `WebApi` | The host. `Modularity/` holds the runtime. The same image runs as every pool. |
 | `WebApi.Contracts` | `IRuntimeModule` and `ModuleManifest`. The host references it, so it is always shared. |
-| `WebApi.Modules.Greeting` | A sample module. The host does **not** reference it: its build output is zipped and uploaded. |
+| `Modules/Core/*` | Core modules (`Identity`, `Tenancy`), shipped with every WebApi release. |
+| `Modules/Custom/WebApi.Modules.Greeting` | A sample custom module. The host does **not** reference it: its build output is zipped and uploaded. |
+| `Modules/Custom/Inventory` | A sample custom module split into Domain, Application and Infrastructure projects. |
 | `Aspire/Hybird` | A runnable lab: gateway, three pools, broker, Redis, PostgreSQL. See [Hybrid architecture lab](/backend/hybrid-lab/). |
+
+All paths are under `src/WebApi/`.
+
+## Core and custom modules
+
+`src/WebApi/Modules/` has two folders. Their modules work the same way at runtime (same load context, overlay
+container, swap and broadcast); they differ in how they arrive:
+
+| Folder | Built | Arrives in the catalog | Removable |
+| --- | --- | --- | --- |
+| `Core/` | By the WebApi build, with every release; output copied to `CoreModules/<AssemblyName>/` | Seeded as `Active` on startup | Can be deactivated, unloaded and reconfigured, but not uninstalled or replaced by an upload (`409`); upgraded only by a release |
+| `Custom/` | On their own, outside the WebApi release | Uploaded by an admin (`POST /api/admin/modules`) | Fully: install, activate, deactivate, unload, uninstall |
+
+- `Modules/Directory.Build.props` holds the shared settings for layered modules (`<Name>.Domain`,
+  `<Name>.Application`, `<Name>.Infrastructure`). The Infrastructure project is the module's entry assembly.
+- `Core/Directory.Build.props` marks core modules and sets up their packaging.
+- `Custom/Directory.Build.props` only imports the shared settings: custom modules are never part of a WebApi release.
+- A pool applies either kind only if its `Modules:Enabled` list includes it, or the list is empty.
 
 ## Lifecycle
 

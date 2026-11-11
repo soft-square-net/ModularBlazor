@@ -138,6 +138,8 @@ public sealed partial class TenancyEndpoints : ICarterModule
 
                 var tenant = new TenantInfo(request.Id, request.Name ?? request.Id, TenantStatus.Active, request.Hosts ?? [],
                     request.DatabaseServer ?? options.Value.DefaultDatabaseServer, request.DatabaseName ?? $"tenant-{request.Id}");
+                if (!databases.IsConfigured(tenant.DatabaseServer))
+                    return Results.ValidationProblem(new Dictionary<string, string[]> { ["databaseServer"] = [$"Unknown database server '{tenant.DatabaseServer}' (no ConnectionStrings:{tenant.DatabaseServer} on this replica)."] });
                 var outcome = await new TenantProvisioning(databases, registry, tenants, log).CreateAsync(tenant, ct);
                 return outcome == TenantProvisioning.Outcome.Created
                     ? Results.Created($"tenants/{tenant.Id}", tenant)

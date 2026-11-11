@@ -147,8 +147,9 @@ internal sealed class TenantDirectoryService(TenantDirectory directory, IService
         {
             if (directory.HasStore && !_migrated)
             {
-                var connection = configuration.GetConnectionString(TenancyHostExtensions.StoreConnectionName)!;
-                await using (await AdvisoryLock.AcquireAsync(connection, "platform:tenant-store:migrate", ct))
+                // The store's engine comes from DatabaseServers:TenantStore:Provider; so does the lock.
+                var store = new TenantDatabases(configuration).Store;
+                await using (await store.Adapter.LockAsync(store.ConnectionString, "platform:tenant-store:migrate", ct))
                 {
                     await using var scope = scopes.CreateAsyncScope();
                     var db = scope.ServiceProvider.GetRequiredService<TenantStoreDbContext>();

@@ -2,25 +2,18 @@ using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using soft.square.net.WebApi.Contracts.Tenancy;
+using soft.square.net.WebApi.SharedKernel;
 
 namespace soft.square.net.WebApi.Data;
-
-/// <summary>
-/// A row that belongs to one tenant. <see cref="TenantDbContext"/> stamps it on insert, refuses to save it for another
-/// tenant and filters every query by it. With a database per tenant this is defence in depth; it also keeps the model
-/// ready for tenants pooled in a shared database.
-/// </summary>
-public interface ITenantOwned
-{
-    string TenantId { get; set; }
-}
 
 /// <summary>
 /// Base class for a runtime module's DbContext (register it with <see cref="TenantDbServiceCollectionExtensions.AddTenantDbContext{TContext}"/>).
 /// <list type="bullet">
 /// <item>Database per tenant: the connection is the current tenant's database (from the tenant store).</item>
-/// <item>One schema per module inside that database (<see cref="Schema"/>), with its own migrations history table, so
-/// modules never collide and a module's tables can be dropped with its schema.</item>
+/// <item>The module's tables kept apart inside that database (<see cref="Schema"/>), with its own migrations history
+/// table: a schema on PostgreSQL and SQL Server, a table-name prefix on MySQL and Oracle (see <see cref="ModuleIsolation"/>).</item>
+/// <item>Any of the four engines: the tenant's server decides (<see cref="TenantDatabases"/>). The module ships one
+/// migration set per engine it supports (<see cref="ProviderMigrationsAssembly"/>).</item>
 /// <item>Entities implementing <see cref="ITenantOwned"/> are stamped and filtered by the tenant.</item>
 /// </list>
 /// Derived contexts configure their model in <see cref="ConfigureModel"/>.
@@ -42,16 +35,15 @@ public abstract class TenantDbContext : DbContext
 
     protected abstract void ConfigureModel(ModelBuilder modelBuilder);
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        // Keeps the connection configured by AddTenantDbContext; only moves the history table into the module's schema.
-        optionsBuilder.UseNpgsql(npgsql => npgsql.MigrationsHistoryTable(HistoryRepository.DefaultTableName, Schema));
-    }
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
+        ModuleIsolation.ConfigureHistoryTable(optionsBuilder, Schema);
 
     protected sealed override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.HasDefaultSchema(Schema);
+        var schemas = ModuleIsolation.UsesSchemas(Database.ProviderName);
+        if (schemas) modelBuilder.HasDefaultSchema(Schema);
         ConfigureModel(modelBuilder);
+        if (!schemas) ModuleIsolation.PrefixTables(modelBuilder, Schema);
 
         foreach (var entity in modelBuilder.Model.GetEntityTypes().Where(e => e.BaseType is null && typeof(ITenantOwned).IsAssignableFrom(e.ClrType)).ToArray())
         {

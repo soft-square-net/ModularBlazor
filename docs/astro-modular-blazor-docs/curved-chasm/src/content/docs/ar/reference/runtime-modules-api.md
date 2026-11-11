@@ -117,15 +117,18 @@ public sealed record ModuleManifest(string Id, string Name, string Version, stri
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <!-- Shared with the host: compile against them, never ship them. -->
     <PackageReference Include="Carter" Version="10.0.0" ExcludeAssets="runtime" />
-    <ProjectReference Include="..\..\WebApi.Contracts\WebApi.Contracts.csproj" Private="false" ExcludeAssets="runtime" />
+    <ProjectReference Include="..\..\..\WebApi.Contracts\WebApi.Contracts.csproj" Private="false" ExcludeAssets="runtime" />
     <!-- Private dependency: loads into the module's own load context. -->
     <PackageReference Include="Humanizer.Core" Version="2.14.1" />
   </ItemGroup>
 </Project>
 ```
 
-تعيش وحدات التشغيل في `src/WebApi/Modules/<Module>/`، بجوار المضيف في `src/WebApi/WebApi/` والعقود في
-`src/WebApi/WebApi.Contracts/`، ولهذا يصعد مرجع العقود مجلدين.
+تعيش الوحدات المخصصة في `src/WebApi/Modules/Custom/<Module>/`؛ والعقود في `src/WebApi/WebApi.Contracts/`، ولهذا يصعد
+المرجع ثلاثة مجلدات. ويطبق `Modules/Custom/Directory.Build.props` على كل وحدة مخصصة. أما الوحدات ذات الطبقات
+(`<Name>.Domain` و`.Application` و`.Infrastructure`، مثل `Custom/Inventory`) فتأخذ مراجعها من
+`Modules/Directory.Build.props` بحسب لاحقة اسم المشروع، فتبقى ملفات مشاريعها شبه فارغة. وتعيش الوحدات الأساسية في
+`Modules/Core/` وتشحن مع إصدار WebApi بدلا من ذلك؛ انظر [وحدات أثناء التشغيل](/ar/backend/runtime-modules/).
 
 | صيغة الحزمة | المحتوى |
 | --- | --- |
@@ -140,11 +143,11 @@ public sealed record ModuleManifest(string Id, string Name, string Version, stri
 **نسخة واحدة:**
 
 ```bash
-dotnet build src/WebApi/Modules/WebApi.Modules.Greeting
+dotnet build src/WebApi/Modules/Custom/WebApi.Modules.Greeting
 dotnet run --project src/WebApi/WebApi --launch-profile http
 ```
 
-اضغط محتويات `src/WebApi/Modules/WebApi.Modules.Greeting/bin/Debug/net10.0` باسم `greeting.zip`، ثم:
+اضغط محتويات `src/WebApi/Modules/Custom/WebApi.Modules.Greeting/bin/Debug/net10.0` باسم `greeting.zip`، ثم:
 
 ```bash
 curl -F "package=@greeting.zip" http://localhost:5298/api/admin/modules

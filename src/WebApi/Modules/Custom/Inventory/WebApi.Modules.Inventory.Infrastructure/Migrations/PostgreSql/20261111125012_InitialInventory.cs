@@ -3,7 +3,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace soft.square.net.WebApi.Modules.Inventory.Migrations
+namespace soft.square.net.WebApi.Modules.Inventory.Infrastructure.Migrations.PostgreSql
 {
     /// <inheritdoc />
     public partial class InitialInventory : Migration
