@@ -37,6 +37,9 @@ dotnet-dump analyze module.dmp -c "dumpheap -type LoaderAllocator" -c "gcroot <a
 | The DI-level `EndpointDataSource` never refreshed, so it kept old endpoints (and served stale OpenAPI) | Subscribe to it once at startup with `GetChangeToken()` |
 | ApiExplorer keeps the last computed descriptions | Recompute them right after the module's routes are removed |
 | OpenAPI singletons cache schema ids by type and operation contexts by id | Their caches are cleared on unload; the next document request rebuilds them |
+| EF Core's static internal service-provider cache (model cache keyed by the module's DbContext type) | Avoided: each module has its own EF internal provider (`TenantEfServices` in `WebApi.Data`), disposed with the module |
+| OpenTelemetry `LogRecordSharedPool` (2048 slots): idle records keep their last exception, state and attributes. Found after EF logged a `DbUpdateException` (→ change tracker → module DbContext) | Idle records' data cleared on unload (`FrameworkCaches.ClearIdleLogRecords`) |
+| System.Linq.Expressions interpreter: `InstructionList.s_loadFields` (by `FieldInfo`), filled when EF evaluates a closure sub-expression such as `Where(i => i.Sku == sku.Trim())`; it kept the specification's closure field, hence the module. Related: `Expression.s_lambdaFactories`, `s_lambdaDelegateCache`, `CallInstruction.s_cache`, `DelegateHelpers._DelegateCache`. `gcroot` showed only the module's own handles; found by bisecting request kinds, then a reflection walk of every static | All cleared on unload, under their own locks where they have them (`FrameworkCaches.ClearExpressionCaches`) |
 
 ### The OpenAPI pin: found by bisecting
 
@@ -70,6 +73,8 @@ Re-measured on 2026-11-11 (Greeting, fresh process per run, two runs each):
 | Other scenario | Result |
 | --- | --- |
 | Repeated unload and activate cycles | Collected every time |
+| Layered `inventory` module with EF Core, specifications and tenant databases on four engines (2 core replicas, [lab](/backend/hybrid-lab/)) | Collected on both replicas within about 10 s, in repeated cycles, after the OpenTelemetry and expression-cache fixes. Without them, every copy that logged an EF error or ran the SKU specification stayed loaded |
+| A module protected with `RequirePermission` (403, then 200 after a grant) | Collected; the authorization pipeline holds no module types |
 | Upgrades and settings changes across 8 replicas ([lab](/backend/hybrid-lab/)) | Swapped-out copies often stay under `/unloading` for a while; later heap dumps showed only the active copy in each replica |
 
 The unload result reports what really happened (`unloaded`, `gcPasses`), so the admin is never told memory was

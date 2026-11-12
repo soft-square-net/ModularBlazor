@@ -22,7 +22,7 @@ namespace soft.square.net.WebApi.Modules.Inventory.Infrastructure;
 /// </summary>
 public sealed class InventoryModule : IRuntimeModule
 {
-    public ModuleManifest Manifest { get; } = new("inventory", "Inventory", "1.1.1", "inventory")
+    public ModuleManifest Manifest { get; } = new("inventory", "Inventory", "1.2.0", "inventory")
     {
         Description = "Sample: stock items per tenant, in each tenant's own database (layers, specifications, repositories)."
     };

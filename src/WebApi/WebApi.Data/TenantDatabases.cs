@@ -59,6 +59,7 @@ public sealed class TenantDatabases(IConfiguration configuration)
     public Task<IAsyncDisposable> LockAsync(TenantInfo tenant, string key, CancellationToken ct)
     {
         var server = ServerOf(tenant);
-        return server.Adapter.LockAsync(ConnectionString(tenant), $"{tenant.DatabaseName}:{key}", ct);
+        var connection = server.Adapter.LockConnectionString(server.ConnectionString, ConnectionString(tenant));
+        return server.Adapter.LockAsync(connection, $"{tenant.DatabaseName}:{key}", ct);
     }
 }

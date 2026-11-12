@@ -2,12 +2,14 @@
 title: Authentication and authorization
 description: Design note for the WebApi runtime-module platform (newsroom SaaS) — OpenIddict identity, tenant memberships, scoped and time-windowed grants, module permissions, the content workflow, shifts and Elsa 3.
 sidebar:
-  order: 10
+  order: 11
 ---
 
 :::caution[Status]
 Final, agreed with the user. Items marked *(assumed)* were recommended and never contested, but not explicitly
-confirmed. **A design decision, not implemented**; no repository changes yet.
+confirmed. **This page is the design decision.** Implementation has started: the host side of steps 1, 2 and 4 and the
+tenant middleware are on `main`, and the identity service is on a branch. See
+[Authentication: implementation](/backend/auth-implementation/) and [Tenancy and tenant data](/backend/tenancy-data/).
 :::
 
 ## 1. Principles

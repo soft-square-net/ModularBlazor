@@ -9,7 +9,9 @@ replica exports OpenTelemetry to the Aspire dashboard.
 dotnet run --project src/Aspire/Hybird --launch-profile http
 ```
 
-Tenant database servers on the other engines are opt-in, because their images are large and Oracle is slow to start:
+Tenant database servers on the other engines are opt-in, because their images are large and Oracle is slow to start.
+Sizes on disk: SQL Server 2022 2.2 GB, MySQL 9.7 1.28 GB, Oracle Database Free 23.26.1.0 14.1 GB (a 3.7 GB download).
+Oracle also publishes a smaller "lite" edition of Database Free; switching to it (`WithImageTag`) is untested here.
 
 ```bash
 dotnet run --project src/Aspire/Hybird --launch-profile http -- --Lab:Engines=sqlserver,mysql,oracle
@@ -63,6 +65,13 @@ connections it was wired to.
   - **Lifecycle unchanged:** `greeting` install, activate (200 on all sales replicas), deactivate (404 everywhere), unload and uninstall all converged over `modules.state`. Greeting was collected on every sales replica.
   - **Unload with EF Core:** in the first run one core replica kept inventory, rooted by an OpenTelemetry pooled log record holding an EF `DbUpdateException` (from a duplicate-SKU 409). After `FrameworkCaches.ClearIdleLogRecords`, the same scenario on a fresh lab collected inventory on both core replicas within about 10 s, in two cycles. As with the other modules, the unload's own GC passes aren't enough, so it shows under `/unloading` first.
   - **Layered module with specifications and repositories:** inventory 1.1.1 (Domain / Application / Infrastructure, Ardalis on EF Core 10), uploaded to the core pool, picked up its existing schema and data without re-migrating. Create 201, duplicate SKU 409 (domain rule), issuing more than in stock 409, list with a spec 200, for acme and initech. Two full cycles (activate, requests, deactivate, unload) were collected on both core replicas within a few seconds, after the `s_loadFields` fix in `FrameworkCaches.ClearExpressionCaches`. Without the fix, every copy that ran the SKU specification stayed loaded.
+  - **Four database engines** (`Lab:Engines=sqlserver,mysql,oracle`, with the platform-admin token from `dotnet user-jwts`):
+    - **Upload:** inventory 1.2.0, which ships a migration set per engine, was uploaded to the core pool. The PostgreSQL tenants (acme, globex, initech) kept their data and history.
+    - **Provisioning:** tenants created on `tenant-sql` (contoso), `tenant-mysql` (umbrella) and `tenant-oracle` (hooli, piedpiper) got their database or schema and the engine's migration set.
+    - **Requests:** on both core replicas, every engine served create 201, duplicate SKU 409, issue 200, over-issue 409 and list.
+    - **Oracle bug found and fixed:** the first Oracle design (`CURRENT_SCHEMA`) failed on the second replica with ORA-00955. Proxy authentication fixed it; `hooli` was repaired with `POST /api/tenancy/tenants/hooli/provision`, and `piedpiper` worked on both replicas from the start.
+    - **Unload:** inventory was then collected on both core replicas within seconds.
+    - **Not covered:** the tenant store on a non-PostgreSQL engine.
   - **Suspend:** `PATCH /api/tenancy/tenants/initech {"status":"Suspended"}` gave 403 on both core and all 4 sales replicas, by header and by host name. `{"status":"Active"}` restored 200 everywhere.
   - **Restart:** tenants (including the provisioned initech) survived a lab restart (Postgres volume).
 

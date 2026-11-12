@@ -1,7 +1,6 @@
 using System.Data.Common;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using MySql.Data.MySqlClient;
 using MySql.EntityFrameworkCore.Extensions;
@@ -25,8 +24,8 @@ public sealed record DatabaseServer(string Name, DatabaseProvider Provider, stri
 /// <list type="bullet">
 /// <item><b>PostgreSQL, SQL Server:</b> a database per tenant, a schema per module.</item>
 /// <item><b>MySQL:</b> a database per tenant (a MySQL schema is a database), a table-name prefix per module.</item>
-/// <item><b>Oracle:</b> a schema-only user per tenant (no login), selected with CURRENT_SCHEMA on every connection;
-/// a table-name prefix per module.</item>
+/// <item><b>Oracle:</b> a schema-only user per tenant (no password), signed in through the server account (proxy
+/// authentication); a table-name prefix per module.</item>
 /// </list>
 /// </summary>
 public abstract class DatabaseProviderAdapter
@@ -61,6 +60,9 @@ public abstract class DatabaseProviderAdapter
 
     /// <summary>Creates the database (Oracle: the schema user) when the server does not have it. True when created.</summary>
     public abstract Task<bool> EnsureDatabaseAsync(string serverConnection, string database, CancellationToken ct);
+
+    /// <summary>Where a tenant's migration lock is taken: the tenant's own database, unless the engine needs the server account.</summary>
+    public virtual string LockConnectionString(string serverConnection, string tenantConnection) => tenantConnection;
 
     /// <summary>A named, exclusive lock held until disposed; replicas use it so a migration runs once at a time.</summary>
     public async Task<IAsyncDisposable> LockAsync(string connectionString, string key, CancellationToken ct)
@@ -227,14 +229,26 @@ internal sealed class OracleAdapter : DatabaseProviderAdapter
     public override string EfProviderName => "Oracle.EntityFrameworkCore";
     public override bool SupportsSchemas => false;
 
-    /// <summary>The server connection names the pluggable database; a tenant's "database" is a schema inside it.</summary>
-    public override string ConnectionString(string serverConnection, string database) => serverConnection;
-
-    public override void Use(DbContextOptionsBuilder options, string connectionString, string database)
+    /// <summary>
+    /// The server connection names the pluggable database and a provisioning account; a tenant's "database" is a
+    /// schema-only user inside it. Tenant connections sign in AS that user through the provisioning account (proxy
+    /// authentication), so the session's own schema, USER_TABLES included, is the tenant's: EF's migration history
+    /// checks query USER_TABLES, which ALTER SESSION SET CURRENT_SCHEMA does not change.
+    /// </summary>
+    public override string ConnectionString(string serverConnection, string database)
     {
-        options.UseOracle(connectionString);
-        options.AddInterceptors(new CurrentSchemaInterceptor(SchemaName(database)));
+        if (string.IsNullOrEmpty(database)) return serverConnection; // the server itself (e.g. the tenant store)
+        var builder = new OracleConnectionStringBuilder(serverConnection);
+        var proxyUser = builder.UserID;
+        var proxyPassword = builder.Password;
+        builder.Remove("Password");
+        builder.UserID = SchemaName(database);
+        builder["Proxy User Id"] = proxyUser;
+        builder["Proxy Password"] = proxyPassword;
+        return builder.ConnectionString;
     }
+
+    public override void Use(DbContextOptionsBuilder options, string connectionString, string database) => options.UseOracle(connectionString);
 
     public override IServiceCollection AddEntityFramework(IServiceCollection services) => services.AddEntityFrameworkOracle();
     public override DbConnection CreateConnection(string connectionString) => new OracleConnection(connectionString);
@@ -243,41 +257,41 @@ internal sealed class OracleAdapter : DatabaseProviderAdapter
     public static string SchemaName(string database) =>
         new string(database.ToUpperInvariant().Select(c => char.IsAsciiLetterOrDigit(c) || c == '_' ? c : '_').ToArray());
 
+    /// <summary>
+    /// Creates the schema-only user (it owns the tenant's tables and cannot sign in with a password) and lets the
+    /// provisioning account connect through it. Idempotent: the grants are applied again for an existing user, which
+    /// also repairs a schema created without them. Needs a provisioning account with CREATE USER, GRANT ANY PRIVILEGE
+    /// and ALTER USER (the lab uses SYSTEM).
+    /// </summary>
     public override async Task<bool> EnsureDatabaseAsync(string serverConnection, string database, CancellationToken ct)
     {
         var schema = SchemaName(database);
+        var proxyUser = new OracleConnectionStringBuilder(serverConnection).UserID.ToUpperInvariant();
         await using var connection = CreateConnection(serverConnection);
         await connection.OpenAsync(ct);
-        if (Convert.ToInt32(await ScalarAsync(connection, "SELECT COUNT(*) FROM all_users WHERE username = :name", "name", schema, ct)) > 0) return false;
-        // A schema-only account: it owns the tenant's tables and cannot sign in. Needs a provisioning account with
-        // CREATE USER and the ANY privileges (the lab uses SYSTEM).
-        try { await NonQueryAsync(connection, $"CREATE USER \"{schema}\" NO AUTHENTICATION DEFAULT TABLESPACE USERS QUOTA UNLIMITED ON USERS", ct); }
-        catch (OracleException e) when (e.Number == 1920) { return false; } // ORA-01920: another replica won
-        return true;
+
+        var created = false;
+        if (Convert.ToInt32(await ScalarAsync(connection, "SELECT COUNT(*) FROM all_users WHERE username = :name", "name", schema, ct)) == 0)
+        {
+            try
+            {
+                await NonQueryAsync(connection, $"CREATE USER \"{schema}\" NO AUTHENTICATION DEFAULT TABLESPACE USERS QUOTA UNLIMITED ON USERS", ct);
+                created = true;
+            }
+            catch (OracleException e) when (e.Number == 1920) { } // ORA-01920: another replica won
+        }
+
+        await NonQueryAsync(connection, $"GRANT CREATE SESSION, CREATE TABLE, CREATE SEQUENCE, CREATE VIEW, CREATE PROCEDURE, CREATE TRIGGER TO \"{schema}\"", ct);
+        await NonQueryAsync(connection, $"ALTER USER \"{schema}\" GRANT CONNECT THROUGH \"{proxyUser}\"", ct);
+        return created;
     }
 
-    // DBMS_LOCK by number (needs EXECUTE on DBMS_LOCK; SYSTEM has it). Session-level: released on RELEASE or disconnect.
+    /// <summary>DBMS_LOCK needs EXECUTE on SYS.DBMS_LOCK, which the provisioning account has and tenant schemas do not.</summary>
+    public override string LockConnectionString(string serverConnection, string tenantConnection) => serverConnection;
+
+    // DBMS_LOCK by number. Session-level: released on RELEASE or disconnect. Instance-wide, so the key names the tenant.
     protected override object LockKey(string key) => StableHash(key);
     protected override string AcquireSql =>
         "DECLARE r INTEGER; BEGIN r := DBMS_LOCK.REQUEST(id => :lockKey, lockmode => DBMS_LOCK.X_MODE, timeout => DBMS_LOCK.MAXWAIT, release_on_commit => FALSE); IF r NOT IN (0, 4) THEN RAISE_APPLICATION_ERROR(-20001, 'DBMS_LOCK.REQUEST returned ' || r); END IF; END;";
     protected override string ReleaseSql => "DECLARE r INTEGER; BEGIN r := DBMS_LOCK.RELEASE(id => :lockKey); END;";
-
-    /// <summary>Points every connection of the context at the tenant's schema, so unqualified names resolve there.</summary>
-    private sealed class CurrentSchemaInterceptor(string schema) : DbConnectionInterceptor
-    {
-        public override void ConnectionOpened(DbConnection connection, ConnectionEndEventData eventData) => Set(connection);
-
-        public override Task ConnectionOpenedAsync(DbConnection connection, ConnectionEndEventData eventData, CancellationToken cancellationToken = default)
-        {
-            Set(connection);
-            return Task.CompletedTask;
-        }
-
-        private void Set(DbConnection connection)
-        {
-            using var command = connection.CreateCommand();
-            command.CommandText = $"ALTER SESSION SET CURRENT_SCHEMA = \"{schema}\"";
-            command.ExecuteNonQuery();
-        }
-    }
 }

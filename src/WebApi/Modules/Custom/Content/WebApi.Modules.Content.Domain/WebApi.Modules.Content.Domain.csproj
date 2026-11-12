@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Content domain: presses, categories and the Article aggregate with its workflow rules. References: WebApi.SharedKernel (../../../Directory.Build.props). -->
+
+</Project>

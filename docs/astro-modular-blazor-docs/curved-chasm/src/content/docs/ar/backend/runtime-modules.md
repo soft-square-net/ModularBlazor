@@ -35,6 +35,54 @@ sidebar:
 - لا يفعل `Custom/Directory.Build.props` سوى استيراد الإعدادات المشتركة: فالوحدات المخصصة ليست جزءا من إصدار WebApi أبدا.
 - لا تطبق المجموعة أيا من النوعين إلا إذا تضمنته قائمة `Modules:Enabled` الخاصة بها، أو كانت القائمة فارغة.
 
+### الوحدات الأساسية
+
+| الوحدة | المشروع (`Modules/Core/`) | المسارات |
+| --- | --- | --- |
+| `identity` 1.1.0 | `WebApi.Modules.Core.Identity` | `GET /api/identity/me` (مع الصلاحيات)، و`/users`، و`/users/{userName}`؛ وإدارة المنح `GET`/`POST /grants` و`DELETE /grants/{id}`؛ و`GET /permissions` (فهرس الصلاحيات). انظر [المصادقة: التنفيذ](/ar/backend/auth-implementation/) |
+| `tenancy` 2.1.0 | `WebApi.Modules.Core.Tenancy` | `GET /api/tenancy/tenants`، و`/tenants/{id}`، و`/current`؛ و`POST /tenants` (يجهز قاعدة البيانات)، و`PATCH /tenants/{id}` (إعادة التسمية، والمضيفون، والتعليق)، و`POST /tenants/{id}/provision` (إصلاح). انظر [المستأجرون وبياناتهم](/ar/backend/tenancy-data/) |
+
+**البذر.** عند البدء، وقبل أول مزامنة، تسجل كل نسخة كل حزمة أساسية مشحونة تحت قفل الفهرس، فتبذر النسخ المتزامنة مرة واحدة:
+
+- غير موجودة في الفهرس ← تثبت بحالة `Active`، وتعلم كـ `Core`، مع بصمة الحزمة؛
+- بصمة حزمة مختلفة وإصدار مشحون ≥ إصدار الفهرس ← ترقى في مكانها، مع الاحتفاظ بحالة المسؤول وإعداداته؛
+- في الفهرس إصدار أحدث (نسخة أقدم أثناء إصدار متدرج) ← تترك كما هي، ولا تخفض أبدا.
+
+إن تغير شيء، تنشر النسخة `core-seeded` لتعيد النسخ العاملة المزامنة. ولا يعيد البذر ضبط اختيار المسؤول أبدا. ويشير
+`Modules:CorePath` (افتراضيا `CoreModules`) إلى مكان آخر عند الحاجة. وأثناء التطوير تغير إعادة البناء بصمة الحزمة، فتعيد
+النسخة المعاد تشغيلها بذر الوحدة (تبديلها) حتى بالإصدار نفسه؛ فارفع الإصدار في الإصدارات الحقيقية.
+
+## الوحدات ذات الطبقات
+
+تستخدم وحدات الأعمال (المحتوى، والمناوبات، والمبيعات، والوحدة النموذجية `Custom/Inventory`) طبقات البنية النظيفة. أما وحدات
+الربط الصغيرة (`identity` و`tenancy` و`greeting`) فتبقى مشاريع مفردة: ثلاثة مشاريع هناك تضيف عبء بناء وتحزيم دون أن تحمي
+أي منطق نطاق.
+
+```text
+Modules/Custom/<Name>/
+  WebApi.Modules.<Name>.Domain          aggregates, rules, DomainException      → WebApi.SharedKernel
+  WebApi.Modules.<Name>.Application     use cases, specifications, DTOs         → Domain, WebApi.Contracts
+  WebApi.Modules.<Name>.Infrastructure  IRuntimeModule, endpoints, DbContext,   → Application, WebApi.Data, Carter
+                                        migrations (the entry assembly)
+```
+
+- **إعداد البناء:** يختار `Modules/Directory.Build.props` مراجع كل طبقة بحسب لاحقة اسم المشروع، فلا يشير مشروع الطبقة إلا
+  إلى الطبقة التي تحته. وكل تجميعة يشحنها المضيف (SharedKernel وContracts وData وEF Core وArdalis وCarter) يبنى عليها ولا تشحن
+  أبدا: فالحزمة هي تجميعات الوحدة الثلاث فقط.
+- **نقاط النهاية في تجميعة الدخول:** لا تربط بيئة التشغيل إلا أصناف `ICarterModule` في التجميعة التي تحوي `IRuntimeModule`.
+- **`WebApi.SharedKernel`** (يشحنه المضيف، دون EF): `IAggregateRoot` و`EntityBase<TId>` و`AggregateRoot<TId>` و`ITenantOwned`
+  و`DomainException`، و`IRepository<T>` / `IReadRepository<T>` (Ardalis.Specification، لجذور التجميعات فقط).
+- **المستودعات:** يسجل `AddTenantDbContext<T>()` المستودع `EfRepository<T>` في حاوية الوحدة فوق أول DbContext لها؛ والوحدة
+  ذات السياقات المتعددة تربط التجميعات بـ `AddTenantRepository<TContext, T>()`. وتقرأ المستودعات قاعدة بيانات المستأجر الحالي
+  وتكتب فيها؛ وتحفظ `Add` و`Update` و`Delete` فورا.
+- **المواصفات:** تمر القراءات عبر `Specification<T>` / `Specification<T, TResult>`؛ وتسقط القوائم إلى كائنات نقل بيانات بـ
+  `Select` وتستخدم `AsNoTracking`.
+- **دون MediatR:** خدمات تطبيق بدلا منه. فذاكرات معالجات الوسيط وخطوطه مفاتيحها أنواع الوحدة، وكانت ستحتاج إلى عمل التفريغ
+  نفسه.
+- يستهدف Ardalis.Specification 9.3.1 الإصدار EF Core 9 ويعمل على EF Core 10 في المضيف؛ تحقق ذلك في المختبر.
+
+بيانات المستأجرين والترحيلات ومحركات قواعد البيانات الأربعة: [المستأجرون وبياناتهم](/ar/backend/tenancy-data/).
+
 ## دورة الحياة
 
 ```text
@@ -204,8 +252,8 @@ admin call ─► any replica ─► catalog (modules.json + packages, cross-pro
 ## ما لم يغط بعد
 
 - جدول وحدات حقيقي بدلا من `modules.json` وملف قفل.
-- التفويض على واجهة الإدارة؛ وتوقيع الحزم والتحقق منها.
-- تشغيل ترحيلات EF Core الخاصة بالوحدة عند التفعيل، مرة واحدة، خلف قفل موزع.
+- توقيع الحزم والتحقق منها. (واجهة الإدارة محمية: تحتاج إلى `platform.modules.manage`.)
+- مستهلكو رسائل الوحدات وخدماتها المستضافة (أداة نطاق المستأجر موجودة).
 - الخدمات ذات المفاتيح داخل الوحدات.
 - استعادة تبعيات `.nupkg`: اشحن التبعيات في صيغة `.zip` بدلا من ذلك.
 - تصريف الطلبات الجارية قبل التفريغ (التبديل لا يحتاج إليه: تبقى النسخة القديمة تخدم حتى تستبدل).

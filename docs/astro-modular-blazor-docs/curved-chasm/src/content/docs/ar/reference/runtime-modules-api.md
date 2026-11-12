@@ -12,6 +12,9 @@ sidebar:
 يمكن أن يصل استدعاء دورة الحياة إلى أي نسخة. فيغير الحالة المرغوبة للوحدة في الفهرس المشترك، ويطبقها على تلك النسخة،
 ويبث التغيير لتتقارب كل نسخة في كل مجموعة. **وتصف الاستجابة النسخة التي أجابت.**
 
+يحتاج كل استدعاء إداري إلى الصلاحية `platform.modules.manage` (يملكها الدور `platform-admin`): **401** دون رمز، و**403** دون
+الصلاحية. انظر [المصادقة: التنفيذ](/ar/backend/auth-implementation/).
+
 | الطريقة والمسار | يفعل |
 | --- | --- |
 | `GET /api/admin/modules` | يسرد الوحدات المسجلة كما تراها هذه النسخة |
@@ -20,11 +23,12 @@ sidebar:
 | `POST /api/admin/modules/{id}/deactivate` | الحالة المرغوبة `Inactive`: إزالة المسارات؛ وتبقى الوحدات المحملة محملة |
 | `POST /api/admin/modules/{id}/unload` | الحالة المرغوبة `Installed`: إزالة المسارات، والتخلص من الخدمات، وتفريغ التجميعات في كل مكان |
 | `PUT /api/admin/modules/{id}/settings` | استبدال الإعدادات (كائن JSON)؛ وتبدل النسخ التي حملت الوحدة إلى نسخة معاد ضبطها |
-| `DELETE /api/admin/modules/{id}` | التفريغ في كل مكان، وحذف الحزمة، وإزالة التسجيل |
+| `DELETE /api/admin/modules/{id}` | التفريغ في كل مكان، وحذف الحزمة، وإزالة التسجيل. و`409` للوحدة الأساسية |
 | `GET /api/admin/modules/unloading` | النسخ المفرغة أو المستبدلة على هذه النسخة التي لم تحرر ذاكرتها بعد |
 
-الأخطاء بصيغة problem details: `400` لحزمة أو بيان غير صالح، و`404` لوحدة غير معروفة، و`409` حين تستخدم وحدة أخرى
-بادئة المسار، و`500` حين تكون ملفات الحزمة مفقودة.
+الأخطاء بصيغة problem details: `400` لحزمة أو بيان غير صالح، أو حين يجد التفعيل صلاحية غير مصرح بها أو متطلب تفويض معرفا
+في الوحدة أو سياسة مسماة؛ و`404` لوحدة غير معروفة؛ و`409` حين تستخدم وحدة أخرى بادئة المسار، أو عند حذف وحدة أساسية أو
+رفع حزمة فوقها؛ و`500` حين تكون ملفات الحزمة مفقودة.
 
 تخدم نقاط نهاية الوحدات تحت `/api/{RoutePrefix}`.
 
@@ -48,15 +52,26 @@ sidebar:
 | المسار | يفعل |
 | --- | --- |
 | `GET /api/pool` | المجموعة والدور والوحدات المفعلة ومعرف النسخة التي أجابت، مع أسماء سلاسل اتصالها (لا قيمها أبدا) |
-| `GET /health` | فحص الصحة الذي تستخدمه البوابة والمنسق |
+| `GET /health` | فحص الصحة الذي تستخدمه البوابة والمنسق (دون دخول) |
 | `GET /openapi/webapi.json` | مستند OpenAPI لنقاط النهاية المدمجة في المضيف (الإدارة و`/api/pool` و`/health`) |
 | `GET /openapi/modules/{id}.json` | مستند OpenAPI لوحدة واحدة؛ و`404` ما لم تكن مساراتها مربوطة على هذه النسخة |
 | `GET /openapi` | المستندات المتاحة الآن: `[{name, title, url, isDefault}]` |
 | `GET /scalar` (ويحول `/` إليه) | مرجع واجهة Scalar، مع مبدل للمستندات نفسها |
 
-توجد نقاط نهاية OpenAPI وScalar في بيئة التطوير، أو حين يضبط `OpenApi:Enabled=true`. وخلف مسارات البوابة
+نقاط نهاية OpenAPI وScalar متاحة دون دخول، وتوجد في بيئة التطوير، أو حين يضبط `OpenApi:Enabled=true`. وخلف مسارات البوابة
 `/pools/{pool}/` تحمل عناوين المستندات تلك البادئة (من `X-Forwarded-Prefix`). كيف يعمل:
 [وحدات أثناء التشغيل](/ar/backend/runtime-modules/).
+
+## نقاط نهاية الوحدات الأساسية
+
+| الوحدة | نقاط النهاية | الصلاحية |
+| --- | --- | --- |
+| `identity` | `GET /api/identity/me` (دون دخول؛ ومع صلاحيات المستدعي حين يكون مسجلا)، و`/users`، و`/users/{userName}` | مسجل الدخول |
+| `identity` | `GET /api/identity/permissions` (الفهرس)، و`GET`/`POST /api/identity/grants`، و`DELETE /api/identity/grants/{id}` | `access.grants.manage` |
+| `tenancy` | `GET /api/tenancy/tenants`، و`/tenants/{id}`، و`/current` | مسجل الدخول |
+| `tenancy` | `POST /api/tenancy/tenants`، و`PATCH /api/tenancy/tenants/{id}`، و`POST /api/tenancy/tenants/{id}/provision` | `platform.tenants.manage` |
+
+قواعد المستأجرين (الترويسات ورموز الحالة) في [المستأجرون وبياناتهم](/ar/backend/tenancy-data/).
 
 ## الحالات
 
@@ -77,6 +92,13 @@ sidebar:
 | `Modules:Enabled` | فارغ (الكل) | معرفات الوحدات التي تطبقها المجموعة، مثل `Modules__Enabled__0=sales` |
 | `ConnectionStrings:broker` | لا شيء | اتصال RabbitMQ؛ حين يضبط، تبث تغييرات دورة الحياة على مبادلة البث `modules.state` |
 | `OpenApi:Enabled` | `false` (مفعل في بيئة التطوير) | يخدم مستندات OpenAPI وScalar خارج بيئة التطوير |
+| `Modules:CorePath` | `CoreModules` | مجلد حزم الوحدات الأساسية المشحونة مع الإصدار |
+| `Auth:Authority` | لا شيء | خدمة الهوية (اكتشاف OIDC وJWKS). ودونها يطبق `Authentication:Schemes:Bearer` (`dotnet user-jwts`) |
+| `Auth:Audience` | `modular-webapi` | جمهور الرمز المتوقع |
+| `Access:Roles:{role}:N` | `platform-admin` ← كل صلاحيات المنصة | ربوط إضافية من الأدوار إلى الصلاحيات |
+| `Access:Grants:N:{Tenant,UserId,Permission,Scope}` | لا شيء | منح للبذر حين لا يوجد مخزن مستأجرين |
+| `ConnectionStrings:TenantStore` | لا شيء | مخزن المستأجرين (الدليل والمنح). ودونه يأتي المستأجرون من `Tenancy:Tenants` وتعيش المنح في الذاكرة |
+| `ConnectionStrings:<server>`، `DatabaseServers:<server>:Provider` | المزود `PostgreSql` | خوادم قواعد البيانات التي تسميها صفوف المستأجرين؛ والمزودون `PostgreSql` و`SqlServer` و`MySql` و`Oracle` |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | لا شيء | حين يضبط، تصدر التتبعات والمقاييس والسجلات عبر OTLP (تضبطه لوحة Aspire) |
 
 ## العقد
@@ -92,6 +114,7 @@ public sealed record ModuleManifest(string Id, string Name, string Version, stri
 {
     public string? Description { get; init; }
     public IReadOnlyDictionary<string, string?> DefaultSettings { get; init; }
+    public IReadOnlyList<PermissionDefinition> Permissions { get; init; } = [];
 }
 ```
 
@@ -101,6 +124,7 @@ public sealed record ModuleManifest(string Id, string Name, string Version, stri
 | `Version` | أحرف وأرقام و`.` و`+` و`-` |
 | `RoutePrefix` | قاعدة `Id` نفسها؛ وفريد بين الوحدات المثبتة |
 | `DefaultSettings` | مفاتيح إعداد مسطحة (`Section:Key`)؛ تنسخ إلى الفهرس عند التثبيت |
+| `Permissions` | كل صلاحية تستخدمها نقاط نهايتها بـ `RequirePermission`؛ ويفشل التفعيل عند صلاحية غير مصرح بها |
 
 تحوي الحزمة **صنفا واحدا فقط** عاما وغير مجرد يطبق `IRuntimeModule` وله منشئ بلا معاملات. وتأتي نقاط النهاية من
 أصناف `ICarterModule` فيها. الخدمات ذات المفاتيح غير مدعومة بعد.

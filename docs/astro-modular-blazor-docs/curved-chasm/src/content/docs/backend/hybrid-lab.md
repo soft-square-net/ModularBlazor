@@ -16,6 +16,13 @@ dotnet run --project src/Aspire/Hybird --launch-profile http
 The dashboard opens at `http://localhost:17888`; the gateway listens on `http://localhost:5080`. Docker is needed
 for the broker, Redis and PostgreSQL containers.
 
+Tenant database servers on the other engines are opt-in, because their images are large (SQL Server 2022 2.2 GB,
+MySQL 9.7 1.28 GB, Oracle Database Free 14.1 GB) and Oracle is slow to start:
+
+```bash
+dotnet run --project src/Aspire/Hybird --launch-profile http -- --Lab:Engines=sqlserver,mysql,oracle
+```
+
 ## Resources
 
 | Resource | What it is |
@@ -26,7 +33,9 @@ for the broker, Redis and PostgreSQL containers.
 | `worker-1`, `worker-2` | Worker pool, `Role=Worker`: modules load (services, consumers) but get no routes, and no public route reaches it |
 | `broker` | RabbitMQ with the management UI |
 | `redis` | Cache, locks, Data Protection keys, rate-limit counters |
-| `tenant-data` | PostgreSQL: `TenantStore` (HybirdTenants), `tenant-acme`, `tenant-globex`, plus pgAdmin |
+| `tenant-data` | PostgreSQL: `TenantStore` (HybirdTenants: the tenant registry and grants, schema `platform`), `tenant-acme`, `tenant-globex` (one database per tenant, a schema per module in it), plus pgAdmin. Replicas get `ConnectionStrings:TenantStore` and the server as `ConnectionStrings:tenant-data`, which tenant rows name |
+| `tenant-sql`, `tenant-mysql`, `tenant-oracle` (`Lab:Engines`) | Optional SQL Server, MySQL and Oracle Database Free servers for tenants. Replicas get `ConnectionStrings:<server>` and `DatabaseServers:<server>:Provider` |
+| `identity` (port 5090) | The OpenIddict identity service, with database `identity-db`. **On branch `claude/identity-service-da759e` only**; the pools aren't wired to it yet. See [Authentication: implementation](/backend/auth-implementation/#the-identity-service) |
 
 A pool is N replicas of the same project; only configuration differs:
 
@@ -42,6 +51,10 @@ ConnectionStrings    broker, redis, TenantStore  injected by Aspire
 and which connections it was wired to.
 
 ## Try the module lifecycle across pools
+
+The admin API needs a token with the `platform-admin` role (see
+[development tokens](/backend/auth-implementation/#development-tokens)); send it as `-H "Authorization: Bearer $TOKEN"`
+on the admin calls below.
 
 ```bash
 # install and activate through the gateway: the call reaches one core replica
@@ -72,6 +85,20 @@ The `/pools/{pool}/**` routes send `X-Forwarded-Prefix: /pools/{pool}` and turn 
 which would overwrite that header. Document URLs and server URLs are built from the header, so "Try it" stays on the
 same `/pools/{pool}/...` path.
 
+## Tenants in the lab
+
+```bash
+# by header, or by host name (the gateway forwards it as X-Forwarded-Host)
+curl -H "X-Tenant: acme" http://localhost:5080/api/tenancy/current
+curl -H "Host: acme.localhost" http://localhost:5080/api/tenancy/current
+
+# create a tenant on the SQL Server engine (needs platform.tenants.manage)
+curl -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \n  -d '{"id":"contoso","databaseServer":"tenant-sql"}' http://localhost:5080/api/tenancy/tenants
+```
+
+`acme.localhost` and `globex.localhost` resolve to 127.0.0.1 in most browsers. How resolution and provisioning work:
+[Tenancy and tenant data](/backend/tenancy-data/).
+
 ## What it verified
 
 | Check | Result |
@@ -82,6 +109,14 @@ same `/pools/{pool}/...` path.
 | Broadcast convergence | Install, activate, deactivate, settings, unload and uninstall made through one replica converged on all 8 replicas; 8 queues are bound to `modules.state` |
 | Zero-downtime swap | A re-install plus a settings change under load: 300 of 300 requests returned 200, and the new settings were live on every replica |
 | Memory after swaps | Released copies often stay under `/api/admin/modules/unloading` for a while; later heap dumps showed only the active copy in each replica |
+| Tenant resolution | `X-Tenant: acme` and `Host: acme.localhost` both resolve acme; a client-sent `X-Forwarded-Host` is overwritten by the gateway; an unknown tenant gets 404, a tenant-required module route without a tenant 400 |
+| Database per tenant | `inventory`, uploaded to the core pool, migrated its schema into `tenant-acme` and `tenant-globex` on activation; rows stayed separate on both core replicas |
+| Provisioning | `POST /api/tenancy/tenants` created `tenant-initech`; both core replicas migrated into it, and all 4 sales replicas (which don't load `tenancy`) knew initech through `tenants.changed` |
+| Suspend | `PATCH …/initech {"status":"Suspended"}` gave 403 on core and all sales replicas, by header and by host name; `Active` restored 200 |
+| Four engines | inventory 1.2.0 (one migration set per engine) served tenants on PostgreSQL, SQL Server (contoso), MySQL (umbrella) and Oracle (hooli, piedpiper) on both core replicas; the Oracle ORA-00955 bug was found here and fixed with proxy authentication |
+| Layered module | inventory 1.1.1 (Domain / Application / Infrastructure, Ardalis on EF Core 10) picked up its existing schema and data; domain rules gave 409s; two full cycles unloaded on both replicas |
+| Restart | Tenants, including the provisioned ones, survived a lab restart (Postgres volume) |
+| Identity service (branch) | Client credentials, Code + PKCE, refresh, tenant switch, picker, non-member refusal, platform token, admin API 403s, suspend and remove revoking refresh tokens, invite and accept, `RequireMfa` refusal |
 
 ## Design lessons
 
@@ -106,6 +141,7 @@ broadcast described in [Runtime modules](/backend/runtime-modules/#pools-and-rep
 
 - The CDN for the Blazor WebAssembly `_framework` files, and the client itself (see `src/Aspire/Host`).
 - Edge TLS and the WAF.
-- JWT validation, rate limiting and tenant resolution at the gateway: described in the research, not configured yet.
+- Token checks and rate limiting at the gateway: not configured yet. Every replica checks tokens and resolves the
+  tenant itself; the gateway only forwards the host name.
 - Autoscaling (the sales pool on CPU or requests) and scaling the worker pool on queue lag (for example KEDA on the
   RabbitMQ queue length).

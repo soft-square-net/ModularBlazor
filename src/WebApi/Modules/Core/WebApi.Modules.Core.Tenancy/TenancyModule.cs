@@ -161,6 +161,16 @@ public sealed partial class TenancyEndpoints : ICarterModule
             })
             .RequirePermission(PlatformPermissions.TenantsManage)
             .WithSummary("Renames a tenant, changes its host names, or suspends / re-activates it (status Active or Suspended).");
+
+        platform.MapPost("/tenants/{id}/provision", async (string id, ITenantDirectory tenants, TenantDatabases databases, CancellationToken ct) =>
+            {
+                if (tenants.Find(id) is not { } tenant) return Results.NotFound();
+                var created = await databases.EnsureDatabaseAsync(tenant, ct);
+                // Modules whose initialization for this tenant failed retry it on their next request.
+                return Results.Ok(new { tenant = tenant.Id, tenant.DatabaseServer, tenant.DatabaseName, created });
+            })
+            .RequirePermission(PlatformPermissions.TenantsManage)
+            .WithSummary("Runs the tenant's database provisioning again (idempotent): creates what is missing and re-applies grants. A repair step.");
     }
 
     [GeneratedRegex("^[a-z0-9][a-z0-9-]{0,39}$")]

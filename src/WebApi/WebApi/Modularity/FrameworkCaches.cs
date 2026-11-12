@@ -60,9 +60,66 @@ internal static class FrameworkCaches
         }
 
         EvictTypeDescriptionProviders(context);
+        EvictLibraryStaticCaches(context);
         ClearIdleLogRecords();
         ClearExpressionCaches();
     }
+
+    /// <summary>Host-shipped data libraries whose static dictionaries cache per-type data (the module's types as keys).</summary>
+    private static readonly string[] StaticCacheAssemblies =
+        ["Microsoft.EntityFrameworkCore", "Ardalis.Specification", "Ardalis.Specification.EntityFrameworkCore"];
+
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<Assembly, FieldInfo[]> StaticDictionaryFields = new();
+
+    /// <summary>
+    /// Static caches of the data libraries modules share with the host. Found with gcroot on the content and shifts
+    /// modules (the first to map enums and use Include):
+    /// <list type="bullet">
+    /// <item>EF Core: a static <c>ConcurrentDictionary&lt;Type, MethodInfo&gt;</c> keyed by the CLR type of every property
+    /// that needs snapshotting, here the modules' enums (ArticleState, ShiftRole).</item>
+    /// <item>Ardalis.Specification: IncludeEvaluator's compiled <c>Include</c> delegates, keyed by (entity type, property type).</item>
+    /// </list>
+    /// Every static dictionary of those assemblies is scanned once per assembly; entries whose key is, or holds, a type
+    /// or member of the module are removed. They are rebuildable caches.
+    /// </summary>
+    private static void EvictLibraryStaticCaches(AssemblyLoadContext context)
+    {
+        var assemblies = AppDomain.CurrentDomain.GetAssemblies()
+            .Where(a => !a.IsCollectible && !a.IsDynamic && StaticCacheAssemblies.Contains(a.GetName().Name));
+        foreach (var assembly in assemblies)
+        foreach (var field in StaticDictionaryFields.GetOrAdd(assembly, FindStaticDictionaries))
+        {
+            if (field.GetValue(null) is not IDictionary cache) continue;
+            try
+            {
+                foreach (var key in cache.Keys.Cast<object>().ToArray())
+                    if (Mentions(key, context)) cache.Remove(key);
+            }
+            catch (InvalidOperationException) { } // a plain Dictionary changed while it was read: the next unload retries
+        }
+    }
+
+    private static FieldInfo[] FindStaticDictionaries(Assembly assembly) =>
+        LoadableTypes(assembly)
+            .Where(t => !t.ContainsGenericParameters)
+            .SelectMany(t => t.GetFields(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
+            .Where(f => !f.IsLiteral && typeof(IDictionary).IsAssignableFrom(f.FieldType))
+            .ToArray();
+
+    /// <summary>The key is a module type or member, or a key object (e.g. a record struct) with such a field.</summary>
+    private static bool Mentions(object key, AssemblyLoadContext context) => key switch
+    {
+        Type type => Belongs(type, context),
+        MemberInfo member => member.DeclaringType is { } declaring && Belongs(declaring, context),
+        _ => key.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .Select(f => f.GetValue(key))
+            .Any(value => value switch
+            {
+                Type type => Belongs(type, context),
+                MemberInfo member => member.DeclaringType is { } declaring && Belongs(declaring, context),
+                _ => false
+            })
+    };
 
     /// <summary>
     /// System.Linq.Expressions keeps process-wide caches keyed by delegate types, methods and parameter types:

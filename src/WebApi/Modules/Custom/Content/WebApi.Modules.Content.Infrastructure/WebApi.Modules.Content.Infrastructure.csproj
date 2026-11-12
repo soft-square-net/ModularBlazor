@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Content module (starter), entry assembly: IRuntimeModule, endpoints, the tenant DbContext and its migrations.
+    References: Application, plus WebApi.Data, EF Core and Carter from the host (../../../Directory.Build.props).
+    NOT referenced by WebApi: zip this project's build output (bin/<Configuration>/net10.0, which holds all three
+    layers) and upload it to POST /api/admin/modules.
+  -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\WebApi.Modules.Content.Application\WebApi.Modules.Content.Application.csproj" />
+  </ItemGroup>
+
+</Project>

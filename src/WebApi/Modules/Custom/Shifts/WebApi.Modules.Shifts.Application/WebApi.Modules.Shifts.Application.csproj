@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Shifts use cases: rota → grants (IGrantStore), check-out, effective settings. References: Domain, plus WebApi.Contracts and the shared kernel (../../../Directory.Build.props). -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\WebApi.Modules.Shifts.Domain\WebApi.Modules.Shifts.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

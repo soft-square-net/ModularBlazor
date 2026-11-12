@@ -39,7 +39,10 @@ Edge load balancer + YARP gateway        TLS, JWT, rate limit, tenant resolution
 | --- | --- |
 | `src/api/ModularBlazor.Host` | The production API host and its built-in modules (`HostModules`) |
 | `src/WebApi/WebApi` | Runtime module prototype: one image that runs as any pool |
-| `src/WebApi/WebApi.Contracts` | `IRuntimeModule` and `ModuleManifest`, shared by the host and every runtime module |
+| `src/WebApi/WebApi.Contracts` | `IRuntimeModule`, `ModuleManifest`, and the tenancy and security contracts modules see |
+| `src/WebApi/WebApi.Data` | Host-shipped data layer: `TenantDbContext`, the tenant store, four EF Core providers |
+| `src/WebApi/WebApi.SharedKernel` | Host-shipped domain base types and repository interfaces (no EF) |
+| `src/WebApi/Identity/WebApi.Identity.Server` | OpenIddict identity service (on branch `claude/identity-service-da759e`, not merged yet) |
 | `src/WebApi/Modules/Core/` | **Core modules** (`Identity`, `Tenancy`): built with every WebApi release and enabled by default |
 | `src/WebApi/Modules/Custom/` | **Custom modules**: built on their own and uploaded while the app runs |
 | `src/WebApi/Modules/Custom/WebApi.Modules.Greeting` | Sample custom module, uploaded as a package |
@@ -59,10 +62,12 @@ arrive (with the release, or by an admin upload). See [Core and custom modules](
 | [Target architecture](/backend/target-architecture/) | The combined design: gateway, module pools, broker, Redis, observability |
 | [Hybrid architecture lab](/backend/hybrid-lab/) | The target architecture running locally with .NET Aspire, and what it measured |
 | [Multitenancy](/backend/multitenancy/) | How the tenant travels through calls and messages, and where tenant data lives |
+| [Tenancy and tenant data](/backend/tenancy-data/) | Implemented: tenant resolution, database per tenant on four engines, migrations on activation |
 | [Endpoints: Minimal API + Carter](/backend/endpoints-carter/) | Why Minimal API + Carter, and not FastEndpoints |
 | [Runtime modules](/backend/runtime-modules/) | How a module is installed, activated and served while the API runs, on every replica of every pool |
 | [Unloading runtime modules](/backend/runtime-module-unloading/) | What it takes to free a module's memory, measured with heap dumps |
-| [Authentication and authorization](/backend/auth-design/) | Design note (not implemented): identity service, tenant memberships, scoped grants, module permissions, newsroom workflow |
+| [Authentication and authorization](/backend/auth-design/) | Design note: identity service, tenant memberships, scoped grants, module permissions, newsroom workflow |
+| [Authentication: implementation](/backend/auth-implementation/) | What is built: JWT checks, permissions and grants, activation checks, the identity service |
 
 The admin endpoints and packaging rules are in the [runtime modules API reference](/reference/runtime-modules-api/).
 
