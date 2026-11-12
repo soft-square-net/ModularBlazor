@@ -1,0 +1,18 @@
+@page
+@model InvitationsModel
+@{ ViewData["Title"] = "Invitations"; }
+<h1>Invitations</h1>
+@if (Model.Pending.Count == 0)
+{
+    <p class="muted">No pending invitations.</p>
+}
+else
+{
+    <form method="post" class="list">
+        @foreach (var tenant in Model.Pending)
+        {
+            <button type="submit" name="tenant" value="@tenant">Join @tenant</button>
+        }
+    </form>
+}
+<p><a href="/">Back</a></p>
