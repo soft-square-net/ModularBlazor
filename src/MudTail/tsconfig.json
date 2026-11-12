@@ -1,0 +1,46 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
+    "module": "ESNext",
+    "types": [
+      "vite/client",
+      "node"
+    ],
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "allowJs": true,
+    "checkJs": false,
+    "allowImportingTsExtensions": true,
+    "paths": {
+      "mudtail": [
+        "./src/index.js"
+      ],
+      "mudtail/animator": [
+        "./src/animator/index.js"
+      ],
+      "mudtail/animator/player": [
+        "./src/animator/player-index.js"
+      ]
+    },
+    "noEmit": true
+  },
+  "include": [
+    "src/**/*",
+    "demo/**/*",
+    "vite.config.ts"
+  ],
+  "exclude": [
+    "dist",
+    "dist-demo",
+    "node_modules"
+  ]
+}

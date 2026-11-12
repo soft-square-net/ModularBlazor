@@ -27,3 +27,4 @@ artifacts/
 
 # node toolchains
 node_modules/
+/docs/astro-modular-blazor-docs/curved-chasm/yarn.lock

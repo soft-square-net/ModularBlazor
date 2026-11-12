@@ -1,0 +1,58 @@
+{
+  "name": "mudtail",
+  "description": "MudTail Material UI framework: Tailwind CSS tokens, vanilla JS components and GSAP animation, built to back Blazor WebAssembly layouts.",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/mudtail.js",
+  "module": "./dist/mudtail.js",
+  "exports": {
+    ".": "./dist/mudtail.js",
+    "./blazor": "./dist/mudtail.blazor.js",
+    "./animator": "./dist/mudtail.animator.js",
+    "./animator/player": "./dist/mudtail.animator.player.js",
+    "./mudtail.css": "./dist/mudtail.css",
+    "./tailwind.css": "./dist/tailwind.css",
+    "./scss/*": "./src/styles/*",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src/styles",
+    "src/core/plugin-tokens.js",
+    "scripts"
+  ],
+  "sideEffects": [
+    "*.css",
+    "*.scss"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run clean && npm run build:lib && npm run build:blazor && npm run build:animator && npm run build:css",
+    "build:lib": "vite build --mode lib",
+    "build:blazor": "vite build --mode blazor",
+    "build:animator": "vite build --mode animator && vite build --mode animator-player",
+    "build:css": "sass --no-source-map --style=compressed src/styles/mudtail.scss dist/mudtail.css && node -e \"require('fs').copyFileSync('src/styles/tailwind.css','dist/tailwind.css')\"",
+    "build:demo": "vite build",
+    "preview": "vite preview",
+    "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
+    "test": "node --import tsx --test \"src/**/*.test.*\"",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "gsap": "^3.15.1",
+    "lucide": "^1.70.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/node": "^22.14.0",
+    "sass": "^1.108.1",
+    "tailwindcss": "^4.3.3",
+    "tsx": "^4.21.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.0"
+  },
+  "bin": {
+    "mudtail-plugin-css": "./scripts/plugin-tailwind.mjs"
+  }
+}
