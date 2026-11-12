@@ -40,14 +40,14 @@ public sealed class ModuleAdminEndpoints : ICarterModule
         modules.MapPost("/{id}/deactivate", (string id, ModuleRuntime runtime, CancellationToken ct) => runtime.DeactivateAsync(id, ct))
             .WithSummary("Remove the module's routes; it stays loaded.");
 
-        modules.MapPost("/{id}/unload", (string id, ModuleRuntime runtime, CancellationToken ct) => runtime.UnloadAsync(id, ct))
-            .WithSummary("Remove routes, dispose services and unload the assembly.");
+        modules.MapPost("/{id}/unload", (string id, ModuleRuntime runtime, CancellationToken ct, bool deferred = false) => runtime.UnloadAsync(id, deferred, ct))
+            .WithSummary("Remove routes, stop hosted services, dispose services and unload the assembly. HotUnload = false: 409 unless ?deferred=true (released at the next restart).");
 
         modules.MapPut("/{id}/settings", (string id, Dictionary<string, string?> settings, ModuleRuntime runtime, CancellationToken ct) =>
                 runtime.UpdateSettingsAsync(id, settings, ct))
             .WithSummary("Replace the module's settings; applied on its next load.");
 
-        modules.MapDelete("/{id}", (string id, ModuleRuntime runtime, CancellationToken ct) => runtime.UninstallAsync(id, ct))
-            .WithSummary("Unload, delete the package and remove the registration. Core modules: 409 (deactivate or unload them instead).");
+        modules.MapDelete("/{id}", (string id, ModuleRuntime runtime, CancellationToken ct, bool deferred = false) => runtime.UninstallAsync(id, deferred, ct))
+            .WithSummary("Unload, delete the package and remove the registration. Core modules: 409 (deactivate or unload them instead). HotUnload = false: 409 unless ?deferred=true.");
     }
 }

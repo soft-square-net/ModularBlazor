@@ -94,6 +94,7 @@
   <Folder Name="/src/WebApi/Modules/Custom/">
     <File Path="src/WebApi/Modules/Custom/Directory.Build.props" />
     <Project Path="src/WebApi/Modules/Custom/WebApi.Modules.Greeting/WebApi.Modules.Greeting.csproj" />
+    <Project Path="src/WebApi/Modules/Custom/WebApi.Modules.Pulse/WebApi.Modules.Pulse.csproj" />
   </Folder>
   <Folder Name="/src/WebApi/Modules/Custom/Inventory/">
     <Project Path="src/WebApi/Modules/Custom/Inventory/WebApi.Modules.Inventory.Domain/WebApi.Modules.Inventory.Domain.csproj" />

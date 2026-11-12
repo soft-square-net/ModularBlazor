@@ -59,6 +59,7 @@ public static class RuntimeModulesExtensions
             if (seeded.Count > 0) await runtime.PublishCoreSeededAsync(seeded, cancellationToken);
         }
 
-        public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+        /// <summary>Host shutdown: module hosted services stop (awaited) and module services are disposed.</summary>
+        public Task StopAsync(CancellationToken cancellationToken) => runtime.StopAllAsync(cancellationToken);
     }
 }

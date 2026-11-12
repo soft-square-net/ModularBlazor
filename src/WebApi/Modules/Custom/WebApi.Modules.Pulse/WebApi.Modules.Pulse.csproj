@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Sample runtime module for module hosted services and module pipelines. NOT referenced by WebApi: zip the build
+    output (bin/<Configuration>/net10.0) and upload it to POST /api/admin/modules while the host is running.
+    Build with -p:PulseHotUnload=false for a copy whose manifest sets HotUnload = false, and -p:PulseVersion=x.y.z for an upgrade.
+  -->
+
+  <PropertyGroup>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <!-- Not -p:Version: a global property, it would also re-version WebApi.Contracts and break type identity. -->
+    <Version>$(PulseVersion)</Version>
+    <Version Condition="'$(PulseVersion)' == ''">1.0.0</Version>
+    <DefineConstants Condition="'$(PulseHotUnload)' == 'false'">$(DefineConstants);NO_HOT_UNLOAD</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <!-- Shared with the host: compile against them, never ship them. -->
+    <PackageReference Include="Carter" Version="10.0.0" ExcludeAssets="runtime" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\WebApi.Contracts\WebApi.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -41,10 +41,23 @@ public sealed class ModuleRecord
 
     /// <summary>Permissions the manifest declares (the permission catalog).</summary>
     public List<Contracts.Security.PermissionDefinition> Permissions { get; init; } = [];
+
+    /// <summary>From the manifest: false refuses unload/uninstall (409) and defers swaps to the next restart.</summary>
+    public bool HotUnload { get; init; } = true;
 }
 
 /// <summary>A module as seen by the replica that answered.</summary>
-public sealed record ModuleStatus(ModuleRecord Module, string Pool, string Instance, bool EnabledInPool, bool Loaded, IReadOnlyList<string> Routes);
+public sealed record ModuleStatus(ModuleRecord Module, string Pool, string Instance, bool EnabledInPool, bool Loaded, IReadOnlyList<string> Routes)
+{
+    /// <summary>Version of the copy loaded on this replica; differs from Module.Version while a restart is pending.</summary>
+    public string? LoadedVersion { get; init; }
+
+    /// <summary>HotUnload = false and the catalog asks for a change this replica only applies on its next restart.</summary>
+    public bool RestartRequired { get; init; }
+
+    /// <summary>The loaded copy's hosted services: state and last error.</summary>
+    public IReadOnlyList<HostedServiceStatus> HostedServices { get; init; } = [];
+}
 
 /// <summary>What a sync did on this replica.</summary>
 public sealed class SyncResult

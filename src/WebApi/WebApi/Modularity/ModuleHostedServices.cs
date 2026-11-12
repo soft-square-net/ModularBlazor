@@ -116,6 +116,7 @@ internal sealed class ModuleHostedServices(string moduleId, ModuleContainer cont
             if (entry.Service is not { } service || entry.State is HostedServiceState.StartFailed) continue;
 
             var lifecycle = service as IHostedLifecycleService;
+            entry.TrySet(HostedServiceState.Running, HostedServiceState.Stopping, null); // ExecuteTask ending now is not "Completed"
             try
             {
                 var task = Task.Run(async () =>
@@ -191,7 +192,7 @@ internal sealed class ModuleHostedServices(string moduleId, ModuleContainer cont
 }
 
 [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<HostedServiceState>))]
-public enum HostedServiceState { Starting, Running, Completed, Faulted, StartFailed, StartTimedOut, Stopped, StopFailed, StopTimedOut }
+public enum HostedServiceState { Starting, Running, Completed, Faulted, StartFailed, StartTimedOut, Stopping, Stopped, StopFailed, StopTimedOut }
 
 /// <summary>One hosted service of a loaded module, as reported by <c>GET /api/admin/modules</c>.</summary>
 public sealed record HostedServiceStatus(string Service, HostedServiceState State, string? Error);

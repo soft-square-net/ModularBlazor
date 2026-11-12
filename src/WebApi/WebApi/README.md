@@ -9,6 +9,7 @@ from an uploaded `.dll`, `.zip` (build output) or `.nupkg`. No restart needed fo
 | `WebApi.Contracts` | `IRuntimeModule` + `ModuleManifest`. Referenced by the host, so it is always shared. |
 | `WebApi.Modules.Greeting` | Sample module, **not** referenced by the host. Zip its `bin/<Configuration>/net10.0` and upload it. |
 | `Modules/Core/WebApi.Modules.Core.*` | Core modules: ship with every release and are seeded as `Active` on first start. See [Core modules](#core-modules). |
+| `WebApi.Modules.Pulse` | Sample for [module hosted services and pipelines](#module-hosted-services-pipelines-and-hotunload): a `BackgroundService` and a private pipeline. |
 | `Modules/Custom/Shifts`, `Modules/Custom/Content` | Newsroom modules (uploaded like any custom module). See [Newsroom modules](#newsroom-modules-shifts-and-content). |
 
 ## Lifecycle
@@ -16,8 +17,9 @@ from an uploaded `.dll`, `.zip` (build output) or `.nupkg`. No restart needed fo
 ```
 upload ─► Install ─► Activate ─────────► Deactivate ─► Unload ─► Uninstall
           │          │                    │             │
-          │          ├ load assembly      ├ routes 404  ├ dispose module services
-          │          ├ build services     │             ├ evict framework caches
+          │          ├ load assembly      ├ routes 404  ├ stop hosted services (awaited)
+          │          ├ build services     │             ├ dispose module services
+          │          ├ start hosted svcs  │             ├ evict framework caches
           │          └ map routes (hot)   │             └ unload AssemblyLoadContext
           └ read manifest in a throw-away load context, register it (modules.json)
 ```
@@ -41,13 +43,13 @@ A re-install or a settings change swaps to a fresh copy without a 404 window. Se
 
 | Endpoint | |
 |---|---|
-| `GET /api/admin/modules` | Registered modules: state, loaded, live routes |
+| `GET /api/admin/modules` | Registered modules: state, loaded (`loadedVersion`), live routes, `hostedServices`, `restartRequired` |
 | `POST /api/admin/modules` (form field `package`) | Install |
 | `POST /api/admin/modules/{id}/activate` | Load if needed, then map routes |
 | `POST /api/admin/modules/{id}/deactivate` | Remove routes; stays loaded |
-| `POST /api/admin/modules/{id}/unload` | Remove routes, dispose, unload assemblies |
+| `POST /api/admin/modules/{id}/unload` | Remove routes, stop hosted services, dispose, unload assemblies. `HotUnload = false`: 409 unless `?deferred=true` |
 | `PUT /api/admin/modules/{id}/settings` | Replace settings; applied on the next load |
-| `DELETE /api/admin/modules/{id}` | Unload, delete files, unregister |
+| `DELETE /api/admin/modules/{id}` | Unload, delete files, unregister. `HotUnload = false`: 409 unless `?deferred=true` |
 | `GET /api/admin/modules/unloading` | Unloaded contexts not yet collected |
 
 A module's endpoints are served under `/api/{RoutePrefix}` and get their own OpenAPI document while the module is routed.
@@ -146,7 +148,7 @@ request ─► host middleware (Tenancy/): X-Tenant header, then host name (X-Fo
   - for a tenant when it is created or re-activated.
   It runs behind the engine's own lock per (tenant database, context), so replicas migrate once at a time. A module request waits up to 30 s for its tenant's initialization; a failure gives 503 and is retried on the next request.
 - **Unload safety with EF Core.** Each module gets its own EF internal service provider (`TenantEfServices`, disposed with the module), so EF's model and query caches, which are keyed by the module's types, never enter EF's process-wide provider cache. Lifecycle hook: `IModuleLifecycleObserver` (`Loaded` / `ReleasingAsync`, called by `ModuleRuntime`); the initializer cancels and awaits its work and drops the module before the container is disposed.
-- **Work outside a request** (worker pool, consumers, jobs): `moduleServices.CreateTenantScope(tenantId)` gives a module scope bound to that tenant. Messages carry the tenant in the `tenant` header (`TenancyNames.MessageHeader`); platform jobs loop over `ITenantDirectory.All`. Module consumers and hosted services themselves are not supported by the runtime yet.
+- **Work outside a request** (worker pool, consumers, jobs): `moduleServices.CreateTenantScope(tenantId)` gives a module scope bound to that tenant. Messages carry the tenant in the `tenant` header (`TenancyNames.MessageHeader`); platform jobs loop over `ITenantDirectory.All`. A module's own `IHostedService`s run on every pool that loads it (see [Module hosted services](#module-hosted-services-pipelines-and-hotunload)); they are not tenant-bound, so they loop over tenants or read the message header themselves.
 - **Elsa (future workflow module):** Elsa's tenant id is the platform tenant id. An Elsa `ITenantResolver` reads `ITenantContext`, an `ITenantsProvider` reads `ITenantDirectory`, and the module refreshes Elsa's tenants on `tenants.changed`, so the tenant store stays the only source. Elsa keeps its own shared database with `TenantId` columns, not `TenantDbContext`. It must run on the host's EF Core version.
 - **No Finbuckle:** the in-house layer is small, and Finbuckle's startup-registered stores, per-tenant options and shared-database focus fit this runtime poorly. Modules only see `ITenantContext`, so it could be swapped in later.
 - **Without a tenant store** (a single local instance, no `ConnectionStrings:TenantStore`), the directory reads `Tenancy:Tenants` from the host configuration and the tenancy write endpoints return 503.
@@ -297,6 +299,124 @@ honestly.
 - Install, activate and deactivate: treat as fully hot.
 - Unload and upgrade: treat as "routes gone now, memory reclaimed best-effort". Schedule a rolling restart for guaranteed reclamation, which is normal in the replicated deployment anyway.
 
+## Module hosted services, pipelines and HotUnload
+
+Three runtime capabilities for modules that host more than Carter endpoints (the planned Elsa workflow module in the
+`workflow` pool is the driver). Sample: `Modules/Custom/WebApi.Modules.Pulse`.
+
+### Hosted services (`Modularity/ModuleHostedServices.cs`)
+
+A module registers `IHostedService`s in its own `ConfigureServices` as usual (`services.AddHostedService<T>()`, a
+`BackgroundService`). The generic host only runs services registered at startup, so the runtime runs these:
+
+- **Start:** when the copy is loaded on a replica, on **Api and Worker pools** alike (consumers and schedulers run on
+  worker pools too). Only the module's own registrations are started, never the host's. They start on a clean
+  `ExecutionContext`, as under the generic host, so a `BackgroundService` does not keep the activation request's
+  `AsyncLocal`s. `IHostedLifecycleService` hooks are called.
+- **Stop:** in reverse order, awaited, before the copy's container is disposed:
+  - on unload and uninstall;
+  - on a swap (re-install, upgrade, settings change): the old copy stops before the new copy starts, so two copies
+    never consume or schedule at the same time. Routes still swap without a 404 window;
+  - on host shutdown (`ModuleReconciler.StopAsync` → `ModuleRuntime.StopAllAsync`).
+- **Timeout:** `Modules:HostedServiceTimeout` (default 10 s) bounds each start, and all of a module's stops together.
+- **Failures** never crash the host or the other services. A constructor or `StartAsync` exception, a start or stop
+  timeout, or a faulted `BackgroundService.ExecuteTask` is logged and shown per service in `GET /api/admin/modules`:
+
+  ```json
+  "hostedServices": [
+    { "service": "soft.square.net.WebApi.Modules.Pulse.PulseWorker",  "state": "Running",     "error": null },
+    { "service": "soft.square.net.WebApi.Modules.Pulse.StartupProbe", "state": "StartFailed", "error": "Pulse:FailOnStart is true." }
+  ]
+  ```
+
+  States: `Starting`, `Running`, `Completed`, `Faulted`, `StartFailed`, `StartTimedOut`, `Stopping`, `Stopped`,
+  `StopFailed`, `StopTimedOut`. The report keeps names and messages only, never types, so it cannot pin the module.
+  A stop timeout is also added to the unload result's `note`: a service still running keeps the module loaded.
+- **Deactivate** removes routes only; hosted services keep running while the copy is loaded. Unload to stop them.
+- Hosted services are not tenant-bound: they loop over `ITenantDirectory.All` or read the message's tenant header,
+  and use `CreateTenantScope(...)`.
+
+### Module pipeline (`IModulePipeline`, `Modularity/ModulePipelines.cs`)
+
+**Contract:** an optional interface in `WebApi.Contracts`, implemented by the module's `IRuntimeModule` class:
+
+```csharp
+public interface IModulePipeline
+{
+    void ConfigurePipeline(IApplicationBuilder app);                     // middleware + endpoints, the normal way
+    void ConfigureEndpoint(IEndpointConventionBuilder endpoint) { }       // conventions for the host-side catch-all route
+}
+```
+
+- The runtime maps one catch-all endpoint, `/api/{RoutePrefix}/{**path}`, in the module's route group. It runs a
+  private pipeline built once per loaded copy through `ModuleRouteBuilder.CreateApplicationBuilder()`, so
+  `app.ApplicationServices` is the module's container. A library that wires itself with `app.UseXyz()`,
+  `UseRouting` / `UseEndpoints` or `UseMiddleware<T>` runs unchanged.
+- **Semantics of `app.Map(prefix, ...)`:** inside the pipeline `Request.PathBase` is `/api/{prefix}` and
+  `Request.Path` is the rest, so routes are relative (`/whoami` serves `/api/pulse/whoami`). The endpoint and route
+  values the host matched are cleared, so the pipeline's own `UseRouting` matches again. Everything is restored afterwards.
+- **Same `HttpContext`:** the host's middleware has already run for the catch-all route: authentication
+  (`HttpContext.User` from JwtBearer), tenant resolution and authorization. `RequestServices` is a module scope.
+  **Authorization is decided on the catch-all**, so its metadata belongs in `ConfigureEndpoint`: `RequirePermission(...)`,
+  `AllowAnonymous()`, `TenantOptional()`. Without any, the fallback policy requires a signed-in caller.
+  `ModuleAuthorization.Validate` checks the catch-all like any module endpoint. Finer checks inside the pipeline are
+  the library's own (`UseAuthorization` there uses the host's handlers).
+- **The module's Carter routes win:** they are more specific than the catch-all, so a module can mix both.
+- **Stays unloadable:** routing inside the pipeline is kept module-local. `UseEndpoints` registers its data sources in
+  `IOptions<RouteOptions>`; in the host's options they would join the host's route table forever, so the module gets its
+  own `RouteOptions`. The host's `DfaMatcherFactory` resolves the matcher's disposable `DataSourceDependentMatcher.Lifetime`
+  from the host root, which keeps it until the host is disposed, so the module gets its own factory and lifetime
+  registration. Both are internal types reached by reflection (a warning is logged if they change); re-verify after a
+  .NET upgrade.
+- Not covered: the host's `LinkGenerator` does not see pipeline endpoints; there is one pipeline per module, at its prefix.
+
+### `ModuleManifest.HotUnload` (default `true`)
+
+For modules (or hosted libraries) with process-wide state that pins their assemblies. When `false`:
+
+| Action | Result |
+|---|---|
+| `POST …/{id}/unload`, `DELETE …/{id}` | **409** `"cannot be unloaded while the host runs (HotUnload is false)"` |
+| … with `?deferred=true` | 200: the catalog changes now and routes go now; the loaded copies keep running until the next restart (`restartRequired: true`) |
+| Re-install, upgrade, settings change | No swap: the replica keeps serving the old copy and reports `restartRequired: true`, with `loadedVersion` ≠ `module.version`. The next restart loads the new one. |
+| Deactivate / activate | Work as usual (routes off and on; the copy and its hosted services stay) |
+| Host shutdown | Hosted services are stopped and services disposed, as for any module |
+
+The value is stored in the catalog (`hotUnload`), so the 409 applies on every replica. In sync, the loaded copy's own
+value decides, so an upgrade to a hot-unloadable version still waits for the restart.
+
+### Verified (2026-11-12, standalone host, `dotnet user-jwts` admin token)
+
+- **Hosted services:** after activate, `PulseWorker` runs and `/api/pulse/status` counts beats. A settings change swapped
+  the copy: the log shows the old worker stopping and its services stopped (28 ms) before the new worker started. With
+  `Pulse:FailOnStart=true`, `StartupProbe` is reported `StartFailed` with its message and the module keeps serving.
+- **Pipeline:** `/api/pulse/whoami` returned 401 without a token. With the token it returned 200 with
+  `{"authenticated":true,"name":"admin","roles":["platform-admin"],"pathBase":"/api/pulse","path":"/whoami","endpoint":"HTTP: GET /whoami"}`
+  and the module middleware's `X-Pulse-Beats` header. Also verified:
+  - the inline middleware's `/ping` short-circuit;
+  - a `POST /echo/{word}` minimal API with a JSON body;
+  - 404 for unknown paths;
+  - the Carter route `/api/pulse/status` next to the catch-all, anonymous.
+- **HotUnload = false** (`-p:PulseHotUnload=false`):
+  - unload and DELETE gave 409;
+  - re-installing 1.0.1 gave `version 1.0.1`, `loadedVersion 1.0.0`, `restartRequired: true`, and the old copy kept serving;
+  - deactivate gave 404 and activate 200 again;
+  - `unload?deferred=true` removed the routes and kept the copy;
+  - after a restart, 1.0.1 loaded.
+- **Unload measurement** (fresh process per run, two runs each; requests served, then unload; `/unloading` polled):
+
+  | Module | Requests before unload | Unload's own 20 GC passes | +5 s | +10 s | +20 s | +40 s |
+  |---|---|---|---|---|---|---|
+  | Greeting (baseline, this build) | 6 | not collected | listed | **collected** | collected | collected |
+  | Pulse (running `BackgroundService` + pipeline with `UseRouting`/`UseEndpoints`) | 12 | not collected | listed | **collected** | collected | collected |
+
+  Pulse with a running hosted service and a private routing pipeline unloads exactly like the baseline in both runs.
+  The baseline itself now collects by +10 s rather than +5 s, as in the earlier measurement. The difference is a host
+  difference (after the auth merge) and was not investigated. One copy released by a *swap* during a live session was
+  collected only between +20 s and +30 s (single observation, not repeated).
+- **Not verified on a running host:** stopping module hosted services on host shutdown. Graceful shutdown could not be
+  triggered from the test shell on Windows (no console Ctrl+C); the path (`ModuleReconciler.StopAsync`) is code-reviewed only.
+
 ## Authentication and authorization
 
 Foundation of the agreed auth design (docs site: Backend → Authentication and authorization). Every replica checks
@@ -421,7 +541,8 @@ content: article workflow ─► IAccessScopes.HasPermissionAsync(permission, [p
   - Gateway token checks.
   - Grant templates for the shifts module and Elsa.
 - **Tenancy:** per-tenant module enablement (plans), per-tenant module settings, dropping a module's schema on uninstall.
-- **Workers:** module consumers and hosted services (the tenant scope primitive exists).
+- **Workers:** a broker consumer abstraction for modules (hosted services run; a module brings its own client today).
+- **Pipelines:** host `LinkGenerator` does not know endpoints inside a module pipeline; only one pipeline per module, at its prefix.
 - **DI:** keyed services inside modules.
 - **Packages:** `.nupkg` dependency restore. Ship dependencies in the `.zip` form instead.
 - **In-flight requests:** draining requests during unload.
@@ -434,3 +555,8 @@ dotnet build src/WebApi/Modules/Custom/WebApi.Modules.Greeting
 
 Zip the *contents* of `src/WebApi/Modules/Custom/WebApi.Modules.Greeting/bin/Debug/net10.0`, run the host
 (`dotnet run --project src/WebApi/WebApi --launch-profile http`), then use `WebApi.http`.
+
+Pulse (hosted services and pipeline) works the same way: build `src/WebApi/Modules/Custom/WebApi.Modules.Pulse`, zip
+its output, then install and activate it as `pulse`. For the HotUnload case, build with
+`-p:PulseHotUnload=false -p:PulseVersion=1.0.1`. Don't use `-p:Version`: it is a global property and re-versions
+`WebApi.Contracts` too.

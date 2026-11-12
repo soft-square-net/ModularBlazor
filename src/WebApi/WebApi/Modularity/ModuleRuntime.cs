@@ -439,12 +439,13 @@ internal sealed partial class ModuleRuntime
         return result;
     }
 
-    private void ActivateLocal(ModuleRecord record)
+    private async Task ActivateLocalAsync(ModuleRecord record)
     {
         if (!_loaded.TryGetValue(record.Id, out var module))
         {
             _loaded[record.Id] = module = Load(record);
             _log.LogInformation("Loaded module {Id} {Version} in pool {Pool} ({Role})", record.Id, record.Version, _options.Pool, _options.Role);
+            await module.HostedServices.StartAsync(_options.HostedServiceTimeout); // every role; failures are only reported
         }
         if (_options.Role != ModuleRole.Api || module.Routed) return;
 
@@ -483,13 +484,16 @@ internal sealed partial class ModuleRuntime
         }
         catch
         {
-            await ReleaseAsync(fresh, _hostRoot, _host.Services);
+            await ReleaseAsync(fresh, _hostRoot, _host.Services, _options.HostedServiceTimeout);
             throw;
         }
 
         _loaded[record.Id] = fresh;
         _log.LogInformation("Swapped module {Id} to {Version} ({InstalledAt}) in pool {Pool}", record.Id, record.Version, record.InstalledAt, _options.Pool);
-        return await ReleaseLoadedAsync(record.Id, old.Version, old);
+        // Hosted services: the old copy's stop before the new copy's start, so two copies never consume or schedule at once.
+        var released = await ReleaseLoadedAsync(record.Id, old.Version, old);
+        await fresh.HostedServices.StartAsync(_options.HostedServiceTimeout);
+        return released;
     }
 
     private async Task<UnloadResult> UnloadLocalAsync(string id, string version)
@@ -507,7 +511,7 @@ internal sealed partial class ModuleRuntime
         // again; the routes are gone now, so recompute it without them.
         _ = _hostRoot.GetService<IApiDescriptionGroupCollectionProvider>()?.ApiDescriptionGroups;
 
-        var context = await ReleaseAsync(module!, _hostRoot, _host.Services);
+        var (context, stopNote) = await ReleaseAsync(module!, _hostRoot, _host.Services, _options.HostedServiceTimeout);
         module = null; // the async state machine would otherwise keep the module alive
 
         // Collection needs several GCs (the loader allocator is freed by finalizers) and other threads can briefly
@@ -523,8 +527,47 @@ internal sealed partial class ModuleRuntime
         var unloaded = !context.IsAlive;
         if (!unloaded) _unloading[$"{id}@{version}#{Guid.NewGuid():n}"] = context;
         _log.LogInformation("Unloaded module {Id} in pool {Pool}: {Result} after {Passes} GC passes", id, _options.Pool, unloaded ? "collected" : "still referenced", passes);
-        return new UnloadResult(id, unloaded, passes,
-            unloaded ? null : "Not collected yet; tracked under GET /api/admin/modules/unloading. If it never clears, something still references the module's types.");
+        var note = unloaded ? null : "Not collected yet; tracked under GET /api/admin/modules/unloading. If it never clears, something still references the module's types.";
+        return new UnloadResult(id, unloaded, passes, stopNote is null ? note : $"{stopNote} {note}".Trim());
+    }
+
+    /// <summary>
+    /// Host shutdown: stops every loaded module's hosted services (awaited, with the timeout) and disposes its
+    /// services, so module consumers and schedulers end cleanly instead of being abandoned.
+    /// </summary>
+    public async Task StopAllAsync(CancellationToken ct)
+    {
+        await _gate.WaitAsync(ct);
+        try
+        {
+            foreach (var (id, module) in _loaded.ToArray())
+            {
+                _endpoints.Remove(id);
+                _loaded.Remove(id);
+                try { await ReleaseAsync(module, _hostRoot, _host.Services, _options.HostedServiceTimeout); }
+                catch (Exception e) { _log.LogError(e, "Module {Id} did not shut down cleanly", id); }
+            }
+        }
+        finally { _gate.Release(); }
+    }
+
+    /// <summary>HotUnload = false refuses unload/uninstall (409) unless the caller defers it to the next restart.</summary>
+    private static void EnsureHotUnload(ModuleRecord record, bool deferred, string action)
+    {
+        if (!record.HotUnload && !deferred)
+            throw new ModuleException($"Module '{record.Id}' cannot be {action} while the host runs (HotUnload is false). " +
+                                      "Deactivate it, or repeat with ?deferred=true: routes go now, the loaded copies at the next restart.",
+                StatusCodes.Status409Conflict);
+    }
+
+    /// <summary>A loaded copy with HotUnload = false is never released in place; it is kept until the next restart.</summary>
+    private bool KeptUntilRestart(string id, LoadedModule module, string change)
+    {
+        if (module.HotUnload) return false;
+        if (!module.RestartLogged)
+            _log.LogWarning("Module {Id} has HotUnload = false: {Change} deferred, the running copy {Version} stays until the next restart", id, change, module.Version);
+        module.RestartLogged = true;
+        return true;
     }
 
     private async Task<ModuleStatus> StatusAsync(string id, CancellationToken ct)
@@ -559,6 +602,7 @@ internal sealed partial class ModuleRuntime
             var services = new ServiceCollection();
             var settings = new ConfigurationBuilder().AddInMemoryCollection(record.Settings).Build();
             module.ConfigureServices(services, settings);
+            if (module is IModulePipeline) ModulePipelines.AddPipelineServices(services, _hostRoot, _log);
 
             // The module's own JsonOptions, configured exactly like the host's. Minimal API caches JSON metadata for
             // the module's request/response types inside these options; in the host's singleton they would pin the
@@ -576,7 +620,10 @@ internal sealed partial class ModuleRuntime
             var loaded = new LoadedModule(context, container, routeModules, record)
             {
                 // Plain strings only: nothing of the module instance is kept.
-                DeclaredPermissions = module.Manifest.Permissions.Select(p => p.Name).ToHashSet(StringComparer.Ordinal)
+                DeclaredPermissions = module.Manifest.Permissions.Select(p => p.Name).ToHashSet(StringComparer.Ordinal),
+                HotUnload = module.Manifest.HotUnload,
+                Pipeline = module as IModulePipeline,
+                HostedServices = new ModuleHostedServices(record.Id, container, _log)
             };
             // Tenancy (per-tenant initialization) and other host observers; they let go in ReleaseAsync.
             foreach (var observer in _hostRoot.GetServices<IModuleLifecycleObserver>()) observer.Loaded(record.Id, container.Root);
@@ -598,6 +645,8 @@ internal sealed partial class ModuleRuntime
 
         foreach (var type in module.RouteModules)
             ((ICarterModule)ActivatorUtilities.CreateInstance(module.Container.Root, type)).AddRoutes(group);
+        if (module.Pipeline is { } pipeline) // catch-all /api/{prefix}/{**path}, validated like any module endpoint
+            ModulePipelines.Map(group, pipeline, module.Container.Root, $"{_routeBase}/{record.RoutePrefix}", record.Id);
 
         var endpoints = builder.DataSources.SelectMany(source => source.Endpoints).OfType<RouteEndpoint>().ToArray();
         ModuleAuthorization.Validate(record.Id, module.DeclaredPermissions, endpoints, module.Context);
@@ -619,15 +668,16 @@ internal sealed partial class ModuleRuntime
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
-    private static async Task<WeakReference> ReleaseAsync(LoadedModule module, IServiceProvider hostRoot, IServiceCollection hostServices)
+    private static async Task<(WeakReference Context, string? StopNote)> ReleaseAsync(LoadedModule module, IServiceProvider hostRoot, IServiceCollection hostServices, TimeSpan hostedServiceTimeout)
     {
+        var stopNote = await module.HostedServices.StopAsync(hostedServiceTimeout); // before anything is disposed
         foreach (var observer in hostRoot.GetServices<IModuleLifecycleObserver>())
             await observer.ReleasingAsync(module.Id, module.Container.Root);
         await module.Container.DisposeAsync();
         FrameworkCaches.Evict(module.Context, hostRoot, hostServices);
         var context = new WeakReference(module.Context);
         module.Context.Unload();
-        return context;
+        return (context, stopNote);
     }
 
     /// <summary>Reads the manifest in a throw-away load context, so nothing stays loaded after install.</summary>
@@ -755,8 +805,20 @@ internal sealed partial class ModuleRuntime
     private ModuleRecord Get(string id) =>
         _records.TryGetValue(id, out var record) ? record : throw new ModuleException($"Module '{id}' is not installed.", StatusCodes.Status404NotFound);
 
-    private ModuleStatus Status(ModuleRecord record) =>
-        new(record, _options.Pool, ModuleInstance.Id, _options.IsEnabled(record.Id), _loaded.ContainsKey(record.Id), _endpoints.Describe(record.Id));
+    private ModuleStatus Status(ModuleRecord record)
+    {
+        _loaded.TryGetValue(record.Id, out var module);
+        // HotUnload = false: a change that needs a fresh copy (unload, upgrade, settings, pool) waits for a restart.
+        var restartRequired = module is { HotUnload: false }
+            && (module.InstalledAt != record.InstalledAt || module.Settings != SettingsFingerprint(record)
+                || record.DesiredState == ModuleState.Installed || !_options.IsEnabled(record.Id));
+        return new(record, _options.Pool, ModuleInstance.Id, _options.IsEnabled(record.Id), module is not null, _endpoints.Describe(record.Id))
+        {
+            LoadedVersion = module?.Version,
+            RestartRequired = restartRequired,
+            HostedServices = module?.HostedServices.Describe() ?? []
+        };
+    }
 
     [GeneratedRegex("^[a-z0-9][a-z0-9.-]{0,63}$")]
     private static partial Regex Slug();
@@ -773,6 +835,11 @@ internal sealed partial class ModuleRuntime
         public IReadOnlyList<Endpoint>? Endpoints { get; set; }
         public bool Routed { get; set; }
         public IReadOnlySet<string> DeclaredPermissions { get; init; } = new HashSet<string>();
+        public bool HotUnload { get; init; } = true;
+        public bool RestartLogged { get; set; }
+        /// <summary>The module instance, when it has a private pipeline; dropped with the copy.</summary>
+        public IModulePipeline? Pipeline { get; init; }
+        public required ModuleHostedServices HostedServices { get; init; }
 
         /// <summary>Which catalog entry this was loaded from; a re-install changes it and triggers a reload.</summary>
         public DateTimeOffset InstalledAt { get; } = record.InstalledAt;
