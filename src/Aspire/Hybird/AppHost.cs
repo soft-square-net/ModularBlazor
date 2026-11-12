@@ -151,6 +151,10 @@ IResourceBuilder<ProjectResource>[] AddPool(string name, string role, int replic
             .WithReference(redis).WaitFor(redis)
             .WithReference(tenantStore).WaitFor(tenantStore)
             .WithEnvironment("DatabaseServers__TenantStore__Provider", "PostgreSql")
+            // Tokens from the identity service: JwtBearer reads its discovery document and JWKS (http in the lab).
+            .WithEnvironment("Auth__Authority", IdentityIssuer)
+            .WithEnvironment("Auth__Audience", "modular-webapi")
+            .WaitFor(identity)
             .WithHttpHealthCheck("/health");
 
         foreach (var server in databaseServers) server(replica); // tenant-data plus the Lab:Engines servers
