@@ -147,13 +147,13 @@ public static class ConnectEndpoints
     {
         var principal = (await context.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme)).Principal;
         var user = principal is null ? null : await users.FindByIdAsync(principal.GetClaim(Claims.Subject) ?? "");
-        if (user is null)
+        if (principal is null || user is null)
             return Results.Challenge(authenticationSchemes: [OpenIddictServerAspNetCoreDefaults.AuthenticationScheme]);
 
         var claims = new Dictionary<string, object?>(StringComparer.Ordinal) { [Claims.Subject] = user.Id };
-        if (principal!.GetClaim(IdentityClaims.Tenant) is { } tenant) claims[IdentityClaims.Tenant] = tenant;
-        if (principal!.HasScope(Scopes.Profile)) claims[Claims.Name] = principal.GetClaim(Claims.Name);
-        if (principal!.HasScope(Scopes.Email)) claims[Claims.Email] = user.Email;
+        if (principal.GetClaim(IdentityClaims.Tenant) is { } tenant) claims[IdentityClaims.Tenant] = tenant;
+        if (principal.HasScope(Scopes.Profile)) claims[Claims.Name] = principal.GetClaim(Claims.Name);
+        if (principal.HasScope(Scopes.Email)) claims[Claims.Email] = user.Email;
         claims[Claims.Role] = principal.GetClaims(Claims.Role);
         return Results.Ok(claims);
     }

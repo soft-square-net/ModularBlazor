@@ -72,13 +72,14 @@ if (engines.Contains("oracle"))
 // Not routed through the gateway: the issuer is one URL, and in production it gets its own host name.
 const int IdentityPort = 5090;
 const string IdentityIssuer = "http://localhost:5090/";
-var identityDb = tenantData.AddDatabase("identity");
+// Resource "identity-db" (names are unique across resources), database "identity", passed as ConnectionStrings:identity.
+var identityDb = tenantData.AddDatabase("identity-db", databaseName: "identity");
 var identity = builder.AddProject<Projects.WebApi_Identity_Server>("identity", launchProfileName: null)
     .WithHttpEndpoint(port: IdentityPort)
     .WithExternalHttpEndpoints()
     .WithEnvironment("ASPNETCORE_ENVIRONMENT", "Development")
     .WithEnvironment("Identity__Issuer", IdentityIssuer)
-    .WithReference(identityDb).WaitFor(identityDb)
+    .WithReference(identityDb, connectionName: "identity").WaitFor(identityDb)
     .WithHttpHealthCheck("/health");
 
 // ---------------------------------------------------------------- module pools (same image, different config)

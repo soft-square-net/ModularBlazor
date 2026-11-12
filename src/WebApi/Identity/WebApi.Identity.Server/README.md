@@ -132,7 +132,7 @@ TODO: an invitation email with a set-password link for new accounts.
 
 ## Data
 
-- PostgreSQL database `identity` (Aspire resource `identity` on the `tenant-data` server), schema `identity`, with
+- PostgreSQL database `identity` (Aspire resource `identity-db` on the `tenant-data` server, passed as `ConnectionStrings:identity`), schema `identity`, with
   EF Core migrations in `Data/Migrations`. They're applied at startup, and EF Core's migration lock keeps replicas
   safe.
 - Tables:
