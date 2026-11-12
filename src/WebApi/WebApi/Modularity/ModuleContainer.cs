@@ -153,7 +153,8 @@ internal sealed class ModuleScope : IServiceProvider, IServiceScope, IServiceSco
         return result;
     }
 
-    private object? Resolve(ServiceDescriptor descriptor, Type type)
+    /// <summary>Resolves one module registration (e.g. a module's IHostedService, without the host's ones).</summary>
+    internal object? Resolve(ServiceDescriptor descriptor, Type type)
     {
         switch (descriptor.Lifetime)
         {

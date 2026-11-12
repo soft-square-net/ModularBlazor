@@ -30,6 +30,9 @@ public sealed class ModuleRuntimeOptions
     /// <summary>Core module packages shipped with this release (one folder per module), relative to the app base directory.</summary>
     public string CorePath { get; set; } = "CoreModules";
 
+    /// <summary>How long a module's hosted services may take to start, and (all together) to stop.</summary>
+    public TimeSpan HostedServiceTimeout { get; set; } = TimeSpan.FromSeconds(10);
+
     public bool IsEnabled(string moduleId) =>
         Enabled.Length == 0 || Enabled.Contains(moduleId, StringComparer.OrdinalIgnoreCase);
 }
@@ -139,6 +142,7 @@ internal sealed partial class ModuleRuntime
                         Version = manifest.Version,
                         RoutePrefix = manifest.RoutePrefix.Trim('/'),
                         Description = manifest.Description,
+                        HotUnload = manifest.HotUnload,
                         EntryAssembly = entry,
                         Settings = settings,
                         DesiredState = previous?.DesiredState ?? ModuleState.Installed, // an upgrade keeps the module's state
@@ -176,9 +180,10 @@ internal sealed partial class ModuleRuntime
     }
 
     /// <summary>Unloads the module on every replica; the result describes this replica.</summary>
-    public async Task<UnloadResult> UnloadAsync(string id, CancellationToken ct)
+    /// <param name="deferred">Required for a module with HotUnload = false: routes go now, the loaded copies at the next restart.</param>
+    public async Task<UnloadResult> UnloadAsync(string id, bool deferred, CancellationToken ct)
     {
-        var record = await SetDesiredStateAsync(id, ModuleState.Installed, ct);
+        var record = await SetDesiredStateAsync(id, ModuleState.Installed, ct, deferred);
         var result = await ApplyAndPublishAsync(record.Id, "unloaded", ct);
         return result.Unloaded.TryGetValue(record.Id, out var unload)
             ? unload
@@ -201,7 +206,7 @@ internal sealed partial class ModuleRuntime
         finally { _gate.Release(); }
     }
 
-    public async Task<UnloadResult> UninstallAsync(string id, CancellationToken ct)
+    public async Task<UnloadResult> UninstallAsync(string id, bool deferred, CancellationToken ct)
     {
         await _gate.WaitAsync(ct);
         string moduleId;
@@ -213,6 +218,7 @@ internal sealed partial class ModuleRuntime
                 var record = Get(id);
                 if (record.Core)
                     throw new ModuleException($"'{record.Id}' is a core module and ships with the release; deactivate or unload it instead.", StatusCodes.Status409Conflict);
+                EnsureHotUnload(record, deferred, "uninstalled");
                 moduleId = record.Id;
                 _records.Remove(moduleId);
                 _store.Save(_records.Values);
@@ -324,6 +330,7 @@ internal sealed partial class ModuleRuntime
                         Version = manifest.Version,
                         RoutePrefix = prefix,
                         Description = manifest.Description,
+                        HotUnload = manifest.HotUnload,
                         EntryAssembly = entry,
                         Settings = settings,
                         DesiredState = previous?.DesiredState ?? ModuleState.Active,
@@ -363,10 +370,19 @@ internal sealed partial class ModuleRuntime
                 var wanted = record is not null && record.DesiredState != ModuleState.Installed && _options.IsEnabled(id);
                 if (!wanted)
                 {
+                    if (KeptUntilRestart(id, module, "unload")) // HotUnload = false: routes go, the copy stays
+                    {
+                        RemoveRoutes(id);
+                        result.Unloaded[id] = new UnloadResult(id, Unloaded: false, GcPasses: 0,
+                            Note: "HotUnload is false: routes removed; the loaded copy keeps running until the next restart (restartRequired).");
+                        continue;
+                    }
                     result.Unloaded[id] = await UnloadLocalAsync(id, record?.Version ?? module.Version);
                 }
                 else if (module.InstalledAt != record!.InstalledAt || module.Settings != SettingsFingerprint(record))
                 {
+                    if (KeptUntilRestart(id, module, "swap")) continue; // the running copy keeps serving
+
                     // Re-installed or re-configured: swap to a freshly loaded copy, then release the old one.
                     try { result.Unloaded[id] = await SwapAsync(record, module); }
                     catch (Exception e) when (e is ModuleException or IOException or BadImageFormatException or TypeLoadException or InvalidOperationException)
@@ -381,7 +397,7 @@ internal sealed partial class ModuleRuntime
             {
                 try
                 {
-                    if (record.DesiredState == ModuleState.Active) ActivateLocal(record);
+                    if (record.DesiredState == ModuleState.Active) await ActivateLocalAsync(record);
                     else RemoveRoutes(record.Id);
                 }
                 catch (Exception e) when (e is ModuleException or IOException or BadImageFormatException or TypeLoadException or InvalidOperationException)
@@ -395,7 +411,7 @@ internal sealed partial class ModuleRuntime
         finally { _gate.Release(); }
     }
 
-    private async Task<ModuleRecord> SetDesiredStateAsync(string id, ModuleState state, CancellationToken ct)
+    private async Task<ModuleRecord> SetDesiredStateAsync(string id, ModuleState state, CancellationToken ct, bool deferred = false)
     {
         await _gate.WaitAsync(ct);
         try
@@ -404,6 +420,7 @@ internal sealed partial class ModuleRuntime
             {
                 ReloadRecords();
                 var record = Get(id);
+                if (state == ModuleState.Installed) EnsureHotUnload(record, deferred, "unloaded");
                 record.DesiredState = state;
                 _store.Save(_records.Values);
                 return record;

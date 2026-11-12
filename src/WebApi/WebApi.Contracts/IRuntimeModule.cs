@@ -18,6 +18,11 @@ public interface IRuntimeModule
     /// host for everything else (logging, options, tenant context, ...).
     /// </summary>
     /// <param name="settings">The module's settings: the manifest defaults, overridden by the admin.</param>
+    /// <remarks>
+    /// <c>IHostedService</c>s registered here (<c>AddHostedService&lt;T&gt;()</c>, a <c>BackgroundService</c>) are started
+    /// when the module is loaded, on Api and Worker pools alike, and stopped (awaited, with a timeout) before the
+    /// module's services are disposed: on unload, on a swap to a new version or new settings, and on host shutdown.
+    /// </remarks>
     void ConfigureServices(IServiceCollection services, IConfiguration settings);
 }
 
@@ -29,4 +34,13 @@ public sealed record ModuleManifest(string Id, string Name, string Version, stri
 
     /// <summary>Default settings copied into the module store on install; the admin can override them.</summary>
     public IReadOnlyDictionary<string, string?> DefaultSettings { get; init; } = new Dictionary<string, string?>();
+
+    /// <summary>
+    /// True (default): the module can be unloaded, uninstalled and swapped to a new version or new settings while
+    /// the host runs. Set it to false when the module, or a library it hosts, keeps process-wide state that pins its
+    /// assemblies (static caches, global registrations). The runtime then refuses unload and uninstall with 409
+    /// (unless they are deferred to the next restart), and an upgrade or settings change keeps the running copy and
+    /// reports <c>restartRequired</c>. Activate and deactivate still work.
+    /// </summary>
+    public bool HotUnload { get; init; } = true;
 }
