@@ -85,6 +85,9 @@
     <Project Path="src/WebApi/WebApi.SharedKernel/WebApi.SharedKernel.csproj" />
     <Project Path="src/WebApi/WebApi/WebApi.csproj" />
   </Folder>
+  <Folder Name="/src/WebApi/Identity/">
+    <Project Path="src/WebApi/Identity/WebApi.Identity.Server/WebApi.Identity.Server.csproj" />
+  </Folder>
   <Folder Name="/src/WebApi/Modules/">
     <File Path="src/WebApi/Modules/Directory.Build.props" />
   </Folder>

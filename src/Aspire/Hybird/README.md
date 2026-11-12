@@ -37,6 +37,7 @@ running; they then keep the data volumes in use, and the next run needs them sto
 | Resource | What it is |
 |---|---|
 | `gateway` (http://localhost:5080) | YARP. `/api/sales/**` and `/api/greeting/**` go to the sales pool; everything else goes to core. `/pools/{core\|sales\|worker}/**` reaches one pool directly (lab only). |
+| `identity` (http://localhost:5090) | Identity service (`src/WebApi/Identity/WebApi.Identity.Server`): OpenIddict + ASP.NET Core Identity, database `identity` on `tenant-data`. Issuer `http://localhost:5090/`, audience `modular-webapi`, JWKS `/.well-known/jwks`. Clients `blazor-client` (Code + PKCE) and `elsa-workflows` (client credentials). Not routed through the gateway. See its README for flows, claims and dev accounts. |
 | `core-1..2` | Core pool, Role=Api, modules: identity, tenancy (both core modules, active by default), workflow, inventory |
 | `sales-1..4` | Sales pool, Role=Api, modules: sales, greeting (the sample module stands in for Sales) |
 | `worker-1..2` | Worker pool, Role=Worker: modules load (services, consumers) but get no routes, and there is no public route |

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@(ViewData["Title"] ?? "Sign in") · Modular Identity</title>
+    <style>
+        :root { color-scheme: light dark; --fg: #1d2330; --bg: #f5f6f8; --card: #fff; --muted: #687083; --accent: #2f5bea; --err: #b42318; }
+        @@media (prefers-color-scheme: dark) { :root { --fg: #e7e9ee; --bg: #12151b; --card: #1b1f27; --muted: #9aa1b1; --accent: #7896ff; --err: #ff8a80; } }
+        body { margin: 0; font: 15px/1.5 system-ui, sans-serif; color: var(--fg); background: var(--bg); }
+        main { max-width: 400px; margin: 10vh auto; padding: 0 16px; }
+        .card { background: var(--card); border-radius: 10px; padding: 28px; box-shadow: 0 1px 3px rgb(0 0 0 / .12); }
+        h1 { font-size: 20px; margin: 0 0 18px; }
+        label { display: block; font-size: 13px; color: var(--muted); margin: 12px 0 4px; }
+        input[type=email], input[type=password], input[type=text] { width: 100%; box-sizing: border-box; padding: 9px 10px; border: 1px solid #8884; border-radius: 6px; background: transparent; color: inherit; font: inherit; }
+        button, .button { display: inline-block; margin-top: 18px; padding: 9px 16px; border: 0; border-radius: 6px; background: var(--accent); color: #fff; font: inherit; cursor: pointer; text-decoration: none; }
+        .list button { width: 100%; text-align: left; margin-top: 8px; }
+        .error { color: var(--err); margin: 8px 0; }
+        .muted { color: var(--muted); font-size: 13px; }
+    </style>
+</head>
+<body>
+<main><div class="card">@RenderBody()</div></main>
+</body>
+</html>

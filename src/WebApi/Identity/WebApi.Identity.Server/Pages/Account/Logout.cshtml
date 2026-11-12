@@ -1,0 +1,6 @@
+@page
+@model LogoutModel
+@{ ViewData["Title"] = "Sign out"; }
+<h1>Sign out</h1>
+<p>Sign out of the identity service? Applications keep their tokens until they expire, but cannot get new ones silently.</p>
+<form method="post"><button type="submit">Sign out</button></form>
