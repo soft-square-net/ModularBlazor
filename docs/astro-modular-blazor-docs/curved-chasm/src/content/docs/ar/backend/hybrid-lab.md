@@ -16,6 +16,13 @@ dotnet run --project src/Aspire/Hybird --launch-profile http
 تفتح اللوحة على `http://localhost:17888`؛ وتستمع البوابة على `http://localhost:5080`. ويلزم Docker لحاويات الوسيط
 وRedis وPostgreSQL.
 
+خوادم قواعد بيانات المستأجرين على المحركات الأخرى اختيارية، لأن صورها كبيرة (SQL Server 2022 بحجم 2.2 GB، وMySQL 9.7 بحجم
+1.28 GB، وOracle Database Free بحجم 14.1 GB) ولأن Oracle بطيء البدء:
+
+```bash
+dotnet run --project src/Aspire/Hybird --launch-profile http -- --Lab:Engines=sqlserver,mysql,oracle
+```
+
 ## الموارد
 
 | المورد | ما هو |
@@ -26,7 +33,9 @@ dotnet run --project src/Aspire/Hybird --launch-profile http
 | `worker-1`، `worker-2` | مجموعة العمال، `Role=Worker`: تحمل الوحدات (خدمات ومستهلكون) دون مسارات، ولا يصل إليها أي مسار عام |
 | `broker` | RabbitMQ مع واجهة الإدارة |
 | `redis` | الذاكرة المؤقتة والأقفال ومفاتيح Data Protection وعدادات تحديد المعدل |
-| `tenant-data` | PostgreSQL: `TenantStore` (HybirdTenants) و`tenant-acme` و`tenant-globex`، مع pgAdmin |
+| `tenant-data` | PostgreSQL: `TenantStore` (HybirdTenants: سجل المستأجرين والمنح، بالمخطط `platform`)، و`tenant-acme` و`tenant-globex` (قاعدة بيانات لكل مستأجر، ومخطط لكل وحدة فيها)، مع pgAdmin. وتتلقى النسخ `ConnectionStrings:TenantStore` والخادم نفسه كـ `ConnectionStrings:tenant-data`، الذي تسميه صفوف المستأجرين |
+| `tenant-sql` و`tenant-mysql` و`tenant-oracle` (`Lab:Engines`) | خوادم SQL Server وMySQL وOracle Database Free اختيارية للمستأجرين. وتتلقى النسخ `ConnectionStrings:<server>` و`DatabaseServers:<server>:Provider` |
+| `identity` (المنفذ 5090) | خدمة الهوية OpenIddict، بقاعدة البيانات `identity-db`. **في الفرع `claude/identity-service-da759e` فقط**؛ ولم تربط المجموعات بها بعد. انظر [المصادقة: التنفيذ](/ar/backend/auth-implementation/) |
 
 المجموعة هي N نسخة من المشروع نفسه؛ والإعدادات وحدها تختلف:
 
@@ -41,6 +50,9 @@ ConnectionStrings    broker, redis, TenantStore  injected by Aspire
 يبين `GET /api/pool` (أو `GET /pools/{pool}/api/pool` عبر البوابة) أي مجموعة ودور ونسخة أجابت، وبأي اتصالات ربطت.
 
 ## جرب دورة حياة الوحدة عبر المجموعات
+
+تحتاج واجهة الإدارة إلى رمز بالدور `platform-admin` (انظر رموز التطوير في [المصادقة: التنفيذ](/ar/backend/auth-implementation/))؛
+أرسله بـ `-H "Authorization: Bearer $TOKEN"` في الاستدعاءات الإدارية أدناه.
 
 ```bash
 # install and activate through the gateway: the call reaches one core replica
@@ -71,6 +83,21 @@ curl http://localhost:5080/pools/worker/api/admin/modules   # loaded, no routes
 الذي كان سيكتب فوق تلك الترويسة. وتبنى عناوين المستندات وعناوين الخوادم من الترويسة، فيبقى "Try it" على المسار
 `/pools/{pool}/...` نفسه.
 
+## المستأجرون في المختبر
+
+```bash
+# by header, or by host name (the gateway forwards it as X-Forwarded-Host)
+curl -H "X-Tenant: acme" http://localhost:5080/api/tenancy/current
+curl -H "Host: acme.localhost" http://localhost:5080/api/tenancy/current
+
+# create a tenant on the SQL Server engine (needs platform.tenants.manage)
+curl -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"id":"contoso","databaseServer":"tenant-sql"}' http://localhost:5080/api/tenancy/tenants
+```
+
+يحل `acme.localhost` و`globex.localhost` إلى 127.0.0.1 في معظم المتصفحات. كيف يعمل التحديد والتجهيز:
+[المستأجرون وبياناتهم](/ar/backend/tenancy-data/).
+
 ## ما الذي تحقق منه
 
 | الفحص | النتيجة |
@@ -81,6 +108,14 @@ curl http://localhost:5080/pools/worker/api/admin/modules   # loaded, no routes
 | تقارب البث | التثبيت والتفعيل وإلغاء التفعيل والإعدادات والتفريغ وإلغاء التثبيت عبر نسخة واحدة تقاربت على النسخ الثماني كلها؛ و8 طوابير مربوطة بـ `modules.state` |
 | تبديل دون توقف | إعادة تثبيت مع تغيير إعدادات تحت الحمل: أعاد 300 من 300 طلب الرمز 200، وكانت الإعدادات الجديدة حية على كل نسخة |
 | الذاكرة بعد التبديل | تبقى النسخ المحررة غالبا تحت `/api/admin/modules/unloading` لبعض الوقت؛ وأظهرت تفريغات الذاكرة لاحقا النسخة النشطة وحدها في كل نسخة |
+| تحديد المستأجر | `X-Tenant: acme` و`Host: acme.localhost` يحددان acme كلاهما؛ وتكتب البوابة فوق `X-Forwarded-Host` الذي يرسله العميل؛ والمستأجر المجهول يحصل على 404، ومسار الوحدة الذي يشترط مستأجرا دون مستأجر على 400 |
+| قاعدة بيانات لكل مستأجر | رحلت `inventory`، المرفوعة إلى مجموعة core، مخططها إلى `tenant-acme` و`tenant-globex` عند التفعيل؛ وبقيت الصفوف منفصلة على نسختي core |
+| التجهيز | أنشأ `POST /api/tenancy/tenants` القاعدة `tenant-initech`؛ ورحلت إليها نسختا core، وعرفت نسخ sales الأربع (التي لا تحمل `tenancy`) المستأجر initech عبر `tenants.changed` |
+| التعليق | أعطى `PATCH …/initech {"status":"Suspended"}` الرمز 403 على core وكل نسخ sales، بالترويسة واسم المضيف؛ وأعاد `Active` الرمز 200 |
+| أربعة محركات | خدمت inventory 1.2.0 (مجموعة ترحيلات لكل محرك) مستأجرين على PostgreSQL وSQL Server (contoso) وMySQL (umbrella) وOracle (hooli وpiedpiper) على نسختي core؛ واكتشف هنا خلل ORA-00955 في Oracle وأصلح بالمصادقة بالوكالة |
+| وحدة ذات طبقات | التقطت inventory 1.1.1 (Domain / Application / Infrastructure، وArdalis على EF Core 10) مخططها وبياناتها الموجودة؛ وأعطت قواعد النطاق 409؛ وفرغت دورتان كاملتان على النسختين |
+| إعادة التشغيل | بقي المستأجرون، ومنهم المجهزون، بعد إعادة تشغيل المختبر (وحدة تخزين Postgres) |
+| خدمة الهوية (فرع) | client credentials، وCode مع PKCE، والتجديد، وتبديل المستأجر، والمنتقي، ورفض غير الأعضاء، ورمز المنصة، ورفض واجهة الإدارة بـ 403، وإلغاء رموز التجديد عند التعليق والإزالة، والدعوة والقبول، ورفض `RequireMfa` |
 
 ## دروس في التصميم
 
@@ -103,6 +138,7 @@ sales الأربع. والحل هو الفهرس المشترك مع بث `Modul
 
 - شبكة CDN لملفات `_framework` في Blazor WebAssembly، والعميل نفسه (انظر `src/Aspire/Host`).
 - TLS الطرفي وجدار حماية التطبيقات.
-- التحقق من JWT وتحديد المعدل وتحديد المستأجر في البوابة: موصوفة في البحث، ولم تضبط بعد.
+- فحص الرموز وتحديد المعدل في البوابة: لم يضبطا بعد. تفحص كل نسخة الرموز وتحدد المستأجر بنفسها؛ ولا تفعل البوابة سوى
+  تمرير اسم المضيف.
 - التوسع التلقائي (مجموعة sales حسب المعالج أو الطلبات) وتوسيع مجموعة العمال حسب تأخر الطوابير (مثل KEDA على طول
   طابور RabbitMQ).

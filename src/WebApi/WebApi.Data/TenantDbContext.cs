@@ -44,6 +44,7 @@ public abstract class TenantDbContext : DbContext
         if (schemas) modelBuilder.HasDefaultSchema(Schema);
         ConfigureModel(modelBuilder);
         if (!schemas) ModuleIsolation.PrefixTables(modelBuilder, Schema);
+        if (DatabaseProviderAdapter.ForEfProvider(Database.ProviderName)?.Provider == DatabaseProvider.MySql) StoreDateTimeOffsetAsUtc(modelBuilder);
 
         foreach (var entity in modelBuilder.Model.GetEntityTypes().Where(e => e.BaseType is null && typeof(ITenantOwned).IsAssignableFrom(e.ClrType)).ToArray())
         {
@@ -59,6 +60,20 @@ public abstract class TenantDbContext : DbContext
                     Expression.Property(Expression.Constant(this), nameof(CurrentTenantId))),
                 row);
             builder.HasQueryFilter(filter);
+        }
+    }
+
+    /// <summary>MySQL has no offset-aware type: every DateTimeOffset column of the module is stored as UTC.</summary>
+    private static void StoreDateTimeOffsetAsUtc(ModelBuilder modelBuilder)
+    {
+        var plain = new Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<DateTimeOffset, DateTime>(
+            v => v.UtcDateTime, v => new DateTimeOffset(DateTime.SpecifyKind(v, DateTimeKind.Utc)));
+        var nullable = new Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<DateTimeOffset?, DateTime?>(
+            v => v.HasValue ? v.Value.UtcDateTime : null, v => v.HasValue ? new DateTimeOffset(DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)) : null);
+        foreach (var property in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetProperties()))
+        {
+            if (property.ClrType == typeof(DateTimeOffset)) property.SetValueConverter(plain);
+            else if (property.ClrType == typeof(DateTimeOffset?)) property.SetValueConverter(nullable);
         }
     }
 

@@ -20,6 +20,25 @@ public sealed class TenantRecord
 }
 
 /// <summary>
+/// A grant row (schema "platform", table "access_grants"): a permission in a scope for a user inside one tenant,
+/// optionally time-windowed. Kept in the platform store, keyed by tenant, so every replica of every pool can evaluate
+/// rights without the tenant's database.
+/// </summary>
+public sealed class AccessGrantRecord
+{
+    public Guid Id { get; set; }
+    public string TenantId { get; set; } = "";
+    public string UserId { get; set; } = "";
+    public string Permission { get; set; } = "";
+    public string Scope { get; set; } = "";
+    public DateTimeOffset? ValidFrom { get; set; }
+    public DateTimeOffset? ValidTo { get; set; }
+    public string Source { get; set; } = "";
+    public DateTimeOffset CreatedAt { get; set; }
+    public string? CreatedBy { get; set; }
+}
+
+/// <summary>
 /// The tenant store: the registry of tenants (ConnectionStrings:TenantStore). Its schema belongs to the host, which
 /// reads it on every replica of every pool and migrates it on startup; the tenancy core module writes to it.
 /// </summary>
@@ -28,6 +47,8 @@ public sealed class TenantStoreDbContext(DbContextOptions<TenantStoreDbContext> 
     public const string Schema = "platform";
 
     public DbSet<TenantRecord> Tenants => Set<TenantRecord>();
+
+    public DbSet<AccessGrantRecord> AccessGrants => Set<AccessGrantRecord>();
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
         ModuleIsolation.ConfigureHistoryTable(optionsBuilder, Schema);
@@ -65,6 +86,31 @@ public sealed class TenantStoreDbContext(DbContextOptions<TenantStoreDbContext> 
             {
                 tenant.Property(t => t.CreatedAt).HasConversion(v => v.UtcDateTime, v => new DateTimeOffset(DateTime.SpecifyKind(v, DateTimeKind.Utc)));
                 tenant.Property(t => t.UpdatedAt).HasConversion(v => v.UtcDateTime, v => new DateTimeOffset(DateTime.SpecifyKind(v, DateTimeKind.Utc)));
+            }
+        });
+
+        modelBuilder.Entity<AccessGrantRecord>(grant =>
+        {
+            grant.ToTable("access_grants");
+            grant.HasKey(g => g.Id);
+            grant.Property(g => g.TenantId).HasMaxLength(64);
+            grant.Property(g => g.UserId).HasMaxLength(128);
+            grant.Property(g => g.Permission).HasMaxLength(128);
+            grant.Property(g => g.Scope).HasMaxLength(200);
+            grant.Property(g => g.Source).HasMaxLength(100);
+            grant.Property(g => g.CreatedBy).HasMaxLength(128);
+            grant.HasIndex(g => new { g.TenantId, g.UserId });
+            grant.HasIndex(g => new { g.TenantId, g.Source });
+
+            if (provider == DatabaseProvider.MySql)
+            {
+                grant.Property(g => g.CreatedAt).HasConversion(v => v.UtcDateTime, v => new DateTimeOffset(DateTime.SpecifyKind(v, DateTimeKind.Utc)));
+                grant.Property(g => g.ValidFrom).HasConversion(
+                    v => v.HasValue ? v.Value.UtcDateTime : (DateTime?)null,
+                    v => v.HasValue ? new DateTimeOffset(DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)) : null);
+                grant.Property(g => g.ValidTo).HasConversion(
+                    v => v.HasValue ? v.Value.UtcDateTime : (DateTime?)null,
+                    v => v.HasValue ? new DateTimeOffset(DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)) : null);
             }
         });
 

@@ -1,0 +1,15 @@
+@page
+@using System.Security.Claims
+@{ ViewData["Title"] = "Account"; }
+<h1>Modular Identity</h1>
+@if (User.Identity?.IsAuthenticated == true)
+{
+    <p>Signed in as <strong>@User.FindFirstValue("name")</strong> (@User.FindFirstValue("email")).</p>
+    <p><a href="/Account/Invitations">Pending invitations</a></p>
+    <a class="button" href="/Account/Logout">Sign out</a>
+}
+else
+{
+    <p class="muted">This service issues tokens for the Modular WebApi. Applications send you here to sign in.</p>
+    <a class="button" href="/Account/Login">Sign in</a>
+}

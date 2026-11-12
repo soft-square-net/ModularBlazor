@@ -36,6 +36,59 @@ container, swap and broadcast); they differ in how they arrive:
 - `Custom/Directory.Build.props` only imports the shared settings: custom modules are never part of a WebApi release.
 - A pool applies either kind only if its `Modules:Enabled` list includes it, or the list is empty.
 
+### The core modules
+
+| Module | Project (`Modules/Core/`) | Routes |
+| --- | --- | --- |
+| `identity` 1.1.0 | `WebApi.Modules.Core.Identity` | `GET /api/identity/me` (with permissions), `/users`, `/users/{userName}`; grant admin `GET`/`POST /grants`, `DELETE /grants/{id}`; `GET /permissions` (the permission catalog). See [Authentication: implementation](/backend/auth-implementation/) |
+| `tenancy` 2.1.0 | `WebApi.Modules.Core.Tenancy` | `GET /api/tenancy/tenants`, `/tenants/{id}`, `/current`; `POST /tenants` (provisions the database), `PATCH /tenants/{id}` (rename, hosts, suspend), `POST /tenants/{id}/provision` (repair). See [Tenancy and tenant data](/backend/tenancy-data/) |
+
+**Seeding.** On startup, before the first sync, each replica registers every shipped core package under the catalog
+lock, so concurrent replicas seed once:
+
+- not in the catalog → installed as `Active`, marked `Core`, with the package hash;
+- a different package hash and a shipped version ≥ the catalog's → upgraded in place, keeping the admin's state and
+  settings;
+- the catalog holds a newer version (an older replica during a rolling release) → left alone, never downgraded.
+
+If anything changed, the replica publishes `core-seeded` so replicas that are already running re-sync. Seeding never
+resets an admin's choice. `Modules:CorePath` (default `CoreModules`) points elsewhere if needed. During development a
+rebuild changes the package hash, so a restarted replica re-seeds (swaps) the module even at the same version; bump the
+version for real releases.
+
+## Layered modules
+
+Business modules (content, shifts, sales, the `Custom/Inventory` sample) use clean-architecture layers. Small glue
+modules (`identity`, `tenancy`, `greeting`) stay single projects: three projects there add build and packaging
+overhead without protecting any domain logic.
+
+```text
+Modules/Custom/<Name>/
+  WebApi.Modules.<Name>.Domain          aggregates, rules, DomainException      → WebApi.SharedKernel
+  WebApi.Modules.<Name>.Application     use cases, specifications, DTOs         → Domain, WebApi.Contracts
+  WebApi.Modules.<Name>.Infrastructure  IRuntimeModule, endpoints, DbContext,   → Application, WebApi.Data, Carter
+                                        migrations (the entry assembly)
+```
+
+- **Build setup:** `Modules/Directory.Build.props` picks each layer's references by project-name suffix, so a layer
+  project only references the layer below it. Every host-shipped assembly (SharedKernel, Contracts, Data, EF Core,
+  Ardalis, Carter) is compiled against and never shipped: the package is the module's three assemblies only.
+- **Endpoints live in the entry assembly:** the runtime maps only the `ICarterModule` types of the assembly that holds
+  `IRuntimeModule`.
+- **`WebApi.SharedKernel`** (host-shipped, no EF): `IAggregateRoot`, `EntityBase<TId>`, `AggregateRoot<TId>`,
+  `ITenantOwned`, `DomainException`, and `IRepository<T>` / `IReadRepository<T>` (Ardalis.Specification, aggregate
+  roots only).
+- **Repositories:** `AddTenantDbContext<T>()` registers `EfRepository<T>` in the module's container over its first
+  DbContext; a module with several contexts binds aggregates with `AddTenantRepository<TContext, T>()`. Repositories
+  read and write the current tenant's database; `Add`, `Update` and `Delete` save immediately.
+- **Specifications:** reads go through `Specification<T>` / `Specification<T, TResult>`; lists project to DTOs with
+  `Select` and use `AsNoTracking`.
+- **No MediatR:** application services instead. Mediator handler and pipeline caches are keyed by module types and
+  would need the same unload work.
+- Ardalis.Specification 9.3.1 targets EF Core 9 and runs on the host's EF Core 10; verified in the lab.
+
+Tenant data, migrations and the four database engines: [Tenancy and tenant data](/backend/tenancy-data/).
+
 ## Lifecycle
 
 ```text
@@ -214,8 +267,8 @@ with the new values, without downtime. A re-install keeps the admin's values for
 ## Not covered yet
 
 - A real modules table instead of `modules.json` and a lock file.
-- Authorization on the admin API; package signing and verification.
-- Running a module's EF Core migrations on activation, once, behind a distributed lock.
+- Package signing and verification. (The admin API is protected: it needs `platform.modules.manage`.)
+- Module message consumers and hosted services (the tenant-scope primitive exists).
 - Keyed services inside modules.
 - Restoring `.nupkg` dependencies: ship dependencies in the `.zip` form instead.
 - Draining in-flight requests before an unload (a swap needs none: the old copy keeps serving until it is replaced).

@@ -1,14 +1,19 @@
 using Carter;
+using soft.square.net.WebApi.Contracts.Security;
 
 namespace soft.square.net.WebApi.Modularity;
 
-/// <summary>Admin API for the runtime module lifecycle. Built into the host; no authorization yet (prototype).</summary>
+/// <summary>
+/// Admin API for the runtime module lifecycle. Built into the host. Uploading a package runs its code, so the whole API
+/// needs the platform permission <see cref="PlatformPermissions.ModulesManage"/> (platform operators only).
+/// </summary>
 public sealed class ModuleAdminEndpoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         var modules = app.MapGroup("/api/admin/modules")
             .WithTags("Module admin")
+            .RequirePermission(PlatformPermissions.ModulesManage)
             .AddEndpointFilter(async (context, next) =>
             {
                 try { return await next(context); }

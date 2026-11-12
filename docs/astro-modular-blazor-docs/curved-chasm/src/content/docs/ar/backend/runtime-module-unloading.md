@@ -37,6 +37,9 @@ dotnet-dump analyze module.dmp -c "dumpheap -type LoaderAllocator" -c "gcroot <a
 | `EndpointDataSource` على مستوى حقن التبعيات لم يتحدث أبدا، فاحتفظ بنقاط النهاية القديمة (وقدم OpenAPI قديما) | الاشتراك فيه مرة واحدة عند البدء بـ `GetChangeToken()` |
 | يحتفظ ApiExplorer بآخر أوصاف حسبها | إعادة حسابها مباشرة بعد إزالة مسارات الوحدة |
 | مفردات OpenAPI تخزن معرفات المخططات حسب النوع وسياقات العمليات حسب المعرف | تمسح ذاكراتها عند التفريغ؛ ويعيد طلب المستند التالي بناءها |
+| ذاكرة مزود الخدمات الداخلي الثابتة في EF Core (ذاكرة نماذج مفاتيحها نوع DbContext الخاص بالوحدة) | تتجنب: لكل وحدة مزود EF داخلي خاص بها (`TenantEfServices` في `WebApi.Data`)، يتخلص منه مع الوحدة |
+| `LogRecordSharedPool` في OpenTelemetry (2048 خانة): تحتفظ السجلات الخاملة بآخر استثناء وحالة وسمات. عثر عليه بعد أن سجل EF استثناء `DbUpdateException` (← متتبع التغييرات ← DbContext الخاص بالوحدة) | تمسح بيانات السجلات الخاملة عند التفريغ (`FrameworkCaches.ClearIdleLogRecords`) |
+| مفسر System.Linq.Expressions: `InstructionList.s_loadFields` (حسب `FieldInfo`)، تملؤه EF حين تقيم تعبيرا فرعيا فيه إغلاق مثل `Where(i => i.Sku == sku.Trim())`؛ فاحتفظ بحقل إغلاق المواصفة، ومن ثم بالوحدة. وذاكرات ذات صلة: `Expression.s_lambdaFactories` و`s_lambdaDelegateCache` و`CallInstruction.s_cache` و`DelegateHelpers._DelegateCache`. أظهر `gcroot` مقابض الوحدة نفسها فقط؛ وعثر عليه بتنصيف أنواع الطلبات ثم بمرور انعكاسي على كل الحقول الثابتة | تمسح كلها عند التفريغ، تحت أقفالها حيث وجدت (`FrameworkCaches.ClearExpressionCaches`) |
 
 ### إمساك OpenAPI: عثر عليه بالتنصيف
 
@@ -70,6 +73,8 @@ dotnet-dump analyze module.dmp -c "dumpheap -type LoaderAllocator" -c "gcroot <a
 | سيناريو آخر | النتيجة |
 | --- | --- |
 | دورات تفريغ وتفعيل متكررة | جمعت في كل مرة |
+| وحدة `inventory` ذات الطبقات مع EF Core والمواصفات وقواعد بيانات المستأجرين على أربعة محركات (نسختا core، [المختبر](/ar/backend/hybrid-lab/)) | جمعت على النسختين خلال نحو 10 ثوان، في دورات متكررة، بعد إصلاحي OpenTelemetry وذاكرات التعابير. ودونهما بقيت محملة كل نسخة سجلت خطأ EF أو شغلت مواصفة SKU |
+| وحدة محمية بـ `RequirePermission` (403، ثم 200 بعد المنحة) | جمعت؛ فخط التفويض لا يحمل أنواع الوحدة |
 | الترقيات وتغييرات الإعدادات عبر 8 نسخ ([المختبر](/ar/backend/hybrid-lab/)) | تبقى النسخ المستبدلة غالبا تحت `/unloading` لبعض الوقت؛ وأظهرت تفريغات الذاكرة لاحقا النسخة النشطة وحدها في كل نسخة |
 
 تعيد نتيجة التفريغ ما حدث فعلا (`unloaded` و`gcPasses`)، فلا يخبر المسؤول أبدا أن الذاكرة حررت وهي لم تحرر.

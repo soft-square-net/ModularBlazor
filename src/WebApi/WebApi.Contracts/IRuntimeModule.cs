@@ -36,6 +36,12 @@ public sealed record ModuleManifest(string Id, string Name, string Version, stri
     public IReadOnlyDictionary<string, string?> DefaultSettings { get; init; } = new Dictionary<string, string?>();
 
     /// <summary>
+    /// Permissions the module's endpoints require (<c>RequirePermission</c>), listed in the permission catalog. Activation
+    /// fails when an endpoint requires a permission that is neither declared here nor a platform permission.
+    /// </summary>
+    public IReadOnlyList<Security.PermissionDefinition> Permissions { get; init; } = [];
+
+    /// <summary>
     /// True (default): the module can be unloaded, uninstalled and swapped to a new version or new settings while
     /// the host runs. Set it to false when the module, or a library it hosts, keeps process-wide state that pins its
     /// assemblies (static caches, global registrations). The runtime then refuses unload and uninstall with 409

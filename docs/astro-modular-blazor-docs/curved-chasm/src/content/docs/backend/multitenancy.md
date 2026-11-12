@@ -5,6 +5,9 @@ sidebar:
   order: 6
 ---
 
+Implemented in `src/WebApi`: [Tenancy and tenant data](/backend/tenancy-data/) (resolution on every replica, the
+tenant directory, database per tenant on four engines). The header is `X-Tenant` and the claim is `tenant`.
+
 ## Resolve once, carry everywhere
 
 ```text

@@ -13,6 +13,9 @@ A lifecycle call can reach any replica. It changes the module's desired state in
 that replica, and broadcasts the change so every replica of every pool converges. **The response describes the
 replica that answered.**
 
+Every admin call needs the `platform.modules.manage` permission (the `platform-admin` role has it): **401** without a
+token, **403** without the permission. See [Authentication: implementation](/backend/auth-implementation/).
+
 | Method and path | Does |
 | --- | --- |
 | `GET /api/admin/modules` | Lists registered modules as this replica sees them |
@@ -21,11 +24,13 @@ replica that answered.**
 | `POST /api/admin/modules/{id}/deactivate` | Desired state `Inactive`: remove routes; loaded modules stay loaded |
 | `POST /api/admin/modules/{id}/unload` | Desired state `Installed`: remove routes, dispose services, unload assemblies everywhere |
 | `PUT /api/admin/modules/{id}/settings` | Replace settings (JSON object); replicas that have the module loaded swap to a reconfigured copy |
-| `DELETE /api/admin/modules/{id}` | Unload everywhere, delete the package, remove the registration |
+| `DELETE /api/admin/modules/{id}` | Unload everywhere, delete the package, remove the registration. `409` for a core module |
 | `GET /api/admin/modules/unloading` | Unloaded or swapped-out copies on this replica whose memory is not freed yet |
 
-Errors are problem details: `400` for an invalid package or manifest, `404` for an unknown module, `409` when the
-route prefix is used by another module, `500` when a package's files are missing.
+Errors are problem details: `400` for an invalid package or manifest, or when activation finds an undeclared
+permission, a module-defined authorization requirement or a named policy; `404` for an unknown module; `409` when the
+route prefix is used by another module, or for deleting or uploading over a core module; `500` when a package's files
+are missing.
 
 Module endpoints are served under `/api/{RoutePrefix}`.
 
@@ -49,15 +54,26 @@ Unload and uninstall return `{ id, unloaded, gcPasses, note }` for the answering
 | Path | Does |
 | --- | --- |
 | `GET /api/pool` | Pool, role, enabled modules and instance of the replica that answered, plus the names (never the values) of its connection strings |
-| `GET /health` | Health check used by the gateway and the orchestrator |
+| `GET /health` | Health check used by the gateway and the orchestrator (anonymous) |
 | `GET /openapi/webapi.json` | OpenAPI document of the host's built-in endpoints (admin, `/api/pool`, `/health`) |
 | `GET /openapi/modules/{id}.json` | OpenAPI document of one module; `404` unless it is routed on this replica |
 | `GET /openapi` | The documents available right now: `[{name, title, url, isDefault}]` |
 | `GET /scalar` (`/` redirects there) | Scalar API reference, with a switcher for the same documents |
 
-The OpenAPI and Scalar endpoints exist in Development, or when `OpenApi:Enabled=true`. Behind the gateway's
+The OpenAPI and Scalar endpoints are anonymous and exist in Development, or when `OpenApi:Enabled=true`. Behind the gateway's
 `/pools/{pool}/` routes, document URLs carry that prefix (from `X-Forwarded-Prefix`). How it works:
 [OpenAPI and Scalar](/backend/runtime-modules/#openapi-and-scalar).
+
+## Core module endpoints
+
+| Module | Endpoints | Permission |
+| --- | --- | --- |
+| `identity` | `GET /api/identity/me` (anonymous; with the caller's permissions when signed in), `/users`, `/users/{userName}` | signed in |
+| `identity` | `GET /api/identity/permissions` (catalog), `GET`/`POST /api/identity/grants`, `DELETE /api/identity/grants/{id}` | `access.grants.manage` |
+| `tenancy` | `GET /api/tenancy/tenants`, `/tenants/{id}`, `/current` | signed in |
+| `tenancy` | `POST /api/tenancy/tenants`, `PATCH /api/tenancy/tenants/{id}`, `POST /api/tenancy/tenants/{id}/provision` | `platform.tenants.manage` |
+
+Tenant rules (headers, status codes) are in [Tenancy and tenant data](/backend/tenancy-data/#resolution-rules).
 
 ## States
 
@@ -78,6 +94,13 @@ The OpenAPI and Scalar endpoints exist in Development, or when `OpenApi:Enabled=
 | `Modules:Enabled` | empty (all) | Module ids this pool applies, e.g. `Modules__Enabled__0=sales` |
 | `ConnectionStrings:broker` | none | RabbitMQ connection; when set, lifecycle changes are broadcast on the `modules.state` fanout exchange |
 | `OpenApi:Enabled` | `false` (on in Development) | Serves the OpenAPI documents and Scalar outside Development |
+| `Modules:CorePath` | `CoreModules` | Folder of the core-module packages shipped with the release |
+| `Auth:Authority` | none | Identity service (OIDC discovery, JWKS). Without it, `Authentication:Schemes:Bearer` applies (`dotnet user-jwts`) |
+| `Auth:Audience` | `modular-webapi` | Expected token audience |
+| `Access:Roles:{role}:N` | `platform-admin` → all platform permissions | Extra role-to-permission mappings |
+| `Access:Grants:N:{Tenant,UserId,Permission,Scope}` | none | Seed grants when there is no tenant store |
+| `ConnectionStrings:TenantStore` | none | Tenant store (tenant directory and grants). Without it, tenants come from `Tenancy:Tenants` and grants live in memory |
+| `ConnectionStrings:<server>`, `DatabaseServers:<server>:Provider` | provider `PostgreSql` | Database servers that tenant rows name; providers `PostgreSql`, `SqlServer`, `MySql`, `Oracle` |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | none | When set, traces, metrics and logs are exported over OTLP (the Aspire dashboard sets it) |
 
 ## Contract
@@ -93,6 +116,7 @@ public sealed record ModuleManifest(string Id, string Name, string Version, stri
 {
     public string? Description { get; init; }
     public IReadOnlyDictionary<string, string?> DefaultSettings { get; init; }
+    public IReadOnlyList<PermissionDefinition> Permissions { get; init; } = [];
 }
 ```
 
@@ -102,6 +126,7 @@ public sealed record ModuleManifest(string Id, string Name, string Version, stri
 | `Version` | Letters, digits, `.`, `+`, `-` |
 | `RoutePrefix` | Same rule as `Id`; unique among installed modules |
 | `DefaultSettings` | Flat configuration keys (`Section:Key`); copied into the catalog on install |
+| `Permissions` | Every permission its endpoints use with `RequirePermission`; activation fails on an undeclared one |
 
 A package contains **exactly one** public, non-abstract `IRuntimeModule` with a parameterless constructor.
 Endpoints come from its `ICarterModule` classes. Keyed services are not supported yet.

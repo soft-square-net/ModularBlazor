@@ -85,6 +85,9 @@
     <Project Path="src/WebApi/WebApi.SharedKernel/WebApi.SharedKernel.csproj" />
     <Project Path="src/WebApi/WebApi/WebApi.csproj" />
   </Folder>
+  <Folder Name="/src/WebApi/Identity/">
+    <Project Path="src/WebApi/Identity/WebApi.Identity.Server/WebApi.Identity.Server.csproj" />
+  </Folder>
   <Folder Name="/src/WebApi/Modules/">
     <File Path="src/WebApi/Modules/Directory.Build.props" />
   </Folder>
@@ -96,6 +99,16 @@
     <Project Path="src/WebApi/Modules/Custom/Inventory/WebApi.Modules.Inventory.Domain/WebApi.Modules.Inventory.Domain.csproj" />
     <Project Path="src/WebApi/Modules/Custom/Inventory/WebApi.Modules.Inventory.Application/WebApi.Modules.Inventory.Application.csproj" />
     <Project Path="src/WebApi/Modules/Custom/Inventory/WebApi.Modules.Inventory.Infrastructure/WebApi.Modules.Inventory.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/WebApi/Modules/Custom/Content/">
+    <Project Path="src/WebApi/Modules/Custom/Content/WebApi.Modules.Content.Domain/WebApi.Modules.Content.Domain.csproj" />
+    <Project Path="src/WebApi/Modules/Custom/Content/WebApi.Modules.Content.Application/WebApi.Modules.Content.Application.csproj" />
+    <Project Path="src/WebApi/Modules/Custom/Content/WebApi.Modules.Content.Infrastructure/WebApi.Modules.Content.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/WebApi/Modules/Custom/Shifts/">
+    <Project Path="src/WebApi/Modules/Custom/Shifts/WebApi.Modules.Shifts.Domain/WebApi.Modules.Shifts.Domain.csproj" />
+    <Project Path="src/WebApi/Modules/Custom/Shifts/WebApi.Modules.Shifts.Application/WebApi.Modules.Shifts.Application.csproj" />
+    <Project Path="src/WebApi/Modules/Custom/Shifts/WebApi.Modules.Shifts.Infrastructure/WebApi.Modules.Shifts.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/src/WebApi/Modules/Core/">
     <File Path="src/WebApi/Modules/Core/Directory.Build.props" />

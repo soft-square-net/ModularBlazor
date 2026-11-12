@@ -65,6 +65,23 @@ if (engines.Contains("oracle"))
     databaseServers.Add(replica => replica.WithReference(oracle).WaitFor(oracle).WithEnvironment("DatabaseServers__tenant-oracle__Provider", "Oracle"));
 }
 
+// ---------------------------------------------------------------- identity service (OpenIddict, its own database)
+
+// Issues tenant-bound JWT access tokens (audience "modular-webapi") for every pool. A fixed port keeps the issuer
+// stable: resource servers validate tokens with Authority = IdentityIssuer and read the keys from its JWKS.
+// Not routed through the gateway: the issuer is one URL, and in production it gets its own host name.
+const int IdentityPort = 5090;
+const string IdentityIssuer = "http://localhost:5090/";
+// Resource "identity-db" (names are unique across resources), database "identity", passed as ConnectionStrings:identity.
+var identityDb = tenantData.AddDatabase("identity-db", databaseName: "identity");
+var identity = builder.AddProject<Projects.WebApi_Identity_Server>("identity", launchProfileName: null)
+    .WithHttpEndpoint(port: IdentityPort)
+    .WithExternalHttpEndpoints()
+    .WithEnvironment("ASPNETCORE_ENVIRONMENT", "Development")
+    .WithEnvironment("Identity__Issuer", IdentityIssuer)
+    .WithReference(identityDb, connectionName: "identity").WaitFor(identityDb)
+    .WithHttpHealthCheck("/health");
+
 // ---------------------------------------------------------------- module pools (same image, different config)
 
 // Core pool: every module except the extracted ones. "identity" and "tenancy" are core modules: they ship with every
@@ -134,6 +151,10 @@ IResourceBuilder<ProjectResource>[] AddPool(string name, string role, int replic
             .WithReference(redis).WaitFor(redis)
             .WithReference(tenantStore).WaitFor(tenantStore)
             .WithEnvironment("DatabaseServers__TenantStore__Provider", "PostgreSql")
+            // Tokens from the identity service: JwtBearer reads its discovery document and JWKS (http in the lab).
+            .WithEnvironment("Auth__Authority", IdentityIssuer)
+            .WithEnvironment("Auth__Audience", "modular-webapi")
+            .WaitFor(identity)
             .WithHttpHealthCheck("/health");
 
         foreach (var server in databaseServers) server(replica); // tenant-data plus the Lab:Engines servers

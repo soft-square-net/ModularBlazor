@@ -146,6 +146,7 @@ internal sealed partial class ModuleRuntime
                         EntryAssembly = entry,
                         Settings = settings,
                         DesiredState = previous?.DesiredState ?? ModuleState.Installed, // an upgrade keeps the module's state
+                        Permissions = manifest.Permissions.ToList(),
                         InstalledAt = DateTimeOffset.UtcNow
                     };
                     _records[record.Id] = record;
@@ -336,7 +337,8 @@ internal sealed partial class ModuleRuntime
                         DesiredState = previous?.DesiredState ?? ModuleState.Active,
                         InstalledAt = DateTimeOffset.UtcNow,
                         Core = true,
-                        PackageHash = hash
+                        PackageHash = hash,
+                        Permissions = manifest.Permissions.ToList()
                     };
                     _store.Save(_records.Values);
                     changed.Add(manifest.Id);
@@ -571,7 +573,11 @@ internal sealed partial class ModuleRuntime
             var routeModules = LoadableTypes(assembly)
                 .Where(t => t is { IsClass: true, IsAbstract: false } && typeof(ICarterModule).IsAssignableFrom(t))
                 .ToArray();
-            var loaded = new LoadedModule(context, container, routeModules, record);
+            var loaded = new LoadedModule(context, container, routeModules, record)
+            {
+                // Plain strings only: nothing of the module instance is kept.
+                DeclaredPermissions = module.Manifest.Permissions.Select(p => p.Name).ToHashSet(StringComparer.Ordinal)
+            };
             // Tenancy (per-tenant initialization) and other host observers; they let go in ReleaseAsync.
             foreach (var observer in _hostRoot.GetServices<IModuleLifecycleObserver>()) observer.Loaded(record.Id, container.Root);
             return loaded;
@@ -593,11 +599,9 @@ internal sealed partial class ModuleRuntime
         foreach (var type in module.RouteModules)
             ((ICarterModule)ActivatorUtilities.CreateInstance(module.Container.Root, type)).AddRoutes(group);
 
-        return builder.DataSources
-            .SelectMany(source => source.Endpoints)
-            .OfType<RouteEndpoint>()
-            .Select(endpoint => WithModuleServices(endpoint, module.Container))
-            .ToArray();
+        var endpoints = builder.DataSources.SelectMany(source => source.Endpoints).OfType<RouteEndpoint>().ToArray();
+        ModuleAuthorization.Validate(record.Id, module.DeclaredPermissions, endpoints, module.Context);
+        return endpoints.Select(endpoint => WithModuleServices(endpoint, module.Container)).ToArray();
     }
 
     /// <summary>Runs the endpoint with RequestServices swapped for a module scope layered over the request scope.</summary>
@@ -768,6 +772,7 @@ internal sealed partial class ModuleRuntime
         public Type[] RouteModules { get; } = routeModules;
         public IReadOnlyList<Endpoint>? Endpoints { get; set; }
         public bool Routed { get; set; }
+        public IReadOnlySet<string> DeclaredPermissions { get; init; } = new HashSet<string>();
 
         /// <summary>Which catalog entry this was loaded from; a re-install changes it and triggers a reload.</summary>
         public DateTimeOffset InstalledAt { get; } = record.InstalledAt;

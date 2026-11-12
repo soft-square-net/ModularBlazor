@@ -37,7 +37,10 @@ Edge load balancer + YARP gateway        TLS, JWT, rate limit, tenant resolution
 | --- | --- |
 | `src/api/ModularBlazor.Host` | مضيف الواجهة الإنتاجي ووحداته المدمجة (`HostModules`) |
 | `src/WebApi/WebApi` | النموذج الأولي لوحدات التشغيل: صورة واحدة تعمل كأي مجموعة |
-| `src/WebApi/WebApi.Contracts` | `IRuntimeModule` و`ModuleManifest`، مشتركان بين المضيف وكل وحدة تشغيل |
+| `src/WebApi/WebApi.Contracts` | `IRuntimeModule` و`ModuleManifest`، وعقود المستأجرين والأمان التي تراها الوحدات |
+| `src/WebApi/WebApi.Data` | طبقة بيانات يشحنها المضيف: `TenantDbContext`، ومخزن المستأجرين، وأربعة مزودين لـ EF Core |
+| `src/WebApi/WebApi.SharedKernel` | أنواع نطاق أساسية وواجهات مستودعات يشحنها المضيف (دون EF) |
+| `src/WebApi/Identity/WebApi.Identity.Server` | خدمة الهوية OpenIddict (في الفرع `claude/identity-service-da759e`، ولم تدمج بعد) |
 | `src/WebApi/Modules/Core/` | **الوحدات الأساسية** (`Identity` و`Tenancy`): تبنى مع كل إصدار من WebApi وتفعل افتراضيا |
 | `src/WebApi/Modules/Custom/` | **الوحدات المخصصة**: تبنى وحدها وترفع والتطبيق يعمل |
 | `src/WebApi/Modules/Custom/WebApi.Modules.Greeting` | وحدة مخصصة نموذجية، ترفع كحزمة |
@@ -57,10 +60,12 @@ Edge load balancer + YARP gateway        TLS, JWT, rate limit, tenant resolution
 | [البنية المستهدفة](/ar/backend/target-architecture/) | التصميم المجمع: البوابة ومجموعات الوحدات والوسيط وRedis والمراقبة |
 | [مختبر البنية الهجينة](/ar/backend/hybrid-lab/) | البنية المستهدفة تعمل محليا عبر .NET Aspire، وما قاسته |
 | [تعدد المستأجرين](/ar/backend/multitenancy/) | كيف ينتقل المستأجر عبر الاستدعاءات والرسائل، وأين تعيش بياناته |
+| [المستأجرون وبياناتهم](/ar/backend/tenancy-data/) | منفذ: تحديد المستأجر، وقاعدة بيانات لكل مستأجر على أربعة محركات، والترحيلات عند التفعيل |
 | [نقاط النهاية: Minimal API مع Carter](/ar/backend/endpoints-carter/) | لماذا Minimal API مع Carter وليس FastEndpoints |
 | [وحدات أثناء التشغيل](/ar/backend/runtime-modules/) | كيف تثبت وحدة وتفعل وتخدم والواجهة تعمل، على كل نسخة في كل مجموعة |
 | [تفريغ وحدات التشغيل](/ar/backend/runtime-module-unloading/) | ما يلزم لتحرير ذاكرة وحدة، مقيسا بتفريغات الذاكرة |
-| [المصادقة والتفويض](/ar/backend/auth-design/) | مذكرة تصميم (غير منفذة): خدمة الهوية، وعضويات المستأجرين، والمنح محددة النطاق، وصلاحيات الوحدات، وسير عمل غرفة الأخبار |
+| [المصادقة والتفويض](/ar/backend/auth-design/) | مذكرة تصميم: خدمة الهوية، وعضويات المستأجرين، والمنح محددة النطاق، وصلاحيات الوحدات، وسير عمل غرفة الأخبار |
+| [المصادقة: التنفيذ](/ar/backend/auth-implementation/) | ما بني: فحص JWT، والصلاحيات والمنح، وفحوص التفعيل، وخدمة الهوية |
 
 نقاط نهاية الإدارة وقواعد التحزيم في [مرجع واجهة وحدات التشغيل](/ar/reference/runtime-modules-api/).
 

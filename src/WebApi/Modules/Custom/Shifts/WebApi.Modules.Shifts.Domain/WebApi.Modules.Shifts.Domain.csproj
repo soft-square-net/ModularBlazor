@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Shifts domain: sections (which categories a desk covers), shifts and their rota. References: WebApi.SharedKernel (../../../Directory.Build.props). -->
+
+</Project>

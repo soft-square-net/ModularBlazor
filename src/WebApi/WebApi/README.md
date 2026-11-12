@@ -9,6 +9,7 @@ from an uploaded `.dll`, `.zip` (build output) or `.nupkg`. No restart needed fo
 | `WebApi.Contracts` | `IRuntimeModule` + `ModuleManifest`. Referenced by the host, so it is always shared. |
 | `WebApi.Modules.Greeting` | Sample module, **not** referenced by the host. Zip its `bin/<Configuration>/net10.0` and upload it. |
 | `Modules/Core/WebApi.Modules.Core.*` | Core modules: ship with every release and are seeded as `Active` on first start. See [Core modules](#core-modules). |
+| `Modules/Custom/Shifts`, `Modules/Custom/Content` | Newsroom modules (uploaded like any custom module). See [Newsroom modules](#newsroom-modules-shifts-and-content). |
 
 ## Lifecycle
 
@@ -133,7 +134,7 @@ request ─► host middleware (Tenancy/): X-Tenant header, then host name (X-Fo
 
 - **Resolution rules:**
   - The `X-Tenant` header wins. If the host name names a different tenant, the request gets 400.
-  - Once tokens exist, the `tenant` claim must match the request's tenant (403), or is the tenant when the request names none.
+  - With a token, the `tenant` claim must match the request's tenant (403), or is the tenant when the request names none. See [Authentication and authorization](#authentication-and-authorization).
   - An unknown tenant gets 404, a suspended one 403.
   - Module endpoints need a tenant (400 without one) unless they are `.TenantOptional()`. Host endpoints never need one.
   - `greeting`, `identity` and `tenancy` are tenant-optional for now.
@@ -170,7 +171,14 @@ Tenant databases, and the tenant store, can live on any of four engines, each wi
 | PostgreSQL | `Npgsql.EntityFrameworkCore.PostgreSQL` 10.0.3 | a database | schema `<module>` | `pg_advisory_lock` |
 | SQL Server | `Microsoft.EntityFrameworkCore.SqlServer` 10.0.14 | a database | schema `<module>` | `sp_getapplock` (session) |
 | MySQL | `MySql.EntityFrameworkCore` 10.0.12 (Oracle's) | a database | prefix `<module>_` | `GET_LOCK` |
-| Oracle | `Oracle.EntityFrameworkCore` 10.23.26400 | a schema-only user (`NO AUTHENTICATION`), selected with `CURRENT_SCHEMA` per connection | prefix `<module>_` | `DBMS_LOCK` |
+| Oracle | `Oracle.EntityFrameworkCore` 10.23.26400 | a schema-only user (`NO AUTHENTICATION`), signed in through the server account (proxy authentication: `User Id=<TENANT>; Proxy User Id=<server account>`) | prefix `<module>_` | `DBMS_LOCK` (on the server account) |
+
+- **Oracle and proxy authentication:**
+  - The first design selected the tenant schema with `ALTER SESSION SET CURRENT_SCHEMA`. It broke in the lab: EF's Oracle provider checks for its history table in `USER_TABLES`, which lists the *signed-in* user's tables.
+  - The second replica therefore saw no history table, tried to create it again and failed with ORA-00955. It kept failing on every retry.
+  - Signing in as the tenant user (through the server account) makes the session's own schema the tenant's.
+  - Provisioning creates the user, grants `CREATE SESSION`, `CREATE TABLE`, `SEQUENCE`, `VIEW`, `PROCEDURE` and `TRIGGER`, and `GRANT CONNECT THROUGH <server account>`.
+  - Provisioning is idempotent: `POST /api/tenancy/tenants/{id}/provision` re-runs it as a repair step. Modules whose initialization failed retry on their next request.
 
 - **Why these packages:** Pomelo's MySQL provider stops at EF Core 9 (9.0.0), so MySQL uses Oracle's `MySql.EntityFrameworkCore`, as the old host did. `System.Security.Cryptography.Pkcs` (from the MySQL and Oracle clients) is pinned to 10.0.15 because the transitive 9.0.11 has known vulnerabilities.
 - **Servers are configuration:** `ConnectionStrings:<server>` plus `DatabaseServers:<server>:Provider` (`PostgreSql` when not set). The tenant store uses `DatabaseServers:TenantStore:Provider`.
@@ -189,7 +197,8 @@ Tenant databases, and the tenant store, can live on any of four engines, each wi
   The script also sets `EfDesignAssets=all` and rebuilds without it afterwards. Tenant store: `-Project src/WebApi/WebApi.Data -Context TenantStoreDbContext -MigrationsDir Migrations/TenantStore -Namespace soft.square.net.WebApi.Data.TenantStore.Migrations`.
 - **Packages stay small:** module references to the host-shipped projects carry `ExcludeAssets="runtime;native"`. Otherwise the providers' client libraries (SqlClient, MySql.Data, ODP.NET, Azure.Identity and their native files) were copied into every module package. A module package is its own assemblies only.
 - **Production notes:**
-  - Oracle provisioning needs an account with `CREATE USER`, the `ANY` table and index privileges, and `EXECUTE` on `DBMS_LOCK`; the lab uses SYSTEM.
+  - Oracle: the server account needs `CREATE USER`, `ALTER USER` (for `CONNECT THROUGH`), `GRANT ANY PRIVILEGE` and `EXECUTE` on `DBMS_LOCK`; the lab uses SYSTEM.
+  - Verified at runtime: tenant databases on all four engines. The tenant store on SQL Server, MySQL and Oracle is only generated and model-checked; the lab keeps the store on PostgreSQL.
   - SQL Server provisioning needs `CREATE DATABASE`.
   - Run provisioning with a privileged account and serve tenants with a least-privilege one (not modelled yet).
 
@@ -247,6 +256,7 @@ module types forever (found with `dotnet-dump gcroot`):
 | EF Core's static internal service provider cache (model cache keyed by the module's DbContext type) | Avoided: each module has its own EF internal provider (`TenantEfServices` in `WebApi.Data`), disposed with the module |
 | OpenTelemetry `LogRecordSharedPool` (2048 slots): idle records keep their last exception, state and attributes. Found with gcroot after EF logged a `DbUpdateException` (→ change tracker → module DbContext) | Idle records' data cleared on unload (`FrameworkCaches.ClearIdleLogRecords`) |
 | System.Linq.Expressions interpreter: `InstructionList.s_loadFields` (Dictionary by `FieldInfo`), filled when EF evaluates a closure sub-expression such as `Where(i => i.Sku == sku.Trim())`; it kept the specification's closure `FieldInfo`, hence the module. Related caches: `Expression.s_lambdaFactories` / `s_lambdaDelegateCache`, `CallInstruction.s_cache`, `DelegateHelpers._DelegateCache`. gcroot showed only the module's own handles; found by bisecting request kinds, then a reflection walk of every static from a throw-away diagnostic module | All cleared on unload, under their own locks where they have them (`FrameworkCaches.ClearExpressionCaches`) |
+| EF Core's static `ConcurrentDictionary<Type, MethodInfo>` keyed by property CLR types that need snapshotting (the modules' enums), and Ardalis.Specification's `IncludeEvaluator` cache of compiled `Include` delegates keyed by (entity type, property type). Found with gcroot on the content and shifts modules: they stayed loaded for more than 3 minutes | Every static dictionary of EF Core and Ardalis.Specification is scanned once; keys that are, or hold, a module type are removed on unload (`FrameworkCaches.EvictLibraryStaticCaches`). Both modules were then collected about 2 s after unloading |
 
 **Result (sample module):**
 
@@ -287,11 +297,130 @@ honestly.
 - Install, activate and deactivate: treat as fully hot.
 - Unload and upgrade: treat as "routes gone now, memory reclaimed best-effort". Schedule a rolling restart for guaranteed reclamation, which is normal in the replicated deployment anyway.
 
+## Authentication and authorization
+
+Foundation of the agreed auth design (docs site: Backend → Authentication and authorization). Every replica checks
+tokens and has the final say; permissions are looked up on the server, never carried in the token.
+
+```
+request ─► UseRouting ─► UseAuthentication (JwtBearer) ─► UseTenancy (tenant + claim check) ─► UseAuthorization ─► endpoint
+                                                                                                 │
+              PermissionRequirement ─► IAccessScopes ─► GrantCache (per tenant+user, 5 min, cleared via "access.grants.changed")
+                                                            └─► platform.access_grants (tenant store) │ in memory without a store
+```
+
+| Piece | Where | What |
+|---|---|---|
+| `RequirePermission(...)`, `PermissionRequirement`, `PlatformClaims`, `PlatformRoles`, `PlatformPermissions`, `AccessScope`, `GrantSources`, `IAccessScopes`, `IGrantStore`, `IPermissionCatalog`, `ModuleManifest.Permissions` | `WebApi.Contracts/Security`, `IRuntimeModule.cs` | Everything a module sees. Host types only: nothing in the authorization pipeline can pin a module. |
+| JwtBearer, fallback policy, permission handler, grant cache and store, broker invalidation | `WebApi/Security` | `builder.AddPlatformSecurity("broker")`, `app.UseRouting(); app.UsePlatformSecurity();` |
+| Activation checks | `Modularity/ModuleAuthorization.cs` | Fails activation (400) on an undeclared permission, a requirement type defined by the module, or a named policy. |
+| Grant admin, permission catalog, `/me` with permissions | `identity` core module 1.1.0 | `GET/POST /api/identity/grants`, `DELETE /grants/{id}` (`access.grants.manage`), `GET /permissions`. |
+
+- **Tokens:**
+  - `Auth:Authority` points at the identity service (OIDC discovery and JWKS); `Auth:Audience` defaults to `modular-webapi`.
+  - Inbound claim mapping is off, so the host reads `sub`, `tenant` and `role` exactly as issued.
+  - Without an authority, the standard `Authentication:Schemes:Bearer` section applies. That is what `dotnet user-jwts` writes for development; the signing key sits in the project's user secrets.
+- **Secure by default:** every endpoint needs a signed-in caller unless it calls `AllowAnonymous()`. Anonymous today: `/health`, the OpenAPI documents and Scalar (where enabled), and `/api/identity/me`.
+- **Permissions:**
+  - The endpoint check is coarse: the caller holds the permission in some scope of the request's tenant, or through a platform role.
+  - Per-resource checks are module code: `IAccessScopes.HasPermissionAsync(permission, [AccessScope.Press(p), AccessScope.Category(c)])`.
+  - List filters use `ScopesAsync(permission)`.
+  - The rights of another user (an assignee, say) come from `UserHasPermissionAsync`.
+- **Grants:**
+  - A grant is a tenant × user × permission × scope (`tenant`, `press:{id}`, `category:{id}`) with an optional `validFrom`/`validTo` (UTC) and a source (`standing`, `shift:{id}`).
+  - Windows are evaluated at check time, so a shift grant starts and ends on the clock without any cache event.
+  - `IGrantStore.ReplaceSourceAsync` publishes a rota in one transaction; `EndAsync` ends a user's grants of a source early (check-out).
+  - Platform permissions can't be granted (400). `access.grants.manage` is the exception, because tenant admins need it.
+- **Platform roles:** `platform-admin` holds every platform permission (`platform.modules.manage`, `platform.tenants.manage`, `access.grants.manage`) in any tenant and without one. Other mappings come from `Access:Roles:{role}:N`.
+- **Protected host and core endpoints:**
+  - `/api/admin/modules` needs `platform.modules.manage`.
+  - Tenant create and update need `platform.tenants.manage`.
+  - The grant API needs `access.grants.manage`.
+- **Without a tenant store**, grants are in memory, seeded from `Access:Grants:N:{Tenant,UserId,Permission,Scope}`.
+
+**Development tokens:**
+
+```bash
+dotnet user-jwts create --project src/WebApi/WebApi --name admin --role platform-admin
+dotnet user-jwts create --project src/WebApi/WebApi --name editor1 --claim tenant=acme
+```
+
+`user-jwts` tokens have `aud` set to the launch-profile URLs (`http://localhost:5298`, `https://localhost:7276`).
+Replicas on other ports need `--audience` or `Authentication:Schemes:Bearer:ValidAudiences`. The Hybird lab gets real
+tokens once the identity service exists.
+
+**Verified** (standalone host on :5298; grants both in memory and in Postgres):
+- **Protection:** the admin API returns 401 anonymous, 403 for an editor and 200 for `platform-admin`. Tenant writes return 403 for an editor.
+- **Tenant match:** a token for `acme` with `X-Tenant: globex` gets 403.
+- **Grants:**
+  - Added and revoked grants take effect on the next request.
+  - A grant whose `validFrom` is in the future is not yet effective.
+  - Granting a platform permission returns 400.
+- **Activation checks:** a test module was refused (400) for an undeclared permission, and again for its own requirement type. The declared version served 403, then 200 after the grant.
+- **Unload:** that module unloaded, but only after the synchronous 20-pass check. `/unloading` was empty a little later. The variants that never served requests behaved the same, so the delay isn't specific to authorization.
+- **Postgres:** the `AddAccessGrants` migration ran there (migrations exist for all four engines; SQL Server, MySQL and Oracle weren't run).
+
+## Newsroom modules (shifts and content)
+
+Two custom modules implement the newsroom scenario of the auth design. They never reference each other: they meet
+only through grants. A published rota becomes grants via `IGrantStore`; the content module checks them via `IAccessScopes`.
+
+```
+shifts:  section (categories) + shift (UTC window) + rota (Manager, Desk, Editor) ─publish─► IGrantStore.ReplaceSourceAsync("shift:{id}")
+                                                                                              │  valid from start to the member's end
+content: article workflow ─► IAccessScopes.HasPermissionAsync(permission, [press:{p}, category:{c}]) ◄┘  (evaluated per request)
+```
+
+| Module | Projects | Schema | Routes (`/api/...`) |
+|---|---|---|---|
+| `shifts` 0.1.0 | `Modules/Custom/Shifts/WebApi.Modules.Shifts.{Domain,Application,Infrastructure}` | `shifts` | `sections`, `sections/{id}/settings`, `shifts`, `shifts/{id}/publish`, `shifts/{id}/check-out`, `shifts/{id}/members/{user}/check-out`, `mine`, `overdue` |
+| `content` 0.1.0 (starter) | `Modules/Custom/Content/WebApi.Modules.Content.{Domain,Application,Infrastructure}` | `content` | `presses`, `categories`, `articles` (`?view=Mine\|Queue\|Review\|Desk`), `articles/{id}` and `/submit`, `/accept`, `/assign`, `/approve`, `/return`, `/transfer`, `/schedule`, `/publish`, `articles/publish-due` |
+
+- **Rota roles:**
+
+  | Role | Grants (on the section's categories, during the shift only) |
+  |---|---|
+  | Manager | `content.accept`, `content.assign`, `content.transfer`, `content.return` |
+  | Desk | `content.publish`, `content.return` |
+  | Editor | `content.review` |
+
+  - Standing grants come from admins: `content.author` (press or category), `content.editor`, `content.manage`, `shifts.view`, `shifts.manage`.
+  - A member's grants end at the scheduled end, or earlier when they or the whole shift check out.
+  - Changing the rota, the times, or the section's categories rewrites the grants.
+- **Workflow:**
+  - **States:** Draft → Submitted → Accepted → InReview → Approved → Scheduled → Published. Returned, and AwaitingDeskReapproval after an edit while approved or scheduled.
+  - **Owner edits:** in Draft or Returned, or within `Content:OwnerEditWindow` (24 h) after submitting, until a manager accepts or assigns the article.
+  - **Assigning:** the assignee must hold `content.review` on the article right now.
+  - **Publishing your own work:** a Desk user who wrote or reviewed the article also needs a standing `content.editor` grant on its category.
+  - **Scheduled publishing:** a schedule is tied to the version it was made for; `publish-due` publishes only unchanged articles.
+  - **History:** every change is recorded in the article's history (who, what, the resulting state).
+- **Concurrency:** every change sends the article's `version`, which is also an EF concurrency token. A stale version gets 409, and of two racing assignments the second gets 409.
+- **Settings:** `Shifts:AutoAssignDelay` (5 min) and `Shifts:CheckoutGrace` (15 min) can be overridden per section (`sections/{id}/settings`). They are consumed by the coming Elsa module, which will auto-assign and auto-check-out via `overdue`.
+- **Categories:** category ids are unique within the tenant (e.g. `ahram-sports`), so `category:{id}` identifies one category even when a section spans presses.
+- **Engines:** migrations exist for all four engines. `TenantDbContext` now stores every `DateTimeOffset` as UTC on MySQL.
+
+**Verified** (test host on a throwaway PostgreSQL, tenant `nr` provisioned through `tenancy`, user-jwts tokens):
+- **Setup:** both modules installed and activated. Publishing the rota gave the manager the shift permissions; before publishing there were none.
+- **Authoring:** create needs `content.author`. Edits work in Draft and within the window; a stale version gets 409, and the owner is locked out after accept (409).
+- **Scope:** the manager's queue shows only the section's category. An article in another category returns 404 to them.
+- **Assignment:** assigning someone not on shift gets 409. 4 parallel assigns gave one 200 and three 409.
+- **Review and publishing:** reviewer edit and approval, Desk schedule, Desk edit → AwaitingDeskReapproval, then publish. History records every step.
+- **Check-out:** checking a member out ends their access (their edit gets 403). Transfer sets `transferredFromShift`, and Desk can return an article to its author.
+- **Self-publish:** allowed with a standing `content.editor` grant on the category, refused (403) without it.
+- **Time windows:** a future shift's grants are not yet effective. A whole-shift check-out empties the manager's permissions and queue.
+- **Unload:** both modules unload and are collected (see the EF Core / Ardalis row under Unloading).
+- **Not run:** the SQL Server, MySQL and Oracle migrations.
+
 ## Not covered yet
 
 - **Database:** a real modules schema (DB table) instead of `modules.json`.
-- **Security:** authorization on the admin API; package signing and verification.
-- **Tenancy:** token validation (the `tenant` claim check is in place but no JwtBearer yet), membership checks, per-tenant module enablement (plans), per-tenant module settings, dropping a module's schema on uninstall.
+- **Security:** package signing and verification.
+- **Auth:**
+  - The identity service (OpenIddict) is not built yet.
+  - Membership checks per request: revocation over the broker from the identity service.
+  - Gateway token checks.
+  - Grant templates for the shifts module and Elsa.
+- **Tenancy:** per-tenant module enablement (plans), per-tenant module settings, dropping a module's schema on uninstall.
 - **Workers:** module consumers and hosted services (the tenant scope primitive exists).
 - **DI:** keyed services inside modules.
 - **Packages:** `.nupkg` dependency restore. Ship dependencies in the `.zip` form instead.

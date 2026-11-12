@@ -38,6 +38,9 @@ public sealed class ModuleRecord
 
     /// <summary>Content hash of the shipped core package; a different hash on startup re-seeds the module.</summary>
     public string? PackageHash { get; init; }
+
+    /// <summary>Permissions the manifest declares (the permission catalog).</summary>
+    public List<Contracts.Security.PermissionDefinition> Permissions { get; init; } = [];
 }
 
 /// <summary>A module as seen by the replica that answered.</summary>
