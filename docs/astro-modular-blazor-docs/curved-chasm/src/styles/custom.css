@@ -23,3 +23,71 @@
 	--sl-text-body: 1.0625rem;
 	--sl-line-height: 1.85;
 }
+
+/* Keep Mermaid connectors and arrowheads readable in both Starlight color themes. */
+.mermaid-viewer svg.flowchart .edgePaths .flowchart-link {
+	stroke: var(--sl-color-text) !important;
+	stroke-width: 1.75px !important;
+}
+
+.mermaid-viewer svg.flowchart .marker .arrowMarkerPath {
+	fill: var(--sl-color-text) !important;
+	stroke: var(--sl-color-text) !important;
+}
+
+.mermaid-code-toggle {
+	margin-block: 0.75rem 1.5rem;
+}
+
+.mermaid-code-toggle > summary {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.45rem;
+	padding: 0.4rem 0.7rem;
+	border: 1px solid var(--sl-color-gray-5);
+	border-radius: 0.5rem;
+	background: var(--sl-color-gray-6);
+	color: var(--sl-color-text);
+	cursor: pointer;
+	font-size: var(--sl-text-sm);
+	font-weight: 600;
+	list-style: none;
+}
+
+.mermaid-code-toggle > summary::-webkit-details-marker {
+	display: none;
+}
+
+.mermaid-code-toggle > summary:hover {
+	border-color: var(--sl-color-accent);
+	color: var(--sl-color-accent-high);
+}
+
+.mermaid-code-toggle > summary:focus-visible {
+	outline: 2px solid var(--sl-color-accent);
+	outline-offset: 2px;
+}
+
+.mermaid-toggle-icon {
+	width: 1rem;
+	height: 1rem;
+	flex: none;
+}
+
+.mermaid-diagram-label,
+.mermaid-code-toggle[open] .mermaid-code-label {
+	display: none;
+}
+
+.mermaid-code-toggle[open] .mermaid-diagram-label {
+	display: inline;
+}
+
+.mermaid-viewer:has(> .mermaid-code-toggle[open]) > .mermaid-diagram {
+	display: none;
+}
+
+.mermaid-code-toggle > pre {
+	direction: ltr;
+	text-align: left;
+}
