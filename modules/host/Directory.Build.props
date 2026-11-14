@@ -19,7 +19,7 @@
   <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Infrastructure'))">
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <!-- Floating on purpose: pin to the Carter version you want to ship. -->
-    <PackageReference Include="Carter" Version="*" />
+    <PackageReference Include="Carter" Version="10.*" />
     <ProjectReference Include="$(MSBuildThisFileDirectory)../../src/api/_Framework/Infrastructure/Infrastructure.csproj" />
     <Using Include="Carter" />
     <Using Include="Microsoft.AspNetCore.Builder" />

@@ -9,12 +9,12 @@ This page tracks what is **implemented** from the [authentication and authorizat
 
 | Design step | Status |
 | --- | --- |
-| 1. Identity service (OpenIddict) in Aspire; JwtBearer, fallback policy and admin API protection in the host | Host side **done** (on `main`). Identity service **built and verified on branch `claude/identity-service-da759e`, not merged yet** |
+| 1. Identity service (OpenIddict) in Aspire; JwtBearer, fallback policy and admin API protection in the host | Host side **done** (on `main`). Identity service **merged into `main` and verified**; pool authority wiring is in place |
 | 2. `RequirePermission`, manifest permissions and the activation check; unload test of the policy cache | **Done** |
 | 3. Tenant middleware, membership check, subscription gating | Tenant middleware **done** ([Tenancy and tenant data](/backend/tenancy-data/)). Per-request membership check and subscription gating not yet |
 | 4. Grant store, `IAccessScopes`, claims mapping | **Done** |
-| 5. Shifts and content modules | Not started |
-| 6. Runtime gaps for Elsa (module hosted services, sub-pipeline spike), then the Elsa module | Not done |
+| 5. Shifts and content modules | Starter modules built; feature development is next |
+| 6. Runtime gaps for Elsa (module hosted services, sub-pipeline, hot-unload declaration) | Implemented on `claude/module-hosted-services-c8094b`; Elsa server module itself remains future work |
 
 ## The host (`src/WebApi/WebApi`)
 
@@ -117,11 +117,7 @@ On a standalone host (port 5298), with grants both in memory and in PostgreSQL:
 
 ## The identity service
 
-:::note[Branch]
-Built and verified on branch `claude/identity-service-da759e` (project `src/WebApi/Identity/WebApi.Identity.Server`),
-**not merged into `main` yet**. The WebApi pools aren't wired to it yet: `Auth__Authority` still has to be passed to
-them.
-:::
+The identity service is merged into `main` (project `src/WebApi/Identity/WebApi.Identity.Server`) and runs as an independent Aspire process. In the Hybird lab, it is exposed at `http://localhost:5090/`; WebApi pools use it as their authority. Identity remains outside the runtime-module loader.
 
 OpenIddict (authorization server) and ASP.NET Core Identity (accounts), in its own process with its own database,
 never as a runtime module. It owns global accounts, tenant memberships, the tenant security policy and token
@@ -199,8 +195,56 @@ check, still to be built, closes that gap.
 tenant picker, non-member refusal, platform-admin token, admin API 403s, suspend and remove revoking refresh tokens,
 invite and accept, and the `RequireMfa` refusal.
 
+## Scalar OAuth in the Hybird lab
+
+Scalar uses the public `scalar-client` with Authorization Code + PKCE. It has no client secret. The browser signs in at the separate identity service, then Scalar exchanges the authorization code for a token and sends that token to the selected API pool.
+
+```text
+Browser / Scalar UI                         Identity service                 YARP → WebApi pool
+http://localhost:5080/.../scalar/           http://localhost:5090             http://localhost:5080
+       │                                             │                                │
+       ├─ top-level /connect/authorize ────────────►│                                │
+       │◄─ login, then redirect with code ──────────┤                                │
+       ├─ POST /connect/token + PKCE (fetch) ──────►│                                │
+       │◄─ access_token (JWT) ──────────────────────┤                                │
+       ├─ API request + Authorization: Bearer ─────────────────────────────────────►│
+       │                                             │                 validate JWT + authorize
+```
+
+The authorize redirect and token exchange have different browser rules:
+
+| Setting | What it matches | Hybird lab example |
+| --- | --- | --- |
+| CORS allowed origin | Only scheme, host and port of browser JavaScript | `http://localhost:5080` (one entry covers root and pool Scalar paths) |
+| OAuth redirect URI | Exact callback URL, including path | `http://localhost:5080/scalar/` or `http://localhost:5080/pools/sales/scalar/` |
+
+A top-level navigation to `/connect/authorize` is not blocked by CORS. Scalar's JavaScript token request to `/connect/token` is cross-origin and needs the gateway origin in the identity service's CORS allowlist. The redirect URI must separately match an exact URI registered for `scalar-client`.
+
+### A/B deployment and Scalar URLs
+
+In Scenario A, open Scalar through the stable gateway, usually `http://localhost:5080/scalar/`. In Scenario B, use the pool route, for example `http://localhost:5080/pools/sales/scalar/` or `/pools/worker/scalar/`. Register the matching full callback URI for every Scalar entry point. Do not use a per-replica Aspire URL such as `http://localhost:65033/scalar/` as a durable callback: its port may change at restart. The gateway URL stays stable and YARP routes the request to the pool.
+
+The current Development CORS setting is:
+
+```json
+{
+  "Cors": {
+    "AllowedOrigins": [ "http://localhost:5080" ]
+  }
+}
+```
+
+The Scalar client registration must include the exact root and pool redirect URIs. These localhost values are for the Hybird development lab. Configure the actual HTTPS origin and callbacks for each customer deployment; do not use wildcard origins or callbacks.
+
+### Troubleshooting Scalar authorization
+
+- **“Failed to fetch” after login:** inspect the browser Network panel. If `/connect/token` fails with a CORS error, allow the exact Scalar origin in identity-service CORS. If it is a 400, compare the `redirect_uri` and client registration exactly, including scheme, port, path and trailing slash.
+- **401 from a protected API:** Scalar did not attach a valid access token, or the API rejected its issuer/audience/signature/expiry. Re-authorize and inspect the request's `Authorization: Bearer` header and response body.
+- **403 from a protected API:** the token was accepted, but it lacks the required permission or scope.
+- **A different port after restart:** use the fixed gateway origin and pool path; do not bookmark the random replica address.
+
 ## Not built yet
 
-- Wiring the pools to the identity service (`Auth__Authority`), and gateway token checks.
-- The per-request membership check, with revocation over the broker from the identity service.
-- Grant templates for the shifts module and Elsa; MFA enrolment; production signing keys.
+- Per-request tenant-membership validation in WebApi, with revocation propagated from the identity service.
+- Shift grant templates and Elsa workflow integration; MFA enrolment; production signing-key management and rotation.
+- Gateway-side JWT checks are not required for correctness because each WebApi pool validates tokens. Add gateway checks only as an additional edge control, and keep authorization enforcement in the destination API.

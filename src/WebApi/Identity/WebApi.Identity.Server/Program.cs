@@ -13,6 +13,10 @@ using soft.square.net.WebApi.Identity.Server.Data;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
 var builder = WebApplication.CreateBuilder(args);
+// Browser clients such as Scalar exchange authorization codes cross-origin; only configured origins are allowed.
+var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
+    policy.WithOrigins(corsOrigins).AllowAnyHeader().AllowAnyMethod()));
 
 var section = builder.Configuration.GetSection("Identity");
 builder.Services.Configure<IdentityServerOptions>(section);
@@ -134,6 +138,7 @@ await IdentitySeeder.InitializeAsync(app.Services);
 
 app.UseStatusCodePages();
 app.UseRouting();
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 

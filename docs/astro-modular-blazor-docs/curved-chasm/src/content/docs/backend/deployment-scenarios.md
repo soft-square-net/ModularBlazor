@@ -78,6 +78,18 @@ UI shows "pending" states), contracts need versioning, and every pool needs its 
 **No service reads another service's tables.** Sharing a database *server* is fine; sharing a schema or
 credentials is not. Data another service needs arrives through its API or its events.
 
+## Scalar and OAuth through the gateway
+
+The A/B deployment choice does not change the identity boundary: the identity service remains independent, and each API pool validates the JWT. Browse Scalar through the stable YARP gateway so its API requests follow the same route as the documentation UI.
+
+| Deployment | Scalar URL | OAuth callback to register |
+| --- | --- | --- |
+| Scenario A / root API | `http://localhost:5080/scalar/` | `http://localhost:5080/scalar/` |
+| Scenario B / sales pool | `http://localhost:5080/pools/sales/scalar/` | `http://localhost:5080/pools/sales/scalar/` |
+| Scenario B / worker pool | `http://localhost:5080/pools/worker/scalar/` | `http://localhost:5080/pools/worker/scalar/` |
+
+The browser origin for all these local URLs is `http://localhost:5080`, so the identity service needs one matching CORS origin. OAuth redirect URIs are different: register each full path exactly. Dynamic per-replica ports are for diagnostics, not stable Scalar URLs or OAuth callbacks. See [Scalar OAuth troubleshooting](/backend/auth-implementation/#scalar-oauth-in-the-hybird-lab).
+
 ## Build for B, deploy as A
 
 Design every module as if it were already separate, and deploy it inside the monolith until it needs to scale or

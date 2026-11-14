@@ -89,7 +89,7 @@ var identity = builder.AddProject<Projects.WebApi_Identity_Server>("identity", l
 var core = AddPool("core", role: "Api", replicas: 2, "identity", "tenancy", "workflow", "inventory");
 
 // Sales pool: the module that needed independent scaling. The sample "greeting" module stands in for Sales here.
-var sales = AddPool("sales", role: "Api", replicas: 4, "sales", "greeting");
+var sales = AddPool("sales", role: "Api", replicas: 4, "sales", "greeting","shifts");
 
 // Worker pool: loads modules for their consumers and jobs, gets no public HTTP routes. In production it scales on
 // queue lag (e.g. KEDA on the RabbitMQ queue length); locally it is a fixed count.

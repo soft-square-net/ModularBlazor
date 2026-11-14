@@ -15,7 +15,7 @@
 
   <ItemGroup>
 
-    <PackageReference Include="Carter" Version="*" />
+    <PackageReference Include="Carter" Version="10.*" />
     <!-- Startup project for `dotnet ef` (see scripts/add-migration.*). -->
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.*" PrivateAssets="all" />
   </ItemGroup>

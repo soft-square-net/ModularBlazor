@@ -78,6 +78,18 @@ Workflow API   ×2     saga state in a database, so any replica can resume a wor
 **لا تقرأ أي خدمة جداول خدمة أخرى.** مشاركة *خادم* قاعدة البيانات مقبولة؛ أما مشاركة المخطط أو بيانات الاعتماد
 فلا. البيانات التي تحتاجها خدمة تصلها عبر واجهة الخدمة المالكة أو أحداثها.
 
+## Scalar وOAuth عبر البوابة
+
+لا يغير اختيار النشر A أو B حد الهوية: تبقى خدمة الهوية مستقلة، وتتحقق كل مجموعة API من JWT. افتح Scalar عبر بوابة YARP الثابتة كي تمر طلبات الواجهة عبر المسار نفسه.
+
+| النشر | رابط Scalar | عنوان OAuth لإعادة التوجيه |
+| --- | --- | --- |
+| السيناريو A / واجهة الجذر | `http://localhost:5080/scalar/` | `http://localhost:5080/scalar/` |
+| السيناريو B / مجموعة sales | `http://localhost:5080/pools/sales/scalar/` | `http://localhost:5080/pools/sales/scalar/` |
+| السيناريو B / مجموعة worker | `http://localhost:5080/pools/worker/scalar/` | `http://localhost:5080/pools/worker/scalar/` |
+
+أصل المتصفح لهذه الروابط المحلية واحد: `http://localhost:5080`، لذا تحتاج خدمة الهوية إلى أصل CORS واحد مطابق. أما عناوين إعادة OAuth فتختلف: سجل كل مسار كاملا كما هو. منافذ نسخ Aspire الديناميكية للتشخيص، وليست روابط Scalar أو عناوين OAuth ثابتة. راجع [تشخيص OAuth في Scalar](/ar/backend/auth-implementation/#oauth-في-scalar-بمختبر-hybird).
+
 ## ابن لـ B وانشر كـ A
 
 صمم كل وحدة كأنها منفصلة بالفعل، وانشرها داخل التطبيق الموحد إلى أن تحتاج إلى أن تتوسع أو تفشل وحدها. يصبح نقلها

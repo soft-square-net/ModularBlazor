@@ -3,7 +3,6 @@ using NJsonSchema;
 using NSwag;
 using NSwag.Generation.AspNetCore;
 using NSwag.Generation.Processors;
-using NSwag.Generation.Processors.Security;
 
 namespace soft.square.net.ModularBlazor.Infrastructure.Authorization;
 
@@ -25,8 +24,9 @@ internal static class Extension
       Name = "X-API-Key",
       Description = "Key from POST /api/v1/identity/api-keys."
     });
-    settings.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("JWT"));
-    settings.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("ApiKey"));
+    // These are Minimal API endpoints: detect their RequireAuthorization / RequirePermission metadata
+    // directly so Scalar knows to send the configured credentials when an operation is executed.
+    settings.OperationProcessors.Add(new EndpointSecurityOperationProcessor());
 
     // Every operation, including POST /api/v1/identity/tokens, runs for one tenant: the X-Tenant header (default: root).
     settings.OperationProcessors.Add(new OperationProcessor(context =>

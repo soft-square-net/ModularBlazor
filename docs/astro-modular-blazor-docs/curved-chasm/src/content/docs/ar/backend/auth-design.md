@@ -108,10 +108,33 @@ sidebar:
 
 ## 7. سير عمل المحتوى (تملك وحدة المحتوى الحالة)
 
-```text
-draft → submitted ─(Manager accepts)→ accepted ─(Manager assigns within AutoAssignDelay, else Elsa)→ in review
-      → approved → scheduled (bound to the approved version) → published (Desk)
-returned ← Manager or Desk;  an edit while scheduled → schedule cancelled → awaiting Desk re-approval
+```mermaid
+flowchart TD
+    Draft["ينشئ الكاتب مسودة<br/>ويمكنه الكتابة خارج المناوبة"] --> Submit["إرسال للمراجعة"]
+    Submit --> Wait["بانتظار قبول مدير المناوبة<br/>يمكن للكاتب التعديل خلال نافذة 24 ساعة"]
+    Wait -->|يقبل المدير| Accepted["قبول الإرسال<br/>قفل تعديل الكاتب"]
+    Wait -->|لا يوجد قبول| Reminder["يذكّر Elsa المدير<br/>ولا يقبل Elsa المقال"]
+    Accepted --> Delay["بدء AutoAssignDelay<br/>5 دقائق افتراضيا، قابلة للتغيير"]
+    Delay --> AssignedByManager{"هل يسند المدير المقال إلى محرر مؤهل<br/>قبل انتهاء المؤقت؟"}
+    AssignedByManager -->|نعم| Assigned["إسناد ضمن مناوبة نشطة<br/>يغطي قسمها فئة المقال"]
+    AssignedByManager -->|لا| AutoAssign["يسند Elsa المقال إلى محرر مؤهل"]
+    AutoAssign --> Assigned
+    Assigned --> Review["يراجع المحرر المقال ويعدله<br/>ما دامت منح المناوبة والفئة فعالة"]
+    Review --> Return{"هل يعيده Desk<br/>أو مدير المناوبة؟"}
+    Return -->|نعم| AuthorEdits["إعادته للكاتب للتعديل"]
+    AuthorEdits --> Submit
+    Return -->|لا: موافقة| PublishCheck{"هل لدى مستخدم Desk صلاحية النشر<br/>لهذه الفئة؟"}
+    PublishCheck -->|نعم، والكاتب والمراجع شخصان آخران| Publish["نشر أو جدولة النشر"]
+    PublishCheck -->|هو الكاتب أو المراجع| Exception{"هل لديه أيضا دور Editor<br/>في فئة شركته؟"}
+    Exception -->|نعم| Publish
+    Exception -->|لا| WaitForDesk["انتظار مستخدم Desk مؤهل آخر"]
+    Publish --> Published["النسخة المنشورة متاحة"]
+    Publish --> Scheduled["جدولة نشر مستقبلي"]
+    Published --> EditAfter["تعديل لاحق"]
+    Scheduled --> EditAfter
+    EditAfter --> Cancel["إلغاء الجدولة المعلقة<br/>وإبقاء أي نسخة منشورة متاحة"]
+    Cancel --> Reapprove["إرسال النسخة المعدلة لإعادة اعتماد Desk"]
+    Reapprove --> Review
 ```
 
 - **تعديل المالك:** الحالة ∈ {draft, returned} ∨ (submitted ∧ الآن < submittedAt + OwnerEditWindow ∧ لم يقبل ولم
@@ -136,6 +159,26 @@ returned ← Manager or Desk;  an edit while scheduled → schedule cancelled �
 - **الإعدادات:** AutoAssignDelay = 5m، وCheckoutGrace = 15m، وOwnerEditWindow = 24h.
   - قيم افتراضية للمنصة، وتجاوزات للمستأجر، وتجاوزات للقسم.
   - تغييرها يتطلب `newsroom.settings.manage`.
+
+### مخطط دورة المناوبة
+
+```mermaid
+flowchart TD
+    Rota["تملك وحدة المناوبات الجدول<br/>المواعيد والمدير وDesk والمحررون"] --> Section["يغطي القسم أزواج الصحف والفئات<br/>وقد يمتد إلى عدة صحف"]
+    Section --> Start["بدء المناوبة حسب الجدول"]
+    Start --> Grants["تسري منح المناوبة بحسب الساعة<br/>على فئات القسم"]
+    Grants --> Work["يعمل المحررون وDesk<br/>ضمن أدوارهم ونطاق الفئات"]
+    Work --> Checkout{"هل يسجل المدير الخروج مبكرا؟"}
+    Checkout -->|نعم| Choose["يختار المدير المغادر<br/>العمل غير المنتهي الذي سينقله"]
+    Choose --> EndEarly["إنهاء منح المناوبة الآن"]
+    EndEarly --> Incoming["إرسال العمل المختار للمناوبة القادمة<br/>لإعادة إسناده"]
+    Checkout -->|لا| ScheduledEnd["يحين موعد النهاية المجدولة<br/>وتنتهي المنح بحسب الساعة"]
+    ScheduledEnd --> Grace["انتظار CheckoutGrace<br/>15 دقيقة افتراضيا"]
+    Grace --> Auto["يسجل Elsa خروج المناوبة<br/>وينقل كل العمل غير المنتهي"]
+    Auto --> Incoming
+```
+
+تملك وحدة المناوبات الجدول ومنح المناوبة. وتملك وحدة المحتوى حالات المقالات. وينسق Elsa تذكير القبول ومؤقتات الإسناد وتسجيل الخروج التلقائي والتسليم وجدولة النشر.
 
 ## 9. Elsa 3 (خادم Elsa داخل وحدة تشغيل خاصة به)
 

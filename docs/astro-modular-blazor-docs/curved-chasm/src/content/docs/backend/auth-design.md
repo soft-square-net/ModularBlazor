@@ -113,10 +113,33 @@ See also [Multitenancy across pools](/backend/multitenancy/).
 
 ## 7. Content workflow (the content module owns state)
 
-```text
-draft → submitted ─(Manager accepts)→ accepted ─(Manager assigns within AutoAssignDelay, else Elsa)→ in review
-      → approved → scheduled (bound to the approved version) → published (Desk)
-returned ← Manager or Desk;  an edit while scheduled → schedule cancelled → awaiting Desk re-approval
+```mermaid
+flowchart TD
+    Draft["Author creates a draft<br/>Can write outside a shift"] --> Submit["Submit for review"]
+    Submit --> Wait["Waiting for Shift Manager acceptance<br/>Author may edit within the 24-hour window"]
+    Wait -->|Manager accepts| Accepted["Accept submission<br/>Lock author's edits"]
+    Wait -->|No acceptance| Reminder["Elsa reminds the manager<br/>Elsa does not accept"]
+    Accepted --> Delay["Start AutoAssignDelay<br/>5 minutes by default; configurable"]
+    Delay --> AssignedByManager{"Manager assigns an eligible Editor<br/>before the timer expires?"}
+    AssignedByManager -->|Yes| Assigned["Assign in an active section<br/>covering the article category"]
+    AssignedByManager -->|No| AutoAssign["Elsa assigns an eligible Editor"]
+    AutoAssign --> Assigned
+    Assigned --> Review["Editor reviews and edits<br/>while shift and category grants are active"]
+    Review --> Return{"Desk or Shift Manager<br/>sends it back?"}
+    Return -->|Yes| AuthorEdits["Return to author for changes"]
+    AuthorEdits --> Submit
+    Return -->|No: approve| PublishCheck{"Desk has publish permission<br/>for this category?"}
+    PublishCheck -->|Yes, different author and reviewer| Publish["Publish or schedule"]
+    PublishCheck -->|Same author or reviewer| Exception{"Also has Editor role<br/>in the company's category?"}
+    Exception -->|Yes| Publish
+    Exception -->|No| WaitForDesk["Wait for another eligible Desk user"]
+    Publish --> Published["Published version is live"]
+    Publish --> Scheduled["Future publication is scheduled"]
+    Published --> EditAfter["Later edit"]
+    Scheduled --> EditAfter
+    EditAfter --> Cancel["Cancel pending schedule;<br/>keep any live version available"]
+    Cancel --> Reapprove["Send edited version for Desk re-approval"]
+    Reapprove --> Review
 ```
 
 - **Owner edit:** state ∈ {draft, returned} ∨ (submitted ∧ now < submittedAt + OwnerEditWindow ∧ not accepted or
@@ -144,6 +167,26 @@ returned ← Manager or Desk;  an edit while scheduled → schedule cancelled �
 - **Settings:** AutoAssignDelay = 5m, CheckoutGrace = 15m, OwnerEditWindow = 24h.
   - Platform defaults, tenant overrides, section overrides.
   - Changing them needs `newsroom.settings.manage`.
+
+### Shift lifecycle diagram
+
+```mermaid
+flowchart TD
+    Rota["Shifts module owns the rota<br/>schedule, manager, Desk, Editors"] --> Section["Section covers press/category pairs<br/>May span several presses"]
+    Section --> Start["Scheduled shift starts"]
+    Start --> Grants["Shift grants become valid by the clock<br/>for the section's categories"]
+    Grants --> Work["Editors and Desk work within<br/>their role and category scope"]
+    Work --> Checkout{"Manager checks out early?"}
+    Checkout -->|Yes| Choose["Outgoing manager chooses<br/>unfinished work to transfer"]
+    Choose --> EndEarly["End shift grants now"]
+    EndEarly --> Incoming["Send chosen work to incoming shift<br/>for reassignment"]
+    Checkout -->|No| ScheduledEnd["Scheduled end arrives<br/>grants expire by the clock"]
+    ScheduledEnd --> Grace["Wait CheckoutGrace<br/>15 minutes by default"]
+    Grace --> Auto["Elsa checks out the shift<br/>and transfers all unfinished work"]
+    Auto --> Incoming
+```
+
+The Shifts module owns rota and shift grants. The Content module owns article state. Elsa coordinates acceptance reminders, assignment timers, automatic check-out, handover, and publication scheduling.
 
 ## 9. Elsa 3 (Elsa Server inside its own runtime module)
 

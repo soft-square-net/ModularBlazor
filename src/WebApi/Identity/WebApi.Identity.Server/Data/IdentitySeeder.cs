@@ -132,9 +132,49 @@ public static class IdentitySeeder
             },
         };
         await UpsertAsync(applications, elsa, ct);
-    }
 
-    private static async Task UpsertAsync(IOpenIddictApplicationManager applications, OpenIddictApplicationDescriptor descriptor, CancellationToken ct)
+    /*───────────────────────Ahmed_Galal───────────────────────────*/
+    var scalar = new OpenIddictApplicationDescriptor
+    {
+      ClientId = "scalar-client",
+      ClientType = ClientTypes.Public,
+      ConsentType = ConsentTypes.Implicit,
+      DisplayName = "Scalar API Documentation",
+
+      Permissions =
+    {
+        Permissions.Endpoints.Authorization,
+        Permissions.Endpoints.Token,
+
+        Permissions.GrantTypes.AuthorizationCode,
+        Permissions.GrantTypes.RefreshToken,
+
+        Permissions.ResponseTypes.Code,
+
+        Permissions.Scopes.Profile,
+        Permissions.Scopes.Email,
+        Permissions.Prefixes.Scope + IdentityClaims.ApiScope,
+        Permissions.Prefixes.Scope + Scopes.OfflineAccess
+    },
+
+      Requirements =
+    {
+        Requirements.Features.ProofKeyForCodeExchange
+    }
+    };
+
+    // Register the actual Scalar redirect URI here.
+    scalar.RedirectUris.Add(
+        new Uri("http://localhost:5080/scalar/"));
+    scalar.RedirectUris.Add(new Uri("http://localhost:5080/pools/core/scalar/"));
+    scalar.RedirectUris.Add(new Uri("http://localhost:5080/pools/sales/scalar/"));
+    scalar.RedirectUris.Add(new Uri("http://localhost:5080/pools/worker/scalar/"));
+
+    await UpsertAsync(applications, scalar, ct);
+    /*───────────────────────Ahmed_Galal───────────────────────────*/
+  }
+
+  private static async Task UpsertAsync(IOpenIddictApplicationManager applications, OpenIddictApplicationDescriptor descriptor, CancellationToken ct)
     {
         if (await applications.FindByClientIdAsync(descriptor.ClientId!, ct) is { } existing)
             await applications.UpdateAsync(existing, descriptor, ct); // re-hashes the secret from configuration
@@ -187,4 +227,7 @@ public static class IdentitySeeder
             await db.SaveChangesAsync(ct);
         }
     }
+
+
+
 }
