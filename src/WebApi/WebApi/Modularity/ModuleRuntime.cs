@@ -600,7 +600,19 @@ internal sealed partial class ModuleRuntime
             var module = (IRuntimeModule)Activator.CreateInstance(type)!;
 
             var services = new ServiceCollection();
-            var settings = new ConfigurationBuilder().AddInMemoryCollection(record.Settings).Build();
+            var moduleSettings = new Dictionary<string, string?>(record.Settings, StringComparer.OrdinalIgnoreCase);
+            if (record.Id.Equals("elsa", StringComparison.OrdinalIgnoreCase))
+            {
+                // Elsa is the only module allowed these runtime secrets. They are injected from the host's secret
+                // provider into this module's private configuration and never copied into modules.json.
+                var hostConfiguration = _hostRoot.GetRequiredService<IConfiguration>();
+                moduleSettings["ConnectionStrings:elsa"] = hostConfiguration.GetConnectionString("elsa");
+                moduleSettings["Identity:ElsaClient:ClientId"] = hostConfiguration["Identity:ElsaClient:ClientId"];
+                moduleSettings["Identity:ElsaClient:ClientSecret"] = hostConfiguration["Identity:ElsaClient:ClientSecret"];
+                moduleSettings["Elsa:IdentityAuthority"] = hostConfiguration["Elsa:IdentityAuthority"];
+                moduleSettings["Elsa:PlatformApiBaseUrl"] = hostConfiguration["Elsa:PlatformApiBaseUrl"];
+            }
+            var settings = new ConfigurationBuilder().AddInMemoryCollection(moduleSettings).Build();
             module.ConfigureServices(services, settings);
             if (module is IModulePipeline) ModulePipelines.AddPipelineServices(services, _hostRoot, _log);
 

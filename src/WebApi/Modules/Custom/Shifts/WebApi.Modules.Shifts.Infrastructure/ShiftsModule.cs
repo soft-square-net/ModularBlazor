@@ -116,6 +116,7 @@ public sealed class ShiftsEndpoints : ICarterModule
             .RequirePermission(ShiftPermissions.Manage)
             .WithSummary("Changing the categories rewrites the grants of the section's published shifts that have not ended.");
         shifts.MapGet("/sections/{id:int}/settings", (int id, ShiftService s, CancellationToken ct) => s.SettingsAsync(id, ct))
+            .RequirePermission(ShiftPermissions.View, ShiftPermissions.Manage)
             .WithSummary("Effective AutoAssignDelay and CheckoutGrace: the section's override, else the module's settings.");
 
         shifts.MapGet("/mine", (ShiftService s, CancellationToken ct) => s.MineAsync(ct))
@@ -127,6 +128,9 @@ public sealed class ShiftsEndpoints : ICarterModule
             .RequirePermission(ShiftPermissions.View, ShiftPermissions.Manage);
         shifts.MapGet("/shifts/{id:int}", (int id, ShiftService s, CancellationToken ct) => s.GetAsync(id, ct))
             .RequirePermission(ShiftPermissions.View, ShiftPermissions.Manage);
+        shifts.MapGet("/shifts/{id:int}/automation", (int id, ShiftService s, CancellationToken ct) => s.AutomationInfoAsync(id, ct))
+            .RequirePermission(ShiftPermissions.View, ShiftPermissions.Manage)
+            .WithSummary("Shift clock and section-specific assignment/check-out timers for the workflow service.");
         shifts.MapPost("/shifts", async (ShiftRequest r, ShiftService s, CancellationToken ct) =>
             {
                 var shift = await s.AddShiftAsync(r, ct);

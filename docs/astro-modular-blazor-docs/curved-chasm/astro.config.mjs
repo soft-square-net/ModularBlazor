@@ -23,7 +23,6 @@ function rehypeMermaidViewer() {
 					visit(node);
 					return [node];
 				}
-
 				const source = code.children.map((child) => child.value ?? '').join('');
 				const sourceBlock = {
 					type: 'element', tagName: 'pre', properties: {},
@@ -37,7 +36,7 @@ function rehypeMermaidViewer() {
 				return [{
 					type: 'element', tagName: 'div', properties: { className: ['mermaid-viewer'] },
 					children: [
-						{ type: 'element', tagName: 'div', properties: { className: ['mermaid-diagram'] }, children: [node] },
+						{ type: 'element', tagName: 'div', properties: { className: ['mermaid-diagram'], tabindex: '0', 'aria-label': isArabic ? 'مخطط تفاعلي؛ اسحب للتحريك واستخدم أدوات التكبير' : 'Interactive diagram; drag to pan and use the zoom controls' }, children: [node] },
 						{
 							type: 'element', tagName: 'details', properties: { className: ['mermaid-code-toggle'] },
 							children: [
@@ -59,11 +58,62 @@ function rehypeMermaidViewer() {
 export default defineConfig({
 	markdown: {
 		processor: unified({
-			rehypePlugins: [rehypeMermaidViewer, rehypeMermaid],
+			rehypePlugins: [
+				rehypeMermaidViewer,
+				[
+					rehypeMermaid,
+					{
+						mermaidConfig: {
+							theme: 'base',
+							fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif',
+							fontSize: 15,
+							flowchart: { curve: 'basis', nodeSpacing: 48, rankSpacing: 58, padding: 16 },
+							sequence: { actorMargin: 54, messageMargin: 38, noteMargin: 16, mirrorActors: false },
+							 themeVariables: {
+								primaryColor: '#28243f',
+								primaryTextColor: '#f4f2ff',
+								primaryBorderColor: '#8b7cf6',
+								secondaryColor: '#202f43',
+								secondaryTextColor: '#e5f0ff',
+								secondaryBorderColor: '#5da9e9',
+								tertiaryColor: '#173b35',
+								tertiaryTextColor: '#e5fff5',
+								tertiaryBorderColor: '#45c2a1',
+								lineColor: '#9a9bb3',
+								textColor: '#ecebfa',
+								mainBkg: '#28243f',
+								secondBkg: '#202f43',
+								tertiaryBkg: '#173b35',
+								clusterBkg: '#171923',
+								clusterBorder: '#45445a',
+								nodeBorder: '#8b7cf6',
+								actorBkg: '#28243f',
+								actorBorder: '#8b7cf6',
+								actorTextColor: '#f4f2ff',
+								actorLineColor: '#77788d',
+								 signalColor: '#c6c2e0',
+								signalTextColor: '#f4f2ff',
+								labelBoxBkgColor: '#252437',
+								labelBoxBorderColor: '#55536e',
+								labelTextColor: '#f4f2ff',
+								loopTextColor: '#e9e6ff',
+								noteBkgColor: '#342d16',
+								noteBorderColor: '#d1a94d',
+								noteTextColor: '#fff2c6',
+								activationBkgColor: '#39345a',
+								activationBorderColor: '#a69cf8',
+								edgeLabelBackground: '#191a22',
+								fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif',
+							},
+						},
+					},
+				],
+			],
 		}),
 	},
 	integrations: [
 		starlight({
+			head: [{ tag: 'script', attrs: { src: '/mermaid-viewer.js', type: 'module' } }],
 			title: { en: 'Astro × Modular Blazor', ar: 'Astro مع Blazor المعياري' },
 			description: 'How to combine Astro sites and Islands with the Modular Blazor WebAssembly client and MudTail.',
 			defaultLocale: 'root',
@@ -87,6 +137,10 @@ export default defineConfig({
 					label: 'Backend architecture',
 					translations: { ar: 'البنية الخلفية' },
 					items: [{ autogenerate: { directory: 'backend' } }],
+				},
+				{
+					label: 'Modules',
+					items: [{ autogenerate: { directory: 'modules' } }],
 				},
 				{
 					label: 'Reference',

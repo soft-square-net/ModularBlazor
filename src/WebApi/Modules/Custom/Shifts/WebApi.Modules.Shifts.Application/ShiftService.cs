@@ -51,6 +51,9 @@ public sealed record SectionDto(int Id, string Name, IReadOnlyList<string> Categ
 
 public sealed record SectionSettings(int SectionId, TimeSpan AutoAssignDelay, TimeSpan CheckoutGrace);
 
+public sealed record ShiftAutomationInfo(int ShiftId, int SectionId, DateTimeOffset StartsAt, DateTimeOffset EndsAt,
+    DateTimeOffset? CheckedOutAt, TimeSpan AutoAssignDelay, TimeSpan CheckoutGrace);
+
 public sealed record RotaEntry(string UserId, ShiftRole Role);
 
 public sealed record ShiftRequest(int SectionId, DateTimeOffset StartsAt, DateTimeOffset EndsAt, IReadOnlyList<RotaEntry> Rota);
@@ -128,6 +131,14 @@ public sealed class ShiftService(
         return new SectionSettings(section.Id,
             section.AutoAssignDelayMinutes is { } delay ? TimeSpan.FromMinutes(delay) : options.Value.AutoAssignDelay,
             section.CheckoutGraceMinutes is { } grace ? TimeSpan.FromMinutes(grace) : options.Value.CheckoutGrace);
+    }
+
+    public async Task<ShiftAutomationInfo> AutomationInfoAsync(int shiftId, CancellationToken ct)
+    {
+        var shift = await ShiftAsync(shiftId, ct);
+        var settings = await SettingsAsync(shift.SectionId, ct);
+        return new(shift.Id, shift.SectionId, shift.StartsAt, shift.EndsAt, shift.CheckedOutAt,
+            settings.AutoAssignDelay, settings.CheckoutGrace);
     }
 
     public async Task<IReadOnlyList<ShiftDto>> ShiftsAsync(int? sectionId, DateTimeOffset? from, DateTimeOffset? to, CancellationToken ct) =>

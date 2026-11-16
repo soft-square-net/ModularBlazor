@@ -14,6 +14,8 @@ using Aspire.Hosting.Yarp.Transforms;
 using Yarp.ReverseProxy.Transforms;
 
 var builder = DistributedApplication.CreateBuilder(args);
+// Set with Aspire user-secrets in development and a deployment secret store in production.
+var elsaClientSecret = builder.AddParameter("elsa-client-secret", secret: true);
 
 // ---------------------------------------------------------------- shared infrastructure
 
@@ -33,6 +35,7 @@ var tenantData = builder.AddPostgres("tenant-data")
     .WithDataVolume("hybird-tenant-data")
     .WithPgAdmin();
 var tenantStore = tenantData.AddDatabase("TenantStore", databaseName: "HybirdTenants");
+var elsaDatabase = tenantData.AddDatabase("elsa-db", databaseName: "ElsaWorkflows");
 tenantData.AddDatabase("tenant-acme");
 tenantData.AddDatabase("tenant-globex");
 
@@ -79,6 +82,7 @@ var identity = builder.AddProject<Projects.WebApi_Identity_Server>("identity", l
     .WithExternalHttpEndpoints()
     .WithEnvironment("ASPNETCORE_ENVIRONMENT", "Development")
     .WithEnvironment("Identity__Issuer", IdentityIssuer)
+    .WithEnvironment("Identity__ElsaClient__ClientSecret", elsaClientSecret)
     .WithReference(identityDb, connectionName: "identity").WaitFor(identityDb)
     .WithHttpHealthCheck("/health");
 
@@ -86,14 +90,22 @@ var identity = builder.AddProject<Projects.WebApi_Identity_Server>("identity", l
 
 // Core pool: every module except the extracted ones. "identity" and "tenancy" are core modules: they ship with every
 // WebApi release (CoreModules folder) and are seeded into the catalog as Active on first start.
-var core = AddPool("core", role: "Api", replicas: 2, "identity", "tenancy", "workflow", "inventory");
+var core = AddPool("core", role: "Api", replicas: 2, "identity", "tenancy", "inventory");
 
 // Sales pool: the module that needed independent scaling. The sample "greeting" module stands in for Sales here.
-var sales = AddPool("sales", role: "Api", replicas: 4, "sales", "greeting","shifts");
+var sales = AddPool("sales", role: "Api", replicas: 4, "sales", "greeting", "shifts", "content");
 
 // Worker pool: loads modules for their consumers and jobs, gets no public HTTP routes. In production it scales on
 // queue lag (e.g. KEDA on the RabbitMQ queue length); locally it is a fixed count.
-var worker = AddPool("worker", role: "Worker", replicas: 2, "sales", "greeting", "workflow");
+var worker = AddPool("worker", role: "Worker", replicas: 2, "sales", "greeting");
+var workflow = AddPool("workflow", role: "Api", replicas: 2, "elsa");
+foreach (var replica in workflow)
+    replica.WithReference(elsaDatabase, connectionName: "elsa").WaitFor(elsaDatabase)
+        .WithEnvironment("Identity__ElsaClient__ClientId", "elsa-workflows")
+        .WithEnvironment("Identity__ElsaClient__ClientSecret", elsaClientSecret)
+        .WithEnvironment("Elsa__Schema", "elsa")
+        .WithEnvironment("Elsa__IdentityAuthority", IdentityIssuer)
+        .WithEnvironment("Elsa__PlatformApiBaseUrl", "http://localhost:5080");
 
 // ---------------------------------------------------------------- edge: YARP gateway
 
@@ -107,10 +119,14 @@ var gateway = builder.AddYarp("gateway")
         var coreCluster = Cluster(yarp, "core", core);
         var salesCluster = Cluster(yarp, "sales", sales);
         var workerCluster = Cluster(yarp, "worker", worker);
+        var workflowCluster = Cluster(yarp, "workflow", workflow);
 
         // Extracted modules go to their own pool; everything else to the core pool.
         yarp.AddRoute("/api/sales/{**catch-all}", salesCluster);
         yarp.AddRoute("/api/greeting/{**catch-all}", salesCluster);
+        yarp.AddRoute("/api/shifts/{**catch-all}", salesCluster);
+        yarp.AddRoute("/api/content/{**catch-all}", salesCluster);
+        yarp.AddRoute("/api/elsa/{**catch-all}", workflowCluster);
         yarp.AddRoute("/{**catch-all}", coreCluster);
 
         // Lab only: reach one pool directly (its admin API, /api/pool, /openapi, /scalar) through the gateway.
@@ -118,6 +134,7 @@ var gateway = builder.AddYarp("gateway")
         PoolRoute("core", coreCluster);
         PoolRoute("sales", salesCluster);
         PoolRoute("worker", workerCluster);
+        PoolRoute("workflow", workflowCluster);
 
         void PoolRoute(string pool, YarpCluster cluster) =>
             yarp.AddRoute($"/pools/{pool}/{{**catch-all}}", cluster)
@@ -128,7 +145,7 @@ var gateway = builder.AddYarp("gateway")
     });
 // The clusters name each replica by service-discovery name (http://core-1, ...); referencing the replicas gives
 // the gateway the matching discovery entries.
-foreach (var replica in core.Concat(sales).Concat(worker))
+foreach (var replica in core.Concat(sales).Concat(worker).Concat(workflow))
     gateway.WithReference(replica).WaitFor(replica);
 
 builder.Build().Run();

@@ -17,7 +17,7 @@ using soft.square.net.WebApi.SharedKernel;
 namespace soft.square.net.WebApi.Modules.Content.Infrastructure;
 
 /// <summary>
-/// Content module (starter): presses, categories and articles with the newsroom workflow of the auth design. Tenant
+/// Contents module (starter): presses, categories and Posts with the newsroom workflow of the auth design. Tenant
 /// data (schema "content" in each tenant's database). Rights come from grants: standing ones (author, editor) from
 /// admins, shift ones (accept, assign, transfer, return, review, publish) from the shifts module's rota, so they
 /// hold only while the shift runs.
@@ -26,7 +26,7 @@ public sealed class ContentModule : IRuntimeModule
 {
     public ModuleManifest Manifest { get; } = new("content", "Content", "0.1.0", "content")
     {
-        Description = "Newsroom content (starter): presses, categories, articles and their review and publishing workflow.",
+        Description = "Newsroom posts (article, news, video, reportage, and other post kinds), taxonomy, review and publishing workflow.",
         DefaultSettings = new Dictionary<string, string?> { ["Content:OwnerEditWindow"] = "1.00:00:00" },
         Permissions = ContentPermissions.All
     };
@@ -34,8 +34,8 @@ public sealed class ContentModule : IRuntimeModule
     public void ConfigureServices(IServiceCollection services, IConfiguration settings)
     {
         services.Configure<ContentOptions>(settings.GetSection("Content"));
-        services.AddTenantDbContext<ContentDbContext>(); // IRepository<T> / IReadRepository<T> for Article, Press, Category
-        services.AddScoped<ArticleService>();
+        services.AddTenantDbContext<ContentDbContext>(); // IRepository<T> / IReadRepository<T> for Post, Press, Category
+        services.AddScoped<PostService>();
         services.AddScoped<TaxonomyService>();
     }
 }
@@ -46,7 +46,7 @@ public sealed class ContentDbContext(DbContextOptions<ContentDbContext> options,
 
     public DbSet<Press> Presses => Set<Press>();
     public DbSet<Category> Categories => Set<Category>();
-    public DbSet<Article> Articles => Set<Article>();
+    public DbSet<Post> Posts => Set<Post>();
 
     protected override void ConfigureModel(ModelBuilder modelBuilder)
     {
@@ -66,28 +66,37 @@ public sealed class ContentDbContext(DbContextOptions<ContentDbContext> options,
             category.HasIndex(c => c.PressId);
         });
 
-        modelBuilder.Entity<Article>(article =>
+        modelBuilder.Entity<Post>(post =>
         {
-            article.ToTable("articles");
-            article.Property(a => a.PressId).HasMaxLength(64);
-            article.Property(a => a.CategoryId).HasMaxLength(64);
-            article.Property(a => a.Title).HasMaxLength(300);
-            article.Property(a => a.OwnerId).HasMaxLength(128);
-            article.Property(a => a.State).HasConversion<string>().HasMaxLength(32);
-            article.Property(a => a.Version).IsConcurrencyToken();
-            foreach (var user in new[] { nameof(Article.AcceptedBy), nameof(Article.AssigneeId), nameof(Article.ReviewerId), nameof(Article.ScheduledBy), nameof(Article.PublishedBy) })
-                article.Property(user).HasMaxLength(128);
-            article.Property(a => a.AssignedShiftId).HasMaxLength(64);
-            article.Property(a => a.TransferredFromShift).HasMaxLength(64);
-            article.Ignore(a => a.Scopes);
-            article.HasIndex(a => new { a.State, a.CategoryId });
-            article.HasIndex(a => a.OwnerId);
-            article.HasIndex(a => a.AssigneeId);
-            article.HasMany(a => a.History).WithOne().HasForeignKey("ArticleId").OnDelete(DeleteBehavior.Cascade);
-            article.Navigation(a => a.History).UsePropertyAccessMode(PropertyAccessMode.Field);
+            // Retain deployed table/column names until an explicit data migration is planned.
+            post.ToTable("articles");
+            post.Property(a => a.PressId).HasMaxLength(64);
+            post.Property(a => a.CategoryId).HasMaxLength(64);
+            post.Property(a => a.Title).HasMaxLength(300);
+            post.Property(a => a.OwnerId).HasMaxLength(128);
+            post.Property(a => a.State).HasConversion<string>().HasMaxLength(32);
+            post.Property(a => a.PostKind).HasColumnName("Type").HasConversion<string>().HasMaxLength(32).HasDefaultValue(PostKind.Article);
+            post.Property(a => a.PublicId).HasMaxLength(32);
+            post.Property(a => a.SchemaId).HasMaxLength(128).HasDefaultValue("legacy.basic");
+            post.Property(a => a.SchemaVersion).HasDefaultValue(1);
+            post.Property(a => a.DocumentJson).HasDefaultValue("{}");
+            post.Property(a => a.PublishedDocumentJson);
+            post.Property(a => a.PublishedTitle).HasMaxLength(300);
+            post.Property(a => a.Version).IsConcurrencyToken();
+            foreach (var user in new[] { nameof(Post.AcceptedBy), nameof(Post.AssigneeId), nameof(Post.ReviewerId), nameof(Post.ScheduledBy), nameof(Post.PublishedBy) })
+                post.Property(user).HasMaxLength(128);
+            post.Property(a => a.AssignedShiftId).HasMaxLength(64);
+            post.Property(a => a.TransferredFromShift).HasMaxLength(64);
+            post.Ignore(a => a.Scopes);
+            post.HasIndex(a => new { a.State, a.CategoryId });
+            post.HasIndex(a => a.OwnerId);
+            post.HasIndex(a => a.AssigneeId);
+            post.HasIndex(a => a.PublicId).IsUnique();
+            post.HasMany(a => a.History).WithOne().HasForeignKey("ArticleId").OnDelete(DeleteBehavior.Cascade);
+            post.Navigation(a => a.History).UsePropertyAccessMode(PropertyAccessMode.Field);
         });
 
-        modelBuilder.Entity<ArticleEvent>(e =>
+        modelBuilder.Entity<PostEvent>(e =>
         {
             e.ToTable("article_history");
             e.Property(x => x.Actor).HasMaxLength(128);
@@ -123,7 +132,7 @@ public sealed class ContentEndpoints : ICarterModule
             catch (ContentNotFoundException e) { return Results.Problem(e.Message, statusCode: StatusCodes.Status404NotFound); }
             catch (ContentAccessDeniedException e) { return Results.Problem(e.Message, statusCode: StatusCodes.Status403Forbidden); }
             catch (ContentVersionConflictException e) { return Results.Problem(e.Message, statusCode: StatusCodes.Status409Conflict); }
-            catch (DbUpdateConcurrencyException) { return Results.Problem("Someone else changed this article first; reload it and try again.", statusCode: StatusCodes.Status409Conflict); }
+            catch (DbUpdateConcurrencyException) { return Results.Problem("Someone else changed this Post first; reload it and try again.", statusCode: StatusCodes.Status409Conflict); }
             catch (DomainException e) { return Results.Problem(e.Message, statusCode: StatusCodes.Status409Conflict); }
         });
 
@@ -134,40 +143,58 @@ public sealed class ContentEndpoints : ICarterModule
         content.MapPost("/categories", (CategoryDto category, TaxonomyService taxonomy, CancellationToken ct) => taxonomy.AddCategoryAsync(category, ct))
             .RequirePermission(ContentPermissions.Manage);
 
-        var articles = content.MapGroup("/articles");
+        MapPosts(content.MapGroup("/posts"), "posts");
+        MapPosts(content.MapGroup("/articles"), "articles"); // compatibility route
+        MapPosts(content.MapGroup("/works"), "works"); // compatibility route
+        content.MapGet("/public/{publicId}", (string publicId, PostService service, CancellationToken ct) => service.GetPublishedAsync(publicId, ct))
+            .WithSummary("Resolve the permanent Post URL; only the immutable published snapshot is returned.");
+    }
 
-        articles.MapGet("/", (ArticleView? view, ArticleService service, CancellationToken ct) => service.ListAsync(view ?? ArticleView.Mine, ct))
-            .WithSummary("?view=Mine (default) | Queue (accept/assign, on shift) | Review (assigned to you) | Desk (approved and scheduled).");
-        articles.MapGet("/{id:int}", (int id, ArticleService service, CancellationToken ct) => service.GetAsync(id, ct))
-            .WithSummary("The article with its history; visible to its owner, its assignee and those with a shift or editor right on its category.");
-        articles.MapPost("/", async (NewArticle request, ArticleService service, CancellationToken ct) =>
+    private static void MapPosts(RouteGroupBuilder posts, string resourceSegment)
+    {
+        posts.MapGet("/", (PostView? view, PostService service, CancellationToken ct) => service.ListAsync(view ?? PostView.Mine, ct))
+            .WithSummary("Posts by post kind: article, news, video, reportage, and more. ?view=Mine | Queue | Review | Desk.");
+        posts.MapGet("/{id:int}", (int id, PostService service, CancellationToken ct) => service.GetAsync(id, ct));
+        posts.MapPost("/", async (NewPost request, PostService service, CancellationToken ct) =>
             {
-                var article = await service.CreateAsync(request, ct);
-                return Results.Created($"articles/{article.Id}", article);
+                var post = await service.CreateAsync(request, ct);
+                return Results.Created($"{resourceSegment}/{post.Id}", post);
             })
-            .RequirePermission(ContentPermissions.Author)
-            .WithSummary("A draft in a category where you hold content.author.");
-        articles.MapPut("/{id:int}", (int id, ArticleEdit edit, ArticleService service, CancellationToken ct) => service.EditAsync(id, edit, ct))
-            .WithSummary("Owner (draft, returned, or within the edit window after submitting), assigned reviewer on shift, or Desk (cancels a schedule).");
+            .RequirePermission(ContentPermissions.Author);
+        posts.MapPut("/{id:int}", (int id, PostEdit edit, PostService service, CancellationToken ct) => service.EditAsync(id, edit, ct));
 
-        articles.MapPost("/{id:int}/submit", (int id, VersionRequest r, ArticleService s, CancellationToken ct) => s.SubmitAsync(id, r.Version, ct));
-        articles.MapPost("/{id:int}/accept", (int id, VersionRequest r, ArticleService s, CancellationToken ct) => s.AcceptAsync(id, r.Version, ct))
+        posts.MapPost("/{id:int}/submit", (int id, VersionRequest r, PostService s, CancellationToken ct) => s.SubmitAsync(id, r.Version, ct));
+        posts.MapPost("/{id:int}/accept", (int id, AcceptRequest r, PostService s, CancellationToken ct) => s.AcceptAsync(id, r, ct))
             .RequirePermission(ContentPermissions.Accept);
-        articles.MapPost("/{id:int}/assign", (int id, Assignment r, ArticleService s, CancellationToken ct) => s.AssignAsync(id, r, ct))
-            .RequirePermission(ContentPermissions.Assign)
-            .WithSummary("The assignee must be an Editor on an active shift covering the article; a racing assignment gets 409.");
-        articles.MapPost("/{id:int}/approve", (int id, VersionRequest r, ArticleService s, CancellationToken ct) => s.ApproveAsync(id, r.Version, ct))
+        posts.MapPost("/{id:int}/assign", (int id, Assignment r, PostService s, CancellationToken ct) => s.AssignAsync(id, r, ct))
+            .RequirePermission(ContentPermissions.Assign);
+        posts.MapPost("/{id:int}/approve", (int id, VersionRequest r, PostService s, CancellationToken ct) => s.ApproveAsync(id, r.Version, ct))
             .RequirePermission(ContentPermissions.Review);
-        articles.MapPost("/{id:int}/return", (int id, ReturnRequest r, ArticleService s, CancellationToken ct) => s.ReturnAsync(id, r.Version, r.Reason, ct))
+        posts.MapPost("/{id:int}/return", (int id, ReturnRequest r, PostService s, CancellationToken ct) => s.ReturnAsync(id, r.Version, r.Reason, ct))
             .RequirePermission(ContentPermissions.Return);
-        articles.MapPost("/{id:int}/transfer", (int id, TransferRequest r, ArticleService s, CancellationToken ct) => s.TransferAsync(id, r.Version, r.FromShift, ct))
+        posts.MapPost("/{id:int}/transfer", (int id, TransferRequest r, PostService s, CancellationToken ct) => s.TransferAsync(id, r.Version, r.FromShift, ct))
             .RequirePermission(ContentPermissions.Transfer);
-        articles.MapPost("/{id:int}/schedule", (int id, ScheduleRequest r, ArticleService s, CancellationToken ct) => s.ScheduleAsync(id, r.Version, r.PublishAt, ct))
+        posts.MapPost("/{id:int}/schedule", (int id, ScheduleRequest r, PostService s, CancellationToken ct) => s.ScheduleAsync(id, r.Version, r.PublishAt, ct))
             .RequirePermission(ContentPermissions.Publish);
-        articles.MapPost("/{id:int}/publish", (int id, VersionRequest r, ArticleService s, CancellationToken ct) => s.PublishAsync(id, r.Version, ct))
+        posts.MapPost("/{id:int}/publish", (int id, VersionRequest r, PostService s, CancellationToken ct) => s.PublishAsync(id, r.Version, ct))
             .RequirePermission(ContentPermissions.Publish);
-        articles.MapPost("/publish-due", (ArticleService s, CancellationToken ct) => s.PublishDueAsync(ct))
-            .RequirePermission(ContentPermissions.Publish)
-            .WithSummary("Publishes scheduled articles that are due and unchanged (for the workflow module; needs publish tenant-wide).");
+        posts.MapPost("/publish-due", (PostService s, CancellationToken ct) => s.PublishDueAsync(ct))
+            .RequirePermission(ContentPermissions.Publish);
+    }
+}
+
+public sealed class ContentAutomationEndpoints : ICarterModule
+{
+    public void AddRoutes(IEndpointRouteBuilder app)
+    {
+        app.MapGet("/automation/accepted", (PostService service, CancellationToken ct) => service.AcceptedForAutomationAsync(ct))
+            .RequirePermission(ContentPermissions.Assign)
+            .WithSummary("Accepted works available for Elsa's durable assignment-delay workflow.");
+        app.MapPost("/automation/accepted/{id:int}/assign", (int id, PostService service, CancellationToken ct) => service.AutoAssignAsync(id, ct))
+            .RequirePermission(ContentPermissions.Assign)
+            .WithSummary("Assign the accepted work to an eligible editor on an active shift; concurrency conflicts preserve a manager's assignment.");
+        app.MapPost("/automation/shifts/{shiftId}/handover", (string shiftId, PostService service, CancellationToken ct) => service.TransferShiftWorkAsync(shiftId, ct))
+            .RequirePermission(ContentPermissions.Transfer)
+            .WithSummary("Return all unfinished review work from the outgoing shift to the queue; safe to repeat after recovery.");
     }
 }

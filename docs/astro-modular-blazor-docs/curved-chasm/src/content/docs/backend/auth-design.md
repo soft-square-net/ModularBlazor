@@ -113,6 +113,9 @@ See also [Multitenancy across pools](/backend/multitenancy/).
 
 ## 7. Content workflow (the content module owns state)
 
+The Content module's domain structure, invariants, and module boundaries are described in the dedicated
+[Contents module section](/modules/contents/).
+
 ```mermaid
 flowchart TD
     Draft["Author creates a draft<br/>Can write outside a shift"] --> Submit["Submit for review"]
