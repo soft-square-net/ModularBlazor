@@ -1,0 +1,163 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Greeting",
+    "description": "Sample runtime module: own services, options, a private dependency and Carter endpoints.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "paths": {
+    "/api/greeting": {
+      "get": {
+        "tags": [
+          "Greeting"
+        ],
+        "operationId": "Greeting_GreetWorld",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GreetingResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/greeting/{name}": {
+      "get": {
+        "tags": [
+          "Greeting"
+        ],
+        "operationId": "Greeting_Greet",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GreetingResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/greeting/echo": {
+      "post": {
+        "tags": [
+          "Greeting"
+        ],
+        "operationId": "Greeting_Echo",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EchoRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EchoRequest"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "EchoRequest": {
+        "required": [
+          "text"
+        ],
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          }
+        }
+      },
+      "GreetingResponse": {
+        "required": [
+          "message",
+          "count",
+          "loaded"
+        ],
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "loaded": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "OAuth2": {
+        "type": "oauth2",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "http://localhost:5090/connect/authorize",
+            "tokenUrl": "http://localhost:5090/connect/token",
+            "scopes": {
+              "openid": "User identity",
+              "profile": "User profile",
+              "email": "User email",
+              "api": "Access to Modular WebApi",
+              "offline_access": "Refresh token"
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "OAuth2": [
+        "openid",
+        "profile",
+        "email",
+        "api"
+      ]
+    }
+  ],
+  "tags": [
+    {
+      "name": "Greeting"
+    }
+  ]
+}

@@ -1,0 +1,655 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "WebApi host",
+    "description": "Built-in endpoints of the WebApi host: the runtime module admin API, the pool probe and health. Each active module has its own document.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "paths": {
+    "/api/pool": {
+      "get": {
+        "tags": [
+          "Pool"
+        ],
+        "operationId": "Pool_Get",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PoolInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/modules": {
+      "get": {
+        "tags": [
+          "Module admin"
+        ],
+        "operationId": "Modules_List",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ModuleStatus"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Module admin"
+        ],
+        "summary": "Install: upload a .dll, .zip or .nupkg; the manifest is read and registered.",
+        "operationId": "Modules_Install",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "package"
+                ],
+                "type": "object",
+                "properties": {
+                  "package": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModuleRecord"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/modules/unloading": {
+      "get": {
+        "tags": [
+          "Module admin"
+        ],
+        "summary": "Unloaded modules whose assemblies are not collected yet.",
+        "operationId": "Modules_ListUnloading",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/modules/{id}/activate": {
+      "post": {
+        "tags": [
+          "Module admin"
+        ],
+        "summary": "Load the assembly (if needed), build its services and map its routes.",
+        "operationId": "Modules_Activate",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModuleStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/modules/{id}/deactivate": {
+      "post": {
+        "tags": [
+          "Module admin"
+        ],
+        "summary": "Remove the module's routes; it stays loaded.",
+        "operationId": "Modules_Deactivate",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModuleStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/modules/{id}/unload": {
+      "post": {
+        "tags": [
+          "Module admin"
+        ],
+        "summary": "Remove routes, stop hosted services, dispose services and unload the assembly. HotUnload = false: 409 unless ?deferred=true (released at the next restart).",
+        "operationId": "Modules_Unload",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "deferred",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnloadResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/modules/{id}/settings": {
+      "put": {
+        "tags": [
+          "Module admin"
+        ],
+        "summary": "Replace the module's settings; applied on its next load.",
+        "operationId": "Modules_UpdateSettings",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModuleRecord"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/modules/{id}": {
+      "delete": {
+        "tags": [
+          "Module admin"
+        ],
+        "summary": "Unload, delete the package and remove the registration. Core modules: 409 (deactivate or unload them instead). HotUnload = false: 409 unless ?deferred=true.",
+        "operationId": "Modules_Uninstall",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "deferred",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnloadResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "summary": "Health of this replica (Healthy, Degraded or Unhealthy).",
+        "operationId": "Health_Get",
+        "responses": {
+          "200": {
+            "description": "Healthy or Degraded"
+          },
+          "503": {
+            "description": "Unhealthy"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "HostedServiceState": {
+        "enum": [
+          "Starting",
+          "Running",
+          "Completed",
+          "Faulted",
+          "StartFailed",
+          "StartTimedOut",
+          "Stopping",
+          "Stopped",
+          "StopFailed",
+          "StopTimedOut"
+        ],
+        "type": "string"
+      },
+      "HostedServiceStatus": {
+        "required": [
+          "service",
+          "state",
+          "error"
+        ],
+        "type": "object",
+        "properties": {
+          "service": {
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/HostedServiceState"
+          },
+          "error": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ModuleRecord": {
+        "required": [
+          "id",
+          "name",
+          "version",
+          "routePrefix",
+          "entryAssembly"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "routePrefix": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "entryAssembly": {
+            "type": "string"
+          },
+          "settings": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "desiredState": {
+            "$ref": "#/components/schemas/ModuleState"
+          },
+          "installedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "core": {
+            "type": "boolean"
+          },
+          "packageHash": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PermissionDefinition"
+            }
+          },
+          "hotUnload": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ModuleState": {
+        "enum": [
+          "Installed",
+          "Active",
+          "Inactive"
+        ],
+        "type": "string"
+      },
+      "ModuleStatus": {
+        "required": [
+          "module",
+          "pool",
+          "instance",
+          "enabledInPool",
+          "loaded",
+          "routes"
+        ],
+        "type": "object",
+        "properties": {
+          "module": {
+            "$ref": "#/components/schemas/ModuleRecord"
+          },
+          "pool": {
+            "type": "string"
+          },
+          "instance": {
+            "type": "string"
+          },
+          "enabledInPool": {
+            "type": "boolean"
+          },
+          "loaded": {
+            "type": "boolean"
+          },
+          "routes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "loadedVersion": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "restartRequired": {
+            "type": "boolean"
+          },
+          "hostedServices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HostedServiceStatus"
+            }
+          }
+        }
+      },
+      "PermissionDefinition": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "PoolInfo": {
+        "required": [
+          "pool",
+          "role",
+          "enabledModules",
+          "instance",
+          "connections"
+        ],
+        "type": "object",
+        "properties": {
+          "pool": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "enabledModules": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "instance": {
+            "type": "string"
+          },
+          "connections": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "UnloadResult": {
+        "required": [
+          "id",
+          "unloaded",
+          "gcPasses",
+          "note"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "unloaded": {
+            "type": "boolean"
+          },
+          "gcPasses": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "note": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "OAuth2": {
+        "type": "oauth2",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "http://localhost:5090/connect/authorize",
+            "tokenUrl": "http://localhost:5090/connect/token",
+            "scopes": {
+              "openid": "User identity",
+              "profile": "User profile",
+              "email": "User email",
+              "api": "Access to Modular WebApi",
+              "offline_access": "Refresh token"
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "OAuth2": [
+        "openid",
+        "profile",
+        "email",
+        "api"
+      ]
+    }
+  ],
+  "tags": [
+    {
+      "name": "Pool"
+    },
+    {
+      "name": "Module admin"
+    },
+    {
+      "name": "Health"
+    }
+  ]
+}

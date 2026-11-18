@@ -1,0 +1,1454 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Content",
+    "description": "Newsroom posts (article, news, video, reportage, and other post kinds), taxonomy, review and publishing workflow.",
+    "version": "0.1.0"
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "paths": {
+    "/api/content/presses": {
+      "get": {
+        "tags": [
+          "Content"
+        ],
+        "operationId": "Content_ListPresses",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PressDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Content"
+        ],
+        "operationId": "Content_AddPress",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PressDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PressDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/content/categories": {
+      "get": {
+        "tags": [
+          "Content"
+        ],
+        "operationId": "Content_ListCategories",
+        "parameters": [
+          {
+            "name": "pressId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Content"
+        ],
+        "operationId": "Content_AddCategory",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/content/public/{publicId}": {
+      "get": {
+        "tags": [
+          "Content"
+        ],
+        "summary": "Resolve the permanent Post URL; only the immutable published snapshot is returned.",
+        "operationId": "Content_GetPublishedPost",
+        "parameters": [
+          {
+            "name": "publicId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublishedPost"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/content/posts": {
+      "get": {
+        "tags": [
+          "Content"
+        ],
+        "summary": "Posts by post kind: article, news, video, reportage, and more. ?view=Mine | Queue | Review | Desk.",
+        "operationId": "Content_ListPosts",
+        "parameters": [
+          {
+            "name": "view",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PostView"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PostSummary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Content"
+        ],
+        "operationId": "Content_CreatePost",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewPost"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/content/posts/{id}": {
+      "get": {
+        "tags": [
+          "Content"
+        ],
+        "operationId": "Content_GetPost",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostDetail"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Content"
+        ],
+        "operationId": "Content_EditPost",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostEdit"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/content/posts/{id}/submit": {
+      "post": {
+        "tags": [
+          "Content"
+        ],
+        "operationId": "Content_SubmitPost",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VersionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/content/posts/{id}/accept": {
+      "post": {
+        "tags": [
+          "Content"
+        ],
+        "operationId": "Content_AcceptPost",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/content/posts/{id}/assign": {
+      "post": {
+        "tags": [
+          "Content"
+        ],
+        "operationId": "Content_AssignPost",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Assignment"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/content/posts/{id}/approve": {
+      "post": {
+        "tags": [
+          "Content"
+        ],
+        "operationId": "Content_ApprovePost",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VersionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/content/posts/{id}/return": {
+      "post": {
+        "tags": [
+          "Content"
+        ],
+        "operationId": "Content_ReturnPost",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReturnRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/content/posts/{id}/transfer": {
+      "post": {
+        "tags": [
+          "Content"
+        ],
+        "operationId": "Content_TransferPost",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransferRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/content/posts/{id}/schedule": {
+      "post": {
+        "tags": [
+          "Content"
+        ],
+        "operationId": "Content_SchedulePost",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScheduleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/content/posts/{id}/publish": {
+      "post": {
+        "tags": [
+          "Content"
+        ],
+        "operationId": "Content_PublishPost",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VersionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/content/posts/publish-due": {
+      "post": {
+        "tags": [
+          "Content"
+        ],
+        "operationId": "Content_PublishDuePosts",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "format": "int32"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/content/automation/accepted": {
+      "get": {
+        "tags": [
+          "Content"
+        ],
+        "summary": "Accepted works available for Elsa's durable assignment-delay workflow.",
+        "operationId": "Content_ListAcceptedForAutomation",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PostSummary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/content/automation/accepted/{id}/assign": {
+      "post": {
+        "tags": [
+          "Content"
+        ],
+        "summary": "Assign the accepted work to an eligible editor on an active shift; concurrency conflicts preserve a manager's assignment.",
+        "operationId": "Content_AutoAssignPost",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/content/automation/shifts/{shiftId}/handover": {
+      "post": {
+        "tags": [
+          "Content"
+        ],
+        "summary": "Return all unfinished review work from the outgoing shift to the queue; safe to repeat after recovery.",
+        "operationId": "Content_HandOverShiftWork",
+        "parameters": [
+          {
+            "name": "shiftId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AcceptRequest": {
+        "required": [
+          "version",
+          "shiftId"
+        ],
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "shiftId": {
+            "type": "string"
+          }
+        }
+      },
+      "Assignment": {
+        "required": [
+          "version",
+          "assigneeId",
+          "shiftId"
+        ],
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "assigneeId": {
+            "type": "string"
+          },
+          "shiftId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "CategoryDto": {
+        "required": [
+          "id",
+          "pressId",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "pressId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "JsonElement": { },
+      "NewPost": {
+        "required": [
+          "categoryId",
+          "title",
+          "body"
+        ],
+        "type": "object",
+        "properties": {
+          "categoryId": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "body": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "postKind": {
+            "$ref": "#/components/schemas/PostKind"
+          },
+          "document": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PostDocument"
+              }
+            ]
+          }
+        }
+      },
+      "PostDetail": {
+        "required": [
+          "id",
+          "postKind",
+          "pressId",
+          "categoryId",
+          "title",
+          "body",
+          "ownerId",
+          "state",
+          "version",
+          "createdAt",
+          "updatedAt",
+          "submittedAt",
+          "ownerMayEdit",
+          "acceptedBy",
+          "acceptedAt",
+          "acceptedShiftId",
+          "assigneeId",
+          "assignedShiftId",
+          "reviewerId",
+          "scheduledFor",
+          "scheduledBy",
+          "publishedAt",
+          "publishedBy",
+          "publishedTitle",
+          "publishedBody",
+          "transferredFromShift",
+          "history",
+          "publicId",
+          "permalink",
+          "schemaId",
+          "schemaVersion",
+          "document"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "postKind": {
+            "$ref": "#/components/schemas/PostKind"
+          },
+          "pressId": {
+            "type": "string"
+          },
+          "categoryId": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "ownerId": {
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/PostState"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "submittedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "ownerMayEdit": {
+            "type": "boolean"
+          },
+          "acceptedBy": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "acceptedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "acceptedShiftId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "assigneeId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "assignedShiftId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "reviewerId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "scheduledFor": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "scheduledBy": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "publishedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "publishedBy": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "publishedTitle": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "publishedBody": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "transferredFromShift": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "history": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PostEventDto"
+            }
+          },
+          "publicId": {
+            "type": "string"
+          },
+          "permalink": {
+            "type": "string"
+          },
+          "schemaId": {
+            "type": "string"
+          },
+          "schemaVersion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "document": {
+            "$ref": "#/components/schemas/PostDocument"
+          }
+        }
+      },
+      "PostDocument": {
+        "required": [
+          "schemaId",
+          "schemaVersion",
+          "content",
+          "style",
+          "children"
+        ],
+        "type": "object",
+        "properties": {
+          "schemaId": {
+            "type": "string"
+          },
+          "schemaVersion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "content": {
+            "$ref": "#/components/schemas/JsonElement"
+          },
+          "style": {
+            "$ref": "#/components/schemas/JsonElement"
+          },
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PostNode"
+            }
+          }
+        }
+      },
+      "PostEdit": {
+        "required": [
+          "version",
+          "title",
+          "body"
+        ],
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string"
+          },
+          "body": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "document": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PostDocument"
+              }
+            ]
+          }
+        }
+      },
+      "PostEventDto": {
+        "required": [
+          "at",
+          "actor",
+          "action",
+          "state",
+          "detail"
+        ],
+        "type": "object",
+        "properties": {
+          "at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "actor": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/PostState"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "PostKind": {
+        "enum": [
+          "Article",
+          "News",
+          "Video",
+          "Reportage",
+          "PhotoStory",
+          "Other"
+        ],
+        "type": "string"
+      },
+      "PostNode": {
+        "required": [
+          "nodeId",
+          "postKind",
+          "schemaId",
+          "schemaVersion",
+          "content",
+          "style",
+          "children"
+        ],
+        "type": "object",
+        "properties": {
+          "nodeId": {
+            "type": "string"
+          },
+          "postKind": {
+            "$ref": "#/components/schemas/PostKind"
+          },
+          "schemaId": {
+            "type": "string"
+          },
+          "schemaVersion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "content": {
+            "$ref": "#/components/schemas/JsonElement"
+          },
+          "style": {
+            "$ref": "#/components/schemas/JsonElement"
+          },
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PostNode"
+            }
+          }
+        }
+      },
+      "PostState": {
+        "enum": [
+          "Draft",
+          "Submitted",
+          "Accepted",
+          "InReview",
+          "Returned",
+          "Approved",
+          "Scheduled",
+          "AwaitingDeskReapproval",
+          "Published"
+        ],
+        "type": "string"
+      },
+      "PostSummary": {
+        "required": [
+          "id",
+          "postKind",
+          "pressId",
+          "categoryId",
+          "title",
+          "ownerId",
+          "state",
+          "version",
+          "acceptedAt",
+          "acceptedShiftId",
+          "assigneeId",
+          "submittedAt",
+          "scheduledFor",
+          "transferredFromShift",
+          "updatedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "postKind": {
+            "$ref": "#/components/schemas/PostKind"
+          },
+          "pressId": {
+            "type": "string"
+          },
+          "categoryId": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "ownerId": {
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/PostState"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "acceptedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "acceptedShiftId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "assigneeId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "submittedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "scheduledFor": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "transferredFromShift": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PostView": {
+        "enum": [
+          "Mine",
+          "Queue",
+          "Review",
+          "Desk",
+          null
+        ]
+      },
+      "PressDto": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "PublishedPost": {
+        "required": [
+          "id",
+          "publicId",
+          "permalink",
+          "postKind",
+          "pressId",
+          "categoryId",
+          "title",
+          "publishedAt",
+          "schemaId",
+          "schemaVersion",
+          "document"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "publicId": {
+            "type": "string"
+          },
+          "permalink": {
+            "type": "string"
+          },
+          "postKind": {
+            "$ref": "#/components/schemas/PostKind"
+          },
+          "pressId": {
+            "type": "string"
+          },
+          "categoryId": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "schemaId": {
+            "type": "string"
+          },
+          "schemaVersion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "document": {
+            "$ref": "#/components/schemas/PostDocument"
+          }
+        }
+      },
+      "ReturnRequest": {
+        "required": [
+          "version",
+          "reason"
+        ],
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ScheduleRequest": {
+        "required": [
+          "version",
+          "publishAt"
+        ],
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "publishAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "TransferRequest": {
+        "required": [
+          "version",
+          "fromShift"
+        ],
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fromShift": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "VersionRequest": {
+        "required": [
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "OAuth2": {
+        "type": "oauth2",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "http://localhost:5090/connect/authorize",
+            "tokenUrl": "http://localhost:5090/connect/token",
+            "scopes": {
+              "openid": "User identity",
+              "profile": "User profile",
+              "email": "User email",
+              "api": "Access to Modular WebApi",
+              "offline_access": "Refresh token"
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "OAuth2": [
+        "openid",
+        "profile",
+        "email",
+        "api"
+      ]
+    }
+  ],
+  "tags": [
+    {
+      "name": "Content"
+    }
+  ]
+}

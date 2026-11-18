@@ -1,0 +1,51 @@
+{
+  "runtime": "Net100",
+  "defaultVariables": "Document=../../Core/WebApi.Modules.Core.Tenancy/openapi/tenancy.json,Output=Generated/TenancyClient.g.cs",
+  "documentGenerator": {
+    "fromDocument": {
+      "url": "$(Document)"
+    }
+  },
+  "codeGenerators": {
+    "openApiToCSharpClient": {
+      "namespace": "soft.square.net.WebApi.Modules.Core.Tenancy.Client",
+      "className": "{controller}Client",
+      "operationGenerationMode": "MultipleClientsFromOperationId",
+      "generateClientClasses": true,
+      "generateClientInterfaces": true,
+      "generateDtoTypes": true,
+      "generateExceptionClasses": true,
+      "exceptionClass": "TenancyApiException",
+      "injectHttpClient": true,
+      "disposeHttpClient": false,
+      "useBaseUrl": false,
+      "generateBaseUrlProperty": false,
+      "generateSyncMethods": false,
+      "generateOptionalParameters": true,
+      "generateResponseClasses": false,
+      "wrapResponses": false,
+      "clientClassAccessModifier": "public",
+      "typeAccessModifier": "public",
+      "jsonLibrary": "SystemTextJson",
+      "jsonLibraryVersion": 8.0,
+      "generateNullableReferenceTypes": true,
+      "generateOptionalPropertiesAsNullable": true,
+      "generateNativeRecords": false,
+      "classStyle": "Poco",
+      "dateType": "System.DateTimeOffset",
+      "dateTimeType": "System.DateTimeOffset",
+      "arrayType": "System.Collections.Generic.IReadOnlyList",
+      "arrayInstanceType": "System.Collections.Generic.List",
+      "responseArrayType": "System.Collections.Generic.IReadOnlyList",
+      "parameterArrayType": "System.Collections.Generic.IEnumerable",
+      "dictionaryType": "System.Collections.Generic.IDictionary",
+      "dictionaryInstanceType": "System.Collections.Generic.Dictionary",
+      "anyType": "System.Text.Json.JsonElement",
+      "excludedTypeNames": [ "JsonElement" ],
+      "additionalNamespaceUsages": [ "System.Text.Json" ],
+      "generateDefaultValues": true,
+      "enumStyle": "Enum",
+      "output": "$(Output)"
+    }
+  }
+}
