@@ -69,7 +69,11 @@ sidebar:
 | `identity` | `GET /api/identity/me` (دون دخول؛ ومع صلاحيات المستدعي حين يكون مسجلا)، و`/users`، و`/users/{userName}` | مسجل الدخول |
 | `identity` | `GET /api/identity/permissions` (الفهرس)، و`GET`/`POST /api/identity/grants`، و`DELETE /api/identity/grants/{id}` | `access.grants.manage` |
 | `tenancy` | `GET /api/tenancy/tenants`، و`/tenants/{id}`، و`/current` | مسجل الدخول |
-| `tenancy` | `POST /api/tenancy/tenants`، و`PATCH /api/tenancy/tenants/{id}`، و`POST /api/tenancy/tenants/{id}/provision` | `platform.tenants.manage` |
+| `tenancy` | `POST /api/tenancy/tenants`، و`PATCH /api/tenancy/tenants/{id}`، و`POST /api/tenancy/tenants/{id}/activate`، و`/suspend`، و`/provision` | `platform.tenants.manage` |
+| `tenancy` | `GET /api/tenancy/subscriptions` (التقرير)، و`GET`/`POST /api/tenancy/tenants/{id}/subscriptions`، و`POST …/subscriptions/{subscriptionId}/extend`، و`/cancel` | `platform.tenants.manage` |
+
+الاشتراكات للعلم فقط: انتهاء الاشتراك لا يعلّق المستأجر أبدًا، بل يعلّقه المسؤول يدويًا. العميل المكتوب للوحدة الأساسية:
+`WebApi.Modules.Core.Tenancy.Client` (`TenancyClient`).
 
 قواعد المستأجرين (الترويسات ورموز الحالة) في [المستأجرون وبياناتهم](/ar/backend/tenancy-data/).
 

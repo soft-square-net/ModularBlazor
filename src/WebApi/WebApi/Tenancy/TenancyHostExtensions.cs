@@ -39,6 +39,8 @@ public static class TenancyHostExtensions
             var store = databases.Store;
             services.AddDbContext<TenantStoreDbContext>(options => TenantStoreDbContext.Configure(options, store));
             services.AddScoped<TenantRegistry>();
+            services.AddScoped<TenantSubscriptions>();
+            services.TryAddSingleton(TimeProvider.System);
         }
 
         services.TryAddSingleton<ITenantChangeBus, NullTenantChangeBus>();

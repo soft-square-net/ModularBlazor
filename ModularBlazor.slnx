@@ -80,6 +80,8 @@
     <Project Path="modules/client/Module.ToDo/Module.ToDo.csproj" />
   </Folder>
   <Folder Name="/src/WebApi/">
+    <Project Path="src/WebApi/WebApi.Client/WebApi.Client.csproj" />
+    <Project Path="src/WebApi/Modules/Core.Clients/WebApi.Modules.Core.Tenancy.Client/WebApi.Modules.Core.Tenancy.Client.csproj" />
     <Project Path="src/WebApi/WebApi.Contracts/WebApi.Contracts.csproj" />
     <Project Path="src/WebApi/WebApi.Data/WebApi.Data.csproj" />
     <Project Path="src/WebApi/WebApi.SharedKernel/WebApi.SharedKernel.csproj" />

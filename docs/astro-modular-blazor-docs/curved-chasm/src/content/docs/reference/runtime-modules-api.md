@@ -65,7 +65,10 @@ Unload and uninstall return `{ id, unloaded, gcPasses, note }` for the answering
 
 Module documents are also the source of each module's typed client: `src/WebApi/scripts/Export-ModuleOpenApi.ps1`
 saves one to `<Module>/openapi/<id>.json` without the lab, and NSwag generates the client from it
-([Typed clients for the module](/backend/create-a-module/#typed-clients-for-the-module)).
+([Typed clients for the module](/backend/create-a-module/#typed-clients-for-the-module)). The host document works the
+same way (`-HostDocument`, saved to `src/WebApi/openapi/webapi.json`): `src/WebApi/WebApi.Client` has `ModulesClient`
+for every admin endpoint above, `PoolClient` and `HealthClient`
+([The host's own client](/backend/create-a-module/#the-hosts-own-client-module-management)).
 
 The OpenAPI and Scalar endpoints are anonymous and exist in Development, or when `OpenApi:Enabled=true`. Behind the gateway's
 `/pools/{pool}/` routes, document URLs carry that prefix (from `X-Forwarded-Prefix`). How it works:
@@ -78,7 +81,13 @@ The OpenAPI and Scalar endpoints are anonymous and exist in Development, or when
 | `identity` | `GET /api/identity/me` (anonymous; with the caller's permissions when signed in), `/users`, `/users/{userName}` | signed in |
 | `identity` | `GET /api/identity/permissions` (catalog), `GET`/`POST /api/identity/grants`, `DELETE /api/identity/grants/{id}` | `access.grants.manage` |
 | `tenancy` | `GET /api/tenancy/tenants`, `/tenants/{id}`, `/current` | signed in |
-| `tenancy` | `POST /api/tenancy/tenants`, `PATCH /api/tenancy/tenants/{id}`, `POST /api/tenancy/tenants/{id}/provision` | `platform.tenants.manage` |
+| `tenancy` | `POST /api/tenancy/tenants`, `PATCH /api/tenancy/tenants/{id}`, `POST /api/tenancy/tenants/{id}/activate`, `/suspend`, `/provision` | `platform.tenants.manage` |
+| `tenancy` | `GET /api/tenancy/subscriptions` (report), `GET`/`POST /api/tenancy/tenants/{id}/subscriptions`, `POST …/subscriptions/{subscriptionId}/extend`, `/cancel` | `platform.tenants.manage` |
+
+Subscriptions are informational: an ended one never suspends a tenant
+([Tenant subscriptions](/backend/tenancy-data/#tenant-subscriptions)). The core modules' typed clients:
+`WebApi.Modules.Core.Tenancy.Client` (`TenancyClient`), generated from
+`Modules/Core/WebApi.Modules.Core.Tenancy/openapi/tenancy.json` (`Export-ModuleOpenApi.ps1 -CoreModuleId tenancy`).
 
 Tenant rules (headers, status codes) are in [Tenancy and tenant data](/backend/tenancy-data/#resolution-rules).
 

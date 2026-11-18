@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="D:\ASP\Claude\Blazor WASM Modular Project\_repo\src\WebApi\WebApi.Client\WebApi.Client.csproj" />
+    <ProjectReference Include="D:\ASP\Claude\Blazor WASM Modular Project\_repo\src\WebApi\Modules\Custom\WebApi.Modules.Greeting.Client\WebApi.Modules.Greeting.Client.csproj" />
+  </ItemGroup>
+</Project>

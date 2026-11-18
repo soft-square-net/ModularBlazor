@@ -8,15 +8,17 @@ public sealed class PoolEndpoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/pool", (IOptions<ModuleRuntimeOptions> options, IConfiguration configuration) => new
-            {
+        app.MapGet("/api/pool", (IOptions<ModuleRuntimeOptions> options, IConfiguration configuration) => new PoolInfo(
                 options.Value.Pool,
-                Role = options.Value.Role.ToString(),
-                EnabledModules = options.Value.Enabled.Length == 0 ? ["*"] : options.Value.Enabled,
-                Instance = ModuleInstance.Id,
+                options.Value.Role.ToString(),
+                options.Value.Enabled.Length == 0 ? ["*"] : options.Value.Enabled,
+                ModuleInstance.Id,
                 // Names only, never the values: which infrastructure this instance was wired to.
-                Connections = configuration.GetSection("ConnectionStrings").GetChildren().Select(c => c.Key).Order().ToArray()
-            })
-            .WithTags("Pool");
+                configuration.GetSection("ConnectionStrings").GetChildren().Select(c => c.Key).Order().ToArray()))
+            .WithTags("Pool")
+            .WithName("Pool_Get"); // operation id: PoolClient.GetAsync in the generated host client
     }
 }
+
+/// <summary>A named type (not an anonymous one) so the OpenAPI document and the generated client get a schema.</summary>
+public sealed record PoolInfo(string Pool, string Role, IReadOnlyList<string> EnabledModules, string Instance, IReadOnlyList<string> Connections);

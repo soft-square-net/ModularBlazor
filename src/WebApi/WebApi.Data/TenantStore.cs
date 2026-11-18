@@ -39,6 +39,34 @@ public sealed class AccessGrantRecord
 }
 
 /// <summary>
+/// A subscription row (schema "platform", table "tenant_subscriptions"): a period [StartsAt, EndsAt) of one tenant.
+/// Informational: nothing in the request path reads it; admins suspend tenants by hand.
+/// </summary>
+public sealed class TenantSubscriptionRecord
+{
+    public Guid Id { get; set; }
+    public string TenantId { get; set; } = "";
+    public DateTimeOffset StartsAt { get; set; }
+    public DateTimeOffset EndsAt { get; set; }
+    public string? Plan { get; set; }
+    public string? Notes { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+    public string? CreatedBy { get; set; }
+    public DateTimeOffset? CancelledAt { get; set; }
+    public string? CancelledBy { get; set; }
+    public string? CancelReason { get; set; }
+
+    public SubscriptionState StateAt(DateTimeOffset now) =>
+        CancelledAt is not null ? SubscriptionState.Cancelled
+        : now < StartsAt ? SubscriptionState.Upcoming
+        : now < EndsAt ? SubscriptionState.Current
+        : SubscriptionState.Ended;
+
+    public TenantSubscription ToContract(DateTimeOffset now) =>
+        new(Id, TenantId, StartsAt, EndsAt, Plan, Notes, StateAt(now), CreatedAt, CreatedBy, CancelledAt, CancelledBy, CancelReason);
+}
+
+/// <summary>
 /// The tenant store: the registry of tenants (ConnectionStrings:TenantStore). Its schema belongs to the host, which
 /// reads it on every replica of every pool and migrates it on startup; the tenancy core module writes to it.
 /// </summary>
@@ -49,6 +77,8 @@ public sealed class TenantStoreDbContext(DbContextOptions<TenantStoreDbContext> 
     public DbSet<TenantRecord> Tenants => Set<TenantRecord>();
 
     public DbSet<AccessGrantRecord> AccessGrants => Set<AccessGrantRecord>();
+
+    public DbSet<TenantSubscriptionRecord> Subscriptions => Set<TenantSubscriptionRecord>();
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
         ModuleIsolation.ConfigureHistoryTable(optionsBuilder, Schema);
@@ -109,6 +139,31 @@ public sealed class TenantStoreDbContext(DbContextOptions<TenantStoreDbContext> 
                     v => v.HasValue ? v.Value.UtcDateTime : (DateTime?)null,
                     v => v.HasValue ? new DateTimeOffset(DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)) : null);
                 grant.Property(g => g.ValidTo).HasConversion(
+                    v => v.HasValue ? v.Value.UtcDateTime : (DateTime?)null,
+                    v => v.HasValue ? new DateTimeOffset(DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)) : null);
+            }
+        });
+
+        modelBuilder.Entity<TenantSubscriptionRecord>(subscription =>
+        {
+            subscription.ToTable("tenant_subscriptions");
+            subscription.HasKey(s => s.Id);
+            subscription.Property(s => s.TenantId).HasMaxLength(64);
+            subscription.Property(s => s.Plan).HasMaxLength(100);
+            subscription.Property(s => s.Notes).HasMaxLength(1000);
+            subscription.Property(s => s.CreatedBy).HasMaxLength(128);
+            subscription.Property(s => s.CancelledBy).HasMaxLength(128);
+            subscription.Property(s => s.CancelReason).HasMaxLength(500);
+            subscription.HasOne<TenantRecord>().WithMany().HasForeignKey(s => s.TenantId).OnDelete(DeleteBehavior.Cascade);
+            subscription.HasIndex(s => new { s.TenantId, s.StartsAt });
+            subscription.HasIndex(s => s.EndsAt); // the report: what ends soon
+
+            if (provider == DatabaseProvider.MySql)
+            {
+                subscription.Property(s => s.StartsAt).HasConversion(v => v.UtcDateTime, v => new DateTimeOffset(DateTime.SpecifyKind(v, DateTimeKind.Utc)));
+                subscription.Property(s => s.EndsAt).HasConversion(v => v.UtcDateTime, v => new DateTimeOffset(DateTime.SpecifyKind(v, DateTimeKind.Utc)));
+                subscription.Property(s => s.CreatedAt).HasConversion(v => v.UtcDateTime, v => new DateTimeOffset(DateTime.SpecifyKind(v, DateTimeKind.Utc)));
+                subscription.Property(s => s.CancelledAt).HasConversion(
                     v => v.HasValue ? v.Value.UtcDateTime : (DateTime?)null,
                     v => v.HasValue ? new DateTimeOffset(DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)) : null);
             }

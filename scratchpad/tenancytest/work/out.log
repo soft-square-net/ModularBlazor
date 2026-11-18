@@ -1,0 +1,484 @@
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (5ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT 1
+info: Microsoft.EntityFrameworkCore.Migrations[20411]
+      Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (14ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      DECLARE @result int;
+      EXEC @result = sp_getapplock @Resource = '__EFMigrationsLock', @LockOwner = 'Session', @LockMode = 'Exclusive';
+      SELECT @result
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      IF OBJECT_ID(N'[platform].[__EFMigrationsHistory]') IS NULL
+      BEGIN
+          IF SCHEMA_ID(N'platform') IS NULL EXEC(N'CREATE SCHEMA [platform];');
+          CREATE TABLE [platform].[__EFMigrationsHistory] (
+              [MigrationId] nvarchar(150) NOT NULL,
+              [ProductVersion] nvarchar(32) NOT NULL,
+              CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])
+          );
+      END;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT OBJECT_ID(N'[platform].[__EFMigrationsHistory]');
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [MigrationId], [ProductVersion]
+      FROM [platform].[__EFMigrationsHistory]
+      ORDER BY [MigrationId];
+info: Microsoft.EntityFrameworkCore.Migrations[20402]
+      Applying migration '20261111175343_InitialTenantStore'.
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      IF SCHEMA_ID(N'platform') IS NULL EXEC(N'CREATE SCHEMA [platform];');
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      CREATE TABLE [platform].[tenants] (
+          [Id] nvarchar(64) NOT NULL,
+          [Name] nvarchar(200) NOT NULL,
+          [Status] nvarchar(20) NOT NULL,
+          [Hosts] nvarchar(2000) NOT NULL,
+          [DatabaseServer] nvarchar(100) NOT NULL,
+          [DatabaseName] nvarchar(63) NOT NULL,
+          [CreatedAt] datetimeoffset NOT NULL,
+          [UpdatedAt] datetimeoffset NOT NULL,
+          CONSTRAINT [PK_tenants] PRIMARY KEY ([Id])
+      );
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      INSERT INTO [platform].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+      VALUES (N'20261111175343_InitialTenantStore', N'10.0.14');
+info: Microsoft.EntityFrameworkCore.Migrations[20402]
+      Applying migration '20261111204539_AddAccessGrants'.
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      CREATE TABLE [platform].[access_grants] (
+          [Id] uniqueidentifier NOT NULL,
+          [TenantId] nvarchar(64) NOT NULL,
+          [UserId] nvarchar(128) NOT NULL,
+          [Permission] nvarchar(128) NOT NULL,
+          [Scope] nvarchar(200) NOT NULL,
+          [ValidFrom] datetimeoffset NULL,
+          [ValidTo] datetimeoffset NULL,
+          [Source] nvarchar(100) NOT NULL,
+          [CreatedAt] datetimeoffset NOT NULL,
+          [CreatedBy] nvarchar(128) NULL,
+          CONSTRAINT [PK_access_grants] PRIMARY KEY ([Id])
+      );
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      CREATE INDEX [IX_access_grants_TenantId_Source] ON [platform].[access_grants] ([TenantId], [Source]);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      CREATE INDEX [IX_access_grants_TenantId_UserId] ON [platform].[access_grants] ([TenantId], [UserId]);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      INSERT INTO [platform].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+      VALUES (N'20261111204539_AddAccessGrants', N'10.0.14');
+info: Microsoft.EntityFrameworkCore.Migrations[20402]
+      Applying migration '20261118102221_AddTenantSubscriptions'.
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      CREATE TABLE [platform].[tenant_subscriptions] (
+          [Id] uniqueidentifier NOT NULL,
+          [TenantId] nvarchar(64) NOT NULL,
+          [StartsAt] datetimeoffset NOT NULL,
+          [EndsAt] datetimeoffset NOT NULL,
+          [Plan] nvarchar(100) NULL,
+          [Notes] nvarchar(1000) NULL,
+          [CreatedAt] datetimeoffset NOT NULL,
+          [CreatedBy] nvarchar(128) NULL,
+          [CancelledAt] datetimeoffset NULL,
+          [CancelledBy] nvarchar(128) NULL,
+          [CancelReason] nvarchar(500) NULL,
+          CONSTRAINT [PK_tenant_subscriptions] PRIMARY KEY ([Id]),
+          CONSTRAINT [FK_tenant_subscriptions_tenants_TenantId] FOREIGN KEY ([TenantId]) REFERENCES [platform].[tenants] ([Id]) ON DELETE CASCADE
+      );
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      CREATE INDEX [IX_tenant_subscriptions_EndsAt] ON [platform].[tenant_subscriptions] ([EndsAt]);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      CREATE INDEX [IX_tenant_subscriptions_TenantId_StartsAt] ON [platform].[tenant_subscriptions] ([TenantId], [StartsAt]);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      INSERT INTO [platform].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+      VALUES (N'20261118102221_AddTenantSubscriptions', N'10.0.14');
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      DECLARE @result int;
+      EXEC @result = sp_releaseapplock @Resource = '__EFMigrationsLock', @LockOwner = 'Session';
+      SELECT @result
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Id], [t].[CreatedAt], [t].[DatabaseName], [t].[DatabaseServer], [t].[Hosts], [t].[Name], [t].[Status], [t].[UpdatedAt]
+      FROM [platform].[tenants] AS [t]
+      ORDER BY [t].[Id]
+info: soft.square.net.WebApi.Tenancy.TenantDirectory[0]
+      Tenant directory loaded: 0 tenants (0 changed)
+info: soft.square.net.WebApi.Modularity.ModuleRuntime[0]
+      Seeded core module identity 1.1.0 (new)
+info: soft.square.net.WebApi.Modularity.ModuleRuntime[0]
+      Seeded core module tenancy 2.1.0 (new)
+info: soft.square.net.WebApi.Modularity.ModuleRuntime[0]
+      Loaded module identity 1.1.0 in pool all (Api)
+info: soft.square.net.WebApi.Modularity.ModuleRuntime[0]
+      Mapped 7 endpoints of module identity in pool all
+info: soft.square.net.WebApi.Modularity.ModuleRuntime[0]
+      Loaded module tenancy 2.1.0 in pool all (Api)
+info: soft.square.net.WebApi.Modularity.ModuleRuntime[0]
+      Mapped 13 endpoints of module tenancy in pool all
+info: soft.square.net.WebApi.Modules.Core.Tenancy.TenantSeeder[0]
+      Created database tenant-acme for tenant acme
+info: Microsoft.Hosting.Lifetime[14]
+      Now listening on: http://127.0.0.1:5397
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: D:\ASP\Claude\Blazor WASM Modular Project\_repo\src\WebApi\WebApi
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@tenant_Id='?' (Size = 64)], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [platform].[tenants] AS [t]
+              WHERE [t].[Id] = @tenant_Id) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@p0='?' (Size = 64), @p1='?' (DbType = DateTimeOffset), @p2='?' (Size = 63), @p3='?' (Size = 100), @p4='?' (Size = 2000), @p5='?' (Size = 200), @p6='?' (Size = 20), @p7='?' (DbType = DateTimeOffset)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      INSERT INTO [platform].[tenants] ([Id], [CreatedAt], [DatabaseName], [DatabaseServer], [Hosts], [Name], [Status], [UpdatedAt])
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Id], [t].[CreatedAt], [t].[DatabaseName], [t].[DatabaseServer], [t].[Hosts], [t].[Name], [t].[Status], [t].[UpdatedAt]
+      FROM [platform].[tenants] AS [t]
+      ORDER BY [t].[Id]
+info: soft.square.net.WebApi.Tenancy.TenantDirectory[0]
+      Tenant directory loaded: 1 tenants (1 changed)
+info: soft.square.net.WebApi.Modules.Core.Tenancy.TenantSeeder[0]
+      Seeded tenant acme
+info: soft.square.net.WebApi.Modules.Core.Tenancy.TenantSeeder[0]
+      Created database tenant-globex for tenant globex
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@tenant_Id='?' (Size = 64)], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [platform].[tenants] AS [t]
+              WHERE [t].[Id] = @tenant_Id) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (Size = 64), @p1='?' (DbType = DateTimeOffset), @p2='?' (Size = 63), @p3='?' (Size = 100), @p4='?' (Size = 2000), @p5='?' (Size = 200), @p6='?' (Size = 20), @p7='?' (DbType = DateTimeOffset)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      INSERT INTO [platform].[tenants] ([Id], [CreatedAt], [DatabaseName], [DatabaseServer], [Hosts], [Name], [Status], [UpdatedAt])
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Id], [t].[CreatedAt], [t].[DatabaseName], [t].[DatabaseServer], [t].[Hosts], [t].[Name], [t].[Status], [t].[UpdatedAt]
+      FROM [platform].[tenants] AS [t]
+      ORDER BY [t].[Id]
+info: soft.square.net.WebApi.Tenancy.TenantDirectory[0]
+      Tenant directory loaded: 2 tenants (1 changed)
+info: soft.square.net.WebApi.Modules.Core.Tenancy.TenantSeeder[0]
+      Seeded tenant globex
+info: soft.square.net.WebApi.Modules.Core.Tenancy.TenancyEndpoints[0]
+      Created database tenant-subtest for tenant subtest
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@tenant_Id='?' (Size = 64)], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [platform].[tenants] AS [t]
+              WHERE [t].[Id] = @tenant_Id) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p0='?' (Size = 64), @p1='?' (DbType = DateTimeOffset), @p2='?' (Size = 63), @p3='?' (Size = 100), @p4='?' (Size = 2000), @p5='?' (Size = 200), @p6='?' (Size = 20), @p7='?' (DbType = DateTimeOffset)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      INSERT INTO [platform].[tenants] ([Id], [CreatedAt], [DatabaseName], [DatabaseServer], [Hosts], [Name], [Status], [UpdatedAt])
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Id], [t].[CreatedAt], [t].[DatabaseName], [t].[DatabaseServer], [t].[Hosts], [t].[Name], [t].[Status], [t].[UpdatedAt]
+      FROM [platform].[tenants] AS [t]
+      ORDER BY [t].[Id]
+info: soft.square.net.WebApi.Tenancy.TenantDirectory[0]
+      Tenant directory loaded: 3 tenants (1 changed)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Id], [t].[CreatedAt], [t].[DatabaseName], [t].[DatabaseServer], [t].[Hosts], [t].[Name], [t].[Status], [t].[UpdatedAt]
+      FROM [platform].[tenants] AS [t]
+      ORDER BY [t].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Id], [t].[CancelReason], [t].[CancelledAt], [t].[CancelledBy], [t].[CreatedAt], [t].[CreatedBy], [t].[EndsAt], [t].[Notes], [t].[Plan], [t].[StartsAt], [t].[TenantId]
+      FROM [platform].[tenant_subscriptions] AS [t]
+      WHERE [t].[CancelledAt] IS NULL
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@tenantId='?' (Size = 64)], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [platform].[tenants] AS [t]
+              WHERE [t].[Id] = @tenantId) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@tenantId='?' (Size = 64)], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Id], [t].[CancelReason], [t].[CancelledAt], [t].[CancelledBy], [t].[CreatedAt], [t].[CreatedBy], [t].[EndsAt], [t].[Notes], [t].[Plan], [t].[StartsAt], [t].[TenantId]
+      FROM [platform].[tenant_subscriptions] AS [t]
+      WHERE [t].[TenantId] = @tenantId AND [t].[CancelledAt] IS NULL
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@p0='?' (DbType = Guid), @p1='?' (Size = 500), @p2='?' (DbType = DateTimeOffset), @p3='?' (Size = 128), @p4='?' (DbType = DateTimeOffset), @p5='?' (Size = 128), @p6='?' (DbType = DateTimeOffset), @p7='?' (Size = 1000), @p8='?' (Size = 100), @p9='?' (DbType = DateTimeOffset), @p10='?' (Size = 64)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      INSERT INTO [platform].[tenant_subscriptions] ([Id], [CancelReason], [CancelledAt], [CancelledBy], [CreatedAt], [CreatedBy], [EndsAt], [Notes], [Plan], [StartsAt], [TenantId])
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@tenantId='?' (Size = 64)], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [platform].[tenants] AS [t]
+              WHERE [t].[Id] = @tenantId) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@tenantId='?' (Size = 64)], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Id], [t].[CancelReason], [t].[CancelledAt], [t].[CancelledBy], [t].[CreatedAt], [t].[CreatedBy], [t].[EndsAt], [t].[Notes], [t].[Plan], [t].[StartsAt], [t].[TenantId]
+      FROM [platform].[tenant_subscriptions] AS [t]
+      WHERE [t].[TenantId] = @tenantId AND [t].[CancelledAt] IS NULL
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@tenantId='?' (Size = 64)], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [platform].[tenants] AS [t]
+              WHERE [t].[Id] = @tenantId) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@tenantId='?' (Size = 64)], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [platform].[tenants] AS [t]
+              WHERE [t].[Id] = @tenantId) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@tenantId='?' (Size = 64)], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [platform].[tenants] AS [t]
+              WHERE [t].[Id] = @tenantId) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@tenantId='?' (Size = 64)], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Id], [t].[CancelReason], [t].[CancelledAt], [t].[CancelledBy], [t].[CreatedAt], [t].[CreatedBy], [t].[EndsAt], [t].[Notes], [t].[Plan], [t].[StartsAt], [t].[TenantId]
+      FROM [platform].[tenant_subscriptions] AS [t]
+      WHERE [t].[TenantId] = @tenantId AND [t].[CancelledAt] IS NULL
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p0='?' (DbType = Guid), @p1='?' (Size = 500), @p2='?' (DbType = DateTimeOffset), @p3='?' (Size = 128), @p4='?' (DbType = DateTimeOffset), @p5='?' (Size = 128), @p6='?' (DbType = DateTimeOffset), @p7='?' (Size = 1000), @p8='?' (Size = 100), @p9='?' (DbType = DateTimeOffset), @p10='?' (Size = 64)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      INSERT INTO [platform].[tenant_subscriptions] ([Id], [CancelReason], [CancelledAt], [CancelledBy], [CreatedAt], [CreatedBy], [EndsAt], [Notes], [Plan], [StartsAt], [TenantId])
+      VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Id], [t].[CreatedAt], [t].[DatabaseName], [t].[DatabaseServer], [t].[Hosts], [t].[Name], [t].[Status], [t].[UpdatedAt]
+      FROM [platform].[tenants] AS [t]
+      ORDER BY [t].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Id], [t].[CancelReason], [t].[CancelledAt], [t].[CancelledBy], [t].[CreatedAt], [t].[CreatedBy], [t].[EndsAt], [t].[Notes], [t].[Plan], [t].[StartsAt], [t].[TenantId]
+      FROM [platform].[tenant_subscriptions] AS [t]
+      WHERE [t].[CancelledAt] IS NULL
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Id], [t].[CreatedAt], [t].[DatabaseName], [t].[DatabaseServer], [t].[Hosts], [t].[Name], [t].[Status], [t].[UpdatedAt]
+      FROM [platform].[tenants] AS [t]
+      ORDER BY [t].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Id], [t].[CancelReason], [t].[CancelledAt], [t].[CancelledBy], [t].[CreatedAt], [t].[CreatedBy], [t].[EndsAt], [t].[Notes], [t].[Plan], [t].[StartsAt], [t].[TenantId]
+      FROM [platform].[tenant_subscriptions] AS [t]
+      WHERE [t].[CancelledAt] IS NULL
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@id='?' (DbType = Guid), @tenantId='?' (Size = 64)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [t].[Id], [t].[CancelReason], [t].[CancelledAt], [t].[CancelledBy], [t].[CreatedAt], [t].[CreatedBy], [t].[EndsAt], [t].[Notes], [t].[Plan], [t].[StartsAt], [t].[TenantId]
+      FROM [platform].[tenant_subscriptions] AS [t]
+      WHERE [t].[Id] = @id AND [t].[TenantId] = @tenantId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@tenantId='?' (Size = 64), @except='?' (DbType = Guid)], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Id], [t].[CancelReason], [t].[CancelledAt], [t].[CancelledBy], [t].[CreatedAt], [t].[CreatedBy], [t].[EndsAt], [t].[Notes], [t].[Plan], [t].[StartsAt], [t].[TenantId]
+      FROM [platform].[tenant_subscriptions] AS [t]
+      WHERE [t].[TenantId] = @tenantId AND [t].[CancelledAt] IS NULL AND [t].[Id] <> @except
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@id='?' (DbType = Guid), @tenantId='?' (Size = 64)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [t].[Id], [t].[CancelReason], [t].[CancelledAt], [t].[CancelledBy], [t].[CreatedAt], [t].[CreatedBy], [t].[EndsAt], [t].[Notes], [t].[Plan], [t].[StartsAt], [t].[TenantId]
+      FROM [platform].[tenant_subscriptions] AS [t]
+      WHERE [t].[Id] = @id AND [t].[TenantId] = @tenantId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@id='?' (DbType = Guid), @tenantId='?' (Size = 64)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [t].[Id], [t].[CancelReason], [t].[CancelledAt], [t].[CancelledBy], [t].[CreatedAt], [t].[CreatedBy], [t].[EndsAt], [t].[Notes], [t].[Plan], [t].[StartsAt], [t].[TenantId]
+      FROM [platform].[tenant_subscriptions] AS [t]
+      WHERE [t].[Id] = @id AND [t].[TenantId] = @tenantId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@tenantId='?' (Size = 64), @except='?' (DbType = Guid)], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Id], [t].[CancelReason], [t].[CancelledAt], [t].[CancelledBy], [t].[CreatedAt], [t].[CreatedBy], [t].[EndsAt], [t].[Notes], [t].[Plan], [t].[StartsAt], [t].[TenantId]
+      FROM [platform].[tenant_subscriptions] AS [t]
+      WHERE [t].[TenantId] = @tenantId AND [t].[CancelledAt] IS NULL AND [t].[Id] <> @except
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@p1='?' (DbType = Guid), @p0='?' (DbType = DateTimeOffset)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      UPDATE [platform].[tenant_subscriptions] SET [EndsAt] = @p0
+      OUTPUT 1
+      WHERE [Id] = @p1;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@id='?' (DbType = Guid), @tenantId='?' (Size = 64)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [t].[Id], [t].[CancelReason], [t].[CancelledAt], [t].[CancelledBy], [t].[CreatedAt], [t].[CreatedBy], [t].[EndsAt], [t].[Notes], [t].[Plan], [t].[StartsAt], [t].[TenantId]
+      FROM [platform].[tenant_subscriptions] AS [t]
+      WHERE [t].[Id] = @id AND [t].[TenantId] = @tenantId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@p3='?' (DbType = Guid), @p0='?' (Size = 500), @p1='?' (DbType = DateTimeOffset), @p2='?' (Size = 128)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      UPDATE [platform].[tenant_subscriptions] SET [CancelReason] = @p0, [CancelledAt] = @p1, [CancelledBy] = @p2
+      OUTPUT 1
+      WHERE [Id] = @p3;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@id='?' (DbType = Guid), @tenantId='?' (Size = 64)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [t].[Id], [t].[CancelReason], [t].[CancelledAt], [t].[CancelledBy], [t].[CreatedAt], [t].[CreatedBy], [t].[EndsAt], [t].[Notes], [t].[Plan], [t].[StartsAt], [t].[TenantId]
+      FROM [platform].[tenant_subscriptions] AS [t]
+      WHERE [t].[Id] = @id AND [t].[TenantId] = @tenantId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@id='?' (DbType = Guid), @tenantId='?' (Size = 64)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [t].[Id], [t].[CancelReason], [t].[CancelledAt], [t].[CancelledBy], [t].[CreatedAt], [t].[CreatedBy], [t].[EndsAt], [t].[Notes], [t].[Plan], [t].[StartsAt], [t].[TenantId]
+      FROM [platform].[tenant_subscriptions] AS [t]
+      WHERE [t].[Id] = @id AND [t].[TenantId] = @tenantId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@id='?' (DbType = Guid), @tenantId='?' (Size = 64)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [t].[Id], [t].[CancelReason], [t].[CancelledAt], [t].[CancelledBy], [t].[CreatedAt], [t].[CreatedBy], [t].[EndsAt], [t].[Notes], [t].[Plan], [t].[StartsAt], [t].[TenantId]
+      FROM [platform].[tenant_subscriptions] AS [t]
+      WHERE [t].[Id] = @id AND [t].[TenantId] = @tenantId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Id], [t].[CreatedAt], [t].[DatabaseName], [t].[DatabaseServer], [t].[Hosts], [t].[Name], [t].[Status], [t].[UpdatedAt]
+      FROM [platform].[tenants] AS [t]
+      ORDER BY [t].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Id], [t].[CancelReason], [t].[CancelledAt], [t].[CancelledBy], [t].[CreatedAt], [t].[CreatedBy], [t].[EndsAt], [t].[Notes], [t].[Plan], [t].[StartsAt], [t].[TenantId]
+      FROM [platform].[tenant_subscriptions] AS [t]
+      WHERE [t].[CancelledAt] IS NULL
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@tenantId='?' (Size = 64)], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [platform].[tenants] AS [t]
+              WHERE [t].[Id] = @tenantId) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@tenantId='?' (Size = 64)], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Id], [t].[CancelReason], [t].[CancelledAt], [t].[CancelledBy], [t].[CreatedAt], [t].[CreatedBy], [t].[EndsAt], [t].[Notes], [t].[Plan], [t].[StartsAt], [t].[TenantId]
+      FROM [platform].[tenant_subscriptions] AS [t]
+      WHERE [t].[TenantId] = @tenantId
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@tenantId='?' (Size = 64)], CommandType='Text', CommandTimeout='30']
+      SELECT CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM [platform].[tenants] AS [t]
+              WHERE [t].[Id] = @tenantId) THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit)
+      END
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@id='?' (Size = 64)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [t].[Id], [t].[CreatedAt], [t].[DatabaseName], [t].[DatabaseServer], [t].[Hosts], [t].[Name], [t].[Status], [t].[UpdatedAt]
+      FROM [platform].[tenants] AS [t]
+      WHERE [t].[Id] = @id
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p2='?' (Size = 64), @p0='?' (Size = 20), @p1='?' (DbType = DateTimeOffset)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      UPDATE [platform].[tenants] SET [Status] = @p0, [UpdatedAt] = @p1
+      OUTPUT 1
+      WHERE [Id] = @p2;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Id], [t].[CreatedAt], [t].[DatabaseName], [t].[DatabaseServer], [t].[Hosts], [t].[Name], [t].[Status], [t].[UpdatedAt]
+      FROM [platform].[tenants] AS [t]
+      ORDER BY [t].[Id]
+info: soft.square.net.WebApi.Tenancy.TenantDirectory[0]
+      Tenant directory loaded: 3 tenants (1 changed)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Id], [t].[CreatedAt], [t].[DatabaseName], [t].[DatabaseServer], [t].[Hosts], [t].[Name], [t].[Status], [t].[UpdatedAt]
+      FROM [platform].[tenants] AS [t]
+      ORDER BY [t].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Id], [t].[CancelReason], [t].[CancelledAt], [t].[CancelledBy], [t].[CreatedAt], [t].[CreatedBy], [t].[EndsAt], [t].[Notes], [t].[Plan], [t].[StartsAt], [t].[TenantId]
+      FROM [platform].[tenant_subscriptions] AS [t]
+      WHERE [t].[CancelledAt] IS NULL
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@id='?' (Size = 64)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [t].[Id], [t].[CreatedAt], [t].[DatabaseName], [t].[DatabaseServer], [t].[Hosts], [t].[Name], [t].[Status], [t].[UpdatedAt]
+      FROM [platform].[tenants] AS [t]
+      WHERE [t].[Id] = @id
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p2='?' (Size = 64), @p0='?' (Size = 20), @p1='?' (DbType = DateTimeOffset)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      UPDATE [platform].[tenants] SET [Status] = @p0, [UpdatedAt] = @p1
+      OUTPUT 1
+      WHERE [Id] = @p2;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Id], [t].[CreatedAt], [t].[DatabaseName], [t].[DatabaseServer], [t].[Hosts], [t].[Name], [t].[Status], [t].[UpdatedAt]
+      FROM [platform].[tenants] AS [t]
+      ORDER BY [t].[Id]
+info: soft.square.net.WebApi.Tenancy.TenantDirectory[0]
+      Tenant directory loaded: 3 tenants (1 changed)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@id='?' (Size = 64)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [t].[Id], [t].[CreatedAt], [t].[DatabaseName], [t].[DatabaseServer], [t].[Hosts], [t].[Name], [t].[Status], [t].[UpdatedAt]
+      FROM [platform].[tenants] AS [t]
+      WHERE [t].[Id] = @id
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@id='?' (Size = 64)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [t].[Id], [t].[CreatedAt], [t].[DatabaseName], [t].[DatabaseServer], [t].[Hosts], [t].[Name], [t].[Status], [t].[UpdatedAt]
+      FROM [platform].[tenants] AS [t]
+      WHERE [t].[Id] = @id
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p3='?' (Size = 64), @p0='?' (Size = 2000), @p1='?' (Size = 200), @p2='?' (DbType = DateTimeOffset)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      UPDATE [platform].[tenants] SET [Hosts] = @p0, [Name] = @p1, [UpdatedAt] = @p2
+      OUTPUT 1
+      WHERE [Id] = @p3;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Id], [t].[CreatedAt], [t].[DatabaseName], [t].[DatabaseServer], [t].[Hosts], [t].[Name], [t].[Status], [t].[UpdatedAt]
+      FROM [platform].[tenants] AS [t]
+      ORDER BY [t].[Id]
+info: soft.square.net.WebApi.Tenancy.TenantDirectory[0]
+      Tenant directory loaded: 3 tenants (1 changed)

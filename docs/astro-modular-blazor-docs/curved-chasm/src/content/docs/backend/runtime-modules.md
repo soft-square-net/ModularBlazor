@@ -45,7 +45,7 @@ container, swap and broadcast); they differ in how they arrive:
 | Module | Project (`Modules/Core/`) | Routes |
 | --- | --- | --- |
 | `identity` 1.1.0 | `WebApi.Modules.Core.Identity` | `GET /api/identity/me` (with permissions), `/users`, `/users/{userName}`; grant admin `GET`/`POST /grants`, `DELETE /grants/{id}`; `GET /permissions` (the permission catalog). See [Authentication: implementation](/backend/auth-implementation/) |
-| `tenancy` 2.1.0 | `WebApi.Modules.Core.Tenancy` | `GET /api/tenancy/tenants`, `/tenants/{id}`, `/current`; `POST /tenants` (provisions the database), `PATCH /tenants/{id}` (rename, hosts, suspend), `POST /tenants/{id}/provision` (repair). See [Tenancy and tenant data](/backend/tenancy-data/) |
+| `tenancy` 2.2.0 | `WebApi.Modules.Core.Tenancy` | `GET /api/tenancy/tenants`, `/tenants/{id}`, `/current`; `POST /tenants` (provisions the database), `PATCH /tenants/{id}` (rename, hosts, suspend), `POST /tenants/{id}/activate`, `/suspend`, `/provision` (repair); subscriptions (`GET /subscriptions` report, `/tenants/{id}/subscriptions` add, extend, cancel; informational only). See [Tenancy and tenant data](/backend/tenancy-data/) |
 
 **Seeding.** On startup, before the first sync, each replica registers every shipped core package under the catalog
 lock, so concurrent replicas seed once:

@@ -124,9 +124,39 @@ the session's own schema the tenant's. Provisioning creates the user, grants `CR
 
 - Oracle: the server account needs `CREATE USER`, `ALTER USER`, `GRANT ANY PRIVILEGE` and `EXECUTE` on `DBMS_LOCK`
   (the lab uses SYSTEM). SQL Server provisioning needs `CREATE DATABASE`.
-- Verified at runtime: tenant databases on all four engines. The tenant store on SQL Server, MySQL and Oracle is only
-  generated and model-checked; the lab keeps it on PostgreSQL.
+- Verified at runtime: tenant databases on all four engines, and the tenant store on PostgreSQL (the lab) and SQL Server
+  (LocalDB, with subscriptions). The tenant store on MySQL and Oracle is only generated and model-checked.
 - Provision with a privileged account and serve tenants with a least-privilege one (not modelled yet).
+
+## Tenant subscriptions
+
+A subscription is a period a tenant has paid for (or was granted): from `startsAt` (inclusive) to `endsAt` (exclusive),
+with an optional plan and notes. Subscriptions live in the tenant store (table `platform.tenant_subscriptions`), next to
+the tenants, so every replica could read them without a tenant database.
+
+**They are informational only.** When a subscription ends, nothing happens by itself: the tenant keeps working. The
+report lists the tenants an admin should look at, and the admin suspends a tenant by hand
+(`POST /api/tenancy/tenants/{id}/suspend`). Tenant resolution never reads subscriptions.
+
+| Rule | Answer when broken |
+| --- | --- |
+| The end is after the start | 400 |
+| A tenant's subscriptions that are not cancelled never overlap (back-to-back is fine) | 409 |
+| Extending only moves the end later, and not into the next subscription | 400 / 409 |
+| A cancelled subscription stays in the history, no longer counts, and frees its period; it cannot be extended or cancelled again | 409 |
+
+| Endpoint (all need `platform.tenants.manage`) | Does |
+| --- | --- |
+| `GET /api/tenancy/subscriptions?endingWithinDays=30` | The report: every tenant with its current and next subscription, `endsAt` (the end of the current subscription, followed through the ones that start exactly where it ends), `daysLeft`, `lastEndedAt` and `needsAttention` |
+| `GET /api/tenancy/tenants/{id}/subscriptions` | The tenant's subscriptions, oldest first, cancelled ones included; each has a `state`: `Upcoming`, `Current`, `Ended` or `Cancelled` |
+| `POST /api/tenancy/tenants/{id}/subscriptions` | New subscription: `{ startsAt, endsAt, plan?, notes? }` → 201 |
+| `POST /api/tenancy/tenants/{id}/subscriptions/{subscriptionId}/extend` | `{ endsAt }`: a renewal of the same period |
+| `POST /api/tenancy/tenants/{id}/subscriptions/{subscriptionId}/cancel` | `{ reason? }`: records who cancelled and when |
+| `POST /api/tenancy/tenants/{id}/activate`, `/suspend` | The tenant's status, as actions (the same change as `PATCH` with `status`) |
+
+`needsAttention` is true for an **Active** tenant that nothing covers now, or whose covered time ends within
+`endingWithinDays`. Suspended tenants never need attention. The admin client module calls these through
+`TenancyClient` ([typed clients](/backend/create-a-module/#typed-clients-for-the-module)).
 
 ## Adding tenant data to a module
 
@@ -158,4 +188,5 @@ tenant. Messages carry the tenant in the `tenant` header (`TenancyNames.MessageH
 
 ## Not covered yet
 
-Per-tenant module enablement (plans), per-tenant module settings, and dropping a module's schema on uninstall.
+Per-tenant module enablement (plans), per-tenant module settings, dropping a module's schema on uninstall, and enforcing
+subscriptions (by design they are informational; an admin suspends by hand).

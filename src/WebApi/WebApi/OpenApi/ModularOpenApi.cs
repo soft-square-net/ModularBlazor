@@ -45,6 +45,7 @@ internal static partial class ModularOpenApi
     {
       options.ShouldInclude = description => ModuleOf(description) is null;
       options.AddSchemaTransformer(PlainNumbers);
+      options.AddDocumentTransformer(InlineFileUploads);
       options.AddDocumentTransformer((document, _, _) =>
           {
 
@@ -63,6 +64,7 @@ internal static partial class ModularOpenApi
               {
                 [HttpMethod.Get] = new()
                 {
+                  OperationId = "Health_Get", // HealthClient.GetAsync in the generated host client
                   Summary = "Health of this replica (Healthy, Degraded or Unhealthy).",
                   Tags = new HashSet<OpenApiTagReference> { new("Health", document) },
                   Responses = new OpenApiResponses
@@ -80,6 +82,7 @@ internal static partial class ModularOpenApi
     services.AddOpenApi(ModuleSlot, options =>
     {
       options.AddSchemaTransformer(PlainNumbers);
+      options.AddDocumentTransformer(InlineFileUploads);
       options.AddDocumentTransformer((document, _, _) =>
       {
         AddOAuthSecurity(document);
@@ -226,6 +229,33 @@ internal static partial class ModularOpenApi
   /// <c>"News"</c>). They get <c>"type": "string"</c>.</item>
   /// </list>
   /// </summary>
+  /// <summary>
+  /// Uploads (<c>IFormFile</c> form fields) are described inline as <c>{"type": "string", "format": "binary"}</c> instead
+  /// of a reference to an <c>IFormFile</c> component: NSwag only emits its <c>FileParameter</c> type for inline binary
+  /// fields, so with the reference the generated client does not compile.
+  /// </summary>
+  private static Task InlineFileUploads(OpenApiDocument document, OpenApiDocumentTransformerContext context, CancellationToken cancellationToken)
+  {
+    var fileSchemas = new[] { "IFormFile", "IFormFileCollection" };
+    var operations = document.Paths?.Values.SelectMany(p => p.Operations?.Values.AsEnumerable() ?? []) ?? [];
+    foreach (var operation in operations)
+    {
+      foreach (var media in operation.RequestBody?.Content?.Values.AsEnumerable() ?? [])
+      {
+        if (media.Schema?.Properties is not { } properties) continue;
+        foreach (var (name, property) in properties.ToArray().Select(p => (p.Key, p.Value)))
+        {
+          if (property is OpenApiSchemaReference { Reference.Id: { } id } && fileSchemas.Contains(id))
+            properties[name] = id == "IFormFile"
+                ? new OpenApiSchema { Type = JsonSchemaType.String, Format = "binary" }
+                : new OpenApiSchema { Type = JsonSchemaType.Array, Items = new OpenApiSchema { Type = JsonSchemaType.String, Format = "binary" } };
+        }
+      }
+    }
+    foreach (var id in fileSchemas) document.Components?.Schemas?.Remove(id);
+    return Task.CompletedTask;
+  }
+
   private static Task PlainNumbers(OpenApiSchema schema, OpenApiSchemaTransformerContext context, CancellationToken cancellationToken)
   {
     if (schema.Type is { } type && type.HasFlag(JsonSchemaType.String) &&

@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="D:\ASP\Claude\Blazor WASM Modular Project\_repo\src\WebApi\Modules\Core.Clients\WebApi.Modules.Core.Tenancy.Client\WebApi.Modules.Core.Tenancy.Client.csproj" />
+  </ItemGroup>
+</Project>

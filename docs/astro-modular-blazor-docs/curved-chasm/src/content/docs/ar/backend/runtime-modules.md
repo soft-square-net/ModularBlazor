@@ -40,7 +40,7 @@ sidebar:
 | الوحدة | المشروع (`Modules/Core/`) | المسارات |
 | --- | --- | --- |
 | `identity` 1.1.0 | `WebApi.Modules.Core.Identity` | `GET /api/identity/me` (مع الصلاحيات)، و`/users`، و`/users/{userName}`؛ وإدارة المنح `GET`/`POST /grants` و`DELETE /grants/{id}`؛ و`GET /permissions` (فهرس الصلاحيات). انظر [المصادقة: التنفيذ](/ar/backend/auth-implementation/) |
-| `tenancy` 2.1.0 | `WebApi.Modules.Core.Tenancy` | `GET /api/tenancy/tenants`، و`/tenants/{id}`، و`/current`؛ و`POST /tenants` (يجهز قاعدة البيانات)، و`PATCH /tenants/{id}` (إعادة التسمية، والمضيفون، والتعليق)، و`POST /tenants/{id}/provision` (إصلاح). انظر [المستأجرون وبياناتهم](/ar/backend/tenancy-data/) |
+| `tenancy` 2.2.0 | `WebApi.Modules.Core.Tenancy` | `GET /api/tenancy/tenants`، و`/tenants/{id}`، و`/current`؛ و`POST /tenants` (يجهز قاعدة البيانات)، و`PATCH /tenants/{id}` (إعادة التسمية، والمضيفون، والتعليق)، و`POST /tenants/{id}/activate` و`/suspend` و`/provision` (إصلاح)؛ والاشتراكات (`GET /subscriptions` تقرير، و`/tenants/{id}/subscriptions` إضافة وتمديد وإلغاء؛ للعلم فقط). انظر [المستأجرون وبياناتهم](/ar/backend/tenancy-data/) |
 
 **البذر.** عند البدء، وقبل أول مزامنة، تسجل كل نسخة كل حزمة أساسية مشحونة تحت قفل الفهرس، فتبذر النسخ المتزامنة مرة واحدة:
 

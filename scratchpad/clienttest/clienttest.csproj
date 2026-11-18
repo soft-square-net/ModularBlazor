@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net10.0</TargetFramework><Nullable>enable</Nullable><ImplicitUsings>enable</ImplicitUsings><NoWarn>CS0436</NoWarn></PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="D:/ASP/Claude/Blazor WASM Modular Project/_repo/src/WebApi/Modules/Custom/Content/WebApi.Modules.Content.Client/WebApi.Modules.Content.Client.csproj" Aliases="client" />
+    <ProjectReference Include="D:/ASP/Claude/Blazor WASM Modular Project/_repo/src/WebApi/Modules/Custom/Content/WebApi.Modules.Content.Application/WebApi.Modules.Content.Application.csproj" Aliases="server" />
+    <ProjectReference Include="D:/ASP/Claude/Blazor WASM Modular Project/_repo/src/WebApi/Modules/Custom/Content/WebApi.Modules.Content.Domain/WebApi.Modules.Content.Domain.csproj" Aliases="server" />
+    <ProjectReference Include="D:/ASP/Claude/Blazor WASM Modular Project/_repo/src/WebApi/WebApi.SharedKernel/WebApi.SharedKernel.csproj" />
+    <ProjectReference Include="D:/ASP/Claude/Blazor WASM Modular Project/_repo/src/WebApi/WebApi.Contracts/WebApi.Contracts.csproj" />
+  </ItemGroup>
+</Project>

@@ -804,9 +804,43 @@ Every custom module has a client today:
 | Greeting | `WebApi.Modules.Greeting/openapi/greeting.json` | `WebApi.Modules.Greeting.Client` | `GreetingClient` (3) |
 | Pulse | `WebApi.Modules.Pulse/openapi/pulse.json` | `WebApi.Modules.Pulse.Client` | `PulseClient` (1: `/status`) |
 
+Core modules work the same way, with two differences. They are active as soon as the host starts, so the export
+installs nothing: `Export-ModuleOpenApi.ps1 -CoreModuleId tenancy` writes
+`Modules/Core/WebApi.Modules.Core.Tenancy/openapi/tenancy.json`. And their clients live in `Modules/Core.Clients/`,
+because the WebApi build ships every `Modules/Core/*/*.csproj` as a core module. Today that is
+`WebApi.Modules.Core.Tenancy.Client` (`TenancyClient`, 13 operations: tenants, activate and suspend, provisioning,
+subscriptions and the subscription report).
+
 Routes served by a module's private pipeline (`IModulePipeline`, like Pulse's `/ping`, `/whoami`, `/beats` and `/echo`)
 sit behind one catch-all endpoint that the host leaves out of OpenAPI, so they get no client methods. Expose a route as a
 Carter endpoint when a client needs it.
+
+### The host's own client: module management
+
+The host's built-in endpoints (the module admin API, `/api/pool`, `/health`) have their own document and client, built
+the same way. The project is `src/WebApi/WebApi.Client`, and the document is `src/WebApi/openapi/webapi.json`. Export it
+with `-HostDocument` (no module is installed):
+
+```powershell
+./src/WebApi/scripts/Export-ModuleOpenApi.ps1 -HostDocument          # add -Check in CI
+```
+
+| Client | Methods |
+| --- | --- |
+| `ModulesClient` | `ListAsync`, `ListUnloadingAsync`, `InstallAsync(FileParameter)`, `ActivateAsync`, `DeactivateAsync`, `UnloadAsync(id, deferred)`, `UpdateSettingsAsync`, `UninstallAsync(id, deferred)` |
+| `PoolClient` | `GetAsync` (`PoolInfo`: pool, role, enabled modules, instance) |
+| `HealthClient` | `GetAsync` (throws `WebApiException` with status 503 when the replica is unhealthy) |
+
+```csharp
+var modules = new ModulesClient(http);   // http: the "ModularBlazor.API" client, signed in as a platform admin
+await using var zip = File.OpenRead("greeting.zip");
+var record = await modules.InstallAsync(new FileParameter(zip, "greeting.zip", "application/zip"));
+var status = await modules.ActivateAsync(record.Id!);   // status.Routes: the live routes on the replica that answered
+```
+
+Lifecycle errors (unknown module, prefix in use, `HotUnload = false` without `deferred`) arrive as `WebApiException`
+with the status code and the problem-details body. Uploads are described inline as `"format": "binary"` (the host's
+OpenAPI setup does this for every `IFormFile`), which is what makes NSwag generate `FileParameter`.
 
 ### Why NSwag
 
@@ -821,7 +855,9 @@ For TypeScript (Astro islands), generate types from the same document with `open
 with `openapi-fetch`.
 
 The old `src/ModularBlazor.Abstractions/Api/ApiClient.cs` was generated from the previous API
-(`http://localhost:5100/openapi/v1.json`) and does not cover the runtime modules.
+(`http://localhost:5100/openapi/v1.json`) and does not cover the runtime modules. The hand-written `IModuleAdminApi`
+behind the Blazor "Module Management" page also calls the previous API (`/api/v1/modules/...`); the runtime lifecycle
+is in `WebApi.Client`'s `ModulesClient`.
 
 ## Making it a core module instead
 
