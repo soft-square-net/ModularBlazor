@@ -3,8 +3,6 @@ title: Definition model and nested field types
 description: Proposed versioned form, field component, nesting, and metadata model for Dynamic Fields.
 ---
 
-# Definition model and nested field types
-
 ## Core records
 
 | Record | Responsibility | Lifecycle |
@@ -73,7 +71,7 @@ Keep validation schema and display metadata separate in the exported package. Th
 }
 ```
 
-`presentation` carries optional labels, descriptions, help text, ordering, grouping, and references to declarative visibility rules. It must not contain executable expressions, raw HTML, CSS, or a frontend component name. The schema defines the data contract; frontends can render it differently without changing validation. See [Conditional visibility](./conditional-visibility/) for the rule model and hidden-value semantics.
+`presentation` carries optional labels, descriptions, help text, ordering, grouping, and references to declarative visibility rules. It must not contain executable expressions, raw HTML, CSS, or a frontend component name. The schema defines the data contract; frontends can render it differently without changing validation. See [Conditional visibility](/modules/dynamic-fields/conditional-visibility/) for the rule model and hidden-value semantics.
 
 ## Nested field rules
 
@@ -87,6 +85,6 @@ Keep validation schema and display metadata separate in the exported package. Th
 
 ## Values remain with the consumer
 
-Dynamic Fields stores definitions, not a universal answer/submission table. The consuming module persists submitted values with its own aggregate and domain audit. Contents stores a Post's JSON payload and records the exact `formKey` and `formVersion` used to validate it. Contents selects the allowed form for the Post kind and tenant; the frontend asks Contents which form applies, fetches the published schema, renders its own controls, then submits values back to Contents. Forms define payload data only: they cannot declare authorization, tenant/press/category scope, editorial states, assignments, or publication decisions.
+Dynamic Fields stores definitions, not a universal answer/submission table. The consuming module persists submitted values with its own aggregate and domain audit. Contents stores a Post's document and records, at the root and on every node, the `schemaId` and `schemaVersion` (this module's form key and version) that its `content` must match. Contents selects the allowed form for the Post kind and tenant; the frontend asks Contents which form applies, fetches the published schema, renders its own controls, then submits the document back to Contents. Forms define payload data only: they cannot declare authorization, tenant/press/category scope, editorial states, assignments, or publication decisions.
 
 This avoids a generic dynamic-data database that would weaken domain constraints and make every consumer depend on a single catch-all record model.

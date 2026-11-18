@@ -3,8 +3,6 @@ title: Conditional visibility
 description: Best-practice strategy for showing, requiring, and validating nested fields based on other values or trusted record state.
 ---
 
-# Conditional visibility
-
 Dynamic Fields should support conditional fields as declarative, versioned rules. A field or group can be visible, required, or constrained based on another field's value or trusted context, such as a consuming record's state or whether the form is being created or edited.
 
 This is **form behavior metadata plus validation semantics**, not a UI implementation. Dynamic Fields defines and evaluates the rules. A frontend renders the result using its own controls. The server recomputes the result for every validation or write.

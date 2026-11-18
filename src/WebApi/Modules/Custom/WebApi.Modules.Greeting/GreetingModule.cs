@@ -64,8 +64,13 @@ public sealed class GreetingEndpoints : ICarterModule
         // Not tenant data (yet): works with or without a tenant.
         app = app.MapGroup("").TenantOptional();
 
-        app.MapGet("/", (GreetingService greetings) => greetings.Greet("world"));
-        app.MapGet("/{name}", (string name, GreetingService greetings) => greetings.Greet(name));
-        app.MapPost("/echo", (EchoRequest request) => Results.Ok(request with { Text = request.Text.Pascalize() }));
+        // Endpoint names are the OpenAPI operation ids ("Greeting_Greet" becomes GreetingClient.GreetAsync).
+        app.MapGet("/", (GreetingService greetings) => greetings.Greet("world"))
+            .WithName("Greeting_GreetWorld");
+        app.MapGet("/{name}", (string name, GreetingService greetings) => greetings.Greet(name))
+            .WithName("Greeting_Greet");
+        app.MapPost("/echo", (EchoRequest request) => Results.Ok(request with { Text = request.Text.Pascalize() }))
+            .Produces<EchoRequest>() // Results.Ok hides the type from OpenAPI
+            .WithName("Greeting_Echo");
     }
 }

@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using Elsa.Common.Multitenancy;
@@ -64,15 +65,15 @@ internal sealed class NewsroomAutomationClient(HttpClient http, IConfiguration s
         {
             if (!work.TryGetProperty("id", out var idValue) || !idValue.TryGetInt32(out var id) ||
                 !work.TryGetProperty("acceptedAt", out var acceptedAtValue) ||
-                !DateTimeOffset.TryParse(acceptedAtValue.GetString(), out var acceptedAt) ||
+                acceptedAtValue.ValueKind != JsonValueKind.String || !acceptedAtValue.TryGetDateTimeOffset(out var acceptedAt) ||
                 !work.TryGetProperty("acceptedShiftId", out var shiftValue) || shiftValue.ValueKind != JsonValueKind.String)
                 continue;
 
             var shiftId = shiftValue.GetString();
             if (string.IsNullOrWhiteSpace(shiftId)) continue;
             var shift = await GetJsonAsync($"{api}/api/shifts/shifts/{Uri.EscapeDataString(shiftId)}/automation", tenantId, token, cancellationToken);
-            if (!shift.TryGetProperty("autoAssignDelay", out var delayValue) || !delayValue.TryGetDouble(out var delaySeconds)) continue;
-            if (DateTimeOffset.UtcNow < acceptedAt.AddSeconds(delaySeconds)) continue;
+            if (!shift.TryGetProperty("autoAssignDelay", out var delayValue) || !TryGetTimeSpan(delayValue, out var delay)) continue;
+            if (DateTimeOffset.UtcNow < acceptedAt + delay) continue;
             await SendAsync(HttpMethod.Post, $"{api}/api/content/automation/accepted/{id}/assign", tenantId, token, cancellationToken);
         }
 
@@ -84,15 +85,30 @@ internal sealed class NewsroomAutomationClient(HttpClient http, IConfiguration s
         {
             if (!shift.TryGetProperty("id", out var id) || !id.TryGetInt32(out var shiftId)) continue;
             var automation = await GetJsonAsync($"{api}/api/shifts/shifts/{shiftId}/automation", tenantId, token, cancellationToken);
-            if (!automation.TryGetProperty("endsAt", out var endsValue) ||
-                !DateTimeOffset.TryParse(endsValue.GetString(), out var endsAt) ||
-                !automation.TryGetProperty("checkoutGrace", out var graceValue) || !graceValue.TryGetDouble(out var graceSeconds) ||
-                DateTimeOffset.UtcNow < endsAt.AddSeconds(graceSeconds)) continue;
+            if (!automation.TryGetProperty("endsAt", out var endsValue) || endsValue.ValueKind != JsonValueKind.String ||
+                !endsValue.TryGetDateTimeOffset(out var endsAt) ||
+                !automation.TryGetProperty("checkoutGrace", out var graceValue) || !TryGetTimeSpan(graceValue, out var grace) ||
+                DateTimeOffset.UtcNow < endsAt + grace) continue;
 
             // Transfer first; handover is idempotent, and a retry can safely complete checkout after a process restart.
             await SendAsync(HttpMethod.Post, $"{api}/api/content/automation/shifts/{shiftId}/handover", tenantId, token, cancellationToken);
             await SendAsync(HttpMethod.Post, $"{api}/api/shifts/shifts/{shiftId}/check-out", tenantId, token, cancellationToken);
         }
+    }
+
+    /// <summary>
+    /// System.Text.Json writes a TimeSpan as a constant-format string ("00:05:00", "1.00:00:00"); a number is read as
+    /// seconds so a future contract change to numeric durations keeps working.
+    /// </summary>
+    internal static bool TryGetTimeSpan(JsonElement value, out TimeSpan result)
+    {
+        result = default;
+        return value.ValueKind switch
+        {
+            JsonValueKind.String => TimeSpan.TryParseExact(value.GetString(), "c", CultureInfo.InvariantCulture, out result),
+            JsonValueKind.Number when value.TryGetDouble(out var seconds) => (result = TimeSpan.FromSeconds(seconds)) >= TimeSpan.Zero,
+            _ => false
+        };
     }
 
     private async Task<JsonElement> GetJsonAsync(string url, string tenantId, string token, CancellationToken cancellationToken)

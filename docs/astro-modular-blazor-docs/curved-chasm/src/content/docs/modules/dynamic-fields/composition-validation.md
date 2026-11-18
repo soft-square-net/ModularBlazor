@@ -3,8 +3,6 @@ title: Composition, validation, and safety rules
 description: Rules for composing reusable field definitions and validating nested JSON safely and consistently.
 ---
 
-# Composition, validation, and safety rules
-
 ## Compose from immutable components
 
 Users can compose a form from built-in fields and previously published components. A reference is always tenant-local and version-pinned. At publish time, Dynamic Fields resolves the references, checks the complete graph, and stores a self-contained snapshot with the form version.
@@ -38,7 +36,7 @@ JSON Schema's `$defs` and `$ref` support reusable sub-schemas. This module shoul
 
 Validation runs on the server against an immutable published version. Client-side checks are only for user experience. The validator must:
 
-Conditional visibility and state-based rules are defined in the [Conditional visibility strategy](./conditional-visibility/). The API evaluates them server-side from submitted values and trusted consumer context; a client-supplied visibility flag never controls validation.
+Conditional visibility and state-based rules are defined in the [Conditional visibility strategy](/modules/dynamic-fields/conditional-visibility/). The API evaluates them server-side from submitted values and trusted consumer context; a client-supplied visibility flag never controls validation.
 
 - Check JSON type, required keys, lengths, numeric ranges, formats, enumerations, and nested/repeating values.
 - Reject unknown properties unless the schema explicitly allows them.

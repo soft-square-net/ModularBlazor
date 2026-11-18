@@ -3,8 +3,6 @@ title: Dynamic Fields
 description: Strategy for an optional backend module that defines nested, reusable fields and validates JSON form data without rendering UI.
 ---
 
-# Dynamic Fields module
-
 Dynamic Fields is an optional **backend schema and validation module**. It lets authorized users define nested fields, compose new fields and forms from reusable definitions, validate JSON data, and import/export portable JSON packages.
 
 It has **no representation layer**: it does not render HTML, Blazor components, controls, CSS, or form pages. It returns a stable schema plus display metadata. A frontend or consuming module decides how to render that schema. Server-side validation remains authoritative regardless of client.
@@ -17,14 +15,18 @@ Use [JSON Schema Draft 2020-12](https://json-schema.org/specification) as the da
 | --- | --- | --- |
 | Field/component definitions, form schema versions, schema composition, publishing, import/export, and validation results | Domain records, domain lifecycle, persistence of submitted values, and policy for when values are required | UI components, layout/rendering, client-side convenience validation, accessibility, and interaction design |
 
-Dynamic Fields can be disabled or absent in an ERP deployment. A module may use only its static domain fields, or declare an optional capability dependency when it needs dynamic values. In the newsroom profile, Contents uses published forms to define the JSON payload for each Post kind, including article/news, video, document, image, album, and mixed ordered-block posts. Contents still owns the Post envelope, submitted payload values, revisions, authorization, and editorial lifecycle; Dynamic Fields owns only reusable form definitions, immutable schema versions, and validation. This is a planned integration, not an implemented capability.
+Dynamic Fields can be disabled or absent in an ERP deployment. A module may use only its static domain fields, or declare an optional capability dependency when it needs dynamic values. In the newsroom profile, published forms will define the `content` of a Post document and of each nested node (article/news, video, document, image, album and mixed posts). Contents already stores that document with a `schemaId`/`schemaVersion` per node, which is the form key/version pair here. Contents still owns the Post envelope, submitted payload values, revisions, authorization, and editorial lifecycle; Dynamic Fields owns only reusable form definitions, immutable schema versions, and validation. This is a planned integration, not an implemented capability: no Dynamic Fields module exists yet, and Contents performs only structural checks. See [Post document](/modules/contents/posts/#post-document-implemented).
+
+:::note[Content versus style]
+A Post node carries separate `content` and `style` objects. Dynamic Fields validates `content` only. `style` holds responsive presentation values that Contents keeps as opaque JSON. This does not conflict with the rule that form `presentation` metadata never contains CSS or component names: `style` is Post data, not part of a form definition. Whether `style` gets its own schema (for example a theme-token allowlist) is still an open decision.
+:::
 
 ## Suggested page structure
 
-- [Definition model and nested field types](./definition-model/) covers the authoring model, reusable components, and stable field identity.
-- [Conditional visibility](./conditional-visibility/) covers fields shown or required based on other values or trusted record/form state.
-- [Composition, validation, and safety rules](./composition-validation/) covers reference pinning, nesting limits, validation semantics, and security.
-- [JSON package, APIs, and module integration](./json-and-integration/) covers import/export, lifecycle, permissions, and consuming-module patterns.
+- [Definition model and nested field types](/modules/dynamic-fields/definition-model/) covers the authoring model, reusable components, and stable field identity.
+- [Conditional visibility](/modules/dynamic-fields/conditional-visibility/) covers fields shown or required based on other values or trusted record/form state.
+- [Composition, validation, and safety rules](/modules/dynamic-fields/composition-validation/) covers reference pinning, nesting limits, validation semantics, and security.
+- [JSON package, APIs, and module integration](/modules/dynamic-fields/json-and-integration/) covers import/export, lifecycle, permissions, and consuming-module patterns.
 
 ## Module boundary diagram
 

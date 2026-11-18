@@ -44,6 +44,7 @@ internal static partial class ModularOpenApi
     services.AddOpenApi(HostDocument, options =>
     {
       options.ShouldInclude = description => ModuleOf(description) is null;
+      options.AddSchemaTransformer(PlainNumbers);
       options.AddDocumentTransformer((document, _, _) =>
           {
 
@@ -78,6 +79,7 @@ internal static partial class ModularOpenApi
 
     services.AddOpenApi(ModuleSlot, options =>
     {
+      options.AddSchemaTransformer(PlainNumbers);
       options.AddDocumentTransformer((document, _, _) =>
       {
         AddOAuthSecurity(document);
@@ -211,6 +213,32 @@ internal static partial class ModularOpenApi
 
   [GeneratedRegex("^(/[A-Za-z0-9._~-]+)+/?$")]
   private static partial Regex SafePrefix();
+
+  /// <summary>
+  /// Makes schemas precise enough for client generators (NSwag, openapi-typescript):
+  /// <list type="bullet">
+  /// <item>The web JSON defaults (<c>JsonNumberHandling.AllowReadingFromString</c>) make ASP.NET Core describe every number
+  /// as <c>"type": ["integer", "string"]</c> with a digits pattern. The API does accept quoted numbers, but clients should
+  /// send and expect numbers: generators read the string alternative as "any type" (NSwag makes ids <c>object</c>).
+  /// Numbers are described as plain numbers; nullability is kept.</item>
+  /// <item>Enums serialized by name (<c>JsonStringEnumConverter</c>) come out as <c>"enum": [...]</c> with no type, so
+  /// generators cannot tell names from numbers (NSwag then emits no string converter and the client fails to read
+  /// <c>"News"</c>). They get <c>"type": "string"</c>.</item>
+  /// </list>
+  /// </summary>
+  private static Task PlainNumbers(OpenApiSchema schema, OpenApiSchemaTransformerContext context, CancellationToken cancellationToken)
+  {
+    if (schema.Type is { } type && type.HasFlag(JsonSchemaType.String) &&
+        (type.HasFlag(JsonSchemaType.Integer) || type.HasFlag(JsonSchemaType.Number)))
+    {
+      schema.Type = type & ~JsonSchemaType.String;
+      schema.Pattern = null;
+    }
+    if (schema.Type is null && schema.Enum is { Count: > 0 } values &&
+        values.All(v => v is System.Text.Json.Nodes.JsonValue value && value.GetValueKind() == System.Text.Json.JsonValueKind.String))
+      schema.Type = JsonSchemaType.String;
+    return Task.CompletedTask;
+  }
 
   private static void AddOAuthSecurity(OpenApiDocument document)
   {

@@ -105,53 +105,74 @@ public sealed class ShiftsEndpoints : ICarterModule
             catch (DomainException e) { return Results.Problem(e.Message, statusCode: StatusCodes.Status409Conflict); }
         });
 
-        shifts.MapGet("/sections", (ShiftService s, CancellationToken ct) => s.SectionsAsync(ct)).RequirePermission(ShiftPermissions.View, ShiftPermissions.Manage);
+        // Endpoint names are the OpenAPI operation ids: "Shifts_ListSections" becomes ShiftsClient.ListSectionsAsync.
+        // They must be unique across the whole host, hence the module prefix.
+        shifts.MapGet("/sections", (ShiftService s, CancellationToken ct) => s.SectionsAsync(ct))
+            .RequirePermission(ShiftPermissions.View, ShiftPermissions.Manage)
+            .WithName("Shifts_ListSections");
         shifts.MapPost("/sections", async (SectionRequest r, ShiftService s, CancellationToken ct) =>
             {
                 var section = await s.AddSectionAsync(r, ct);
                 return Results.Created($"sections/{section.Id}", section);
             })
-            .RequirePermission(ShiftPermissions.Manage);
+            .Produces<SectionDto>(StatusCodes.Status201Created) // Results.Created hides the type from OpenAPI
+            .RequirePermission(ShiftPermissions.Manage)
+            .WithName("Shifts_AddSection");
         shifts.MapPut("/sections/{id:int}", (int id, SectionRequest r, ShiftService s, CancellationToken ct) => s.UpdateSectionAsync(id, r, ct))
             .RequirePermission(ShiftPermissions.Manage)
+            .WithName("Shifts_UpdateSection")
             .WithSummary("Changing the categories rewrites the grants of the section's published shifts that have not ended.");
         shifts.MapGet("/sections/{id:int}/settings", (int id, ShiftService s, CancellationToken ct) => s.SettingsAsync(id, ct))
             .RequirePermission(ShiftPermissions.View, ShiftPermissions.Manage)
+            .WithName("Shifts_GetSectionSettings")
             .WithSummary("Effective AutoAssignDelay and CheckoutGrace: the section's override, else the module's settings.");
 
         shifts.MapGet("/mine", (ShiftService s, CancellationToken ct) => s.MineAsync(ct))
+            .WithName("Shifts_ListMine")
             .WithSummary("Your running and upcoming shifts (next 7 days).");
         shifts.MapGet("/overdue", (ShiftService s, CancellationToken ct) => s.OverdueAsync(ct))
             .RequirePermission(ShiftPermissions.Manage)
+            .WithName("Shifts_ListOverdue")
             .WithSummary("Published shifts past their end that nobody checked out (for the workflow's automatic check-out).");
         shifts.MapGet("/shifts", (int? sectionId, DateTimeOffset? from, DateTimeOffset? to, ShiftService s, CancellationToken ct) => s.ShiftsAsync(sectionId, from, to, ct))
-            .RequirePermission(ShiftPermissions.View, ShiftPermissions.Manage);
+            .RequirePermission(ShiftPermissions.View, ShiftPermissions.Manage)
+            .WithName("Shifts_ListShifts");
         shifts.MapGet("/shifts/{id:int}", (int id, ShiftService s, CancellationToken ct) => s.GetAsync(id, ct))
-            .RequirePermission(ShiftPermissions.View, ShiftPermissions.Manage);
+            .RequirePermission(ShiftPermissions.View, ShiftPermissions.Manage)
+            .WithName("Shifts_GetShift");
         shifts.MapGet("/shifts/{id:int}/automation", (int id, ShiftService s, CancellationToken ct) => s.AutomationInfoAsync(id, ct))
             .RequirePermission(ShiftPermissions.View, ShiftPermissions.Manage)
+            .WithName("Shifts_GetShiftAutomation")
             .WithSummary("Shift clock and section-specific assignment/check-out timers for the workflow service.");
         shifts.MapPost("/shifts", async (ShiftRequest r, ShiftService s, CancellationToken ct) =>
             {
                 var shift = await s.AddShiftAsync(r, ct);
                 return Results.Created($"shifts/{shift.Id}", shift);
             })
+            .Produces<ShiftDto>(StatusCodes.Status201Created)
             .RequirePermission(ShiftPermissions.Manage)
+            .WithName("Shifts_AddShift")
             .WithSummary("Plans a shift with its rota (exactly one Manager). Nothing is granted until it is published.");
         shifts.MapPut("/shifts/{id:int}", (int id, ShiftRequest r, ShiftService s, CancellationToken ct) => s.UpdateShiftAsync(id, r, ct))
-            .RequirePermission(ShiftPermissions.Manage);
+            .RequirePermission(ShiftPermissions.Manage)
+            .WithName("Shifts_UpdateShift");
         shifts.MapPost("/shifts/{id:int}/publish", (int id, ShiftService s, CancellationToken ct) => s.PublishAsync(id, ct))
             .RequirePermission(ShiftPermissions.Manage)
+            .WithName("Shifts_PublishShift")
             .WithSummary("Writes the rota's grants: each member's role permissions on the section's categories, valid for the shift only.");
         shifts.MapPost("/shifts/{id:int}/check-out", (int id, ShiftService s, CancellationToken ct) => s.CheckOutAsync(id, ct))
+            .WithName("Shifts_CheckOutShift")
             .WithSummary("Handover: the whole shift checks out and every member's grants end now (the shift's manager, or a shift admin).");
         shifts.MapPost("/shifts/{id:int}/members/{userId}/check-out", (int id, string userId, ShiftService s, CancellationToken ct) => s.CheckOutMemberAsync(id, userId, ct))
+            .WithName("Shifts_CheckOutMember")
             .WithSummary("One member leaves early; their grants end now (themselves, the shift's manager, or a shift admin).");
         shifts.MapDelete("/shifts/{id:int}", async (int id, ShiftService s, CancellationToken ct) =>
             {
                 await s.DeleteAsync(id, ct);
                 return Results.NoContent();
             })
-            .RequirePermission(ShiftPermissions.Manage);
+            .Produces(StatusCodes.Status204NoContent)
+            .RequirePermission(ShiftPermissions.Manage)
+            .WithName("Shifts_DeleteShift");
     }
 }

@@ -19,11 +19,13 @@ public static partial class TenantDbServiceCollectionExtensions
     /// once at a time behind an advisory lock. Migrations live in the module assembly.</item>
     /// <item>the default <see cref="SharedKernel.IRepository{T}"/> and <see cref="SharedKernel.IReadRepository{T}"/> for the
     /// module's aggregates (<see cref="EfRepository{T}"/>), on the first DbContext a module registers.</item>
+    /// <item>the <see cref="DomainEventDispatcher"/> the context uses to run domain event handlers on SaveChangesAsync.</item>
     /// </list>
     /// </summary>
     public static IServiceCollection AddTenantDbContext<TContext>(this IServiceCollection services) where TContext : TenantDbContext
     {
         services.TryAddSingleton<TenantEfServices>();
+        services.TryAddScoped<DomainEventDispatcher>();
         services.AddDbContext<TContext>((sp, options) =>
         {
             // The tenant's server decides the engine; each engine has its own internal provider (and model cache).

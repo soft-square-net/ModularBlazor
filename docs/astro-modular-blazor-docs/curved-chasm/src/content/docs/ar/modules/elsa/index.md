@@ -5,9 +5,8 @@ sidebar:
   order: 1
 ---
 
-:::caution[الحالة]
-تسجل هذه الصفحة تصميم التكامل الموصى به. لم ينفذ بعد في مضيف WebApi الجديد ذي وحدات التشغيل.
-يحتوي `ModularBlazor.Host` الأقدم على مضيف Elsa مضمّن؛ راجع [حالة المستودع](#حالة-المستودع).
+:::note[الحالة]
+وحدة التشغيل `elsa` موجودة الآن في `src/WebApi/Modules/Custom/Elsa` (الإصدار 0.1.0) وتعمل في مجمع `workflow` في مختبر Hybird. تستضيف محرك Elsa وواجهته البرمجية ومحولات المستأجرين، لكنها **لا تحتوي بعد على تعريفات سير عمل**: مؤقتات غرفة الأخبار تعمل في خدمة استطلاع مستضافة (`NewsroomAutomationService`). التفاصيل والمشكلات المفتوحة في [الصفحة الإنجليزية](/modules/elsa/#current-implementation).
 :::
 
 ## التوصية
@@ -66,11 +65,11 @@ flowchart LR
 | الجزء | الحالة الحالية |
 | --- | --- |
 | `src/api/ModularBlazor.Host` الأقدم | Elsa 3.9 مضمنة بوصفها `ElsaHostModule`. تربط تعدد المستأجرين في Elsa بـFinbuckle وتخزن سير العمل في قاعدة مشتركة مع معرّف مستأجر Elsa. محول الصلاحيات فيها يتبع نموذج التفويض القديم. |
-| مضيف وحدات التشغيل الجديد في `src/WebApi` | يحتوي خدمة هوية OpenIddict مستقلة ووحدة مناوبات واعية بالمستأجر. لا يستضيف Elsa بعد ولا يحتوي مشروع وحدة تشغيل لها. |
+| مضيف وحدات التشغيل الجديد في `src/WebApi` | يستضيف Elsa 3.9 بوصفها وحدة التشغيل المخصصة `elsa` (`WebApi.Modules.Elsa.Infrastructure`) مع `HotUnload = false` وخط معالجة خاص (`IModulePipeline`) تحت `/api/elsa`، وتخزين PostgreSQL في المخطط `elsa`، ومحولات مستأجرين تقرأ دليل المنصة، وصلاحيات `workflow.view` و`workflow.design` و`workflow.run`. لا توجد تعريفات سير عمل بعد. |
 
-يبرهن `FinbuckleTenantResolver` الأقدم على نمط المحول المفيد: يأخذ المستأجر الذي حله المضيف ويمرر معرّفه إلى Elsa. في المضيف الجديد، اربط هذا المحول بسياق/دليل المستأجر الحالي. لا تنشئ قائمة مستأجرين ثانية مستقلة داخل Elsa. موضع النشر المتفق عليه موضح في [المصادقة والتفويض، القسم 9](/ar/backend/auth-design/).
+طُبق نمط المحول في المضيف الجديد: `ElsaPlatformTenantResolver` يمرر المستأجر الذي حله المضيف، و`ElsaPlatformTenantsProvider` يقرأ `ITenantDirectory`. لا تنشئ قائمة مستأجرين ثانية مستقلة داخل Elsa. موضع النشر المتفق عليه موضح في [المصادقة والتفويض، القسم 9](/ar/backend/auth-design/).
 
-مواضع الشيفرة ذات الصلة: `ElsaHostModule.cs` و`FinbuckleTenancy.cs` في المضيف القديم، و`ShiftsModule.cs` و`TokenIssuer.cs` في تطبيق WebApi الجديد.
+مواضع الشيفرة ذات الصلة: `ElsaModule.cs` و`NewsroomAutomationService.cs` في وحدة `elsa`، و`ModuleRuntime.cs` (حقن الأسرار)، و`src/Aspire/Hybird/AppHost.cs` (مجمع `workflow`).
 
 ## تمرير المستأجر وعزل البيانات
 

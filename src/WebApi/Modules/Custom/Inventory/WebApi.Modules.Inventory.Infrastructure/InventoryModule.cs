@@ -69,22 +69,33 @@ public sealed class InventoryEndpoints : ICarterModule
     {
         var inventory = app;
 
+        // Endpoint names are the OpenAPI operation ids ("Inventory_ListItems" becomes InventoryClient.ListItemsAsync).
+        // Guard returns IResult, which hides the response types from OpenAPI: Produces declares them.
         inventory.MapGet("/", async (ITenantContext tenant, InventoryDbContext db, InventoryService service, CancellationToken ct) =>
                 new InventoryInfo(tenant.Required.Id, tenant.ResolvedBy, db.Database.GetDbConnection().Database, "inventory",
                     await service.CountAsync(ct)))
+            .WithName("Inventory_GetInfo")
             .WithSummary("Which tenant and database this request was served from.");
 
         inventory.MapGet("/items", (int? below, InventoryService service, CancellationToken ct) => service.ListAsync(below, ct))
+            .WithName("Inventory_ListItems")
             .WithSummary("Stock items by SKU; ?below=N lists only those with fewer than N in stock.");
 
         inventory.MapPost("/items", (NewStockItem request, InventoryService service, CancellationToken ct) => Guard(async () =>
-        {
-            var item = await service.AddAsync(request, ct);
-            return Results.Created($"items/{item.Sku}", item);
-        }));
+            {
+                var item = await service.AddAsync(request, ct);
+                return Results.Created($"items/{item.Sku}", item);
+            }))
+            .Produces<StockItemDto>(StatusCodes.Status201Created)
+            .ProducesProblem(StatusCodes.Status409Conflict)
+            .WithName("Inventory_AddItem");
 
         inventory.MapPost("/items/{sku}/adjust", (string sku, Adjustment request, InventoryService service, CancellationToken ct) => Guard(async () =>
                 await service.AdjustAsync(sku, request.Delta, ct) is { } item ? Results.Ok(item) : Results.NotFound()))
+            .Produces<StockItemDto>()
+            .Produces(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status409Conflict)
+            .WithName("Inventory_AdjustItem")
             .WithSummary("Receives (positive delta) or issues (negative delta) stock; never below zero.");
     }
 

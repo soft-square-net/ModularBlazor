@@ -3,8 +3,6 @@ title: JSON package, APIs, and integration
 description: Import/export contract, proposed endpoints, authorization, lifecycle, and integration guidance for consuming modules.
 ---
 
-# JSON package, APIs, and integration
-
 ## Import/export contract
 
 Use a versioned JSON envelope such as `platform.dynamic-fields/v1`. It contains the form key/title/version, JSON Schema dialect, validation schema, presentation hints, and exact component dependencies. Export should be deterministic: canonical property ordering, stable IDs, normalized line endings, and no environment-specific database IDs or secrets.
@@ -46,7 +44,7 @@ Tenant resolution and grant checks happen in the host and at the module boundary
 
 ## Consuming module pattern
 
-Contents remains responsible for Posts, editorial transitions, and persistence. Contents maintains the server-side mapping from tenant and allowed Post kind to a published form version. On write, it checks caller scope and current state, validates submitted JSON against that exact version, validates Keyword IDs and any Media asset IDs, then persists the Post, payload, version reference, tag assignments, revision, and outbox event in its own transaction. On read, it returns the Post envelope, payload, and pinned form reference; the frontend fetches the published schema to render it.
+Contents remains responsible for Posts, editorial transitions, and persistence. Contents maintains the server-side mapping from tenant and allowed Post kind to a published form version. On write, it checks caller scope and current state, validates the `content` of the document and of each node against the exact `schemaId`/`schemaVersion` it names, validates Keyword IDs and any Media asset IDs, then persists the Post, payload, version reference, tag assignments, revision, and outbox event in its own transaction. On read, it returns the Post envelope, payload, and pinned form reference; the frontend fetches the published schema to render it.
 
 ```text
 Frontend ──GET form schema/version──► Dynamic Fields
@@ -61,7 +59,7 @@ Contents ──publish backlink/search event after commit─► Keyword / consum
 
 For a mixed Post, a form may describe a bounded ordered array of discriminated blocks: an allowlisted `kind` identifies a declared paragraph, image, video, document, or album schema. Dynamic Fields checks structure and value constraints. Contents checks that the selected form is permitted, and verifies editorial rules and referenced IDs. Media binaries never belong in the JSON payload; use stable asset IDs.
 
-Because calls across modules are not one database transaction, published schemas must be immutable and retrievable by exact version. If validation is unavailable, Contents should fail the write clearly or use a verified local schema snapshot; it must not accept unvalidated values and claim they were validated. A later schema version is an explicit migration decision, not a background mutation to existing works.
+Because calls across modules are not one database transaction, published schemas must be immutable and retrievable by exact version. If validation is unavailable, Contents should fail the write clearly or use a verified local schema snapshot; it must not accept unvalidated values and claim they were validated. A later schema version is an explicit migration decision, not a background mutation to existing Posts.
 
 When Dynamic Fields is disabled, consumers retain their data and pinned version reference. They can continue to display or export stored JSON using a locally retained schema snapshot. Dynamic Fields must never cascade-delete consumer data. If a consumer requires live validation or editing, declare that as an optional module capability/dependency and make the degraded behavior explicit when the service is absent.
 

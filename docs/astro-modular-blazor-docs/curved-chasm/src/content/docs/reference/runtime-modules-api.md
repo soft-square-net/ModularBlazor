@@ -22,15 +22,15 @@ token, **403** without the permission. See [Authentication: implementation](/bac
 | `POST /api/admin/modules` | **Install**: multipart form field `package` with a `.dll`, `.zip` or `.nupkg`. Re-installing an existing id is an upgrade: it keeps the state and swaps every replica to the new version |
 | `POST /api/admin/modules/{id}/activate` | Desired state `Active`: load, build services, map routes (routes only in `Api` pools) |
 | `POST /api/admin/modules/{id}/deactivate` | Desired state `Inactive`: remove routes; loaded modules stay loaded |
-| `POST /api/admin/modules/{id}/unload` | Desired state `Installed`: remove routes, dispose services, unload assemblies everywhere |
-| `PUT /api/admin/modules/{id}/settings` | Replace settings (JSON object); replicas that have the module loaded swap to a reconfigured copy |
-| `DELETE /api/admin/modules/{id}` | Unload everywhere, delete the package, remove the registration. `409` for a core module |
+| `POST /api/admin/modules/{id}/unload` | Desired state `Installed`: remove routes, stop hosted services, dispose services, unload assemblies everywhere. `HotUnload = false`: `409` unless `?deferred=true` |
+| `PUT /api/admin/modules/{id}/settings` | Replace settings (JSON object); replicas that have the module loaded swap to a reconfigured copy (`HotUnload = false`: applied at the next restart) |
+| `DELETE /api/admin/modules/{id}` | Unload everywhere, delete the package, remove the registration. `409` for a core module; `HotUnload = false`: `409` unless `?deferred=true` |
 | `GET /api/admin/modules/unloading` | Unloaded or swapped-out copies on this replica whose memory is not freed yet |
 
 Errors are problem details: `400` for an invalid package or manifest, or when activation finds an undeclared
 permission, a module-defined authorization requirement or a named policy; `404` for an unknown module; `409` when the
-route prefix is used by another module, or for deleting or uploading over a core module; `500` when a package's files
-are missing.
+route prefix is used by another module, for deleting or uploading over a core module, or for unloading or
+uninstalling a `HotUnload = false` module without `?deferred=true`; `500` when a package's files are missing.
 
 Module endpoints are served under `/api/{RoutePrefix}`.
 
@@ -46,6 +46,9 @@ Module endpoints are served under `/api/{RoutePrefix}`.
 | `enabledInPool` | Whether that pool applies this module (`Modules:Enabled`) |
 | `loaded` | Whether the module is loaded on that replica |
 | `routes` | Its live routes on that replica, e.g. `GET /api/greeting/{name}` |
+| `loadedVersion` | Version of the copy loaded on that replica; differs from `module.version` while a restart is pending |
+| `restartRequired` | `HotUnload = false` and the catalog asks for a change this replica applies only on its next restart |
+| `hostedServices` | The loaded copy's hosted services: `{ service, state, error }` |
 
 Unload and uninstall return `{ id, unloaded, gcPasses, note }` for the answering replica.
 
@@ -59,6 +62,10 @@ Unload and uninstall return `{ id, unloaded, gcPasses, note }` for the answering
 | `GET /openapi/modules/{id}.json` | OpenAPI document of one module; `404` unless it is routed on this replica |
 | `GET /openapi` | The documents available right now: `[{name, title, url, isDefault}]` |
 | `GET /scalar` (`/` redirects there) | Scalar API reference, with a switcher for the same documents |
+
+Module documents are also the source of each module's typed client: `src/WebApi/scripts/Export-ModuleOpenApi.ps1`
+saves one to `<Module>/openapi/<id>.json` without the lab, and NSwag generates the client from it
+([Typed clients for the module](/backend/create-a-module/#typed-clients-for-the-module)).
 
 The OpenAPI and Scalar endpoints are anonymous and exist in Development, or when `OpenApi:Enabled=true`. Behind the gateway's
 `/pools/{pool}/` routes, document URLs carry that prefix (from `X-Forwarded-Prefix`). How it works:
@@ -117,6 +124,14 @@ public sealed record ModuleManifest(string Id, string Name, string Version, stri
     public string? Description { get; init; }
     public IReadOnlyDictionary<string, string?> DefaultSettings { get; init; }
     public IReadOnlyList<PermissionDefinition> Permissions { get; init; } = [];
+    public bool HotUnload { get; init; } = true;
+}
+
+// Optional, on the same class: a private ASP.NET Core pipeline behind /api/{RoutePrefix}/{**path}.
+public interface IModulePipeline
+{
+    void ConfigurePipeline(IApplicationBuilder app);
+    void ConfigureEndpoint(IEndpointConventionBuilder endpoint) { }
 }
 ```
 
@@ -125,11 +140,16 @@ public sealed record ModuleManifest(string Id, string Name, string Version, stri
 | `Id` | Lowercase `a-z`, `0-9`, `.`, `-`; stable across versions |
 | `Version` | Letters, digits, `.`, `+`, `-` |
 | `RoutePrefix` | Same rule as `Id`; unique among installed modules |
-| `DefaultSettings` | Flat configuration keys (`Section:Key`); copied into the catalog on install |
+| `DefaultSettings` | Flat configuration keys (`Section:Key`); copied into the catalog on install. Never secrets |
 | `Permissions` | Every permission its endpoints use with `RequirePermission`; activation fails on an undeclared one |
+| `HotUnload` | `false` for a module whose libraries pin their assemblies: unload and uninstall need `?deferred=true`, upgrades and settings apply at the next restart |
 
 A package contains **exactly one** public, non-abstract `IRuntimeModule` with a parameterless constructor.
-Endpoints come from its `ICarterModule` classes. Keyed services are not supported yet.
+Endpoints come from its `ICarterModule` classes, and from its private pipeline if it implements `IModulePipeline`.
+`IHostedService`s registered in `ConfigureServices` are started and stopped with the module
+([Hosted services](/backend/runtime-modules/#hosted-services)). Keyed services are not supported yet.
+
+A full walkthrough, from an empty folder to a module running in a pool: [Create a module, A to Z](/backend/create-a-module/).
 
 ## Packaging a module
 

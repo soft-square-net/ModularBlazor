@@ -1,12 +1,12 @@
 ---
 title: Hybrid architecture lab
-description: The target architecture as a runnable .NET Aspire model — a YARP gateway, three module pools from one image, RabbitMQ, Redis and PostgreSQL — and what it measured.
+description: The target architecture as a runnable .NET Aspire model — a YARP gateway, four module pools from one image, RabbitMQ, Redis and PostgreSQL — and what it measured.
 sidebar:
   order: 5
 ---
 
 `src/Aspire/Hybird` runs the [target architecture](/backend/target-architecture/) on one machine. One image
-(`src/WebApi/WebApi`) is deployed as three **module pools** behind a **YARP gateway**, sharing **RabbitMQ**, **Redis** and
+(`src/WebApi/WebApi`) is deployed as four **module pools** behind a **YARP gateway**, sharing **RabbitMQ**, **Redis** and
 **PostgreSQL**. Every replica exports OpenTelemetry to the Aspire dashboard.
 
 ```bash
@@ -15,6 +15,13 @@ dotnet run --project src/Aspire/Hybird --launch-profile http
 
 The dashboard opens at `http://localhost:17888`; the gateway listens on `http://localhost:5080`. Docker is needed
 for the broker, Redis and PostgreSQL containers.
+
+The workflow pool and the identity service share the Elsa client secret, an Aspire secret parameter. Set it once
+before the first run:
+
+```bash
+dotnet user-secrets set "Parameters:elsa-client-secret" "<dev-secret>" --project src/Aspire/Hybird
+```
 
 Tenant database servers on the other engines are opt-in, because their images are large (SQL Server 2022 2.2 GB,
 MySQL 9.7 1.28 GB, Oracle Database Free 14.1 GB) and Oracle is slow to start:
@@ -27,20 +34,21 @@ dotnet run --project src/Aspire/Hybird --launch-profile http -- --Lab:Engines=sq
 
 | Resource | What it is |
 | --- | --- |
-| `gateway` (port 5080) | YARP. `/api/sales/**` and `/api/greeting/**` go to the sales pool; everything else goes to core. `/pools/{core\|sales\|worker}/**` reaches one pool directly (lab only) |
-| `core-1`, `core-2` | Core pool, `Role=Api`, modules: identity, tenancy (core modules, active by default), workflow, inventory |
-| `sales-1` … `sales-4` | Sales pool, `Role=Api`, modules: sales, greeting (the sample module stands in for Sales) |
+| `gateway` (port 5080) | YARP. `/api/sales/**`, `/api/greeting/**`, `/api/shifts/**` and `/api/content/**` go to the sales pool; `/api/elsa/**` to the workflow pool; everything else to core. `/pools/{core\|sales\|worker\|workflow}/**` reaches one pool directly (lab only) |
+| `core-1`, `core-2` | Core pool, `Role=Api`, modules: identity, tenancy (core modules, active by default), inventory |
+| `sales-1` … `sales-4` | Sales pool, `Role=Api`, modules: sales, greeting (the sample module stands in for Sales), shifts, content |
+| `workflow-1`, `workflow-2` | Workflow pool, `Role=Api`, module: elsa only (`HotUnload = false`). Gets `ConnectionStrings:elsa` (database `elsa-db`), the `elsa-workflows` client ID and secret, the identity authority and the gateway URL. See [Elsa](/modules/elsa/#current-implementation) |
 | `worker-1`, `worker-2` | Worker pool, `Role=Worker`: modules load (services, consumers) but get no routes, and no public route reaches it |
 | `broker` | RabbitMQ with the management UI |
 | `redis` | Cache, locks, Data Protection keys, rate-limit counters |
-| `tenant-data` | PostgreSQL: `TenantStore` (HybirdTenants: the tenant registry and grants, schema `platform`), `tenant-acme`, `tenant-globex` (one database per tenant, a schema per module in it), plus pgAdmin. Replicas get `ConnectionStrings:TenantStore` and the server as `ConnectionStrings:tenant-data`, which tenant rows name |
+| `tenant-data` | PostgreSQL: `TenantStore` (HybirdTenants: the tenant registry and grants, schema `platform`), `tenant-acme`, `tenant-globex` (one database per tenant, a schema per module in it), `elsa-db` (ElsaWorkflows, schema `elsa`), `identity-db`, plus pgAdmin. Replicas get `ConnectionStrings:TenantStore` and the server as `ConnectionStrings:tenant-data`, which tenant rows name |
 | `tenant-sql`, `tenant-mysql`, `tenant-oracle` (`Lab:Engines`) | Optional SQL Server, MySQL and Oracle Database Free servers for tenants. Replicas get `ConnectionStrings:<server>` and `DatabaseServers:<server>:Provider` |
-| `identity` (port 5090) | The OpenIddict identity service, with database `identity-db`. **On branch `claude/identity-service-da759e` only**; the pools aren't wired to it yet. See [Authentication: implementation](/backend/auth-implementation/#the-identity-service) |
+| `identity` (port 5090) | The OpenIddict identity service, with database `identity-db`. Every pool validates its tokens (`Auth__Authority`); clients include `elsa-workflows` (client credentials). See [Authentication: implementation](/backend/auth-implementation/#the-identity-service) |
 
 A pool is N replicas of the same project; only configuration differs:
 
 ```text
-Modules__Pool        core | sales | worker
+Modules__Pool        core | sales | worker | workflow
 Modules__Role        Api | Worker
 Modules__Enabled__N  the modules this pool applies
 Modules__Path        App_Data/modules-catalog   one catalog for every pool

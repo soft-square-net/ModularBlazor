@@ -25,8 +25,8 @@ request ─► host middleware (Tenancy/): X-Tenant header, then host name (X-Fo
 | Piece | Where | What |
 | --- | --- | --- |
 | `ITenantContext`, `TenantInfo`, `ITenantDirectory`, `ITenantInitializer`, `IModuleActivation`, `.TenantOptional()`, `CreateTenantScope(...)`, `TenancyNames` | `WebApi.Contracts/Tenancy` | Everything a module sees. Host-shipped, so one type identity and nothing that pins a module |
-| `TenantDbContext`, `AddTenantDbContext<T>()`, `EfRepository<T>`, `TenantStoreDbContext`, `TenantDatabases`, `DatabaseProviderAdapter`, `ProviderMigrationsAssembly` | `WebApi.Data` (host-shipped: EF Core 10 with four providers, Ardalis.Specification.EntityFrameworkCore) | The data layer modules share. Modules compile against it and never ship it |
-| `ITenantOwned`, entity bases, `IRepository<T>` / `IReadRepository<T>` | `WebApi.SharedKernel` (host-shipped, no EF) | See [Layered modules](/backend/runtime-modules/#layered-modules) |
+| `TenantDbContext`, `AddTenantDbContext<T>()`, `EfRepository<T>`, `DomainEventDispatcher`, `TenantStoreDbContext`, `TenantDatabases`, `DatabaseProviderAdapter`, `ProviderMigrationsAssembly` | `WebApi.Data` (host-shipped: EF Core 10 with four providers, Ardalis.Specification.EntityFrameworkCore) | The data layer modules share. Modules compile against it and never ship it |
+| `ITenantOwned`, entity bases, `IRepository<T>` / `IReadRepository<T>`, `IDomainEvent` / `IDomainEventHandler<T>` | `WebApi.SharedKernel` (host-shipped, no EF) | See [Layered modules](/backend/runtime-modules/#layered-modules) and [domain events](/backend/create-a-module/#reactions-inside-the-module-domain-events) |
 | Middleware, directory cache, `tenants.changed` bus, per-tenant module initialization | `WebApi/Tenancy` | `builder.AddPlatformTenancy("broker")`; `app.UseRouting(); app.UseTenancy();` |
 | Directory admin, provisioning, seeding (acme, globex) | `tenancy` core module | Writes the tenant store, then `ITenantDirectory.NotifyChangedAsync` |
 
@@ -49,6 +49,8 @@ request ─► host middleware (Tenancy/): X-Tenant header, then host name (X-Fo
   (its own schema, or a table prefix on MySQL and Oracle), with their own migrations history table.
 - `ITenantOwned` rows are stamped with the tenant, filtered by it (global query filter) and refused for another tenant
   on save: defence in depth now, and the shared-database option stays open.
+- `SaveChangesAsync` first runs the handlers of domain events raised by tracked aggregates, so their changes are part
+  of the same write ([Domain events](/backend/create-a-module/#reactions-inside-the-module-domain-events)).
 
 ### Migrations on activation
 
@@ -141,17 +143,18 @@ the session's own schema the tenant's. Provisioning creates the user, grants `CR
 
 Worker pools, consumers and jobs call `moduleServices.CreateTenantScope(tenantId)` for a module scope bound to that
 tenant. Messages carry the tenant in the `tenant` header (`TenancyNames.MessageHeader`); platform jobs loop over
-`ITenantDirectory.All`. Module consumers and hosted services themselves are not supported by the runtime yet.
+`ITenantDirectory.All`. Module hosted services are supported (they start without a tenant; see
+[Hosted services](/backend/runtime-modules/#hosted-services)); module message consumers are not supported yet.
 
 ## Decisions
 
 - **No Finbuckle.** The in-house layer is small, and Finbuckle's startup-registered stores, per-tenant options and
   shared-database focus fit a runtime that loads modules later poorly. Modules only see `ITenantContext`, so it could
   be swapped in later.
-- **Elsa (future workflow module):** Elsa's tenant id is the platform tenant id. An Elsa `ITenantResolver` reads
-  `ITenantContext`, an `ITenantsProvider` reads `ITenantDirectory`, and the module refreshes Elsa's tenants on
-  `tenants.changed`. Elsa keeps its own shared database with `TenantId` columns and must run on the host's EF Core
-  version.
+- **Elsa (the `elsa` module):** Elsa's tenant id is the platform tenant id. `ElsaPlatformTenantResolver` reads
+  `ITenantContext` and `ElsaPlatformTenantsProvider` reads `ITenantDirectory` (built). Refreshing Elsa's tenants on
+  `tenants.changed` is not built yet. Elsa keeps its own shared database (`elsa-db`, schema `elsa`) with `TenantId`
+  columns, on PostgreSQL only, and must run on the host's EF Core version.
 
 ## Not covered yet
 

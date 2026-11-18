@@ -3,8 +3,6 @@ title: Keyword
 description: Draft strategy for a multilingual, tenant-aware Keyword module that manages concepts, aliases, relationships, tags, and text analysis.
 ---
 
-# Keyword module
-
 > **Draft strategy:** this page proposes the future module boundaries and behavior. It is not a claim that a Keyword service is implemented.
 
 The **Keyword** module manages canonical terms for things and ideas described across the platform: companies and establishments, people, products, places, events, animals, and topics. A keyword is a stable concept with language-specific names, synonyms, relationships, and optional typed facts. Contents, Shifts, and other optional modules can use its concepts as tags.
@@ -41,7 +39,7 @@ Contents owns press categories because they drive editorial organization, catego
 
 ~~~mermaid
 flowchart LR
-    K["Keyword catalog<br/>concepts, labels, aliases"] -->|stable concept IDs| C["Contents<br/>works and authoritative tags"]
+    K["Keyword catalog<br/>concepts, labels, aliases"] -->|stable concept IDs| C["Contents<br/>Posts and authoritative tags"]
     K -->|stable concept IDs| S["Shifts<br/>optional coverage tags"]
     C -->|tag/link events and canonical URLs| I["Keyword backlink index"]
     S -. "optional link events" .-> I

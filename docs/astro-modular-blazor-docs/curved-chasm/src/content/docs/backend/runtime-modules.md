@@ -12,13 +12,17 @@ and measures its limits.
 | Project | Role |
 | --- | --- |
 | `WebApi` | The host. `Modularity/` holds the runtime. The same image runs as every pool. |
-| `WebApi.Contracts` | `IRuntimeModule` and `ModuleManifest`. The host references it, so it is always shared. |
+| `WebApi.Contracts` | `IRuntimeModule`, `ModuleManifest` and `IModulePipeline`. The host references it, so it is always shared. |
 | `Modules/Core/*` | Core modules (`Identity`, `Tenancy`), shipped with every WebApi release. |
 | `Modules/Custom/WebApi.Modules.Greeting` | A sample custom module. The host does **not** reference it: its build output is zipped and uploaded. |
 | `Modules/Custom/Inventory` | A sample custom module split into Domain, Application and Infrastructure projects. |
-| `Aspire/Hybird` | A runnable lab: gateway, three pools, broker, Redis, PostgreSQL. See [Hybrid architecture lab](/backend/hybrid-lab/). |
+| `Modules/Custom/Shifts`, `Modules/Custom/Content` | The newsroom modules (layered): rota and shift grants; Posts and their workflow. See [Contents](/modules/contents/). |
+| `Modules/Custom/Elsa` | Elsa 3.9 as a runtime module with a private pipeline and `HotUnload = false`. See [Elsa](/modules/elsa/). |
+| `Modules/Custom/WebApi.Modules.Pulse` | A sample module with a private pipeline and a hosted service. |
+| `Aspire/Hybird` | A runnable lab: gateway, four pools, identity service, broker, Redis, PostgreSQL. See [Hybrid architecture lab](/backend/hybrid-lab/). |
 
-All paths are under `src/WebApi/`.
+All paths are under `src/WebApi/`, except `Aspire/Hybird` (`src/Aspire/Hybird`). Step-by-step instructions for
+building, packing and deploying your own module: [Create a module, A to Z](/backend/create-a-module/).
 
 ## Core and custom modules
 
@@ -258,17 +262,80 @@ module gets **its own document**, and Scalar lists the documents that exist righ
 
 `/openapi/v1.json` no longer exists.
 
+## Hosted services
+
+`IHostedService`s a module registers in `ConfigureServices` (`AddHostedService<T>()`, a `BackgroundService`) are run
+by the runtime, because the generic host only knows services registered at startup:
+
+- They start after the module copy is loaded, on `Api` and `Worker` pools alike. On a swap they start only after the
+  old copy's services have stopped, so two copies never run the same consumer or scheduler at once.
+- They stop in reverse order, awaited within `HostedServiceTimeout` (10 s), before the module's container is disposed:
+  on unload, swap and host shutdown.
+- A failing service (constructor, `StartAsync`, a faulted `ExecuteAsync`, a stop timeout) is logged and reported in
+  the module listing (`hostedServices` with state and error). It never stops the host or the other services.
+- They start on a clean execution context, without the activating request's tenant or `HttpContext`. Work for a
+  tenant needs `moduleServices.CreateTenantScope(tenantId)` or, like Elsa's poller, an API call that names the tenant.
+
+Every replica of every pool that enables the module runs its own copy. A job that must run once per cluster needs a
+distributed lock or leader election; it is not provided by the runtime.
+
+## Private pipelines
+
+A module that hosts a library which wires itself with middleware (`app.UseXyz()`, `UseRouting`/`UseEndpoints`) instead
+of Carter endpoints implements `IModulePipeline` next to `IRuntimeModule`:
+
+```csharp
+public sealed class ElsaModule : IRuntimeModule, IModulePipeline
+{
+    public void ConfigurePipeline(IApplicationBuilder app)
+    {
+        app.UseRouting();
+        app.UseWorkflowsApi();
+    }
+
+    public void ConfigureEndpoint(IEndpointConventionBuilder endpoint) => endpoint.RequireAuthorization();
+}
+```
+
+- The host maps one catch-all endpoint, `/api/{RoutePrefix}/{**path}`, that runs a pipeline built from the module's
+  own container. Inside it `PathBase` ends with the prefix, so routes are relative.
+- It runs after the host's middleware: the tenant is resolved and the caller authenticated. `ConfigureEndpoint` adds
+  conventions to the catch-all, such as `.RequireAuthorization()` or `.TenantOptional()`.
+- The module's Carter routes, if any, are more specific and win over the catch-all.
+- The pipeline gets its own `RouteOptions` and matcher, so its endpoints never join the host's route table and are
+  disposed with the module. Those are internal framework types reached by reflection: re-verify after a .NET upgrade.
+
+## Modules that cannot unload: `HotUnload = false`
+
+Some libraries keep process-wide state (static caches, global registrations) that pins their assemblies; Elsa is one.
+Such a module sets `HotUnload = false` in its manifest:
+
+| Operation | With `HotUnload = false` |
+| --- | --- |
+| Install, activate, deactivate | Work as usual |
+| Unload, uninstall | **409**, unless the call adds `?deferred=true`: routes go now, the loaded copy is released at the next restart |
+| Re-install (upgrade), settings change | The running copy is kept; the listing shows `restartRequired: true` and the `loadedVersion` still running. Apply it with a rolling restart of the pool |
+
+Give such a module a pool of its own so its restarts don't disturb other modules.
+
 ## Settings
 
 Manifest defaults are copied into the catalog at install time. The admin can replace them
 (`PUT /api/admin/modules/{id}/settings`); every replica that has the module loaded **swaps** to a copy configured
 with the new values, without downtime. A re-install keeps the admin's values for keys the new version still has.
 
+Settings are stored in plain text in the catalog: never put secrets there. A module only sees its own settings, not
+the host configuration. The one exception today is hard-coded: the runtime copies Elsa's connection string, client
+credentials and URLs from the host configuration into the module with id `elsa` (see
+[Elsa: secrets and settings](/modules/elsa/#secrets-and-settings)). A general, operator-allowlisted mechanism for host
+secrets is still to be designed.
+
 ## Not covered yet
 
 - A real modules table instead of `modules.json` and a lock file.
 - Package signing and verification. (The admin API is protected: it needs `platform.modules.manage`.)
-- Module message consumers and hosted services (the tenant-scope primitive exists).
+- Module message consumers (hosted services are supported; the tenant-scope primitive exists).
+- A general way to give a module host secrets (only `elsa` gets them, hard-coded).
 - Keyed services inside modules.
 - Restoring `.nupkg` dependencies: ship dependencies in the `.zip` form instead.
 - Draining in-flight requests before an unload (a swap needs none: the old copy keeps serving until it is replaced).

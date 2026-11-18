@@ -81,6 +81,12 @@ public sealed class ContentDbContext(DbContextOptions<ContentDbContext> options,
             post.Property(a => a.SchemaVersion).HasDefaultValue(1);
             post.Property(a => a.DocumentJson).HasDefaultValue("{}");
             post.Property(a => a.PublishedDocumentJson);
+            if (Database.ProviderName == "Oracle.EntityFrameworkCore")
+            {
+                // Oracle maps an unbounded string to NVARCHAR2(2000); Post documents may be up to 2 MB.
+                post.Property(a => a.DocumentJson).HasColumnType("NCLOB");
+                post.Property(a => a.PublishedDocumentJson).HasColumnType("NCLOB");
+            }
             post.Property(a => a.PublishedTitle).HasMaxLength(300);
             post.Property(a => a.Version).IsConcurrencyToken();
             foreach (var user in new[] { nameof(Post.AcceptedBy), nameof(Post.AssigneeId), nameof(Post.ReviewerId), nameof(Post.ScheduledBy), nameof(Post.PublishedBy) })
@@ -136,49 +142,63 @@ public sealed class ContentEndpoints : ICarterModule
             catch (DomainException e) { return Results.Problem(e.Message, statusCode: StatusCodes.Status409Conflict); }
         });
 
-        content.MapGet("/presses", (TaxonomyService taxonomy, CancellationToken ct) => taxonomy.PressesAsync(ct));
+        // Endpoint names are the OpenAPI operation ids: "Content_ListPosts" becomes ContentClient.ListPostsAsync in the
+        // generated client. They must be unique across the whole host, hence the module prefix.
+        content.MapGet("/presses", (TaxonomyService taxonomy, CancellationToken ct) => taxonomy.PressesAsync(ct))
+            .WithName("Content_ListPresses");
         content.MapPost("/presses", (PressDto press, TaxonomyService taxonomy, CancellationToken ct) => taxonomy.AddPressAsync(press, ct))
-            .RequirePermission(ContentPermissions.Manage);
-        content.MapGet("/categories", (string? pressId, TaxonomyService taxonomy, CancellationToken ct) => taxonomy.CategoriesAsync(pressId, ct));
+            .RequirePermission(ContentPermissions.Manage)
+            .WithName("Content_AddPress");
+        content.MapGet("/categories", (string? pressId, TaxonomyService taxonomy, CancellationToken ct) => taxonomy.CategoriesAsync(pressId, ct))
+            .WithName("Content_ListCategories");
         content.MapPost("/categories", (CategoryDto category, TaxonomyService taxonomy, CancellationToken ct) => taxonomy.AddCategoryAsync(category, ct))
-            .RequirePermission(ContentPermissions.Manage);
+            .RequirePermission(ContentPermissions.Manage)
+            .WithName("Content_AddCategory");
 
-        MapPosts(content.MapGroup("/posts"), "posts");
-        MapPosts(content.MapGroup("/articles"), "articles"); // compatibility route
-        MapPosts(content.MapGroup("/works"), "works"); // compatibility route
+        MapPosts(content.MapGroup("/posts"), "posts", documented: true);
+        // Compatibility routes: the same handlers, left out of the OpenAPI document so generated clients only use /posts.
+        MapPosts(content.MapGroup("/articles").ExcludeFromDescription(), "articles", documented: false);
+        MapPosts(content.MapGroup("/works").ExcludeFromDescription(), "works", documented: false);
         content.MapGet("/public/{publicId}", (string publicId, PostService service, CancellationToken ct) => service.GetPublishedAsync(publicId, ct))
+            .AllowAnonymous() // readers are not signed in; the tenant still comes from the host name or the X-Tenant header
+            .WithName("Content_GetPublishedPost")
             .WithSummary("Resolve the permanent Post URL; only the immutable published snapshot is returned.");
     }
 
-    private static void MapPosts(RouteGroupBuilder posts, string resourceSegment)
+    /// <summary>Maps the Post routes under one resource segment. Only the documented copy is named (names are unique).</summary>
+    private static void MapPosts(RouteGroupBuilder posts, string resourceSegment, bool documented)
     {
-        posts.MapGet("/", (PostView? view, PostService service, CancellationToken ct) => service.ListAsync(view ?? PostView.Mine, ct))
+        RouteHandlerBuilder Named(RouteHandlerBuilder endpoint, string name) =>
+            documented ? endpoint.WithName("Content_" + name) : endpoint;
+
+        Named(posts.MapGet("/", (PostView? view, PostService service, CancellationToken ct) => service.ListAsync(view ?? PostView.Mine, ct)), "ListPosts")
             .WithSummary("Posts by post kind: article, news, video, reportage, and more. ?view=Mine | Queue | Review | Desk.");
-        posts.MapGet("/{id:int}", (int id, PostService service, CancellationToken ct) => service.GetAsync(id, ct));
-        posts.MapPost("/", async (NewPost request, PostService service, CancellationToken ct) =>
+        Named(posts.MapGet("/{id:int}", (int id, PostService service, CancellationToken ct) => service.GetAsync(id, ct)), "GetPost");
+        Named(posts.MapPost("/", async (NewPost request, PostService service, CancellationToken ct) =>
             {
                 var post = await service.CreateAsync(request, ct);
                 return Results.Created($"{resourceSegment}/{post.Id}", post);
-            })
+            }), "CreatePost")
+            .Produces<PostDetail>(StatusCodes.Status201Created) // Results.Created hides the type from OpenAPI
             .RequirePermission(ContentPermissions.Author);
-        posts.MapPut("/{id:int}", (int id, PostEdit edit, PostService service, CancellationToken ct) => service.EditAsync(id, edit, ct));
+        Named(posts.MapPut("/{id:int}", (int id, PostEdit edit, PostService service, CancellationToken ct) => service.EditAsync(id, edit, ct)), "EditPost");
 
-        posts.MapPost("/{id:int}/submit", (int id, VersionRequest r, PostService s, CancellationToken ct) => s.SubmitAsync(id, r.Version, ct));
-        posts.MapPost("/{id:int}/accept", (int id, AcceptRequest r, PostService s, CancellationToken ct) => s.AcceptAsync(id, r, ct))
+        Named(posts.MapPost("/{id:int}/submit", (int id, VersionRequest r, PostService s, CancellationToken ct) => s.SubmitAsync(id, r.Version, ct)), "SubmitPost");
+        Named(posts.MapPost("/{id:int}/accept", (int id, AcceptRequest r, PostService s, CancellationToken ct) => s.AcceptAsync(id, r, ct)), "AcceptPost")
             .RequirePermission(ContentPermissions.Accept);
-        posts.MapPost("/{id:int}/assign", (int id, Assignment r, PostService s, CancellationToken ct) => s.AssignAsync(id, r, ct))
+        Named(posts.MapPost("/{id:int}/assign", (int id, Assignment r, PostService s, CancellationToken ct) => s.AssignAsync(id, r, ct)), "AssignPost")
             .RequirePermission(ContentPermissions.Assign);
-        posts.MapPost("/{id:int}/approve", (int id, VersionRequest r, PostService s, CancellationToken ct) => s.ApproveAsync(id, r.Version, ct))
+        Named(posts.MapPost("/{id:int}/approve", (int id, VersionRequest r, PostService s, CancellationToken ct) => s.ApproveAsync(id, r.Version, ct)), "ApprovePost")
             .RequirePermission(ContentPermissions.Review);
-        posts.MapPost("/{id:int}/return", (int id, ReturnRequest r, PostService s, CancellationToken ct) => s.ReturnAsync(id, r.Version, r.Reason, ct))
+        Named(posts.MapPost("/{id:int}/return", (int id, ReturnRequest r, PostService s, CancellationToken ct) => s.ReturnAsync(id, r.Version, r.Reason, ct)), "ReturnPost")
             .RequirePermission(ContentPermissions.Return);
-        posts.MapPost("/{id:int}/transfer", (int id, TransferRequest r, PostService s, CancellationToken ct) => s.TransferAsync(id, r.Version, r.FromShift, ct))
+        Named(posts.MapPost("/{id:int}/transfer", (int id, TransferRequest r, PostService s, CancellationToken ct) => s.TransferAsync(id, r.Version, r.FromShift, ct)), "TransferPost")
             .RequirePermission(ContentPermissions.Transfer);
-        posts.MapPost("/{id:int}/schedule", (int id, ScheduleRequest r, PostService s, CancellationToken ct) => s.ScheduleAsync(id, r.Version, r.PublishAt, ct))
+        Named(posts.MapPost("/{id:int}/schedule", (int id, ScheduleRequest r, PostService s, CancellationToken ct) => s.ScheduleAsync(id, r.Version, r.PublishAt, ct)), "SchedulePost")
             .RequirePermission(ContentPermissions.Publish);
-        posts.MapPost("/{id:int}/publish", (int id, VersionRequest r, PostService s, CancellationToken ct) => s.PublishAsync(id, r.Version, ct))
+        Named(posts.MapPost("/{id:int}/publish", (int id, VersionRequest r, PostService s, CancellationToken ct) => s.PublishAsync(id, r.Version, ct)), "PublishPost")
             .RequirePermission(ContentPermissions.Publish);
-        posts.MapPost("/publish-due", (PostService s, CancellationToken ct) => s.PublishDueAsync(ct))
+        Named(posts.MapPost("/publish-due", (PostService s, CancellationToken ct) => s.PublishDueAsync(ct)), "PublishDuePosts")
             .RequirePermission(ContentPermissions.Publish);
     }
 }
@@ -189,12 +209,15 @@ public sealed class ContentAutomationEndpoints : ICarterModule
     {
         app.MapGet("/automation/accepted", (PostService service, CancellationToken ct) => service.AcceptedForAutomationAsync(ct))
             .RequirePermission(ContentPermissions.Assign)
+            .WithName("Content_ListAcceptedForAutomation")
             .WithSummary("Accepted works available for Elsa's durable assignment-delay workflow.");
         app.MapPost("/automation/accepted/{id:int}/assign", (int id, PostService service, CancellationToken ct) => service.AutoAssignAsync(id, ct))
             .RequirePermission(ContentPermissions.Assign)
+            .WithName("Content_AutoAssignPost")
             .WithSummary("Assign the accepted work to an eligible editor on an active shift; concurrency conflicts preserve a manager's assignment.");
         app.MapPost("/automation/shifts/{shiftId}/handover", (string shiftId, PostService service, CancellationToken ct) => service.TransferShiftWorkAsync(shiftId, ct))
             .RequirePermission(ContentPermissions.Transfer)
+            .WithName("Content_HandOverShiftWork")
             .WithSummary("Return all unfinished review work from the outgoing shift to the queue; safe to repeat after recovery.");
     }
 }

@@ -134,12 +134,20 @@ public sealed class PulseHeaderMiddleware(RequestDelegate next, PulseState state
     }
 }
 
+/// <summary>A named type (not an anonymous one) so the OpenAPI document and generated clients get a proper schema.</summary>
+public sealed record PulseStatus(long Beats, DateTimeOffset StartedAt, string Module);
+
+/// <summary>
+/// The only Pulse route in the OpenAPI document. The private pipeline's routes (/ping, /whoami, /beats, /echo) are
+/// behind the module's catch-all, which the host leaves out of OpenAPI, so generated clients do not have them.
+/// </summary>
 public sealed class PulseEndpoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/status", (PulseState state) => new { state.Beats, state.StartedAt, Module = "carter route" })
+        app.MapGet("/status", (PulseState state) => new PulseStatus(state.Beats, state.StartedAt, "carter route"))
             .AllowAnonymous()
-            .TenantOptional();
+            .TenantOptional()
+            .WithName("Pulse_GetStatus");
     }
 }

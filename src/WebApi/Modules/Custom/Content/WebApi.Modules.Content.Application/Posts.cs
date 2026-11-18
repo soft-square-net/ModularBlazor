@@ -34,6 +34,7 @@ public sealed record PublishedPost(int Id, string PublicId, string Permalink, Po
 public sealed record Assignment(int Version, string AssigneeId, string? ShiftId);
 
 /// <summary>Which list: the caller's own, the queue (accept/assign), their reviews, or the Desk's (approved and scheduled).</summary>
+[System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter<PostView>))]
 public enum PostView { Mine, Queue, Review, Desk }
 
 /// <summary>The Post with this id, tracked (for a change); history is appended without loading it.</summary>
@@ -48,14 +49,18 @@ public sealed class PostDetailSpec : SingleResultSpecification<Post>
     public PostDetailSpec(int id) => Query.Where(a => a.Id == id).Include(a => a.History).AsNoTracking();
 }
 
+/// <summary>
+/// A Post with a live published snapshot. Matched on <see cref="Post.PublishedAt"/>, not the current state: while a later
+/// edit waits for Desk re-approval (or was returned), the previously published snapshot stays live.
+/// </summary>
 public sealed class PublishedPostByPublicIdSpec : SingleResultSpecification<Post>
 {
-    public PublishedPostByPublicIdSpec(string publicId) => Query.Where(p => p.PublicId == publicId && p.State == PostState.Published).AsNoTracking();
+    public PublishedPostByPublicIdSpec(string publicId) => Query.Where(p => p.PublicId == publicId && p.PublishedAt != null).AsNoTracking();
 }
 
 public sealed class PublishedPostByLegacyIdSpec : SingleResultSpecification<Post>
 {
-    public PublishedPostByLegacyIdSpec(int id) => Query.Where(p => p.Id == id && p.State == PostState.Published).AsNoTracking();
+    public PublishedPostByLegacyIdSpec(int id) => Query.Where(p => p.Id == id && p.PublishedAt != null).AsNoTracking();
 }
 
 public sealed class PostListSpec : Specification<Post, PostSummary>
@@ -217,7 +222,7 @@ public sealed class PostService(
         return pending.Count;
     }
 
-    /// <summary>Owner (draft, returned, or submitted within the window), assigned reviewer (in review, on shift), or Desk (approved or scheduled).</summary>
+    /// <summary>Owner (draft, returned, or submitted within the window), assigned reviewer (in review, on shift), or Desk (approved, scheduled, awaiting re-approval, or published: the live snapshot stays until re-approved).</summary>
     public Task<PostDetail> EditAsync(int id, PostEdit edit, CancellationToken ct) => ChangeAsync(id, edit.Version, async post =>
     {
         var now = Now;
@@ -228,7 +233,7 @@ public sealed class PostService(
             await RequireAsync(ContentPermissions.Review, post.Scopes, "review in this category now (is your shift over?)", ct);
             post.EditInReview(Me, edit.Title, edit.Body ?? "", now, edit.Document);
         }
-        else if (post.State is PostState.Approved or PostState.Scheduled or PostState.AwaitingDeskReapproval)
+        else if (post.State is PostState.Approved or PostState.Scheduled or PostState.AwaitingDeskReapproval or PostState.Published)
         {
             await RequireAsync(ContentPermissions.Publish, post.Scopes, "edit as Desk in this category", ct);
             post.EditByDesk(Me, edit.Title, edit.Body ?? "", now, edit.Document);

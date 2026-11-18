@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using soft.square.net.WebApi.Contracts.Tenancy;
 using soft.square.net.WebApi.SharedKernel;
@@ -15,6 +16,9 @@ namespace soft.square.net.WebApi.Data;
 /// <item>Any of the four engines: the tenant's server decides (<see cref="TenantDatabases"/>). The module ships one
 /// migration set per engine it supports (<see cref="ProviderMigrationsAssembly"/>).</item>
 /// <item>Entities implementing <see cref="ITenantOwned"/> are stamped and filtered by the tenant.</item>
+/// <item>Domain events raised by tracked aggregates (<see cref="IHasDomainEvents"/>) go to their
+/// <see cref="IDomainEventHandler{TEvent}"/>s inside SaveChangesAsync, before the write, so the handlers' changes are
+/// saved with it. Synchronous SaveChanges refuses pending events.</item>
 /// </list>
 /// Derived contexts configure their model in <see cref="ConfigureModel"/>.
 /// </summary>
@@ -77,16 +81,76 @@ public abstract class TenantDbContext : DbContext
         }
     }
 
+    /// <summary>Rounds of handlers a save runs before it gives up on handlers that keep raising events.</summary>
+    private const int MaxDomainEventRounds = 8;
+    private bool _dispatchingDomainEvents;
+
     public override int SaveChanges(bool acceptAllChangesOnSuccess)
     {
+        ThrowIfSavingFromHandler();
+        if (HasPendingDomainEvents())
+            throw new InvalidOperationException("Aggregates raised domain events; save with SaveChangesAsync so their handlers run.");
         StampTenant();
         return base.SaveChanges(acceptAllChangesOnSuccess);
     }
 
-    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+    /// <summary>
+    /// Runs the handlers of the domain events raised by tracked aggregates (repeating while they raise more), then
+    /// stamps the tenant and writes everything in one save.
+    /// </summary>
+    public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
     {
+        ThrowIfSavingFromHandler();
+        await DispatchDomainEventsAsync(cancellationToken).ConfigureAwait(false);
         StampTenant();
-        return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken).ConfigureAwait(false);
+    }
+
+    private void ThrowIfSavingFromHandler()
+    {
+        if (_dispatchingDomainEvents)
+            throw new InvalidOperationException(
+                "A domain event handler must not save (nor call IRepository Add/Update/Delete, which save at once): the save that raised the event writes its changes.");
+    }
+
+    private bool HasPendingDomainEvents() =>
+        ChangeTracker.Entries<IHasDomainEvents>().Any(e => e.Entity.HasDomainEvents);
+
+    private async Task DispatchDomainEventsAsync(CancellationToken cancellationToken)
+    {
+        if (!HasPendingDomainEvents()) return;
+        var dispatcher = ResolveDispatcher();
+        _dispatchingDomainEvents = true;
+        try
+        {
+            for (var round = 0; ; round++)
+            {
+                // Materialize before handlers run: they may track more entities.
+                var owners = ChangeTracker.Entries<IHasDomainEvents>().Select(e => e.Entity).Where(e => e.HasDomainEvents).ToList();
+                if (owners.Count == 0) return;
+                if (round == MaxDomainEventRounds)
+                    throw new InvalidOperationException(
+                        $"Domain events were still being raised after {MaxDomainEventRounds} rounds; check for handlers that trigger each other.");
+                foreach (var domainEvent in owners.SelectMany(o => o.TakeDomainEvents()).ToList())
+                    await dispatcher.DispatchAsync(domainEvent, cancellationToken).ConfigureAwait(false);
+            }
+        }
+        finally
+        {
+            _dispatchingDomainEvents = false;
+        }
+    }
+
+    /// <summary>
+    /// The dispatcher of the scope that created this context. AddDbContext records that scope as EF's application
+    /// service provider; the module's own internal provider (UseInternalServiceProvider) does not know it.
+    /// </summary>
+    private DomainEventDispatcher ResolveDispatcher()
+    {
+        var scope = this.GetService<IDbContextOptions>().FindExtension<CoreOptionsExtension>()?.ApplicationServiceProvider;
+        return scope?.GetService(typeof(DomainEventDispatcher)) as DomainEventDispatcher
+            ?? throw new InvalidOperationException(
+                $"Aggregates raised domain events, but {GetType().Name} was not created by AddTenantDbContext, so their handlers cannot run.");
     }
 
     private void StampTenant()

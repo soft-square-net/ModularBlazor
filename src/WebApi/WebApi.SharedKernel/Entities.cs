@@ -9,8 +9,31 @@ public abstract class EntityBase<TId> where TId : notnull
     public TId Id { get; protected set; } = default!;
 }
 
-/// <summary>An entity that is the root of an aggregate.</summary>
-public abstract class AggregateRoot<TId> : EntityBase<TId>, IAggregateRoot where TId : notnull;
+/// <summary>
+/// An entity that is the root of an aggregate. It can raise domain events (<see cref="Raise"/>); the module's
+/// TenantDbContext hands them to their handlers inside the same SaveChangesAsync, before anything is written.
+/// </summary>
+public abstract class AggregateRoot<TId> : EntityBase<TId>, IAggregateRoot, IHasDomainEvents where TId : notnull
+{
+    // A field, never a mapped property: EF Core ignores it.
+    private List<IDomainEvent>? _domainEvents;
+
+    /// <summary>Records an event; it is handled when the aggregate is next saved with SaveChangesAsync.</summary>
+    protected void Raise(IDomainEvent domainEvent)
+    {
+        ArgumentNullException.ThrowIfNull(domainEvent);
+        (_domainEvents ??= []).Add(domainEvent);
+    }
+
+    bool IHasDomainEvents.HasDomainEvents => _domainEvents is { Count: > 0 };
+
+    IReadOnlyList<IDomainEvent> IHasDomainEvents.TakeDomainEvents()
+    {
+        var taken = _domainEvents ?? [];
+        _domainEvents = null;
+        return taken;
+    }
+}
 
 /// <summary>
 /// A row that belongs to one tenant. The data layer (TenantDbContext) stamps it on insert, refuses to save it for

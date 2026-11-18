@@ -11,6 +11,8 @@
 
 using Aspire.Hosting.Yarp;
 using Aspire.Hosting.Yarp.Transforms;
+using Google.Protobuf.WellKnownTypes;
+using k8s.ClientSets;
 using Yarp.ReverseProxy.Transforms;
 
 var builder = DistributedApplication.CreateBuilder(args);
@@ -148,6 +150,26 @@ var gateway = builder.AddYarp("gateway")
 foreach (var replica in core.Concat(sales).Concat(worker).Concat(workflow))
     gateway.WithReference(replica).WaitFor(replica);
 
+// soft.square.net.ModularBlazor.Client (Blazor WebAssembly served by nginx on 5000 http / 5001 https).
+// The modules folder is bind-mounted over the image's copy, so modules rebuilt locally (build-modules.*) show up
+// without rebuilding the image.
+var clientModules = Existing("..", "..", "apps", "blazor", "ModularBlazor.Client", "wwwroot", "modules");
+var clientCert = Existing("..", "..", "apps", "blazor", "ModularBlazor.Client", "aspnetapp.pfx");
+var certPassword = builder.AddParameter("my-cert-password", secret: true);
+
+builder
+    .AddDockerfile("client", "../../..", "src/apps/blazor/ModularBlazor.Client/Dockerfile")
+    .WithImage("client")
+    .WithImageTag("latest")
+    .WithHttpEndpoint(port: 5000, targetPort: 5000, name: "http")
+    .WithHttpsEndpoint(port: 5001, targetPort: 5001, name: "https")
+    .WithExternalHttpEndpoints()
+    .WithBuildArg("BUILD_MODULES", "false")
+    .WithBindMount(clientModules, "/usr/share/nginx/html/modules", isReadOnly: true)
+    .WithBindMount(clientCert, "/https/aspnetapp.pfx", isReadOnly: true)
+    .WithEnvironment("CERT_PASSWORD", certPassword)
+    .WaitFor(gateway);
+
 builder.Build().Run();
 
 // A pool is N replicas of the same WebApi project; the pool, its role and the modules it may activate are
@@ -183,3 +205,12 @@ IResourceBuilder<ProjectResource>[] AddPool(string name, string role, int replic
 static YarpCluster Cluster(IYarpConfigurationBuilder yarp, string name, IResourceBuilder<ProjectResource>[] replicas) =>
     yarp.AddCluster(name, replicas.Select(r => (object)r.GetEndpoint("http")).ToArray())
         .WithLoadBalancingPolicy("RoundRobin");
+
+
+string Existing(params string[] parts)
+{
+  var path = Path.GetFullPath(Path.Combine([builder.AppHostDirectory, .. parts]));
+  return File.Exists(path) || Directory.Exists(path)
+      ? path
+      : throw new FileNotFoundException($"Not found: {path}");
+}

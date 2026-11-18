@@ -5,9 +5,8 @@ sidebar:
   order: 1
 ---
 
-:::caution[Status]
-This page records the recommended integration design. It is not yet implemented in the newer runtime-module WebApi.
-The older `ModularBlazor.Host` contains an embedded Elsa host module; see [current repository state](#repository-state).
+:::note[Status]
+The Elsa runtime module exists (`src/WebApi/Modules/Custom/Elsa`, module `elsa` 0.1.0) and runs in the Hybird lab's `workflow` pool. It hosts the Elsa engine, API and tenant adapters, but **no workflow definitions yet**: the newsroom timers run in a hosted polling service. See [Current implementation](#current-implementation).
 :::
 
 ## Recommendation
@@ -59,18 +58,46 @@ This is **process isolation from the other WebApi pools**, not an independent El
 
 Choose a standalone Elsa Server later only if the module-hosting spike shows the private pipeline or hosted-service lifecycle is unreliable, Elsa's dependencies cannot be kept compatible with the workflow host, or Elsa needs a release cadence independent of the WebApi host. The tenant, message, authorization, and domain-ownership contracts should stay the same either way.
 
-## Repository state
+## Current implementation
 
-There are two architectures in the repository, and they should not be conflated:
+There are two architectures in the repository; do not conflate them.
 
-| Area | Current state |
+| Area | State |
 | --- | --- |
-| Older `src/api/ModularBlazor.Host` | Elsa 3.9 is embedded as the `ElsaHostModule`. It registers Elsa tenancy through Finbuckle and stores workflows in a shared database with Elsa tenant IDs. Its permission adapter is from the older host authorization model. |
-| New `src/WebApi` runtime host | Has a separate OpenIddict identity service and a tenant-aware Shifts runtime module. It does not yet host Elsa or contain an Elsa runtime-module project. |
+| New `src/WebApi` runtime host | Elsa 3.9 runs as the custom runtime module `elsa` (`WebApi.Modules.Elsa.Infrastructure`, a single project). |
+| Older `src/api/ModularBlazor.Host` | Elsa is embedded as `ElsaHostModule`, with Finbuckle tenancy and the older permission adapter. Treat it as reference only. |
 
-The older `FinbuckleTenantResolver` is a useful proof of the adapter pattern: take the platform's already-resolved tenant and give that tenant ID to Elsa. For the new host, adapt this to the current tenant directory/context. Do not add a second, independently configured list of tenants inside Elsa. The agreed placement is described in [Authentication and authorization, section 9](/backend/auth-design/#9-elsa-3-elsa-server-inside-its-own-runtime-module).
+### What the `elsa` module does
 
-Relevant code: `modules/host/ElsaHost/ElsaHost.Infrastructure/ElsaHostModule.cs`, `modules/host/ElsaHost/ElsaHost.Infrastructure/Tenancy/FinbuckleTenancy.cs`, `src/WebApi/Modules/Custom/Shifts/WebApi.Modules.Shifts.Infrastructure/ShiftsModule.cs`, and `src/WebApi/Identity/WebApi.Identity.Server/Auth/TokenIssuer.cs`.
+| Piece | Implementation |
+| --- | --- |
+| Manifest | Id and route prefix `elsa`; `HotUnload = false`; permissions `workflow.view`, `workflow.design`, `workflow.run`; settings `Elsa:Schema` (`elsa`), `Elsa:RunMigrations` (`true`), `Elsa:PollInterval` (`00:00:15`) |
+| Hosting | Implements `IModulePipeline`: Elsa's middleware and API run in a private pipeline behind `/api/elsa/{**path}`, after the host has resolved the tenant and authenticated the caller (`RequireAuthorization`) |
+| Persistence | Elsa workflow management and runtime stores on EF Core PostgreSQL, from `ConnectionStrings:elsa`, schema `elsa`; Elsa runs its own migrations |
+| Tenancy | `ElsaPlatformTenantResolver` hands Elsa the tenant the host already resolved; `ElsaPlatformTenantsProvider` lists active tenants from `ITenantDirectory`. Elsa has no tenant list of its own |
+| Authorization | `ElsaWorkflowPermissionMiddleware` maps Elsa API calls to host grants: `workflow-instances` → `workflow.run`, other reads → `workflow.view`, other writes → `workflow.design` |
+| Automation | `NewsroomAutomationService` (a `BackgroundService`) polls the Content and Shifts APIs as client `elsa-workflows`; see [Workflow and module integrations](/modules/contents/workflow-and-integrations/#delivery-sequence) |
+
+### Secrets and settings
+
+The module needs values that must not be stored in the module catalog, so the runtime injects them from the host's configuration into this module's private settings: `ConnectionStrings:elsa`, `Identity:ElsaClient:ClientId`, `Identity:ElsaClient:ClientSecret`, `Elsa:IdentityAuthority` and `Elsa:PlatformApiBaseUrl`. In the Hybird lab the client secret is the Aspire parameter `elsa-client-secret`; set it once with user-secrets:
+
+```bash
+dotnet user-secrets set "Parameters:elsa-client-secret" "<dev-secret>" --project src/Aspire/Hybird
+```
+
+### Open issues
+
+| Issue | Why it matters | Suggested fix |
+| --- | --- | --- |
+| No Elsa workflow definitions | Timers live in a polling loop, not in durable, inspectable workflows | Model assignment delay, scheduled publish and checkout grace as Elsa workflows |
+| Both workflow replicas run the poller | Every command is sent twice; correctness relies on idempotent endpoints | Elect one runner (distributed lock in Redis or the database), or let Elsa's scheduler own the timers |
+| The secret injection is hard-coded for the module id `elsa` in `ModuleRuntime` | Any other module that needs a host secret needs a host change, and any package that claims the id `elsa` receives these secrets | A manifest-declared list of required host keys, allowlisted per module id by the operator |
+| `Elsa:PlatformApiBaseUrl` is `http://localhost:5080` in the AppHost | Breaks outside the lab | Use the gateway's service-discovery reference |
+| Typed `HttpClient` held by a singleton hosted service | `HttpClient` handlers are never rotated, so DNS changes are missed | Use `IHttpClientFactory.CreateClient` per cycle |
+| Elsa's file-system distributed lock with 2 replicas | Locks are not shared across processes | Configure a Redis or PostgreSQL distributed lock provider |
+
+Relevant code: `src/WebApi/Modules/Custom/Elsa/WebApi.Modules.Elsa.Infrastructure/ElsaModule.cs`, `NewsroomAutomationService.cs`, `src/WebApi/WebApi/Modularity/ModuleRuntime.cs` (secret injection), `src/Aspire/Hybird/AppHost.cs` (workflow pool).
 
 ## Tenant propagation and data isolation
 
@@ -89,7 +116,7 @@ Elsa's multitenancy documentation explicitly distinguishes tenant resolution fro
 
 - Keep **OpenIddict Identity** as the only user identity authority. Do not create a second Elsa user database or copy press, category, or shift roles into Elsa.
 - User tokens stay tenant-bound and contain stable identity claims such as `sub` and `tenant`. Press/category scopes and shift grants remain server-side and are checked by the host at request time.
-- Authenticate the Elsa process as a workload. Its delayed commands must be tenant-bound, narrowly authorized, and auditable. Implement this service-token contract before enabling cross-process workflow actions.
+- Authenticate the Elsa process as a workload. Its delayed commands must be tenant-bound, narrowly authorized, and auditable. The lab uses the confidential client `elsa-workflows` (client credentials, scope `api`); its tokens carry no tenant, so each call names the tenant with `X-Tenant` and the host checks the client's grants in that tenant.
 - Protect Elsa's own management API separately with least-privilege workflow administration permissions. Elsa API permissions do not replace application permissions, and Elsa API permissions do not secure HTTP-triggered workflow routes. [Elsa authentication and authorization](https://docs.elsaworkflows.io/guides/authentication.md)
 - Never use a broad `*` permission mapping for ordinary editors or Desk users. In the legacy host, `ElsaPermissionTransformation` gives generic workflow permissions based on a simple role check; that is too broad for the new scoped newsroom policy.
 

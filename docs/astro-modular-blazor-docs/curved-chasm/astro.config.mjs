@@ -140,6 +140,7 @@ export default defineConfig({
 				},
 				{
 					label: 'Modules',
+					translations: { ar: 'الوحدات' },
 					items: [{ autogenerate: { directory: 'modules' } }],
 				},
 				{

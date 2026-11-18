@@ -3,8 +3,6 @@ title: Workflow and module integrations
 description: How Contents coordinates with Shifts, Elsa, Identity, Tenancy, and deployment pools while retaining ownership of editorial state.
 ---
 
-# Workflow and module integrations
-
 ## Editorial lifecycle
 
 The lifecycle is enforced by Contents. Shifts supplies time-bounded role grants and section coverage; Elsa waits, reminds, and issues authorized commands through module APIs.
@@ -88,13 +86,37 @@ Contents never directly queries the Shifts database, and Elsa never changes Cont
 
 - Identity issues the user's token and owns the global account and tenant membership. Content uses the token subject as `OwnerId`/actor ID; it does not own passwords, user records, or membership.
 - The host resolves one tenant per request and validates the tenant context. Content data is tenant-isolated using the configured tenant database/provider strategy.
-- A tenant/company contains its own presses, categories, works, grants, rota sections, and workflow instances. A user may have different company roles and category scopes in multiple tenants.
+- A tenant/company contains its own presses, categories, Posts, grants, rota sections, and workflow instances. A user may have different company roles and category scopes in multiple tenants.
 - Post records store press and category IDs as module-owned references. A section that covers categories in two presses contains two explicit press/category scope pairs, not an inferred wildcard.
 - Elsa's service identity is a confidential client. It receives only the tenant grants needed for automation and sends an explicit tenant context on each API call. Service credentials belong in the secret provider, never module catalog settings or JWT payloads.
 
 ## Service/API boundary
 
-The Content module's canonical resource is `/api/content/posts`; `/api/content/articles` and `/api/content/works` remain compatibility aliases. List/detail/create responses use Post terminology and the `postKind` field. Dynamic form payload/version support is still planned. The API also exposes presses/categories, accepted-Post automation, scheduled publication, and shift handover operations. These routes are not a final public API contract; review consistency, filtering, pagination, response shapes, idempotency, and versioning before stabilizing clients.
+The canonical resource is `/api/content/posts`. `/api/content/articles` and `/api/content/works` are compatibility aliases with the same routes. Responses use Post terminology and the `postKind` field. These routes are not a final public contract yet: review filtering, pagination, response shapes, idempotency and versioning before stabilizing clients.
+
+| Route (under `/api/content`) | Permission | Notes |
+| --- | --- | --- |
+| `GET /presses`, `GET /categories?pressId=` | signed in | |
+| `POST /presses`, `POST /categories` | `content.manage` | |
+| `GET /posts?view=Mine\|Queue\|Review\|Desk` | signed in | Each view is filtered by the caller's scopes |
+| `GET /posts/{id}` | owner, assignee or a scope that sees it | Otherwise 404 |
+| `POST /posts` | `content.author` | Body `NewPost`: `categoryId`, `title`, `body`, `postKind`, optional `document` |
+| `PUT /posts/{id}` | depends on state | Owner, assigned reviewer, or Desk (`content.publish`); body `PostEdit` |
+| `POST /posts/{id}/submit` | owner | `{ version }` |
+| `POST /posts/{id}/accept` | `content.accept` | `{ version, shiftId }` |
+| `POST /posts/{id}/assign` | `content.assign` | `{ version, assigneeId, shiftId }` |
+| `POST /posts/{id}/approve` | `content.review` | Assigned reviewer only |
+| `POST /posts/{id}/return` | `content.return` | `{ version, reason }` |
+| `POST /posts/{id}/transfer` | `content.transfer` | `{ version, fromShift }` |
+| `POST /posts/{id}/schedule` | `content.publish` | `{ version, publishAt }` |
+| `POST /posts/{id}/publish` | `content.publish` | Plus the self-publish check |
+| `POST /posts/publish-due` | `content.publish` | Publishes every due schedule; called by Elsa |
+| `GET /public/{publicId}` | **anonymous** | Published snapshot only; tenant from host name or `X-Tenant` |
+| `GET /automation/accepted` | `content.assign` | Accepted Posts for Elsa's assignment delay |
+| `POST /automation/accepted/{id}/assign` | `content.assign` | Auto-assign to an eligible editor on shift |
+| `POST /automation/shifts/{shiftId}/handover` | `content.transfer` | Returns unfinished review work to the queue; safe to repeat |
+
+Errors are problem details: 403 for a missing right, 404 for a Post the caller may not see, 409 for a stale `version`, a concurrent change or a domain rule.
 
 | Operation | Owner | Expected caller |
 | --- | --- | --- |
@@ -106,9 +128,11 @@ The Content module's canonical resource is `/api/content/posts`; `/api/content/a
 
 The API should expose stable module contracts rather than sharing internal application assemblies. If the modules later need events for search indexing, notifications, or cache invalidation, publish tenant-scoped integration events after the owning transaction commits; events complement commands and do not replace validation at the Contents boundary.
 
-## Post payload and cross-module communication
+## Post document and cross-module communication
 
-Contents owns the Post envelope, submitted payload JSON, revisions, and all editorial decisions. Dynamic Fields owns reusable definitions and immutable form versions. Keyword owns canonical concepts; Contents owns the tag assignments on each Post. A future Media module owns binary assets, while Contents owns their editorial use. These boundaries apply whether modules run in one process or separate pools.
+This section is the **target** design; today Contents stores the document after structural checks only and calls no other module.
+
+Contents owns the Post envelope, the document JSON, revisions, and all editorial decisions. Dynamic Fields owns reusable definitions and immutable form versions. Keyword owns canonical concepts; Contents owns the tag assignments on each Post. A future Media module owns binary assets, while Contents owns their editorial use. These boundaries apply whether modules run in one process or separate pools.
 
 ```mermaid
 sequenceDiagram
@@ -118,12 +142,12 @@ sequenceDiagram
     participant K as Keyword
     participant M as Media (optional)
     UI->>C: Request allowed form for PostKind and category
-    C-->>UI: Form key/version and Post envelope contract
+    C-->>UI: Schema ID/version and Post envelope contract
     UI->>DF: Fetch published schema version
     DF-->>UI: Schema and presentation metadata
-    UI->>C: Save Post envelope, payload, Keyword IDs, asset IDs
+    UI->>C: Save Post envelope, document, Keyword IDs, asset IDs
     C->>C: Authenticate, authorize scope, check state/version
-    C->>DF: Validate payload against server-selected exact form version
+    C->>DF: Validate document content against server-selected schema version
     DF-->>C: Valid or JSON Pointer errors
     C->>K: Resolve submitted concept IDs (or use verified cache)
     K-->>C: Active tenant-visible concepts
@@ -136,7 +160,7 @@ sequenceDiagram
     C-->>K: Post link/tag/publication event after commit
 ```
 
-The frontend may fetch schema and display metadata, but its validation is only a usability aid. On every write, Contents independently selects the permitted form mapping, checks the caller and Post state, validates the payload against that exact immutable version, validates Keyword and asset references, then saves the Post and an outbox event in its own transaction. A client cannot submit a different `formKey` or `formVersion` to change the allowed shape. No cross-module transaction or database join is assumed.
+The frontend may fetch schema and display metadata, but its validation is only a usability aid. On every write, Contents independently selects the permitted form mapping, checks the caller and Post state, validates the payload against that exact immutable version, validates Keyword and asset references, then saves the Post and an outbox event in its own transaction. A client cannot submit a different `schemaId` or `schemaVersion` to change the allowed shape. No cross-module transaction or database join is assumed.
 
 If Dynamic Fields is unavailable, Contents may validate using a previously verified, retained schema snapshot for that exact version. Otherwise it rejects the write with a retriable service-unavailable response; it never silently skips validation. If Keyword or Media is optional and unavailable, existing IDs remain readable from saved snapshots, but new or changed references require a successful authoritative check. Events update Keyword backlinks and search projections after the Contents transaction; the source Post remains authoritative.
 
@@ -163,4 +187,11 @@ In distributed deployments, all replicas must see durable workflow storage and c
 5. Add retries, idempotency keys, observability, operator recovery views, and an explicit policy for no eligible reviewer or failed publication.
 6. Verify the same module package in all-in-one and dedicated-pool layouts, then verify that disabling/uninstalling optional newsroom modules leaves ERP modules operational.
 
-The current code contains a hosted polling coordinator that reconciles persisted deadlines through APIs. It is an integration starter, **not yet the final set of persisted Elsa workflow definitions**. Convert each business timer/process into an Elsa workflow before treating the workflow design as complete. See [Authentication and authorization](/backend/auth-design/) for the original agreed policy and shift decisions.
+The current code does not run Elsa workflow definitions yet. `NewsroomAutomationService`, a hosted service in the Elsa module, reconciles persisted deadlines through the APIs every `Elsa:PollInterval` (15 seconds by default). For each active tenant it:
+
+1. gets a client-credentials token as `elsa-workflows` and sends `X-Tenant` on every call;
+2. reads `GET /api/content/automation/accepted`, and for each Post whose shift's `autoAssignDelay` (from `GET /api/shifts/shifts/{id}/automation`) has passed, calls `POST /api/content/automation/accepted/{id}/assign`;
+3. calls `POST /api/content/posts/publish-due`;
+4. for each shift from `GET /api/shifts/overdue` whose `endsAt + checkoutGrace` has passed, calls the Content handover and then the Shifts check-out.
+
+This is an integration starter, **not the final set of persisted Elsa workflow definitions**. Both workflow-pool replicas run the loop, so every command must stay idempotent; the Content and Shifts endpoints recheck state and version, which makes duplicate calls safe but wasteful. Convert each business timer into an Elsa workflow, or elect one runner, before treating the design as complete. See [Elsa](/modules/elsa/#current-implementation) and [Authentication and authorization](/backend/auth-design/) for the original policy and shift decisions.
