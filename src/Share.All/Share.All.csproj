@@ -1,4 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Published as a NuGet package: modules developed outside this repo compile against it. -->
+  <Import Project="../../build/Platform.Packaging.props" />
+  <PropertyGroup>
+    <Description>ModularBlazor: types shared by the platform, its Blazor clients and modules.</Description>
+  </PropertyGroup>
   <PropertyGroup>
     <AssemblyName>$(SoftSquarePrefix).Share.All</AssemblyName>
     <RootNamespace>$(SoftSquarePrefix).Share.All</RootNamespace>

@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    soft.square.net.ModularBlazor.Module.Sdk: an MSBuild SDK package (no assembly) that gives a module developed
+    OUTSIDE this repo the build setup an in-repo module gets from its Directory.Build.props files, with package
+    references to the platform's contract packages instead of project references. See Sdk/Sdk.props for its use.
+
+    Packed with the contract packages, in the same version (build/pack-platform.ps1). That version is written into the
+    package as Sdk/Platform.props, so a module that pins the SDK version gets contract packages of the same version.
+  -->
+  <Import Project="../../build/Platform.Packaging.props" />
+
+  <PropertyGroup>
+    <Description>ModularBlazor: MSBuild SDK for modules developed outside the platform repo. Server modules (Domain, Application, Infrastructure layers or a single project) and Blazor client modules compile against the platform's contract packages and ship none of them.</Description>
+    <PackageType>MSBuildSdk</PackageType>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <IncludeSymbols>false</IncludeSymbols>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <!-- NU5128: no lib/ folder, on purpose (an SDK package carries MSBuild files only). -->
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+
+    <!-- Versions of the host-shipped packages a module compiles against. Keep them in step with the host:
+         Carter in WebApi/WebApi.csproj, EF Core in WebApi.Data/WebApi.Data.csproj, Components.Web in
+         modules/client/Directory.Build.props. -->
+    <ModuleCarterVersion>10.0.0</ModuleCarterVersion>
+    <ModuleEfCoreVersion>10.0.14</ModuleEfCoreVersion>
+    <ModuleAspNetCoreVersion>10.0.*</ModuleAspNetCoreVersion>
+    <!-- BaseIntermediateOutputPath (obj/): IntermediateOutputPath is not defined yet when the project body is read. -->
+    <_PlatformProps>$(BaseIntermediateOutputPath)Platform.props</_PlatformProps>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="Sdk/*.props;Sdk/*.targets" Pack="true" PackagePath="Sdk/" />
+    <None Include="$(_PlatformProps)" Pack="true" PackagePath="Sdk/Platform.props" Visible="false" />
+  </ItemGroup>
+
+  <Target Name="WritePlatformProps" BeforeTargets="Build;GenerateNuspec">
+    <WriteLinesToFile File="$(_PlatformProps)" Overwrite="true" WriteOnlyWhenDifferent="true" Lines="&lt;Project&gt;
+  &lt;!-- Written when the SDK package was packed: the platform version it belongs to. --&gt;
+  &lt;PropertyGroup&gt;
+    &lt;ModularBlazorPlatformVersion Condition=&quot;'%24(ModularBlazorPlatformVersion)' == ''&quot;&gt;$(ModularBlazorVersion)&lt;/ModularBlazorPlatformVersion&gt;
+    &lt;ModuleCarterVersion Condition=&quot;'%24(ModuleCarterVersion)' == ''&quot;&gt;$(ModuleCarterVersion)&lt;/ModuleCarterVersion&gt;
+    &lt;ModuleEfCoreVersion Condition=&quot;'%24(ModuleEfCoreVersion)' == ''&quot;&gt;$(ModuleEfCoreVersion)&lt;/ModuleEfCoreVersion&gt;
+    &lt;ModuleAspNetCoreVersion Condition=&quot;'%24(ModuleAspNetCoreVersion)' == ''&quot;&gt;$(ModuleAspNetCoreVersion)&lt;/ModuleAspNetCoreVersion&gt;
+  &lt;/PropertyGroup&gt;
+&lt;/Project&gt;" />
+  </Target>
+
+</Project>

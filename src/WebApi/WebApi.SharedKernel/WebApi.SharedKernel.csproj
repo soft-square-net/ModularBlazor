@@ -1,5 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <!-- Published as a NuGet package: modules developed outside this repo compile against it. -->
+  <Import Project="../../../build/Platform.Packaging.props" />
+  <PropertyGroup>
+    <Description>ModularBlazor: shared kernel for module domain and application layers (entities, ITenantOwned, repositories, specifications). The host provides it at runtime.</Description>
+  </PropertyGroup>
+
   <!--
     Shared kernel for module domain and application layers: entity and aggregate base types, ITenantOwned, the
     repository interfaces (Ardalis.Specification) and DomainException. No EF Core, no ASP.NET Core.

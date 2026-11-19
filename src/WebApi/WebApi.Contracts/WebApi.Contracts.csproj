@@ -1,5 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <!-- Published as a NuGet package: modules developed outside this repo compile against it. -->
+  <Import Project="../../../build/Platform.Packaging.props" />
+  <PropertyGroup>
+    <Description>ModularBlazor: contracts of the WebApi host that runtime modules compile against (IRuntimeModule, ModuleManifest, tenancy, permissions). The host provides it at runtime; never ship it in a module.</Description>
+  </PropertyGroup>
+
   <!--
     Contracts shared by the WebApi host and every runtime module.
     The host references this project, so it always loads from the default AssemblyLoadContext:

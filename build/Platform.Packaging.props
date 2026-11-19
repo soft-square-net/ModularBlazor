@@ -1,0 +1,33 @@
+<Project>
+
+  <!--
+    Imported by the platform projects published as NuGet packages: the contracts a module compiles against
+    (Share.All, ModularBlazor.Abstractions, WebApi.Contracts, WebApi.SharedKernel, WebApi.Data) and the Module SDK.
+    Pack them all with build/pack-platform.ps1.
+
+    One version for all of them, ModularBlazorVersion:
+      - local builds:      <prefix>-dev                      (1.0.0-dev)
+      - CI on a branch:    <prefix>-ci.<run>                 (ModularBlazorVersionSuffix=ci.42)
+      - CI on a tag v1.2.0: 1.2.0                            (ModularBlazorVersion=1.2.0)
+    Only these projects get it. Other assemblies keep their own versions: a client module's version is read from its
+    assembly's informational version, so a repo-wide <Version> would silently change the shipped core client modules.
+  -->
+
+  <PropertyGroup>
+    <ModularBlazorVersionPrefix>1.0.0</ModularBlazorVersionPrefix>
+    <ModularBlazorVersionSuffix Condition="'$(ModularBlazorVersionSuffix)' == ''">dev</ModularBlazorVersionSuffix>
+    <ModularBlazorVersion Condition="'$(ModularBlazorVersion)' == ''">$(ModularBlazorVersionPrefix)-$(ModularBlazorVersionSuffix)</ModularBlazorVersion>
+    <Version>$(ModularBlazorVersion)</Version>
+
+    <IsPackable>true</IsPackable>
+    <Authors>soft-square-net</Authors>
+    <Company>soft-square-net</Company>
+    <PackageProjectUrl>https://github.com/soft-square-net/ModularBlazor</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/soft-square-net/ModularBlazor</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>modularblazor;modules;blazor;webapi</PackageTags>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+</Project>

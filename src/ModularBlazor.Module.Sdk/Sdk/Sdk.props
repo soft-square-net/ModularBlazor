@@ -1,0 +1,42 @@
+<Project>
+
+  <!--
+    soft.square.net.ModularBlazor.Module.Sdk: build setup of a module developed outside the platform repo.
+
+    Use it next to the .NET SDK, in every project of the module:
+      <Project Sdk="Microsoft.NET.Sdk">              server module (a layer, or a single project)
+      <Project Sdk="Microsoft.NET.Sdk.Razor">        Blazor client module
+        <Sdk Name="soft.square.net.ModularBlazor.Module.Sdk" />
+    and pin its version once, in global.json:
+      { "msbuild-sdks": { "soft.square.net.ModularBlazor.Module.Sdk": "1.0.0" } }
+    The contract packages it references get the same version (Platform.props; override ModularBlazorPlatformVersion
+    to use another one).
+
+    What a project gets, by kind (ModuleLayer, from the project name unless set):
+      *.Domain          WebApi.SharedKernel
+      *.Application     WebApi.SharedKernel, WebApi.Contracts, ASP.NET Core
+      *.Infrastructure  WebApi.Data (EF Core, SharedKernel), WebApi.Contracts, Carter, ASP.NET Core; the entry assembly
+      Module            any other server project: a single-project module (WebApi.Contracts, Carter, ASP.NET Core;
+                        set ModuleUsesData=true for WebApi.Data); set EnableDynamicLoading=true on the entry project
+      Client            a Razor project: ModularBlazor.Abstractions, browser platform, wwwroot embedded in the assembly
+    All of these are provided by the host at runtime: they are compiled against and never copied into the module's
+    output, so the module's build output (or package) holds only its own assemblies and its private dependencies.
+
+    dotnet-ef needs the host-shipped assemblies next to the project: set the environment variable EfDesignAssets=all for
+    "dotnet ef migrations add", then build again without it before packaging (same switch as in the platform repo).
+  -->
+
+  <Import Project="$(MSBuildThisFileDirectory)Platform.props" Condition="Exists('$(MSBuildThisFileDirectory)Platform.props')" />
+
+  <PropertyGroup>
+    <HostSharedExclude Condition="'$(EfDesignAssets)' != 'all'">runtime;native</HostSharedExclude>
+    <HostSharedPrivate Condition="'$(EfDesignAssets)' != 'all'">false</HostSharedPrivate>
+    <HostSharedPrivate Condition="'$(EfDesignAssets)' == 'all'">true</HostSharedPrivate>
+
+    <!-- The entry assembly of a layered module: copies private dependencies into the output, writes the .deps.json the
+         module loader resolves with, and a runtimeconfig.json for dotnet-ef. Set here, before the .NET SDK targets
+         read it; a single-project module sets it itself. -->
+    <EnableDynamicLoading Condition="'$(EnableDynamicLoading)' == '' And $(MSBuildProjectName.EndsWith('.Infrastructure'))">true</EnableDynamicLoading>
+  </PropertyGroup>
+
+</Project>

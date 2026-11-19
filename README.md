@@ -88,6 +88,37 @@ A module is a Razor class library at `modules/client/<Name>/<Name>.csproj` that 
   builds one with vite (`dotnet build -p:BuildNodeApp=true`). `*.lib.module.js` initializers never run for modules
   loaded at runtime; the host runs `js/module.js` itself.
 
+### Modules outside this repo: the platform packages
+
+A module can live in its own repository (for example `soft-square-net/ModularBlazor.Module.<Name>`) and build against
+NuGet packages instead of this repo's source. `build/pack-platform.ps1` packs them, all in one version
+(`build/Platform.Packaging.props`), and `.github/workflows/platform-packages.yml` publishes them to GitHub Packages on a
+`v*` tag or a manual run:
+
+| Package | For |
+| --- | --- |
+| `soft.square.net.WebApi.Contracts` | `IRuntimeModule`, `ModuleManifest`, tenancy and permission contracts |
+| `soft.square.net.WebApi.SharedKernel` | entities, `ITenantOwned`, repositories, specifications |
+| `soft.square.net.WebApi.Data` | `TenantDbContext`, `EfRepository`, EF Core with the four providers |
+| `soft.square.net.ModularBlazor.Abstractions` (+ `Share.All`) | client modules: `[ClientModule]`, MudTail components, `HttpClientNames` |
+| `soft.square.net.ModularBlazor.Module.Sdk` | the build setup: picks the references above per project, ships none of them |
+
+A module project adds one line, and pins the SDK version (which is also the platform version) once in `global.json`:
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk">            <!-- or Microsoft.NET.Sdk.Razor for a client module -->
+  <Sdk Name="soft.square.net.ModularBlazor.Module.Sdk" />
+```
+
+```json
+{ "msbuild-sdks": { "soft.square.net.ModularBlazor.Module.Sdk": "1.0.0" } }
+```
+
+The SDK reads the project kind from its name (`*.Domain`, `*.Application`, `*.Infrastructure`, any other server
+project, or a Razor project for a client module), the same rules as `src/WebApi/Modules/Directory.Build.props` here.
+The build output holds only the module's own assemblies and its private dependencies. GitHub Packages needs a token
+with `read:packages` to restore, even for public packages, so add the feed with credentials to the module's `NuGet.Config`.
+
 ## Things to know
 
 * **Trimming is disabled** in the host (`PublishTrimmed=false`). Modules are unknown at publish time and may use any
