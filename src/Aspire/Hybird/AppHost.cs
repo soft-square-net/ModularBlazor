@@ -93,9 +93,10 @@ var identity = builder.AddProject<Projects.WebApi_Identity_Server>("identity", l
 
 // ---------------------------------------------------------------- module pools (same image, different config)
 
-// Core pool: every module except the extracted ones. "identity" and "tenancy" are core modules: they ship with every
-// WebApi release (CoreModules folder) and are seeded into the catalog as Active on first start.
-var core = AddPool("core", role: "Api", replicas: 2, "identity", "tenancy", "inventory");
+// Core pool: every module except the extracted ones. "identity", "tenancy" and "client-modules" are core modules: they
+// ship with every WebApi release (CoreModules folder) and are seeded into the catalog as Active on first start.
+// "client-modules" serves the Blazor client's module manifest and files (/api/client-modules, via the catch-all route).
+var core = AddPool("core", role: "Api", replicas: 2, "identity", "tenancy", "client-modules", "inventory");
 
 // Sales pool: the module that needed independent scaling. The sample "greeting" module stands in for Sales here.
 var sales = AddPool("sales", role: "Api", replicas: 4, "sales", "greeting", "shifts", "content");

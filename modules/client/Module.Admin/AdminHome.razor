@@ -1,10 +1,47 @@
 @page "/admin"
+@inject ICurrentUserService Users
 
-<PageTitle>Admin</PageTitle>
+@*
+  The administration overview: who is signed in, and the admin areas. Members is this module's own page; the others
+  belong to the host (client and host modules) or to Module.Tenants, and use the default layout.
+*@
 
-<h1>Admin overview</h1>
-<p>
-    This page uses the <code>admin</code> layout. That layout lives in <code>Layouts.Admin.dll</code>,
-    which was pulled in as a dependency of this module because the manifest lists it under
-    <code>dependencies</code>.
-</p>
+<PageTitle>Administration</PageTitle>
+
+<div class="mud-container adm-page">
+  <header class="adm-header">
+    <h1 class="mud-typography mud-typography-h4">Administration</h1>
+    @if (_user is not null)
+    {
+      <p class="mud-typography mud-typography-body1 adm-muted">
+        Signed in as <strong>@_user.Name</strong> (@string.Join(", ", _user.Roles))@(_user.Tenant is null ? ", platform account" : $", tenant {_user.Tenant}").
+      </p>
+    }
+  </header>
+
+  <div class="adm-cards">
+    @foreach (var area in Areas)
+    {
+      <a class="mud-paper mud-elevation-1 adm-card" href="@area.Href">
+        <h2 class="mud-typography mud-typography-h6">@area.Title</h2>
+        <p class="mud-typography mud-typography-body2 adm-muted">@area.Text</p>
+      </a>
+    }
+  </div>
+</div>
+
+@code {
+  private sealed record Area(string Title, string Href, string Text);
+
+  private static readonly Area[] Areas =
+  [
+    new("Members", "admin/members", "The members of a tenant on the identity service: invite, suspend, activate, remove."),
+    new("Tenants", "tenants", "Organisations on the platform and their subscription periods."),
+    new("Client modules", "client-modules", "The modules of this app: upload, install, settings, versions."),
+    new("Host modules", "host-modules", "The WebApi's own modules, per pool: install, activate, deactivate."),
+  ];
+
+  private UserInfo? _user;
+
+  protected override async Task OnInitializedAsync() => _user = await Users.GetUserInfoAsync();
+}

@@ -30,7 +30,19 @@
       }
     </div>
     <div class="blz-page-actions">
-      <span class="blz-chip">@_rows.Count(r => r.State == "loaded") of @_rows.Count loaded</span>
+      <span class="blz-chip">@_rows.Count(r => r.State != "not loaded") of @_rows.Count loaded</span>
+      @if (Modules.Source == ModuleCatalogSource.Api)
+      {
+        <span class="blz-chip" title="GET api/client-modules/manifest">From the WebApi</span>
+      }
+      else if (Modules.Source == ModuleCatalogSource.Cached)
+      {
+        <span class="blz-chip blz-chip-warning" title="@Modules.ManifestError">WebApi not reachable: last public modules this browser received</span>
+      }
+      else
+      {
+        <span class="blz-chip blz-chip-warning" title="@Modules.ManifestError">WebApi not reachable: no modules</span>
+      }
     </div>
   </header>
 
@@ -48,10 +60,10 @@
     new { key = "name", title = "Name" },
     new { key = "version", title = "Version", width = "110px" },
     new { key = "kind", title = "Kind", type = "enum", options = new[] { "Dll", "NuPkg" }, width = "110px" },
-    new { key = "strategy", title = "Strategy", type = "enum", options = new[] { "startup", "on navigation" } },
+    new { key = "strategy", title = "Strategy", type = "enum", options = new[] { "startup", "lazy", "preload" } },
     new { key = "access", title = "Access" },
     new { key = "routes", title = "Routes" },
-    new { key = "state", title = "State", type = "enum", options = new[] { "loaded", "not loaded" } },
+    new { key = "state", title = "State", type = "enum", options = new[] { "loaded", "not loaded", "update available" } },
   ];
 
   private static readonly IReadOnlyList<object> RowActions =
@@ -84,10 +96,10 @@
       m.Name,
       m.Version,
       m.Kind.ToString(),
-      m.LoadOnStartup ? "startup" : "on navigation",
+      Modules.StrategyOf(m),
       m.RequiredRole is { } role ? $"role {role}" : m.RequiresAuth ? "signed in" : "everyone",
       m.RoutePrefixes.Length == 0 ? "-" : string.Join(", ", m.RoutePrefixes.Select(p => "/" + p.Trim('/'))),
-      Modules.IsLoaded(m.Id) ? "loaded" : "not loaded")).ToList();
+      !Modules.IsLoaded(m.Id) ? "not loaded" : Modules.UpdatesAvailable.Contains(m.Id) ? "update available" : "loaded")).ToList();
 
   private void OnChanged() => _ = InvokeAsync(async () =>
   {

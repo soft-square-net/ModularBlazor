@@ -83,6 +83,7 @@
   </Folder>
   <Folder Name="/src/WebApi/">
     <Project Path="src/WebApi/WebApi.Client/WebApi.Client.csproj" />
+    <Project Path="src/WebApi/Modules/Core.Clients/WebApi.Modules.Core.ClientModules.Client/WebApi.Modules.Core.ClientModules.Client.csproj" />
     <Project Path="src/WebApi/Modules/Core.Clients/WebApi.Modules.Core.Tenancy.Client/WebApi.Modules.Core.Tenancy.Client.csproj" />
     <Project Path="src/WebApi/WebApi.Contracts/WebApi.Contracts.csproj" />
     <Project Path="src/WebApi/WebApi.Data/WebApi.Data.csproj" />
@@ -123,6 +124,7 @@
   </Folder>
   <Folder Name="/src/WebApi/Modules/Core/">
     <File Path="src/WebApi/Modules/Core/Directory.Build.props" />
+    <Project Path="src/WebApi/Modules/Core/WebApi.Modules.Core.ClientModules/WebApi.Modules.Core.ClientModules.csproj" />
     <Project Path="src/WebApi/Modules/Core/WebApi.Modules.Core.Identity/WebApi.Modules.Core.Identity.csproj" />
     <Project Path="src/WebApi/Modules/Core/WebApi.Modules.Core.Tenancy/WebApi.Modules.Core.Tenancy.csproj" />
   </Folder>

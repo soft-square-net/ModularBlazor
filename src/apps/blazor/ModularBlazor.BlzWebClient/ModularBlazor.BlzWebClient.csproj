@@ -4,9 +4,10 @@
     Modular Blazor WebAssembly host for the WebApi platform:
       * signs in with the OpenIddict identity service (Authorization Code + PKCE) and sends its access token to the
         YARP gateway, which fronts every WebApi pool;
-      * loads the client modules (layouts, themes, pages) built from modules/client into wwwroot/modules, listed in
-        wwwroot/module-catalog.json;
-      * manages the host (WebApi) modules through WebApi.Client (install, activate, deactivate, unload, uninstall);
+      * loads its client modules (layouts, themes, pages) from the WebApi's client-modules core module: the manifest
+        (api/client-modules/manifest) says which ones this user gets and when (startup, lazy, preload);
+      * manages the host (WebApi) modules through WebApi.Client (install, activate, deactivate, unload, uninstall),
+        and the client modules through WebApi.Modules.Core.ClientModules.Client (/client-modules);
       * uses MudTail (shipped by the Layouts.Default module) for its tables, forms and buttons.
     It replaces ModularBlazor.Client, which talks to the obsolete api/ModularBlazor.Host.
   -->
@@ -32,6 +33,8 @@
     <ProjectReference Include="..\..\..\ModularBlazor.Abstractions\ModularBlazor.Abstractions.csproj" />
     <!-- Typed client of the WebApi host's module management API (/api/admin/modules, /api/pool, /health). -->
     <ProjectReference Include="..\..\..\WebApi\WebApi.Client\WebApi.Client.csproj" />
+    <!-- Typed client of the client-modules core module (/api/client-modules: upload, install, settings, versions). -->
+    <ProjectReference Include="..\..\..\WebApi\Modules\Core.Clients\WebApi.Modules.Core.ClientModules.Client\WebApi.Modules.Core.ClientModules.Client.csproj" />
   </ItemGroup>
 
   <!-- ================================================================ node-app (wwwroot/js/app.js) -->
@@ -53,49 +56,7 @@
     <Exec Command="npm run build" WorkingDirectory="$(MSBuildProjectDirectory)/node-app" />
   </Target>
 
-  <!-- ================================================================ client modules (wwwroot/modules) -->
-
-  <!--
-    The client modules this app ships, built from modules/client on every build (incremental) and copied into
-    wwwroot/modules, where module-catalog.json points. A module whose project sets <PackageId> is packed (.nupkg),
-    every other one ships as its .dll. Skip with -p:BuildClientModules=false.
-    Not shipped: Module.Auth (password sign-in against the old Host) and Module.Admin (the old Host's module API),
-    because this app signs in with OpenIddict and manages modules through WebApi itself; Module.ToDo calls the old
-    Host's /api/v1/todos, which WebApi does not have.
-  -->
-  <PropertyGroup>
-    <BuildClientModules Condition="'$(BuildClientModules)' == ''">true</BuildClientModules>
-    <ClientModulesDir>$([MSBuild]::NormalizeDirectory('$(MSBuildProjectDirectory)', '..', '..', '..', '..', 'modules', 'client'))</ClientModulesDir>
-    <ClientModulesOutput>$(MSBuildProjectDirectory)\wwwroot\modules\</ClientModulesOutput>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <ClientModuleDll Include="$(ClientModulesDir)Layouts.Default\Layouts.Default.csproj" />
-    <ClientModuleDll Include="$(ClientModulesDir)Module.Dashboard\Module.Dashboard.csproj" />
-    <!-- Module.Tenants ships with one extra assembly, the generated Tenancy client (catalog entry: "extraAssemblies"). -->
-    <ClientModuleDll Include="$(ClientModulesDir)Module.Tenants\Module.Tenants.csproj" />
-    <ClientModuleDll Include="$(MSBuildProjectDirectory)\..\..\..\WebApi\Modules\Core.Clients\WebApi.Modules.Core.Tenancy.Client\WebApi.Modules.Core.Tenancy.Client.csproj" />
-    <ClientModulePackage Include="$(ClientModulesDir)Module.Reports\Module.Reports.csproj" />
-  </ItemGroup>
-
-  <!-- Before static web assets are discovered, so the copied files are served (and published) like any wwwroot file. -->
-  <Target Name="BuildClientModules" BeforeTargets="BeforeBuild" Condition="'$(BuildClientModules)' == 'true'">
-    <!-- The modules are not project references, so the app's restore does not cover them. A unique session id makes
-         MSBuild evaluate them again for the build below, so the build sees the restored assets. -->
-    <MSBuild Projects="@(ClientModuleDll);@(ClientModulePackage)" Targets="Restore"
-             Properties="Configuration=$(Configuration);MSBuildRestoreSessionId=$([System.Guid]::NewGuid())"
-             RemoveProperties="RuntimeIdentifier;SelfContained;TargetFramework;PublishDir;OutDir;OutputPath" />
-    <MSBuild Projects="@(ClientModuleDll)" Targets="Build" Properties="Configuration=$(Configuration)"
-             RemoveProperties="RuntimeIdentifier;SelfContained;TargetFramework;PublishDir;OutDir;OutputPath">
-      <Output TaskParameter="TargetOutputs" ItemName="_ClientModuleAssembly" />
-    </MSBuild>
-    <MSBuild Projects="@(ClientModulePackage)" Targets="Pack" Properties="Configuration=$(Configuration);PackageOutputPath=$(ClientModulesOutput)"
-             RemoveProperties="RuntimeIdentifier;SelfContained;TargetFramework;PublishDir;OutDir;OutputPath" />
-    <Copy SourceFiles="@(_ClientModuleAssembly)" DestinationFolder="$(ClientModulesOutput)" SkipUnchangedFiles="true" />
-    <ItemGroup>
-      <!-- Files created during this build were not there when the Content glob ran; Exclude avoids duplicates. -->
-      <Content Include="wwwroot\modules\*.dll;wwwroot\modules\*.nupkg" Exclude="@(Content)" />
-    </ItemGroup>
-  </Target>
+  <!-- Client modules are not part of this app: the WebApi ships them (CoreClientModules, built from modules/client)
+       and serves them through api/client-modules; admins upload more on the /client-modules page. -->
 
 </Project>

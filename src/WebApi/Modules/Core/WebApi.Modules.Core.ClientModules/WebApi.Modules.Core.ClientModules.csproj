@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Core module "client-modules": the catalog of Blazor WebAssembly client modules (.dll, .nupkg, .zip). Admins upload
+    and configure them; the client app asks it for its manifest (the modules this user may use, startup or lazy) and
+    downloads the files from it. Shared setup in ../Directory.Build.props.
+  -->
+
+</Project>

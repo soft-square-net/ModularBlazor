@@ -8,4 +8,10 @@ public static class HttpClientNames
   /// Registered by ModularBlazor.BlzWebClient; its base address is the gateway, so generated clients use relative urls.
   /// </summary>
   public const string WebApi = "WebApi";
+
+  /// <summary>
+  /// The OpenIddict identity service itself (the OIDC authority), with the same access token: its admin API, e.g.
+  /// /api/admin/tenants/{tenant}/members. Registered by ModularBlazor.BlzWebClient; base address = the authority.
+  /// </summary>
+  public const string Identity = "Identity";
 }

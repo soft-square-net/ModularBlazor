@@ -1,0 +1,29 @@
+/* Module.Admin: layout around MudTail's components. Colours come from the --mud-palette-* tokens of Layouts.Default. */
+.adm-page { padding-block: 0 32px; }
+.adm-header { margin-bottom: 16px; }
+.adm-header h1 { margin: 0 0 4px; }
+.adm-header p { max-width: 72ch; margin: 0; }
+.adm-header-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; justify-content: space-between; }
+.adm-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+.adm-inline { margin: 0; min-width: 220px; }
+.adm-muted { color: var(--mud-palette-text-secondary); }
+.adm-error { color: var(--mud-palette-error); }
+.adm-facts { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.adm-chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 999px; font-size: .8125rem;
+  border: 1px solid var(--mud-palette-lines-default); color: var(--mud-palette-text-primary); background: var(--mud-palette-surface);
+}
+.adm-chip-warning { border-color: var(--mud-palette-warning); }
+.adm-card-section { padding: 20px; margin-bottom: 16px; border-radius: var(--mud-default-borderradius, 8px); }
+.adm-card-section h2 { margin: 0 0 12px; }
+.adm-form { display: grid; gap: 4px; }
+.adm-grid { display: grid; gap: 0 16px; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+.adm-row-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.adm-cards { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+.adm-card {
+  display: block; padding: 20px; border-radius: var(--mud-default-borderradius, 8px); text-decoration: none;
+  color: var(--mud-palette-text-primary); transition: box-shadow .15s;
+}
+.adm-card:hover { box-shadow: 0 4px 16px rgba(0, 0, 0, .12); }
+.adm-card h2 { margin: 0 0 6px; color: var(--mud-palette-primary); }
+.adm-card p { margin: 0; }

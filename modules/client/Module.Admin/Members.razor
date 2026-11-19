@@ -1,0 +1,300 @@
+@page "/admin/members"
+@using System.Text.Json
+@inject IHttpClientFactory HttpClients
+@inject ICurrentUserService Users
+@inject MudTailRuntime MudTail
+
+@*
+  Members of one tenant, on the identity service (HttpClientNames.Identity, the OIDC authority, with the access token):
+    GET    api/admin/tenants/{tenant}/members                  list
+    POST   api/admin/tenants/{tenant}/members                  invite { email, role, displayName }
+    POST   api/admin/tenants/{tenant}/members/{userId}/suspend  (also ends the member's sessions in that tenant)
+    POST   api/admin/tenants/{tenant}/members/{userId}/activate (not for a pending invitation)
+    DELETE api/admin/tenants/{tenant}/members/{userId}          (also ends the member's sessions in that tenant)
+  The tenant list comes from the Tenancy core module through the gateway (GET api/tenancy/tenants). The identity
+  service allows platform-admin, or an active tenant-admin member whose token is for the same tenant.
+*@
+
+<PageTitle>Members</PageTitle>
+
+<div class="mud-container adm-page">
+  <header class="adm-header adm-header-row">
+    <div>
+      <h1 class="mud-typography mud-typography-h4">Members</h1>
+      <p class="mud-typography mud-typography-body1 adm-muted">
+        The accounts of a tenant on the identity service. An invited member joins when they accept the invitation on
+        the identity service's Invitations page; suspending or removing a member also ends their sessions in that tenant.
+      </p>
+    </div>
+    <div class="adm-actions">
+      <div class="mud-input-control adm-inline">
+        <label class="mud-input-label" for="adm-tenant">Tenant</label>
+        <div class="mud-input-wrapper mud-input-wrapper--select mud-input-wrapper--dense">
+          <select id="adm-tenant" class="mud-input-slot" value="@_tenant" @onchange="TenantChangedAsync" disabled="@_busy">
+            @if (_tenants.Count == 0)
+            {
+              <option value="">(no tenants)</option>
+            }
+            @foreach (var t in _tenants)
+            {
+              <option value="@t.Id">@t.Id (@t.Name)</option>
+            }
+          </select>
+        </div>
+      </div>
+      <button type="button" class="mud-button-root mud-button-outlined mud-button-primary mud-button-medium" @onclick="LoadMembersAsync" disabled="@(_busy || _tenant is null)">Refresh</button>
+      <button type="button" class="mud-button-root mud-button-filled mud-button-primary mud-button-medium" @onclick="() => _invite = new()" disabled="@(_busy || _tenant is null)">Invite</button>
+    </div>
+  </header>
+
+  <div class="adm-facts">
+    <span class="adm-chip">Members <strong>@_members.Count</strong></span>
+    <span class="adm-chip">Active <strong>@_members.Count(m => m.Status == "Active")</strong></span>
+    <span class="adm-chip">Invited <strong>@_members.Count(m => m.Status == "Invited")</strong></span>
+    <span class="adm-chip @(_members.Any(m => m.Status == "Suspended") ? "adm-chip-warning" : "")">Suspended <strong>@_members.Count(m => m.Status == "Suspended")</strong></span>
+  </div>
+
+  @if (_error is not null)
+  {
+    <p class="mud-typography mud-typography-body2 adm-error" role="alert">@_error</p>
+  }
+
+  @if (_invite is not null)
+  {
+    <section class="mud-paper mud-elevation-2 adm-card-section">
+      <h2 class="mud-typography mud-typography-h6">Invite to @_tenant</h2>
+      <form class="adm-form" @onsubmit="InviteAsync" @onsubmit:preventDefault>
+        <div class="adm-grid">
+          <div class="mud-input-control">
+            <label class="mud-input-label" for="adm-email">Email</label>
+            <div class="mud-input-wrapper">
+              <input id="adm-email" type="email" class="mud-input-slot" @bind="_invite.Email" required placeholder="someone@example.com" />
+            </div>
+            <div class="mud-input-helper-text">An unknown address gets a new account without a password.</div>
+          </div>
+          <div class="mud-input-control">
+            <label class="mud-input-label" for="adm-name">Display name in this tenant</label>
+            <div class="mud-input-wrapper">
+              <input id="adm-name" class="mud-input-slot" @bind="_invite.DisplayName" />
+            </div>
+          </div>
+          <div class="mud-input-control">
+            <label class="mud-input-label" for="adm-role">Role</label>
+            <div class="mud-input-wrapper mud-input-wrapper--select">
+              <select id="adm-role" class="mud-input-slot" @bind="_invite.Role">
+                <option value="member">Member</option>
+                <option value="tenant-admin">Tenant admin (manages this tenant's members)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="adm-row-actions">
+          <button type="submit" class="mud-button-root mud-button-filled mud-button-primary mud-button-medium" disabled="@_busy">Invite</button>
+          <button type="button" class="mud-button-root mud-button-text mud-button-surface mud-button-medium" @onclick="() => _invite = null">Cancel</button>
+        </div>
+      </form>
+    </section>
+  }
+
+  <section class="mud-paper mud-elevation-1 adm-card-section">
+    <MudTailDataTable @ref="_table" Columns="Columns" Actions="RowActions" OnAction="OnActionAsync"
+                      EmptyText="No members in this tenant yet. Invite one." />
+  </section>
+</div>
+
+@code {
+  /// <summary>The identity service's MemberView.</summary>
+  private sealed record Member(string UserId, string? Email, string? DisplayName, string Status, string Role,
+      string? InvitedBy, DateTimeOffset InvitedAt, DateTimeOffset? JoinedAt);
+
+  /// <summary>What this page needs of the Tenancy module's TenantInfo.</summary>
+  private sealed record Tenant(string Id, string Name);
+
+  private sealed class InviteForm
+  {
+    public string Email { get; set; } = "";
+    public string? DisplayName { get; set; }
+    public string Role { get; set; } = "member";
+  }
+
+  private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
+
+  private static readonly IReadOnlyList<object> Columns =
+  [
+    new { key = "email", title = "Email" },
+    new { key = "name", title = "Display name" },
+    new { key = "role", title = "Role", type = "enum", options = new[] { "member", "tenant-admin" } },
+    new { key = "status", title = "Status", type = "enum", options = new[] { "Active", "Invited", "Suspended" } },
+    new { key = "invited", title = "Invited" },
+    new { key = "joined", title = "Joined" },
+  ];
+
+  // Not "edit"/"delete": MudTail reserves those ids for its own edit dialog.
+  private static readonly IReadOnlyList<object> RowActions =
+  [
+    new { id = "suspend", label = "Suspend" },
+    new { id = "activate", label = "Activate" },
+    new { id = "remove", label = "Remove", color = "error" },
+  ];
+
+  private MudTailDataTable? _table;
+  private List<Tenant> _tenants = [];
+  private List<Member> _members = [];
+  private string? _tenant;
+  private InviteForm? _invite;
+  private bool _busy;
+  private string? _error;
+
+  private HttpClient Identity => HttpClients.CreateClient(HttpClientNames.Identity);
+  private HttpClient Gateway => HttpClients.CreateClient(HttpClientNames.WebApi);
+  private string MembersUrl => $"api/admin/tenants/{Uri.EscapeDataString(_tenant ?? "")}/members";
+
+  protected override async Task OnAfterRenderAsync(bool firstRender)
+  {
+    if (!firstRender) return;
+    var user = await Users.GetUserInfoAsync();
+    await RunAsync(async () =>
+    {
+      _tenants = await Gateway.GetFromJsonAsync<List<Tenant>>("api/tenancy/tenants", Json) ?? [];
+      _tenant = user?.Tenant is { } own && _tenants.Any(t => t.Id == own) ? own : _tenants.FirstOrDefault()?.Id;
+    });
+    await LoadMembersAsync();
+  }
+
+  private async Task TenantChangedAsync(ChangeEventArgs e)
+  {
+    _tenant = e.Value?.ToString();
+    _invite = null;
+    await LoadMembersAsync();
+  }
+
+  private async Task LoadMembersAsync()
+  {
+    if (_tenant is null) return;
+    await RunAsync(async () =>
+    {
+      using var response = await Identity.GetAsync(MembersUrl);
+      await EnsureSuccessAsync(response);
+      _members = (await response.Content.ReadFromJsonAsync<List<Member>>(Json) ?? [])
+          .OrderBy(m => m.Email, StringComparer.OrdinalIgnoreCase).ToList();
+    });
+    if (_table is not null) await _table.SetDataAsync(_members.Select(ToRow).ToList());
+  }
+
+  private static object ToRow(Member m) => new
+  {
+    id = m.UserId,
+    email = m.Email ?? m.UserId,
+    name = m.DisplayName ?? "-",
+    role = m.Role,
+    status = m.Status,
+    invited = m.InvitedAt.ToLocalTime().ToString("yyyy-MM-dd"),
+    joined = m.JoinedAt?.ToLocalTime().ToString("yyyy-MM-dd") ?? "-",
+  };
+
+  private async Task InviteAsync()
+  {
+    if (_invite is null || _tenant is null) return;
+    var invite = _invite;
+    var ok = await RunAsync(async () =>
+    {
+      using var response = await Identity.PostAsJsonAsync(MembersUrl,
+          new { email = invite.Email.Trim(), role = invite.Role, displayName = string.IsNullOrWhiteSpace(invite.DisplayName) ? null : invite.DisplayName.Trim() }, Json);
+      await EnsureSuccessAsync(response);
+      await MudTail.ToastAsync($"{invite.Email} is invited to {_tenant}. They join when they accept the invitation.", "success");
+      _invite = null;
+    });
+    if (ok) await LoadMembersAsync();
+  }
+
+  private async Task OnActionAsync((string Action, string Key) e)
+  {
+    var member = _members.FirstOrDefault(m => m.UserId == e.Key);
+    if (member is null || _tenant is null) return;
+    var who = member.Email ?? member.UserId;
+    var url = $"{MembersUrl}/{Uri.EscapeDataString(member.UserId)}";
+
+    var ok = e.Action switch
+    {
+      "suspend" => await RunAsync(async () =>
+      {
+        using var response = await Identity.PostAsync($"{url}/suspend", null);
+        await EnsureSuccessAsync(response);
+        await MudTail.ToastAsync($"{who} is suspended in {_tenant}; their sessions there have ended.", "warning");
+      }),
+      "activate" => await RunAsync(async () =>
+      {
+        using var response = await Identity.PostAsync($"{url}/activate", null);
+        await EnsureSuccessAsync(response);
+        await MudTail.ToastAsync($"{who} is active in {_tenant} again.", "success");
+      }),
+      "remove" => await RunAsync(async () =>
+      {
+        using var response = await Identity.DeleteAsync(url);
+        await EnsureSuccessAsync(response);
+        await MudTail.ToastAsync($"{who} is no longer a member of {_tenant}; the account itself stays.", "success");
+      }),
+      _ => false
+    };
+    if (ok) await LoadMembersAsync();
+  }
+
+  /// <summary>Runs one call: busy flag, error message and toast. True when it succeeded.</summary>
+  private async Task<bool> RunAsync(Func<Task> call)
+  {
+    _busy = true;
+    _error = null;
+    StateHasChanged();
+    try
+    {
+      await call();
+      return true;
+    }
+    catch (AccessTokenNotAvailableException ex)
+    {
+      ex.Redirect(); // the session ended: sign in again and come back
+      return false;
+    }
+    catch (Exception ex)
+    {
+      _error = ex is HttpRequestException { StatusCode: null }
+          ? $"The service is not reachable ({ex.Message})."
+          : ex.Message;
+      await MudTail.ToastAsync(_error, "error");
+      return false;
+    }
+    finally
+    {
+      _busy = false;
+      StateHasChanged();
+    }
+  }
+
+  /// <summary>Turns an error response (ProblemDetails, validation problem, or { error, message }) into a readable message.</summary>
+  private static async Task EnsureSuccessAsync(HttpResponseMessage response)
+  {
+    if (response.IsSuccessStatusCode) return;
+    var status = (int)response.StatusCode;
+    string? detail = null;
+    try
+    {
+      using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+      var root = document.RootElement;
+      string? Text(string name) => root.ValueKind == JsonValueKind.Object && root.TryGetProperty(name, out var v) && v.ValueKind == JsonValueKind.String ? v.GetString() : null;
+      var errors = root.ValueKind == JsonValueKind.Object && root.TryGetProperty("errors", out var e) && e.ValueKind == JsonValueKind.Object
+          ? string.Join(" ", e.EnumerateObject().SelectMany(p => p.Value.EnumerateArray()).Select(x => x.GetString()))
+          : null;
+      detail = Text("detail") ?? Text("message") ?? Text("error") ?? Text("title");
+      if (!string.IsNullOrWhiteSpace(errors)) detail = $"{detail} {errors}".Trim();
+    }
+    catch (JsonException) { /* not JSON */ }
+
+    throw new HttpRequestException(status switch
+    {
+      401 => "401: the identity service did not accept the access token. Sign in again.",
+      403 => $"403: {detail ?? "requires the platform-admin role or a tenant-admin membership in this tenant."}",
+      409 when detail == "already_member" => "409: that account is already a member of this tenant.",
+      _ => $"{status}: {detail ?? response.ReasonPhrase}"
+    }, null, response.StatusCode);
+  }
+}

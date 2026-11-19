@@ -79,4 +79,3 @@ Plain links work, because the client's routes are base-relative to `/app/`:
 | `/app/` | the client home (layouts and login are startup modules) |
 | `/app/login` | `Module.Auth` |
 | `/app/todo` | `Module.ToDo`, downloaded on navigation |
-| `/app/admin` | `Module.Admin` (role `admin`) |

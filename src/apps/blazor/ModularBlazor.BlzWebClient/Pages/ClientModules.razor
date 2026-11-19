@@ -1,0 +1,595 @@
+@page "/client-modules"
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using soft.square.net.ModularBlazor.Abstractions.Auth
+@using soft.square.net.WebApi.Modules.Core.ClientModules.Client
+@using Problem = soft.square.net.WebApi.Modules.Core.ClientModules.Client.ProblemDetails
+@inject IHttpClientFactory HttpClients
+@inject ICurrentUserService Users
+@inject ModuleManager Modules
+@inject MudTailRuntime MudTail
+
+@*
+  Client module management through the gateway, with the OpenIddict access token: the WebApi's client-modules core
+  module (/api/client-modules, WebApi.Modules.Core.ClientModules.Client). Upload a .dll / .nupkg / .zip, check what was
+  read from it, then install it with its settings; change settings, switch versions, enable, disable, delete.
+  Needs the platform permission platform.modules.manage, which the platform-admin role grants. Every change is applied
+  to this browser's module list at once (the manifest is fetched again); other users get it on their next check.
+*@
+
+<PageTitle>Client modules</PageTitle>
+
+<div class="mud-container blz-page">
+  <header class="blz-page-header">
+    <div>
+      <h1 class="mud-typography mud-typography-h4">Client modules</h1>
+      <p class="mud-typography mud-typography-body1">
+        The modules of this app, served by the WebApi. Each user receives the ones their roles and tenant allow: startup
+        modules before the first page, lazy ones when a page needs them, preload ones in the background after sign-in.
+      </p>
+    </div>
+    <div class="blz-page-actions">
+      <button type="button" class="mud-button-root mud-button-outlined mud-button-primary mud-button-medium" @onclick="RefreshAsync" disabled="@(_busy || !_allowed)">
+        Refresh
+      </button>
+    </div>
+  </header>
+
+  @if (!_allowed)
+  {
+    <section class="mud-paper mud-elevation-1 blz-card">
+      <h2 class="mud-typography mud-typography-h6">Access denied</h2>
+      <p class="mud-typography mud-typography-body1">Managing client modules needs the <code>@ModuleManager.PlatformAdminRole</code> role.</p>
+    </section>
+  }
+  else
+  {
+    <div class="blz-facts">
+      <span class="blz-chip">Modules <strong>@_modules.Count</strong></span>
+      <span class="blz-chip">Enabled <strong>@_modules.Count(m => m.Enabled != false)</strong></span>
+      <span class="blz-chip">Core <strong>@_modules.Count(m => m.Core == true)</strong></span>
+      @if (Modules.Source != ModuleCatalogSource.Api)
+      {
+        <span class="blz-chip blz-chip-warning">This browser could not read the manifest: @Modules.ManifestError</span>
+      }
+    </div>
+
+    @if (_error is not null)
+    {
+      <p class="mud-typography mud-typography-body2 blz-error" role="alert">@_error</p>
+    }
+
+    <section class="mud-paper mud-elevation-1 blz-card">
+      <h2 class="mud-typography mud-typography-h6">Upload a module</h2>
+      <p class="mud-typography mud-typography-body2 blz-muted">
+        A <code>.dll</code> with <code>[assembly: ClientModule]</code>, a <code>.nupkg</code>, or a <code>.zip</code> of the
+        module and its private assemblies. It is checked first (read, never run); you install it in the next step.
+      </p>
+      <div class="blz-install">
+        <label class="mud-button-root mud-button-outlined mud-button-surface mud-button-medium blz-file">
+          <InputFile OnChange="FileChosen" accept=".dll,.nupkg,.zip" />
+          <span>@(_file?.Name ?? "Choose a file…")</span>
+        </label>
+        <button type="button" class="mud-button-root mud-button-filled mud-button-primary mud-button-medium" @onclick="UploadAsync" disabled="@(_file is null || _busy)">
+          Check
+        </button>
+      </div>
+    </section>
+
+    @if (_draft is { } d)
+    {
+      <section class="mud-paper mud-elevation-2 blz-card">
+        <h2 class="mud-typography mud-typography-h6">Install @d.Id @d.Version</h2>
+        <div class="blz-facts">
+          <span class="blz-chip">Kind <strong>@d.Kind</strong></span>
+          <span class="blz-chip @(d.IsCore == true || (d.VersionExists == true && d.SamePackage != true) ? "blz-chip-warning" : "")">@DraftState(d)</span>
+          <span class="blz-chip">Pages <strong>@(d.Routes?.Count ?? 0)</strong></span>
+          @if (d.Layouts is { Count: > 0 })
+          {
+            <span class="blz-chip">Layouts <strong>@string.Join(", ", d.Layouts)</strong></span>
+          }
+        </div>
+        <p class="mud-typography mud-typography-body2 blz-muted">
+          Files: @string.Join(", ", (d.Files ?? []).Select(f => $"{f.Name} ({f.Size / 1024.0:0.#} KB)"))
+          @if (d.Routes is { Count: > 0 }) { <br />@($"Pages: {string.Join(", ", d.Routes)}") }
+        </p>
+        @if (d.Warnings is { Count: > 0 })
+        {
+          <ul class="blz-list blz-error">
+            @foreach (var warning in d.Warnings) { <li>@warning</li> }
+          </ul>
+        }
+
+        @if (d.Current is not null)
+        {
+          <label class="blz-check">
+            <input type="checkbox" @bind="_draftApplySettings" />
+            <span>Replace the module's settings with these (otherwise its current settings are kept)</span>
+          </label>
+        }
+        @if (d.Current is null || _draftApplySettings)
+        {
+          @SettingsFields(_draftForm)
+        }
+
+        <label class="blz-check">
+          <input type="checkbox" @bind="_draftActivate" />
+          <span>Make this the active version (the one users receive)</span>
+        </label>
+        @if (d.VersionExists == true && d.SamePackage != true)
+        {
+          <label class="blz-check">
+            <input type="checkbox" @bind="_draftReplace" />
+            <span>Replace the files of the installed version @d.Version (otherwise raise the module's version)</span>
+          </label>
+        }
+
+        <div class="blz-row-actions">
+          <button type="button" class="mud-button-root mud-button-filled mud-button-primary mud-button-medium" @onclick="InstallAsync" disabled="@_busy">Install</button>
+          <button type="button" class="mud-button-root mud-button-text mud-button-surface mud-button-medium" @onclick="DiscardAsync" disabled="@_busy">Discard</button>
+        </div>
+      </section>
+    }
+
+    <section class="mud-paper mud-elevation-1 blz-card">
+      <MudTailDataTable @ref="_table" Columns="Columns" Actions="RowActions" OnAction="OnActionAsync" EmptyText="No client modules yet. Upload one above." />
+    </section>
+
+    @if (_editing is { } edited)
+    {
+      <section class="mud-paper mud-elevation-2 blz-card">
+        <h2 class="mud-typography mud-typography-h6">Settings of @edited.Id</h2>
+        @SettingsFields(_editForm)
+        <div class="blz-row-actions">
+          <button type="button" class="mud-button-root mud-button-filled mud-button-primary mud-button-medium" @onclick="SaveSettingsAsync" disabled="@_busy">Save</button>
+          <button type="button" class="mud-button-root mud-button-text mud-button-surface mud-button-medium" @onclick="() => _editing = null">Cancel</button>
+        </div>
+      </section>
+    }
+
+    @if (_versionsOf is { } owner)
+    {
+      <section class="mud-paper mud-elevation-2 blz-card">
+        <h2 class="mud-typography mud-typography-h6">Versions of @owner.Id</h2>
+        <table class="blz-versions">
+          <thead>
+            <tr><th>Version</th><th>Kind</th><th>Source</th><th>Uploaded</th><th>Files</th><th></th></tr>
+          </thead>
+          <tbody>
+            @foreach (var v in owner.Versions ?? [])
+            {
+              var active = v.Version == owner.ActiveVersion;
+              <tr>
+                <td><strong>@v.Version</strong>@(active ? " (active)" : "")</td>
+                <td>@v.Kind</td>
+                <td>@v.Source</td>
+                <td>@(v.UploadedAt?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
+                <td>@(1 + (v.ExtraAssemblies?.Count ?? 0))</td>
+                <td>
+                  @if (!active)
+                  {
+                    <button type="button" class="mud-button-root mud-button-text mud-button-primary mud-button-small" @onclick="() => ActivateVersionAsync(owner.Id, v.Version)" disabled="@_busy">Activate</button>
+                    <button type="button" class="mud-button-root mud-button-text mud-button-error mud-button-small" @onclick="() => DeleteVersionAsync(owner.Id, v.Version)" disabled="@_busy">Delete</button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+        <div class="blz-row-actions">
+          <button type="button" class="mud-button-root mud-button-text mud-button-surface mud-button-medium" @onclick="() => _versionsOf = null">Close</button>
+        </div>
+      </section>
+    }
+  }
+</div>
+
+@code {
+  /// <summary>The editable settings, as form text (lists are comma separated).</summary>
+  private sealed class SettingsForm
+  {
+    public string? Name { get; set; }
+    public string? Description { get; set; }
+    public ClientModuleLoadStrategy LoadStrategy { get; set; } = ClientModuleLoadStrategy.Lazy;
+    public bool Hidden { get; set; }
+    public bool RequiresAuth { get; set; } = true;
+    public string? RequiredRole { get; set; }
+    public string? Roles { get; set; }
+    public string? Tenants { get; set; }
+    public string? Layout { get; set; }
+    public string? RoutePrefixes { get; set; }
+    public string? Dependencies { get; set; }
+    public string? Styles { get; set; }
+    public string? Scripts { get; set; }
+    public string? NavTitle { get; set; }
+    public string? NavHref { get; set; }
+    public int NavOrder { get; set; } = 100;
+
+    /// <summary>Menu entries after the first, kept as they are (the form edits one).</summary>
+    public List<ClientModuleNavItem> MoreNav { get; set; } = [];
+
+    public static SettingsForm From(ClientModuleSettings? s)
+    {
+      var nav = s?.Nav ?? [];
+      return new SettingsForm
+      {
+        Name = s?.Name,
+        Description = s?.Description,
+        LoadStrategy = s?.LoadStrategy ?? ClientModuleLoadStrategy.Lazy,
+        Hidden = s?.Hidden ?? false,
+        RequiresAuth = s?.RequiresAuth ?? true,
+        RequiredRole = s?.RequiredRole,
+        Roles = Join(s?.AvailableToRoles),
+        Tenants = Join(s?.AvailableToTenants),
+        Layout = s?.Layout,
+        RoutePrefixes = Join(s?.RoutePrefixes),
+        Dependencies = Join(s?.Dependencies),
+        Styles = Join(s?.Styles),
+        Scripts = Join(s?.Scripts),
+        NavTitle = nav.FirstOrDefault()?.Title,
+        NavHref = nav.FirstOrDefault()?.Href,
+        NavOrder = nav.FirstOrDefault()?.Order ?? 100,
+        MoreNav = nav.Skip(1).ToList()
+      };
+    }
+
+    public ClientModuleSettings ToSettings()
+    {
+      var nav = new List<ClientModuleNavItem>();
+      if (!string.IsNullOrWhiteSpace(NavTitle) && !string.IsNullOrWhiteSpace(NavHref))
+        nav.Add(new ClientModuleNavItem { Title = NavTitle.Trim(), Href = NavHref.Trim(), Order = NavOrder });
+      nav.AddRange(MoreNav);
+      return new ClientModuleSettings
+      {
+        Name = Blank(Name),
+        Description = Blank(Description),
+        LoadStrategy = LoadStrategy,
+        Hidden = Hidden,
+        RequiresAuth = RequiresAuth,
+        RequiredRole = Blank(RequiredRole),
+        AvailableToRoles = Split(Roles),
+        AvailableToTenants = Split(Tenants),
+        Layout = Blank(Layout),
+        RoutePrefixes = Split(RoutePrefixes),
+        Dependencies = Split(Dependencies),
+        Styles = Split(Styles),
+        Scripts = Split(Scripts),
+        Nav = nav
+      };
+    }
+
+    private static string Join(IEnumerable<string>? values) => string.Join(", ", values ?? []);
+    private static List<string> Split(string? text) => (text ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
+    private static string? Blank(string? text) => string.IsNullOrWhiteSpace(text) ? null : text.Trim();
+  }
+
+  private static readonly IReadOnlyList<object> Columns =
+  [
+    new { key = "id", title = "Module" },
+    new { key = "name", title = "Name" },
+    new { key = "version", title = "Version", width = "100px" },
+    new { key = "versions", title = "Versions", type = "number", width = "100px" },
+    new { key = "strategy", title = "Loads", type = "enum", options = new[] { "Startup", "Lazy", "Preload" } },
+    new { key = "access", title = "Who gets it" },
+    new { key = "routes", title = "Routes" },
+    new { key = "enabled", title = "Enabled", type = "boolean", format = "boolean" },
+    new { key = "core", title = "Core", type = "boolean", format = "boolean" },
+  ];
+
+  // Not "edit"/"delete": MudTail reserves those ids for its own edit dialog.
+  private static readonly IReadOnlyList<object> RowActions =
+  [
+    new { id = "settings", label = "Settings" },
+    new { id = "versions", label = "Versions" },
+    new { id = "enable", label = "Enable" },
+    new { id = "disable", label = "Disable" },
+    new { id = "remove", label = "Delete", color = "error" },
+  ];
+
+  /// <summary>The browser keeps the upload in memory; the WebApi accepts packages up to 50 MB by default.</summary>
+  private const long MaxPackageSize = 50 * 1024 * 1024;
+
+  private MudTailDataTable? _table;
+  private List<ClientModuleRecord> _modules = [];
+  private bool _allowed;
+  private bool _busy;
+  private string? _error;
+  private IBrowserFile? _file;
+
+  private ClientModuleUpload? _draft;
+  private SettingsForm _draftForm = new();
+  private bool _draftApplySettings;
+  private bool _draftActivate = true;
+  private bool _draftReplace;
+
+  private ClientModuleRecord? _editing;
+  private SettingsForm _editForm = new();
+  private ClientModuleRecord? _versionsOf;
+
+  private ClientModulesClient Api => new(HttpClients.CreateClient(soft.square.net.ModularBlazor.Abstractions.HttpClientNames.WebApi));
+
+  protected override async Task OnInitializedAsync()
+  {
+    var user = await Users.GetUserInfoAsync();
+    _allowed = user?.IsInRole(ModuleManager.PlatformAdminRole) ?? false;
+  }
+
+  protected override async Task OnAfterRenderAsync(bool firstRender)
+  {
+    if (firstRender && _allowed) await RefreshAsync();
+  }
+
+  private RenderFragment SettingsFields(SettingsForm f) => @<div class="blz-grid">
+    <div class="mud-input-control">
+      <label class="mud-input-label">Name</label>
+      <div class="mud-input-wrapper"><input class="mud-input-slot" @bind="f.Name" /></div>
+    </div>
+    <div class="mud-input-control">
+      <label class="mud-input-label">Loads</label>
+      <div class="mud-input-wrapper mud-input-wrapper--select">
+        <select class="mud-input-slot" @bind="f.LoadStrategy">
+          <option value="@ClientModuleLoadStrategy.Startup">Startup (before the first page)</option>
+          <option value="@ClientModuleLoadStrategy.Lazy">Lazy (when a page needs it)</option>
+          <option value="@ClientModuleLoadStrategy.Preload">Preload (in the background after sign-in)</option>
+        </select>
+      </div>
+    </div>
+    <div class="mud-input-control">
+      <label class="mud-input-label">Layout key</label>
+      <div class="mud-input-wrapper"><input class="mud-input-slot" @bind="f.Layout" placeholder="default" /></div>
+    </div>
+    <div class="mud-input-control blz-wide">
+      <label class="mud-input-label">Description</label>
+      <div class="mud-input-wrapper"><input class="mud-input-slot" @bind="f.Description" /></div>
+    </div>
+    <div class="mud-input-control">
+      <label class="mud-input-label">Roles (any of)</label>
+      <div class="mud-input-wrapper"><input class="mud-input-slot" @bind="f.Roles" placeholder="empty: every signed-in user" /></div>
+    </div>
+    <div class="mud-input-control">
+      <label class="mud-input-label">Required role</label>
+      <div class="mud-input-wrapper"><input class="mud-input-slot" @bind="f.RequiredRole" /></div>
+    </div>
+    <div class="mud-input-control">
+      <label class="mud-input-label">Tenants</label>
+      <div class="mud-input-wrapper"><input class="mud-input-slot" @bind="f.Tenants" placeholder="empty: every tenant" /></div>
+    </div>
+    <div class="mud-input-control">
+      <label class="mud-input-label">Route prefixes</label>
+      <div class="mud-input-wrapper"><input class="mud-input-slot" @bind="f.RoutePrefixes" placeholder="reports, reports-admin" /></div>
+    </div>
+    <div class="mud-input-control">
+      <label class="mud-input-label">Depends on (module ids)</label>
+      <div class="mud-input-wrapper"><input class="mud-input-slot" @bind="f.Dependencies" placeholder="Layouts.Default" /></div>
+    </div>
+    <div class="mud-input-control">
+      <label class="mud-input-label">Styles</label>
+      <div class="mud-input-wrapper"><input class="mud-input-slot" @bind="f.Styles" /></div>
+    </div>
+    <div class="mud-input-control">
+      <label class="mud-input-label">Scripts</label>
+      <div class="mud-input-wrapper"><input class="mud-input-slot" @bind="f.Scripts" /></div>
+    </div>
+    <div class="mud-input-control">
+      <label class="mud-input-label">Menu title</label>
+      <div class="mud-input-wrapper"><input class="mud-input-slot" @bind="f.NavTitle" placeholder="no menu entry" /></div>
+    </div>
+    <div class="mud-input-control">
+      <label class="mud-input-label">Menu link</label>
+      <div class="mud-input-wrapper"><input class="mud-input-slot" @bind="f.NavHref" placeholder="reports" /></div>
+    </div>
+    <div class="mud-input-control">
+      <label class="mud-input-label">Menu order</label>
+      <div class="mud-input-wrapper"><input type="number" class="mud-input-slot" @bind="f.NavOrder" /></div>
+    </div>
+    <label class="blz-check"><input type="checkbox" @bind="f.RequiresAuth" /><span>Requires sign-in</span></label>
+    <label class="blz-check"><input type="checkbox" @bind="f.Hidden" /><span>Hidden (no menu entries; layouts, themes)</span></label>
+  </div>;
+
+  private static string DraftState(ClientModuleUpload d) =>
+      d.IsCore == true ? "Core module: updated with the WebApi release, an upload is refused"
+      : d.CurrentVersion is null ? "New module"
+      : d.VersionExists == true && d.SamePackage == true ? $"Version {d.Version} is installed with these files"
+      : d.VersionExists == true ? $"Version {d.Version} is installed with other files"
+      : $"Update: active version {d.CurrentVersion}";
+
+  private async Task RefreshAsync()
+  {
+    await RunAsync(async () =>
+    {
+      _modules = (await Api.ListAsync()).OrderBy(m => m.Id).ToList();
+      if (_editing is not null) _editing = _modules.FirstOrDefault(m => m.Id == _editing.Id);
+      if (_versionsOf is not null) _versionsOf = _modules.FirstOrDefault(m => m.Id == _versionsOf.Id);
+      if (_table is not null) await _table.SetDataAsync(_modules.Select(ToRow).ToList());
+    });
+  }
+
+  private static object ToRow(ClientModuleRecord m)
+  {
+    var s = m.Settings ?? new ClientModuleSettings();
+    var access = s.RequiresAuth == false ? "everyone"
+        : s.RequiredRole is { } role ? $"role {role}"
+        : s.AvailableToRoles is { Count: > 0 } roles ? $"roles {string.Join(", ", roles)}"
+        : "signed-in users";
+    if (s.AvailableToTenants is { Count: > 0 } tenants) access += $"; tenants {string.Join(", ", tenants)}";
+    return new
+    {
+      id = m.Id,
+      name = s.Name ?? m.Id,
+      version = m.ActiveVersion,
+      versions = m.Versions?.Count ?? 0,
+      strategy = (s.LoadStrategy ?? ClientModuleLoadStrategy.Lazy).ToString(),
+      access,
+      routes = s.RoutePrefixes is { Count: > 0 } prefixes ? string.Join(", ", prefixes.Select(p => "/" + p)) : "-",
+      enabled = m.Enabled != false,
+      core = m.Core == true,
+    };
+  }
+
+  private void FileChosen(InputFileChangeEventArgs e) => _file = e.File;
+
+  private async Task UploadAsync()
+  {
+    if (_file is null) return;
+    var file = _file;
+    await RunAsync(async () =>
+    {
+      await using var stream = file.OpenReadStream(MaxPackageSize);
+      _draft = await Api.UploadAsync(new FileParameter(stream, file.Name, "application/octet-stream"));
+      _draftForm = SettingsForm.From(_draft.Current ?? _draft.Detected);
+      _draftApplySettings = _draft.Current is null;
+      _draftActivate = true;
+      _draftReplace = false;
+      _file = null;
+    });
+  }
+
+  private async Task InstallAsync()
+  {
+    if (_draft is null) return;
+    var draft = _draft;
+    await RunAsync(async () =>
+    {
+      var record = await Api.InstallAsync(draft.Token, new InstallClientModule
+      {
+        Settings = draft.Current is null || _draftApplySettings ? _draftForm.ToSettings() : null,
+        Activate = _draftActivate,
+        Replace = _draftReplace
+      });
+      _draft = null;
+      await MudTail.ToastAsync($"{record.Id} {draft.Version} installed{(record.ActiveVersion == draft.Version ? " and active" : "")}.", "success");
+    }, changed: true);
+  }
+
+  private async Task DiscardAsync()
+  {
+    if (_draft is null) return;
+    var token = _draft.Token;
+    await RunAsync(async () =>
+    {
+      try { await Api.DiscardUploadAsync(token); }
+      catch (ClientModulesApiException e) when (e.StatusCode == 404) { /* expired already */ }
+      _draft = null;
+    });
+  }
+
+  private async Task OnActionAsync((string Action, string Key) e)
+  {
+    var module = _modules.FirstOrDefault(m => m.Id == e.Key);
+    if (module is null) return;
+
+    switch (e.Action)
+    {
+      case "settings":
+        _editing = module;
+        _editForm = SettingsForm.From(module.Settings);
+        StateHasChanged();
+        break;
+
+      case "versions":
+        _versionsOf = module;
+        StateHasChanged();
+        break;
+
+      case "enable":
+        await RunAsync(async () =>
+        {
+          await Api.EnableAsync(module.Id);
+          await MudTail.ToastAsync($"{module.Id} is enabled: users receive it on their next manifest check.", "success");
+        }, changed: true);
+        break;
+
+      case "disable":
+        await RunAsync(async () =>
+        {
+          await Api.DisableAsync(module.Id);
+          await MudTail.ToastAsync($"{module.Id} is disabled: it leaves every user's module list on their next check.", "warning");
+        }, changed: true);
+        break;
+
+      case "remove":
+        await RunAsync(async () =>
+        {
+          await Api.DeleteAsync(module.Id);
+          await MudTail.ToastAsync($"{module.Id} and its files are deleted.", "success");
+          if (_editing?.Id == module.Id) _editing = null;
+          if (_versionsOf?.Id == module.Id) _versionsOf = null;
+        }, changed: true);
+        break;
+    }
+  }
+
+  private async Task SaveSettingsAsync()
+  {
+    if (_editing is null) return;
+    var id = _editing.Id;
+    await RunAsync(async () =>
+    {
+      await Api.UpdateSettingsAsync(id, _editForm.ToSettings());
+      await MudTail.ToastAsync($"Settings of {id} saved.", "success");
+      _editing = null;
+    }, changed: true);
+  }
+
+  private Task ActivateVersionAsync(string id, string version) => RunAsync(async () =>
+  {
+    await Api.ActivateVersionAsync(id, version);
+    await MudTail.ToastAsync($"{id} {version} is the active version.", "success");
+  }, changed: true);
+
+  private Task DeleteVersionAsync(string id, string version) => RunAsync(async () =>
+  {
+    await Api.DeleteVersionAsync(id, version);
+    await MudTail.ToastAsync($"{id} {version} deleted.", "success");
+  }, changed: true);
+
+  /// <summary>
+  /// Runs one API call: busy flag and error message. After a change, the list is read again and this browser's own
+  /// module list follows at once (the manifest is fetched again; the menu updates).
+  /// </summary>
+  private async Task RunAsync(Func<Task> call, bool changed = false)
+  {
+    _busy = true;
+    _error = null;
+    StateHasChanged();
+    try
+    {
+      await call();
+    }
+    catch (AccessTokenNotAvailableException ex)
+    {
+      ex.Redirect(); // the session ended: sign in again and come back
+      return;
+    }
+    catch (Exception ex)
+    {
+      _error = Describe(ex);
+      await MudTail.ToastAsync(_error, "error");
+    }
+    finally
+    {
+      _busy = false;
+    }
+
+    if (changed)
+    {
+      await RefreshAsync();
+      await Modules.RefreshAsync(force: true);
+    }
+    StateHasChanged();
+  }
+
+  private static string Describe(Exception ex) => ex switch
+  {
+    ClientModulesApiException<Problem> problem => $"{problem.StatusCode}: {problem.Result.Detail ?? problem.Result.Title ?? "request failed"}",
+    ClientModulesApiException api when api.StatusCode == 401 => "401: the gateway did not accept the access token. Sign in again.",
+    ClientModulesApiException api when api.StatusCode == 403 => "403: your account may not manage client modules (platform.modules.manage).",
+    ClientModulesApiException api when api.StatusCode == 404 => "404: the WebApi has no client-modules module (restart the lab after building it), or the item is gone.",
+    ClientModulesApiException api => $"{api.StatusCode}: {FirstLine(api.Response) ?? FirstLine(api.Message)}",
+    HttpRequestException http => $"The gateway is not reachable ({http.Message}). Is the Aspire lab running, and does WebApi allow this origin (CORS)?",
+    _ => ex.Message,
+  };
+
+  private static string? FirstLine(string? text)
+      => string.IsNullOrWhiteSpace(text) ? null : text.Split('\n', 2)[0].Trim();
+}

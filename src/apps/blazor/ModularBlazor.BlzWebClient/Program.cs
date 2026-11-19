@@ -10,8 +10,9 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 // Two kinds of HttpClient, on purpose:
-//   * "LocalHttpClient" (this site's own origin): module-catalog.json and the module files in wwwroot/modules.
-//   * "WebApi" (the YARP gateway in front of every WebApi pool): carries the OpenIddict access token.
+//   * "LocalHttpClient" (this site's own origin): app files; modules come from the WebApi, not from this site.
+//   * "WebApi" (the YARP gateway in front of every WebApi pool): carries the OpenIddict access token;
+//     "WebApi.Public" is the same gateway without a token (the anonymous client manifest and public module files).
 builder.Services.AddKeyedSingleton<HttpClient>("LocalHttpClient", (_, _) => new HttpClient
 {
     BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
@@ -45,11 +46,11 @@ var host = builder.Build();
 // host.Services is the app's scope (the one components resolve from), so these are the instances the UI sees.
 var modules = host.Services.GetRequiredService<ModuleManager>();
 
-// Phase 1: the startup modules (layouts, MudTail theme) from module-catalog.json, downloaded before the first render.
+// Phase 1: the client manifest from the WebApi (api/client-modules/manifest; the last anonymous one this browser
+// received when it cannot be reached), then the startup modules (layouts, MudTail theme) before the first render. A returning
+// user's OIDC session is still in the browser, so their manifest is the one fetched and their modules are known before
+// the first route.
 await modules.LoadStartupModulesAsync();
-
-// Phase 2 for a returning user: the OIDC session is still in the browser, so their modules are known before the first route.
-await modules.RestoreUserModulesAsync();
 
 // ...and the startup modules' styles/scripts go live (they stay active for the whole session).
 await host.Services.GetRequiredService<ActiveModuleService>().SyncAsync();

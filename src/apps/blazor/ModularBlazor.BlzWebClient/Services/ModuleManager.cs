@@ -1,10 +1,14 @@
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Routing;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using soft.square.net.ModularBlazor.Abstractions;
+using soft.square.net.ModularBlazor.Abstractions.MudTail;
 using soft.square.net.ModularBlazor.BlzWebClient.Auth;
 using soft.square.net.Share.All;
-using System.Net.Http.Json;
+using System.Net;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
@@ -15,21 +19,42 @@ using System.Text.Json.Serialization;
 
 namespace soft.square.net.ModularBlazor.BlzWebClient.Services;
 
+/// <summary>Where the module catalog came from.</summary>
+public enum ModuleCatalogSource
+{
+  /// <summary>The WebApi's client-modules core module (GET api/client-modules/manifest): filtered per user on the server.</summary>
+  Api,
+
+  /// <summary>
+  /// The WebApi could not be reached: the last anonymous manifest this browser received (public modules: layouts,
+  /// theme), with their files from the module cache. Nothing user-specific is kept in the browser.
+  /// </summary>
+  Cached,
+
+  /// <summary>The WebApi could not be reached and this browser has no manifest yet: no modules.</summary>
+  None
+}
+
 /// <summary>
 /// Owns the client module catalog and the *code* lifecycle of modules (.dll or .nupkg): load, and unload.
 /// The browser-side lifecycle (styles, scripts) belongs to ActiveModuleService, which follows navigation.
-/// The catalog is wwwroot/module-catalog.json (the modules this app ships, built from modules/client); the WebApi
-/// has no client-module catalog, so nothing about client modules is asked of the server.
+/// <para>
+/// The catalog is the WebApi's client manifest (core module "client-modules"): anonymous before sign-in (the public
+/// modules: layouts, theme), the user's own after sign-in (roles and tenant are applied by the server). It is checked
+/// again on sign-in, sign-out and, at most once a minute, on navigation (ETag: an unchanged list costs a 304).
+/// The app ships no modules: when the WebApi cannot be reached at startup, the last anonymous manifest this browser
+/// received is used (with the module files it cached), so the layout still renders.
+/// </para>
 /// Three phases feed it:
-///   1. LoadStartupModulesAsync      - the catalog, then every LoadOnStartup module (layouts, theme)
-///   2. LoadUserModulesAsync         - after sign-in: the catalog entries the user's roles allow (no code downloaded yet)
-///   3. EnsureLoadedAsync            - called from the router when a URL needs a module
+///   1. LoadStartupModulesAsync - the manifest, then every startup module (layouts, theme), before the first render
+///   2. RefreshAsync            - after sign-in / sign-out / now and then: the modules this user may use (no code downloaded)
+///   3. EnsureLoadedAsync       - called from the router when a URL needs a module; "preload" modules in the background
 /// </summary>
 public sealed class ModuleManager : IModuleNavigation
 {
   public const string DefaultLayoutKey = "default";
 
-  /// <summary>Platform role that may manage host modules (the identity service's IdentityClaims.PlatformAdmin).</summary>
+  /// <summary>Platform role that may manage host and client modules (the identity service's IdentityClaims.PlatformAdmin).</summary>
   public const string PlatformAdminRole = "platform-admin";
 
   private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web)
@@ -37,33 +62,44 @@ public sealed class ModuleManager : IModuleNavigation
     Converters = { new JsonStringEnumConverter() }
   };
 
-  private readonly HttpClient _local;               // this site's own files: module-catalog.json, modules/*.dll
-  private readonly IHttpClientFactory _httpClients;  // the gateway's authenticated client, for api/... module urls
+  private const string AnonymousManifestKey = "manifest/anonymous";
+
+  private readonly HttpClient _local;               // this site's own origin (relative module urls outside api/)
+  private readonly IHttpClientFactory _httpClients;  // the gateway: with the user's token, or without one
   private readonly AuthenticationStateProvider _auth;
   private readonly ModuleOptions _options;
   private readonly ModuleAssetStore _assets;
   private readonly ModuleCache _cache;
+  private readonly MudTailRuntime _mudTail;
   private readonly IReadOnlyDictionary<ModuleKind, IModulePackageReader> _readers;
 
-  /// <summary>Every module the catalog file lists, with the roles that may use it (empty: any signed-in user).</summary>
-  private readonly List<(ModuleDescriptor Module, string[] Roles)> _available = [];
   private readonly Dictionary<string, ModuleDescriptor> _catalog = new(StringComparer.OrdinalIgnoreCase);
-  private readonly HashSet<string> _userModuleIds = new(StringComparer.OrdinalIgnoreCase);
+  private readonly HashSet<string> _preload = new(StringComparer.OrdinalIgnoreCase);
   private readonly List<ModuleNavItem> _hostNav = [];
   private readonly Dictionary<string, LoadedModule> _loaded = new(StringComparer.OrdinalIgnoreCase);
   private readonly Dictionary<string, Task> _inflight = new(StringComparer.OrdinalIgnoreCase);
   private readonly Dictionary<Assembly, ModuleDescriptor> _owners = new();
   private readonly Dictionary<string, Type> _layouts = new(StringComparer.OrdinalIgnoreCase);
+  private readonly SemaphoreSlim _refreshLock = new(1, 1);
+
+  private string? _etag;            // of the last manifest applied, for If-None-Match
+  private bool _etagSignedIn;       // ...and whether it was the signed-in one
+  private DateTimeOffset _lastCheck;
 
   private sealed record LoadedModule(ModuleDescriptor Descriptor, IReadOnlyList<Assembly> Assemblies, ModuleLoadContext Context);
+
+  /// <summary>A catalog entry: the descriptor, plus what the descriptor type has no property for.</summary>
+  private sealed record Entry(ModuleDescriptor Module, string[] Roles, string? LoadStrategy);
 
   public ModuleManager(
       [FromKeyedServices("LocalHttpClient")] HttpClient local,
       IHttpClientFactory httpClients,
       AuthenticationStateProvider auth,
+      NavigationManager navigation,
       ModuleOptions options,
       ModuleAssetStore assets,
       ModuleCache cache,
+      MudTailRuntime mudTail,
       IEnumerable<IModulePackageReader> readers)
   {
     _local = local;
@@ -72,21 +108,16 @@ public sealed class ModuleManager : IModuleNavigation
     _options = options;
     _assets = assets;
     _cache = cache;
+    _mudTail = mudTail;
     _readers = readers.ToDictionary(r => r.Kind);
 
     // Signing in (the OIDC callback) brings the user's modules; signing out ends them, whichever page triggered it.
-    _auth.AuthenticationStateChanged += async stateTask =>
+    _auth.AuthenticationStateChanged += state => { _ = RefreshAsync(force: true); };
+
+    // Admins change the catalog while users work: look again now and then, cheaply (ETag).
+    navigation.LocationChanged += (_, _) =>
     {
-      try
-      {
-        var user = (await stateTask).User;
-        if (user.Identity?.IsAuthenticated is true) LoadUserModules(user);
-        else ForgetUserModules();
-      }
-      catch (Exception ex)
-      {
-        Console.Error.WriteLine($"Could not react to the sign-in change: {ex.Message}");
-      }
+      if (DateTimeOffset.UtcNow - _lastCheck > _options.ManifestCheckInterval) _ = RefreshAsync();
     };
   }
 
@@ -94,6 +125,16 @@ public sealed class ModuleManager : IModuleNavigation
   public List<Assembly> RouterAssemblies { get; } = new();
 
   public event Action? Changed;
+
+  /// <summary>Where the current catalog came from.</summary>
+  public ModuleCatalogSource Source { get; private set; } = ModuleCatalogSource.Api;
+
+  /// <summary>Why the manifest could not be fetched the last time (null when it could).</summary>
+  public string? ManifestError { get; private set; }
+
+  /// <summary>Loaded modules whose newer version the manifest announces: reload them (or the page) to use it.</summary>
+  public IReadOnlySet<string> UpdatesAvailable => _updates;
+  private readonly HashSet<string> _updates = new(StringComparer.OrdinalIgnoreCase);
 
   // ---------------------------------------------------------------- catalog
 
@@ -112,6 +153,9 @@ public sealed class ModuleManager : IModuleNavigation
   public bool IsLoaded(string id) => _loaded.ContainsKey(id);
 
   public ModuleDescriptor? GetDescriptor(string id) => _catalog.GetValueOrDefault(id);
+
+  /// <summary>"startup", "lazy" or "preload".</summary>
+  public string StrategyOf(ModuleDescriptor d) => d.LoadOnStartup ? "startup" : _preload.Contains(d.Id) ? "preload" : "lazy";
 
   /// <summary>The module and everything it depends on, dependencies first. Unknown ids and cycles are skipped.</summary>
   public IReadOnlyList<string> GetDependencyClosure(string id)
@@ -178,105 +222,202 @@ public sealed class ModuleManager : IModuleNavigation
   // ---------------------------------------------------------------- phase 1: startup
 
   /// <summary>
-  /// Reads the catalog file and loads every LoadOnStartup module (the layouts and their theme) before the first render.
-  /// Each entry is a module descriptor plus an optional "availableToRoles" list for user modules.
+  /// Reads the manifest (the signed-in one for a returning user whose session is still in the browser, otherwise the
+  /// anonymous one) and loads every startup module (the layouts and their theme) before the first render. Falls back
+  /// to the last anonymous manifest this browser received when the WebApi cannot answer.
   /// </summary>
   public async Task LoadStartupModulesAsync()
   {
-    using var document = JsonDocument.Parse(await _local.GetByteArrayAsync(_options.CatalogUrl));
-    _available.Clear();
-
-    if (document.RootElement.TryGetProperty("modules", out var modules))
-    {
-      foreach (var entry in modules.EnumerateArray())
-      {
-        var module = entry.Deserialize<ModuleDescriptor>(Json);
-        if (module is null || string.IsNullOrWhiteSpace(module.Id)) continue;
-        var roles = entry.TryGetProperty("availableToRoles", out var r) ? r.Deserialize<string[]>(Json) ?? [] : [];
-        _available.Add((module, roles));
-      }
-    }
-
-    Register(_available.Where(a => a.Module.LoadOnStartup).Select(a => a.Module), user: false);
+    await RefreshAsync(force: true);
+    if (Source != ModuleCatalogSource.Api)
+      Console.WriteLine(Source == ModuleCatalogSource.Cached
+          ? $"Client modules: the WebApi manifest is not available ({ManifestError}); using the last one this browser received."
+          : $"Client modules: the WebApi manifest is not available ({ManifestError}) and this browser has none cached: no modules.");
 
     var startup = _catalog.Values.Where(d => d.LoadOnStartup).Select(d => EnsureLoadedAsync(d.Id)).ToList();
     await Task.WhenAll(startup);
   }
 
-  // ---------------------------------------------------------------- phase 2: after sign-in
+  // ---------------------------------------------------------------- phase 2: the user's modules
+
+  /// <summary>Fetches the manifest again for the current user (IModuleNavigation; e.g. after the Login page signed in).</summary>
+  /// <param name="tenantId">Not used: the token is bound to a tenant, and the server applies it.</param>
+  public Task LoadUserModulesAsync(string? tenantId = null) => RefreshAsync(force: true);
+
+  /// <summary>After a page reload the session is still in the browser: the startup call already used it; this re-checks (304).</summary>
+  public Task RestoreUserModulesAsync() => RefreshAsync();
 
   /// <summary>
-  /// Registers the catalog's user modules the signed-in user may use: an entry without "availableToRoles" is for every
-  /// signed-in user, otherwise the token must carry one of the roles. No module code is downloaded here.
+  /// Fetches the manifest for whoever is signed in (or anonymously) and applies it: new modules appear, removed or
+  /// disabled ones are unloaded and disappear, a loaded module with a newer version is reported. No module code is
+  /// downloaded here, except startup modules not loaded yet and "preload" modules (in the background). Never throws:
+  /// on failure the current catalog stays, and the first call falls back to the cached anonymous manifest.
   /// </summary>
-  /// <param name="tenantId">Not used: the token is already bound to a tenant, and roles decide the modules.</param>
-  public async Task LoadUserModulesAsync(string? tenantId = null)
+  /// <param name="force">Ignore the ETag (sign-in, sign-out, an admin change).</param>
+  public async Task RefreshAsync(bool force = false)
   {
-    var user = (await _auth.GetAuthenticationStateAsync()).User;
-    if (user.Identity?.IsAuthenticated is true) LoadUserModules(user);
-  }
-
-  /// <summary>After a page reload the session is still in the browser: register that user's modules before the first route.</summary>
-  public Task RestoreUserModulesAsync() => LoadUserModulesAsync();
-
-  private void LoadUserModules(ClaimsPrincipal user)
-  {
-    var allowed = _available
-        .Where(a => !a.Module.LoadOnStartup)
-        .Where(a => a.Roles.Length == 0 || a.Roles.Any(user.IsInRole))
-        .Select(a => a.Module)
-        .ToList();
-
-    // A fresh answer replaces the previous one (another user, or a role taken away since).
-    foreach (var stale in _userModuleIds.Where(id => allowed.All(m => !m.Id.Equals(id, StringComparison.OrdinalIgnoreCase))).ToList())
+    await _refreshLock.WaitAsync();
+    try
     {
-      _catalog.Remove(stale);
-      _userModuleIds.Remove(stale);
+      _lastCheck = DateTimeOffset.UtcNow;
+      var user = (await _auth.GetAuthenticationStateAsync()).User;
+      var signedIn = user.Identity?.IsAuthenticated is true;
+
+      List<Entry>? entries;
+      try
+      {
+        entries = await FetchManifestAsync(signedIn, force);
+        if (entries is null) return; // 304: nothing changed
+        Source = ModuleCatalogSource.Api;
+        ManifestError = null;
+      }
+      catch (Exception ex) when (ex is HttpRequestException or JsonException or TaskCanceledException or AccessTokenNotAvailableException)
+      {
+        ManifestError = ex.Message;
+        if (_catalog.Count > 0 && Source == ModuleCatalogSource.Api) { Changed?.Invoke(); return; } // keep what we have
+        entries = await ReadCachedManifestAsync();
+        Source = entries is null ? ModuleCatalogSource.None : ModuleCatalogSource.Cached;
+        entries ??= [];
+        _etag = null;
+      }
+
+      Apply(entries, user);
+    }
+    catch (Exception ex)
+    {
+      Console.Error.WriteLine($"Client modules: could not refresh the catalog: {ex.Message}");
+    }
+    finally
+    {
+      _refreshLock.Release();
     }
 
-    _hostNav.Clear();
-    if (user.IsInRole(PlatformAdminRole)) _hostNav.Add(new ModuleNavItem("Host modules", "host-modules", 910));
+    // Outside the lock: loading may itself need the catalog.
+    foreach (var d in _catalog.Values.Where(d => (d.LoadOnStartup || _preload.Contains(d.Id)) && !IsLoaded(d.Id)).ToList())
+      _ = LoadInBackgroundAsync(d.Id);
+  }
 
-    Register(allowed, user: true);
+  private async Task LoadInBackgroundAsync(string id)
+  {
+    try { await EnsureLoadedAsync(id); }
+    catch (Exception ex) { Console.Error.WriteLine($"Client module {id} could not be preloaded: {ex.Message}"); }
   }
 
   /// <summary>
-  /// Forgets the user's module metadata (sign-out) and unloads the user's modules that are loaded, dependents first, so
-  /// their routes disappear with the session. ModuleRouteView still guards every page by auth and role.
+  /// The manifest's entries, or null when the server answers 304 (unchanged since the last one applied). The anonymous
+  /// manifest (public modules only) is kept in the module cache for a start without the WebApi.
   /// </summary>
-  public void ForgetUserModules()
+  private async Task<List<Entry>?> FetchManifestAsync(bool signedIn, bool force)
   {
-    var ids = _userModuleIds.ToList();
+    var client = _httpClients.CreateClient(signedIn ? AuthServiceExtensions.WebApiClient : AuthServiceExtensions.WebApiPublicClient);
+    using var request = new HttpRequestMessage(HttpMethod.Get, _options.ManifestUrl);
+    if (!force && _etag is not null && _etagSignedIn == signedIn && EntityTagHeaderValue.TryParse(_etag, out var etag))
+      request.Headers.IfNoneMatch.Add(etag);
 
-    // Unload only what nothing else still needs; repeat until a pass makes no progress.
+    using var response = await client.SendAsync(request);
+    if (response.StatusCode == HttpStatusCode.NotModified) return null;
+    response.EnsureSuccessStatusCode(); // 404: a WebApi without the client-modules core module
+
+    var bytes = await response.Content.ReadAsByteArrayAsync();
+    using var document = JsonDocument.Parse(bytes);
+    var entries = ReadEntries(document.RootElement);
+    _etag = response.Headers.ETag?.ToString();
+    _etagSignedIn = signedIn;
+
+    if (!signedIn && _options.CacheModules)
+    {
+      try { await _cache.PutAsync(AnonymousManifestKey, bytes); }
+      catch (Exception ex) { Console.Error.WriteLine($"Client modules: could not cache the manifest: {ex.Message}"); }
+    }
+    return entries;
+  }
+
+  /// <summary>The last anonymous manifest this browser received (null when there is none).</summary>
+  private async Task<List<Entry>?> ReadCachedManifestAsync()
+  {
+    if (!_options.CacheModules) return null;
+    try
+    {
+      return await _cache.GetAsync(AnonymousManifestKey) is { } bytes
+          ? ReadEntries(JsonDocument.Parse(bytes).RootElement)
+          : null;
+    }
+    catch (Exception ex) when (ex is JsonException or InvalidOperationException or Microsoft.JSInterop.JSException)
+    {
+      return null;
+    }
+  }
+
+  private static List<Entry> ReadEntries(JsonElement root)
+  {
+    var entries = new List<Entry>();
+    if (!root.TryGetProperty("modules", out var modules)) return entries;
+
+    foreach (var element in modules.EnumerateArray())
+    {
+      var module = element.Deserialize<ModuleDescriptor>(Json);
+      if (module is null || string.IsNullOrWhiteSpace(module.Id)) continue;
+      if (string.IsNullOrWhiteSpace(module.Name)) module.Name = module.Id;
+      var roles = element.TryGetProperty("availableToRoles", out var r) ? r.Deserialize<string[]>(Json) ?? [] : [];
+      var strategy = element.TryGetProperty("loadStrategy", out var s) ? s.GetString() : null;
+      entries.Add(new Entry(module, roles, strategy));
+    }
+    return entries;
+  }
+
+  /// <summary>Makes the catalog match <paramref name="entries"/>.</summary>
+  private void Apply(List<Entry> entries, ClaimsPrincipal user)
+  {
+    var incoming = entries.GroupBy(e => e.Module.Id, StringComparer.OrdinalIgnoreCase).ToDictionary(g => g.Key, g => g.Last(), StringComparer.OrdinalIgnoreCase);
+
+    // Gone (disabled, deleted, or not for this user any more): unload what nothing else still needs, dependents
+    // first, then forget them. A loaded startup module (the shell's layout) stays for the session.
+    var gone = _catalog.Keys.Where(id => !incoming.ContainsKey(id)).ToList();
     bool progress;
     do
     {
       progress = false;
-      foreach (var id in ids.Where(IsLoaded).ToList())
+      foreach (var id in gone.Where(id => IsLoaded(id) && !_catalog[id].LoadOnStartup).ToList())
       {
         try { progress |= Unload(id); }
         catch (InvalidOperationException) { /* still required by another loaded module; try again next pass */ }
       }
     } while (progress);
+    foreach (var id in gone.Where(id => !IsLoaded(id))) _catalog.Remove(id);
 
-    foreach (var id in _userModuleIds) _catalog.Remove(id);
-    _userModuleIds.Clear();
-    _hostNav.Clear();
-    Changed?.Invoke();
-  }
-
-  private void Register(IEnumerable<ModuleDescriptor> modules, bool user)
-  {
-    foreach (var m in modules)
+    var updated = new List<string>();
+    foreach (var (id, entry) in incoming)
     {
-      if (string.IsNullOrWhiteSpace(m.Name)) m.Name = m.Id;
-      _catalog[m.Id] = m;
-      if (user) _userModuleIds.Add(m.Id);
+      if (_loaded.TryGetValue(id, out var loaded) && !SameContent(loaded.Descriptor, entry.Module))
+      {
+        if (_updates.Add(id)) updated.Add(entry.Module.Name);
+      }
+      else _updates.Remove(id);
+      _catalog[id] = entry.Module;
+    }
+
+    _preload.Clear();
+    foreach (var entry in incoming.Values.Where(e => string.Equals(e.LoadStrategy, "preload", StringComparison.OrdinalIgnoreCase)))
+      _preload.Add(entry.Module.Id);
+
+    _hostNav.Clear();
+    if (user.IsInRole(PlatformAdminRole))
+    {
+      _hostNav.Add(new ModuleNavItem("Host modules", "host-modules", 910));
+      _hostNav.Add(new ModuleNavItem("Client modules", "client-modules", 911));
     }
 
     Changed?.Invoke();
+    if (updated.Count > 0)
+      _ = _mudTail.ToastAsync($"New version of {string.Join(", ", updated)}: reload the page (or the module) to use it.", "info");
   }
+
+  private static bool SameContent(ModuleDescriptor a, ModuleDescriptor b) =>
+      string.Equals(a.Version, b.Version, StringComparison.Ordinal)
+      && string.Equals(a.Sha256 ?? "", b.Sha256 ?? "", StringComparison.OrdinalIgnoreCase);
+
+  /// <summary>Sign-out: the anonymous manifest replaces the user's (their modules are unloaded).</summary>
+  public void ForgetUserModules() => _ = RefreshAsync(force: true);
 
   // ---------------------------------------------------------------- phase 3: on navigation
 
@@ -409,7 +550,7 @@ public sealed class ModuleManager : IModuleNavigation
   /// </summary>
   private async Task<byte[]> DownloadAsync(string url, string magic)
   {
-    using var response = await ClientFor(url).GetAsync(url);
+    using var response = await (await ClientForAsync(url)).GetAsync(url);
     response.EnsureSuccessStatusCode();
     var bytes = await response.Content.ReadAsByteArrayAsync();
 
@@ -421,17 +562,26 @@ public sealed class ModuleManager : IModuleNavigation
           $"content-encoding '{string.Join(",", response.Content.Headers.ContentEncoding)}', starts with \"{preview}\".");
     }
 
+    // Manifest URLs carry the file's hash (...?sha256=...): extra assemblies are checked too, not only the primary file.
+    var query = url.IndexOf('?') is var q and >= 0 ? url[(q + 1)..] : "";
+    var expected = query.Split('&').Select(p => p.Split('=', 2)).FirstOrDefault(p => p.Length == 2 && p[0] == "sha256")?[1];
+    if (expected is not null && !Convert.ToHexString(SHA256.HashData(bytes)).Equals(expected, StringComparison.OrdinalIgnoreCase))
+      throw new InvalidOperationException($"'{url}' failed its integrity check.");
+
     return bytes;
   }
 
   /// <summary>
-  /// Module files normally sit next to the app (relative url, this origin). A url under api/ is served by the WebApi behind the gateway (for
-  /// example the module store's download endpoint) and goes through the authenticated client; absolute urls are used as is.
+  /// A url under api/ is served by the WebApi behind the gateway (the client-modules files the manifest lists): with the
+  /// user's token when signed in, without one before (public modules such as the layout). Other relative urls are this
+  /// app's own origin; absolute urls are used as is.
   /// </summary>
-  private HttpClient ClientFor(string url)
-      => url.TrimStart('/').StartsWith("api/", StringComparison.OrdinalIgnoreCase)
-          ? _httpClients.CreateClient(AuthServiceExtensions.WebApiClient)
-          : _local;
+  private async Task<HttpClient> ClientForAsync(string url)
+  {
+    if (!url.TrimStart('/').StartsWith("api/", StringComparison.OrdinalIgnoreCase)) return _local;
+    var signedIn = (await _auth.GetAuthenticationStateAsync()).User.Identity?.IsAuthenticated is true;
+    return _httpClients.CreateClient(signedIn ? AuthServiceExtensions.WebApiClient : AuthServiceExtensions.WebApiPublicClient);
+  }
 
   /// <summary>
   /// The module file: from the persistent cache when the catalog's SHA-256 matches a cached copy, otherwise downloaded

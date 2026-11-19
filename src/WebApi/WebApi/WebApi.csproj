@@ -56,6 +56,73 @@
     <Copy SourceFiles="@(_CoreModulePublishFile)" DestinationFiles="@(_CoreModulePublishFile->'$(PublishDir)CoreModules\%(RecursiveDir)%(Filename)%(Extension)')" />
   </Target>
 
+  <!--
+    Core client modules: the Blazor client modules that ship with every WebApi release (modules/client). They are built
+    here and placed in CoreClientModules/ in the build and publish output; the client-modules core module seeds them
+    into its catalog on startup (as Core modules: updated with the release, not by upload) and serves them to the
+    Blazor app through GET /api/client-modules/manifest. Their settings come from each one's [assembly: ClientModule];
+    an admin may change them afterwards.
+      * plain item:           the module's .dll, at the top of CoreClientModules/;
+      * Pack="true":          packed as a .nupkg (the project sets PackageId);
+      * Folder="<name>":      every item with that Folder goes into CoreClientModules/<name>/ and forms one module
+                              (the one with [ClientModule], plus its private assemblies, e.g. a generated API client).
+    Skip with -p:BuildClientModules=false (the folder from the previous build stays).
+    Not shipped: Module.Auth and Module.ToDo, which only work with the old Host.
+  -->
+  <PropertyGroup>
+    <BuildClientModules Condition="'$(BuildClientModules)' == ''">true</BuildClientModules>
+    <ClientModulesDir>$([MSBuild]::NormalizeDirectory('$(MSBuildProjectDirectory)', '..', '..', '..', 'modules', 'client'))</ClientModulesDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <CoreClientModule Include="$(ClientModulesDir)Layouts.Default\Layouts.Default.csproj" />
+    <CoreClientModule Include="$(ClientModulesDir)Layouts.Admin\Layouts.Admin.csproj" />
+    <CoreClientModule Include="$(ClientModulesDir)Module.Admin\Module.Admin.csproj" />
+    <CoreClientModule Include="$(ClientModulesDir)Module.Dashboard\Module.Dashboard.csproj" />
+    <CoreClientModule Include="$(ClientModulesDir)Module.Reports\Module.Reports.csproj" Pack="true" />
+    <CoreClientModule Include="$(ClientModulesDir)Module.Tenants\Module.Tenants.csproj" Folder="Module.Tenants" />
+    <CoreClientModule Include="..\Modules\Core.Clients\WebApi.Modules.Core.Tenancy.Client\WebApi.Modules.Core.Tenancy.Client.csproj" Folder="Module.Tenants" />
+  </ItemGroup>
+
+  <Target Name="BuildCoreClientModules" AfterTargets="Build" Condition="'$(BuildClientModules)' == 'true' And '@(CoreClientModule)' != ''">
+    <ItemGroup>
+      <_ClientModuleAssemblyProject Include="@(CoreClientModule)" Condition="'%(CoreClientModule.Pack)' != 'true'" />
+      <_ClientModulePackProject Include="@(CoreClientModule)" Condition="'%(CoreClientModule.Pack)' == 'true'" />
+    </ItemGroup>
+    <PropertyGroup>
+      <_ClientModulesOut>$(OutDir)CoreClientModules\</_ClientModulesOut>
+      <_ClientModulesPackOut>$([MSBuild]::NormalizeDirectory('$(MSBuildProjectDirectory)', '$(BaseIntermediateOutputPath)', 'client-modules'))</_ClientModulesPackOut>
+    </PropertyGroup>
+
+    <!-- Browser (WebAssembly) libraries, not project references: restore them here, with their own settings. A unique
+         session id makes MSBuild evaluate them again, so the build sees the restored assets. -->
+    <MSBuild Projects="@(CoreClientModule)" Targets="Restore"
+             Properties="Configuration=$(Configuration);MSBuildRestoreSessionId=$([System.Guid]::NewGuid())"
+             RemoveProperties="RuntimeIdentifier;SelfContained;TargetFramework;PublishDir;OutDir;OutputPath" />
+    <!-- The outputs keep their project item's metadata (Folder). -->
+    <MSBuild Projects="@(_ClientModuleAssemblyProject)" Targets="Build" Properties="Configuration=$(Configuration)"
+             RemoveProperties="RuntimeIdentifier;SelfContained;TargetFramework;PublishDir;OutDir;OutputPath">
+      <Output TaskParameter="TargetOutputs" ItemName="_ClientModuleAssembly" />
+    </MSBuild>
+    <RemoveDir Directories="$(_ClientModulesPackOut)" />
+    <MSBuild Projects="@(_ClientModulePackProject)" Targets="Pack" Properties="Configuration=$(Configuration);PackageOutputPath=$(_ClientModulesPackOut)"
+             RemoveProperties="RuntimeIdentifier;SelfContained;TargetFramework;PublishDir;OutDir;OutputPath" />
+    <ItemGroup>
+      <_ClientModulePackage Include="$(_ClientModulesPackOut)*.nupkg" />
+    </ItemGroup>
+
+    <RemoveDir Directories="$(_ClientModulesOut)" />
+    <Copy SourceFiles="@(_ClientModuleAssembly)" DestinationFolder="$(_ClientModulesOut)%(_ClientModuleAssembly.Folder)" />
+    <Copy SourceFiles="@(_ClientModulePackage)" DestinationFolder="$(_ClientModulesOut)" />
+  </Target>
+
+  <Target Name="PublishCoreClientModules" AfterTargets="Publish">
+    <ItemGroup>
+      <_CoreClientModulePublishFile Include="$(OutDir)CoreClientModules\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_CoreClientModulePublishFile)" DestinationFiles="@(_CoreClientModulePublishFile->'$(PublishDir)CoreClientModules\%(RecursiveDir)%(Filename)%(Extension)')" />
+  </Target>
+
   <ItemGroup>
     <!-- Module store (uploaded packages + modules.json) is runtime data. -->
     <Content Remove="App_Data\**" />

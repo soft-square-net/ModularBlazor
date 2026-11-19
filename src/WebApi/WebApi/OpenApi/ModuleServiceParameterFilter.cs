@@ -36,7 +36,10 @@ internal sealed class ModuleServiceParameterFilter : IApiDescriptionProvider
                 if (bodyType is not null && parameter.Type == bodyType) { keptBody = true; continue; }
                 description.ParameterDescriptions.RemoveAt(i);
             }
-            if (!keptBody) description.SupportedRequestFormats.Clear();
+            // Form fields (IFormFile uploads, [FromForm]) are a body too: keep their formats (multipart/form-data), or the
+            // document falls back to x-www-form-urlencoded and generated clients get no file parameter.
+            var readsForm = description.ParameterDescriptions.Any(p => p.Source == BindingSource.Form || p.Source == BindingSource.FormFile);
+            if (!keptBody && !readsForm) description.SupportedRequestFormats.Clear();
         }
     }
 }

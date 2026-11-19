@@ -33,11 +33,11 @@ src/api/_Framework/Core          shared kernel (BaseEntity, IAggregateRoot, IRep
 src/api/_Framework/Infrastructure  multi-tenancy, EF Core providers, ModuleDbContext, Ardalis repository, MediatR/validation wiring (AddHostModules)
 modules/host/Auth, Catalog, Todo API host modules, each as Domain / Application / Infrastructure projects (see below)
 modules/client/Layouts.Default          dll, startup   - sidebar layout            [LayoutKey("default")]
-modules/client/Layouts.Admin            dll, lazy      - top-bar layout (dependency of Module.Admin) [LayoutKey("admin")]
+modules/client/Layouts.Admin            dll, lazy      - admin top-bar layout (dependency of Module.Admin) [LayoutKey("admin")]; WebApi client
 modules/client/Module.Auth              dll, startup   - /login + auth layout      [LayoutKey("auth")]
 modules/client/Module.Dashboard         dll, lazy      - /dashboard
 modules/client/Module.Reports           nupkg, lazy    - /reports, /reports/{id}, ships reports.css
-modules/client/Module.Admin             dll, lazy      - /admin, /admin/users (role: admin)
+modules/client/Module.Admin             dll, lazy      - /admin, /admin/members (role: platform-admin); WebApi client (BlzWebClient)
 modules/client/Module.ToDo              dll, lazy      - /todo, ships todo.css; uses the Todo host module (/api/v1/todos)
 ```
 
@@ -252,9 +252,10 @@ assets/modules/
   modules.json            manifest (sha-256, size, enabled, target)
 ```
 
-**Management page.** The admin layout has a *Modules* entry (`/admin/modules`, module `Module.Admin`) to upload client or host
-modules, edit a client module's catalog entry, enable/disable, download the file, delete, and restart the API.
-Needs `Permissions.Modules.View|Manage` (held by `admin`) and `ModuleStore:AllowUpload=true` (set in `appsettings.json`).
+**Management page.** `Module.Admin` used to have a *Modules* page (`/admin/modules`) for this API. It now belongs to the WebApi
+client (ModularBlazor.BlzWebClient), which manages its modules on `/client-modules` and `/host-modules` (see the guide
+"The Blazor client for WebApi"); the endpoints below remain for scripts and the old client. They need
+`Permissions.Modules.View|Manage` (held by `admin`) and `ModuleStore:AllowUpload=true` (set in `appsettings.json`).
 
 **Client modules** (what the Blazor app loads):
 

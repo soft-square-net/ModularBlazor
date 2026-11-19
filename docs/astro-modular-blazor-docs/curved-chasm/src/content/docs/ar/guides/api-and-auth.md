@@ -77,4 +77,3 @@ fetch(url, { headers: { Authorization: `Bearer ${token}`, 'X-Tenant': tenantId }
 | `/app/` | الصفحة الرئيسية للعميل (القوالب وتسجيل الدخول وحدات بدء تشغيل) |
 | `/app/login` | `Module.Auth` |
 | `/app/todo` | `Module.ToDo`، ينزل عند التنقل |
-| `/app/admin` | `Module.Admin` (الدور `admin`) |

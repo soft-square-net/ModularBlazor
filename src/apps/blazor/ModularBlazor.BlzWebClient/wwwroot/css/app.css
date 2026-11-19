@@ -124,6 +124,13 @@ small { color: var(--muted); }
   border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spin .8s linear infinite;
 }
 .blz-status { display: flex; align-items: center; }
+.blz-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 4px 16px; }
+.blz-wide { grid-column: 1 / -1; }
+.blz-check { display: flex; align-items: center; gap: 8px; margin: 8px 0; }
+.blz-list { margin: 4px 0 0; padding-inline-start: 20px; }
+.blz-versions { width: 100%; border-collapse: collapse; }
+.blz-versions th, .blz-versions td { text-align: start; padding: 8px; border-bottom: 1px solid var(--mud-palette-lines-default, var(--border)); }
+.blz-versions th { font-size: .8125rem; color: var(--mud-palette-text-secondary, var(--muted)); }
 
 /* sign-in and authentication pages (no layout: a centred MudTail card) */
 .blz-auth {

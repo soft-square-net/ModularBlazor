@@ -1,28 +1,55 @@
-@using Microsoft.JSInterop
 @inherits LayoutComponentBase
 @attribute [LayoutKey("admin")]
+@implements IDisposable
 @inject ICurrentUserService Users
-@inject IJSRuntime JS
+@inject IAuthenticationService Auth
 
-<div class="shell-admin">
-    <header class="topbar">
-        <span class="brand">Admin console</span>
-        <nav>
-            <NavLink href="admin" Match="NavLinkMatch.All">Overview</NavLink>
-            <NavLink href="admin/users">Users</NavLink>
-            <NavLink href="admin/modules">Modules</NavLink>
-        </nav>
-        <a href="">&larr; Back to app</a>
-        <small>@_user?.Name</small>
-    </header>
+@*
+  The administration shell (layout key "admin"): a top bar with the admin areas. Module.Admin's pages use it; the
+  host's own admin pages (client and host modules) and Module.Tenants keep the default layout and are linked here.
+  Colours come from the --mud-palette-* tokens of Layouts.Default (MudTail), styles from css/module.css.
+*@
 
-    <main class="shell-main">@Body</main>
+<div class="adm-shell">
+  <header class="adm-topbar">
+    <a class="adm-brand" href="admin">Administration</a>
+    <nav class="adm-nav">
+      <NavLink href="admin" Match="NavLinkMatch.All">Overview</NavLink>
+      <NavLink href="admin/members">Members</NavLink>
+      <NavLink href="tenants">Tenants</NavLink>
+      <NavLink href="client-modules">Client modules</NavLink>
+      <NavLink href="host-modules">Host modules</NavLink>
+    </nav>
+    <div class="adm-user">
+      @if (_user is not null)
+      {
+        <span>@_user.Name</span>
+        <a href="login" @onclick="SignOutAsync" @onclick:preventDefault>Sign out</a>
+      }
+      <a href="">&larr; Back to the app</a>
+    </div>
+  </header>
+
+  <main class="adm-main">@Body</main>
 </div>
-
-
 
 @code {
   private UserInfo? _user;
 
-  protected override async Task OnInitializedAsync() => _user = await Users.GetUserInfoAsync();
+  protected override async Task OnInitializedAsync()
+  {
+    Users.Changed += OnChanged;
+    _user = await Users.GetUserInfoAsync();
+  }
+
+  // Never block on the async user lookup (.Result freezes WebAssembly): hop onto the renderer and await it there.
+  private void OnChanged() => _ = InvokeAsync(async () =>
+  {
+    _user = await Users.GetUserInfoAsync();
+    StateHasChanged();
+  });
+
+  private Task SignOutAsync() => Auth.LogoutAsync();
+
+  public void Dispose() => Users.Changed -= OnChanged;
 }

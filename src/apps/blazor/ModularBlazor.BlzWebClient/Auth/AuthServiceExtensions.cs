@@ -31,8 +31,22 @@ public static class AuthServiceExtensions
 
         services.AddAuthorizationCore();
         services.AddCascadingAuthenticationState();
+
+        // The identity service's own admin API (memberships), called with the same access token. The token is only
+        // attached to requests for the authority.
+        var authority = configuration["Oidc:Authority"];
+        if (!string.IsNullOrWhiteSpace(authority))
+        {
+            var identity = new Uri(authority.EndsWith('/') ? authority : authority + "/");
+            services.AddHttpClient(IdentityClient, client => client.BaseAddress = identity)
+                .AddHttpMessageHandler(sp => sp.GetRequiredService<AuthorizationMessageHandler>()
+                    .ConfigureHandler(authorizedUrls: [identity.ToString()]));
+        }
         return services;
     }
+
+    /// <summary>Named HttpClient for the identity service (Oidc:Authority), with the user's access token attached.</summary>
+    public const string IdentityClient = soft.square.net.ModularBlazor.Abstractions.HttpClientNames.Identity;
 
     /// <summary>
     /// The gateway's HttpClient ("WebApi"): base address WebApi:BaseUrl, bearer token from the identity service on
@@ -44,6 +58,12 @@ public static class AuthServiceExtensions
         services.AddHttpClient(WebApiClient, client => client.BaseAddress = baseAddress)
             .AddHttpMessageHandler(sp => sp.GetRequiredService<AuthorizationMessageHandler>()
                 .ConfigureHandler(authorizedUrls: [baseAddress.ToString()]));
+        // Same gateway, no token: the anonymous client manifest and public module files (before sign-in, the
+        // AuthorizationMessageHandler would throw for want of a token).
+        services.AddHttpClient(WebApiPublicClient, client => client.BaseAddress = baseAddress);
         return services;
     }
+
+    /// <summary>Named HttpClient for the gateway without a token (anonymous endpoints).</summary>
+    public const string WebApiPublicClient = "WebApi.Public";
 }
