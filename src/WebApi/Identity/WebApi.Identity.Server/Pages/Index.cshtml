@@ -1,15 +1,18 @@
 @page
 @using System.Security.Claims
 @{ ViewData["Title"] = "Account"; }
-<h1>Modular Identity</h1>
 @if (User.Identity?.IsAuthenticated == true)
 {
-    <p>Signed in as <strong>@User.FindFirstValue("name")</strong> (@User.FindFirstValue("email")).</p>
-    <p><a href="/Account/Invitations">Pending invitations</a></p>
-    <a class="button" href="/Account/Logout">Sign out</a>
+    <p class="mud-typography mud-typography-body1">Signed in as <strong>@User.FindFirstValue("name")</strong> (@User.FindFirstValue("email")).</p>
+    <div class="id-stack">
+        <a class="mud-button-root mud-button-outlined mud-button-primary mud-button-medium id-block" href="/Account/Invitations">Pending invitations</a>
+        <a class="mud-button-root mud-button-filled mud-button-primary mud-button-medium id-block" href="/Account/Logout">Sign out</a>
+    </div>
 }
 else
 {
-    <p class="muted">This service issues tokens for the Modular WebApi. Applications send you here to sign in.</p>
-    <a class="button" href="/Account/Login">Sign in</a>
+    <p class="mud-typography mud-typography-body2 id-muted">This service issues tokens for the Modular WebApi. Applications send you here to sign in.</p>
+    <div class="id-stack">
+        <a class="mud-button-root mud-button-filled mud-button-primary mud-button-medium id-block" href="/Account/Login">Sign in</a>
+    </div>
 }

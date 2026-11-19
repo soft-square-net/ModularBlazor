@@ -1,6 +1,7 @@
 @page
 @model LogoutModel
 @{ ViewData["Title"] = "Sign out"; }
-<h1>Sign out</h1>
-<p>Sign out of the identity service? Applications keep their tokens until they expire, but cannot get new ones silently.</p>
-<form method="post"><button type="submit">Sign out</button></form>
+<p class="mud-typography mud-typography-body2 id-muted">Sign out of the identity service? Applications keep their tokens until they expire, but cannot get new ones silently.</p>
+<form method="post" class="id-stack">
+    <button type="submit" class="mud-button-root mud-button-filled mud-button-primary mud-button-large id-block">Sign out</button>
+</form>

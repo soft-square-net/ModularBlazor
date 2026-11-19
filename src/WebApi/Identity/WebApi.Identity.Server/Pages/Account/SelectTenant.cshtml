@@ -1,12 +1,13 @@
 @page
 @model SelectTenantModel
 @{ ViewData["Title"] = "Choose a tenant"; }
-<h1>Choose a tenant</h1>
-<p class="muted">Your account belongs to several organisations. A sign-in is for one of them; you can switch later without signing in again.</p>
-<form method="post" class="list">
+<p class="mud-typography mud-typography-body2 id-muted">Your account belongs to several organisations. A sign-in is for one of them; you can switch later without signing in again.</p>
+<form method="post" class="id-stack">
     <input type="hidden" asp-for="ReturnUrl" />
     @foreach (var tenant in Model.Tenants)
     {
-        <button type="submit" name="tenant" value="@tenant.Id">@tenant.Name <span class="muted">(@tenant.Id)</span></button>
+        <button type="submit" name="tenant" value="@tenant.Id" class="mud-button-root mud-button-outlined mud-button-primary mud-button-large id-block id-tenant">
+            <span>@tenant.Name</span> <span class="id-muted">@tenant.Id</span>
+        </button>
     }
 </form>

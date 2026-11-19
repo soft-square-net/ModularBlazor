@@ -1,14 +1,44 @@
 @page
 @model LoginModel
 @{ ViewData["Title"] = "Sign in"; }
-<h1>Sign in</h1>
-<form method="post">
+<form method="post" class="id-form">
     <input type="hidden" asp-for="ReturnUrl" />
-    @if (Model.Error is not null) { <p class="error">@Model.Error</p> }
-    <label asp-for="Email">Email</label>
-    <input asp-for="Email" type="email" autocomplete="username" autofocus required />
-    <label asp-for="Password">Password</label>
-    <input asp-for="Password" type="password" autocomplete="current-password" required />
-    <label><input asp-for="RememberMe" type="checkbox" /> Keep me signed in</label>
-    <button type="submit">Sign in</button>
+    @if (Model.Error is not null) { <p class="mud-typography mud-typography-body2 id-error" role="alert">@Model.Error</p> }
+
+    <div class="mud-input-control">
+        <label class="mud-input-label" asp-for="Email">Email</label>
+        <div class="mud-input-wrapper">
+            <input asp-for="Email" class="mud-input-slot" type="email" autocomplete="username" placeholder="you@example.com" autofocus required />
+        </div>
+    </div>
+
+    <div class="mud-input-control">
+        <label class="mud-input-label" asp-for="Password">Password</label>
+        <div class="mud-input-wrapper" id="password-wrapper">
+            <input asp-for="Password" class="mud-input-slot" type="password" autocomplete="current-password" required />
+            <button type="button" class="mud-input-adornment-end id-toggle" id="password-toggle" aria-label="Show password" aria-pressed="false">Show</button>
+        </div>
+    </div>
+
+    <div class="id-row">
+        <label class="mud-checkbox">
+            <input asp-for="RememberMe" type="checkbox" />
+            <span>Keep me signed in</span>
+        </label>
+    </div>
+
+    <button type="submit" class="mud-button-root mud-button-filled mud-button-primary mud-button-large id-block">Sign in</button>
 </form>
+<script>
+    // Password reveal (MudTail's password-toggle behaviour, without loading its script bundle here).
+    (() => {
+        const input = document.getElementById('Password'), button = document.getElementById('password-toggle');
+        button.addEventListener('click', () => {
+            const show = input.type === 'password';
+            input.type = show ? 'text' : 'password';
+            button.textContent = show ? 'Hide' : 'Show';
+            button.setAttribute('aria-pressed', String(show));
+            button.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+        });
+    })();
+</script>

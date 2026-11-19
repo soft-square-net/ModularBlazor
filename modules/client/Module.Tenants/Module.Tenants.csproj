@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <!--
+    Tenant administration for ModularBlazor.BlzWebClient: tenants (create, edit, activate, suspend, provision) and their
+    subscription periods (add, extend, cancel, the "ending soon" report), over the Tenancy core module's HTTP API.
+
+    Shipped as soft.square.net.Module.Tenants.dll plus one extra assembly, the generated Tenancy client
+    (soft.square.net.WebApi.Modules.Core.Tenancy.Client.dll), listed in the catalog entry's "extraAssemblies".
+    The host provides everything else: ModularBlazor.Abstractions (MudTailDataTable, MudTailRuntime, HttpClientNames)
+    and Microsoft.Extensions.Http, so those references stay private.
+  -->
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.*" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="10.0.*" PrivateAssets="all" />
+    <ProjectReference Include="..\..\..\src\WebApi\Modules\Core.Clients\WebApi.Modules.Core.Tenancy.Client\WebApi.Modules.Core.Tenancy.Client.csproj" />
+  </ItemGroup>
+
+</Project>

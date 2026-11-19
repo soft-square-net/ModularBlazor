@@ -1,0 +1,316 @@
+/* src/style.css */
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-size: 14px;
+  --color-dark: black;
+  --color-light: white;
+}
+
+:root {
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+  --text: #1d2330;
+  --muted: #667085;
+  --border: #e3e6ec;
+  --accent: #2f6fed;
+  --accent-dark: #1d4ec0;
+  --danger: #c0392b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+a {
+  color: var(--accent);
+}
+
+h1 {
+  margin-top: 0;
+}
+
+code {
+  background: #eef0f4;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.error-text {
+  color: var(--danger);
+}
+
+.hint {
+  color: var(--muted);
+  font-size: .9rem;
+}
+
+.boot, .route-loading {
+  padding: 2rem;
+  color: var(--muted);
+}
+
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 6px;
+  vertical-align: -2px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- default layout: sidebar ---------- */
+.shell-default {
+  display: flex;
+  min-height: 100vh;
+}
+
+  .shell-default .shell-sidebar {
+    width: 240px;
+    background: #172033;
+    color: #dfe5f1;
+    padding: 1.25rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .shell-default .brand {
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.15rem;
+    text-decoration: none;
+  }
+
+  .shell-default nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+  }
+
+    .shell-default nav a {
+      color: #c5cee0;
+      text-decoration: none;
+      padding: .5rem .75rem;
+      border-radius: 6px;
+    }
+
+      .shell-default nav a:hover {
+        background: #24304a;
+      }
+
+      .shell-default nav a.active {
+        background: var(--accent);
+        color: #fff;
+      }
+
+  .shell-default .shell-user {
+    font-size: .85rem;
+    border-top: 1px solid #2b3855;
+    padding-top: .75rem;
+  }
+
+    .shell-default .shell-user a {
+      color: #9db7f5;
+    }
+
+  .shell-default .shell-main {
+    flex: 1;
+    padding: 2rem;
+    max-width: 1100px;
+  }
+
+/* ---------- admin layout: top bar ---------- */
+.shell-admin {
+  min-height: 100vh;
+}
+
+  .shell-admin .topbar {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: .75rem 1.5rem;
+    background: #3a1d4a;
+    color: #f0e4f7;
+  }
+
+    .shell-admin .topbar .brand {
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .shell-admin .topbar nav {
+      display: flex;
+      gap: .25rem;
+      flex: 1;
+    }
+
+    .shell-admin .topbar a {
+      color: #e5d3f0;
+      text-decoration: none;
+      padding: .4rem .7rem;
+      border-radius: 6px;
+    }
+
+      .shell-admin .topbar a:hover {
+        background: #50295f;
+      }
+
+      .shell-admin .topbar a.active {
+        background: #7b3fa0;
+        color: #fff;
+      }
+
+  .shell-admin .shell-main {
+    padding: 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+/* ---------- auth layout: centered card ---------- */
+.shell-auth {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+  .shell-auth .card {
+    width: 100%;
+    max-width: 380px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 6px 24px rgba(20, 30, 60, .08);
+  }
+
+  .shell-auth label {
+    display: block;
+    margin: .75rem 0 .25rem;
+    font-size: .9rem;
+  }
+
+  .shell-auth input {
+    width: 100%;
+    padding: .55rem .7rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font: inherit;
+  }
+
+  .shell-auth button {
+    margin-top: 1.25rem;
+    width: 100%;
+    padding: .6rem;
+    border: 0;
+    border-radius: 6px;
+    background: var(--accent);
+    color: #fff;
+    font: inherit;
+    cursor: pointer;
+  }
+
+    .shell-auth button:hover {
+      background: var(--accent-dark);
+    }
+
+    .shell-auth button:disabled {
+      opacity: .6;
+      cursor: default;
+    }
+
+/* ---------- shared bits ---------- */
+table.modules {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+  table.modules th, table.modules td {
+    text-align: left;
+    padding: .6rem .8rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  table.modules th {
+    background: #eef0f4;
+    font-size: .85rem;
+  }
+
+small {
+  color: var(--muted);
+}
+
+.badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: .78rem;
+}
+
+.badge-on {
+  background: #dcf5e4;
+  color: #14693a;
+}
+
+.badge-off {
+  background: #eceef3;
+  color: var(--muted);
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.card-tile {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+  .card-tile .value {
+    font-size: 1.8rem;
+    font-weight: 700;
+  }
+
+#blazor-error-ui {
+  background: #fff3cd;
+  bottom: 0;
+  box-shadow: 0 -1px 2px rgba(0, 0, 0, .2);
+  display: none;
+  left: 0;
+  padding: .6rem 1.25rem;
+  position: fixed;
+  width: 100%;
+  z-index: 1000;
+}
+
+  #blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: .75rem;
+    top: .5rem;
+  }

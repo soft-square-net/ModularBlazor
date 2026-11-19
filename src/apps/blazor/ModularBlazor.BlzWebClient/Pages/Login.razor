@@ -1,0 +1,98 @@
+@page "/login"
+@attribute [UseLayout("none")]
+@using soft.square.net.ModularBlazor.Abstractions.Auth
+@using soft.square.net.ModularBlazor.BlzWebClient.Auth
+@inject OidcAuthenticationService Auth
+@inject ICurrentUserService Users
+@inject NavigationManager Nav
+
+@*
+  Sign-in page in MudTail markup (card, input control, buttons; the theme and behaviours come from Layouts.Default).
+  The password is typed on the identity service's own page: this button starts Authorization Code + PKCE against
+  OpenIddict, which sends the browser back to authentication/login-callback with a code for the access token.
+*@
+
+<PageTitle>Sign in</PageTitle>
+
+<div class="blz-auth">
+  <div class="mud-paper mud-elevation-4 blz-auth-card">
+    <div class="blz-auth-head">
+      <span class="blz-auth-logo" aria-hidden="true">MB</span>
+      <h1 class="mud-typography mud-typography-h5">Modular Blazor</h1>
+      <p class="mud-typography mud-typography-body2">Sign in with your platform account</p>
+    </div>
+
+    @if (_user is not null)
+    {
+      <p class="mud-typography mud-typography-body1">
+        You are signed in as <strong>@_user.Name</strong>@(_user.Tenant is null ? " (platform)" : $" for tenant {_user.Tenant}").
+      </p>
+      <div class="blz-auth-actions">
+        <a href="@Target" class="mud-button-root mud-button-filled mud-button-primary mud-button-large blz-block">Continue</a>
+        <button type="button" class="mud-button-root mud-button-outlined mud-button-surface mud-button-large blz-block" @onclick="SignOutAsync">
+          Sign out
+        </button>
+      </div>
+    }
+    else
+    {
+      <form @onsubmit="SignIn" @onsubmit:preventDefault>
+        <div class="mud-input-control">
+          <label class="mud-input-label" for="tenant">Organisation (tenant)</label>
+          <div class="mud-input-wrapper">
+            <input id="tenant" class="mud-input-slot" @bind="_tenant" placeholder="e.g. acme" autocomplete="organization" autofocus />
+          </div>
+          <div class="mud-input-helper-text">
+            Optional. Leave it empty for a platform account, or to pick an organisation after signing in.
+          </div>
+        </div>
+
+        <button type="submit" class="mud-button-root mud-button-filled mud-button-primary mud-button-large blz-block" disabled="@_redirecting">
+          @if (_redirecting)
+          {
+            <span class="blz-spinner" aria-hidden="true"></span>
+            <span>Redirecting…</span>
+          }
+          else
+          {
+            <span>Sign in</span>
+          }
+        </button>
+      </form>
+
+      <div class="blz-auth-divider"><span>Secured by OpenIddict</span></div>
+      <p class="mud-typography mud-typography-caption blz-muted">
+        You sign in on the identity service; this app never sees your password. It receives an access token for the
+        WebApi gateway (Authorization Code with PKCE).
+      </p>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Message))
+    {
+      <p class="mud-typography mud-typography-body2 blz-error" role="alert">@Message</p>
+    }
+  </div>
+</div>
+
+@code {
+  [Parameter, SupplyParameterFromQuery] public string? ReturnUrl { get; set; }
+  [Parameter, SupplyParameterFromQuery] public string? Message { get; set; }
+
+  private UserInfo? _user;
+  private string? _tenant;
+  private bool _redirecting;
+
+  /// <summary>Only paths inside this app: an absolute or protocol-relative returnUrl is ignored.</summary>
+  private string Target =>
+      string.IsNullOrWhiteSpace(ReturnUrl) || ReturnUrl.Contains("//") || ReturnUrl.Contains(':') ? "" : ReturnUrl.TrimStart('/');
+
+  protected override async Task OnParametersSetAsync() => _user = await Users.GetUserInfoAsync();
+
+  private void SignIn()
+  {
+    _redirecting = true;
+    Auth.SignIn(Target, _tenant);
+  }
+
+  private Task SignOutAsync() => Auth.LogoutAsync();
+}

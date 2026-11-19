@@ -1,0 +1,13 @@
+@page "/module-error"
+
+<PageTitle>Module failed to load</PageTitle>
+
+<h1>Module failed to load</h1>
+<p>The module <strong>@Module</strong> could not be loaded.</p>
+<p class="error-text">@Message</p>
+<p><a href="">Back to home</a></p>
+
+@code {
+    [Parameter, SupplyParameterFromQuery] public string? Module { get; set; }
+    [Parameter, SupplyParameterFromQuery] public string? Message { get; set; }
+}

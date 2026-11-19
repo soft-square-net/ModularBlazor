@@ -1,0 +1,22 @@
+/* Module.Tenants: layout around MudTail's components. Colours come from the --mud-palette-* tokens of Layouts.Default. */
+.tn-page { padding-block: 8px 32px; }
+.tn-header { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; justify-content: space-between; margin-bottom: 16px; }
+.tn-header h1 { margin: 0 0 4px; }
+.tn-header p { max-width: 72ch; margin: 0; }
+.tn-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+.tn-inline { margin: 0; min-width: 150px; }
+.tn-muted { color: var(--mud-palette-text-secondary); }
+.tn-error { color: var(--mud-palette-error); }
+.tn-back { margin-bottom: 8px; }
+.tn-card { padding: 20px; margin-bottom: 16px; border-radius: var(--mud-default-borderradius, 8px); }
+.tn-card h2 { margin: 0 0 12px; }
+.tn-facts { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.tn-chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 999px; font-size: .8125rem;
+  border: 1px solid var(--mud-palette-lines-default); color: var(--mud-palette-text-primary); background: var(--mud-palette-surface);
+}
+.tn-chip-warning { border-color: var(--mud-palette-warning); }
+.tn-form { display: grid; gap: 4px; }
+.tn-grid { display: grid; gap: 0 16px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+.tn-wide { grid-column: 1 / -1; }
+.tn-row-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }

@@ -1,18 +1,17 @@
 @page
 @model InvitationsModel
 @{ ViewData["Title"] = "Invitations"; }
-<h1>Invitations</h1>
 @if (Model.Pending.Count == 0)
 {
-    <p class="muted">No pending invitations.</p>
+    <p class="mud-typography mud-typography-body2 id-muted">No pending invitations.</p>
 }
 else
 {
-    <form method="post" class="list">
+    <form method="post" class="id-stack">
         @foreach (var tenant in Model.Pending)
         {
-            <button type="submit" name="tenant" value="@tenant">Join @tenant</button>
+            <button type="submit" name="tenant" value="@tenant" class="mud-button-root mud-button-outlined mud-button-primary mud-button-medium id-block">Join @tenant</button>
         }
     </form>
 }
-<p><a href="/">Back</a></p>
+<div class="id-stack"><a class="mud-button-root mud-button-text mud-button-primary mud-button-medium id-block" href="/">Back</a></div>

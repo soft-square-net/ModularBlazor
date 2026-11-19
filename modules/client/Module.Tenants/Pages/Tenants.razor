@@ -1,0 +1,270 @@
+@page "/tenants"
+@inherits TenancyPageBase
+
+@*
+  Tenants of the platform (Tenancy core module, GET /api/tenancy/tenants) with their subscription status
+  (GET /api/tenancy/subscriptions?endingWithinDays=N). Create, edit, activate, suspend and provision here;
+  a row opens the tenant's subscriptions.
+*@
+
+<PageTitle>Tenants</PageTitle>
+
+<div class="mud-container tn-page">
+  <header class="tn-header">
+    <div>
+      <h1 class="mud-typography mud-typography-h4">Tenants</h1>
+      <p class="mud-typography mud-typography-body1 tn-muted">
+        Organisations on the platform and their subscription periods. Subscriptions are informational: when one ends,
+        nothing happens by itself; suspend the tenant here if it should lose access.
+      </p>
+    </div>
+    <div class="tn-actions">
+      <div class="mud-input-control tn-inline">
+        <label class="mud-input-label" for="ending">Ending within</label>
+        <div class="mud-input-wrapper mud-input-wrapper--select mud-input-wrapper--dense">
+          <select id="ending" class="mud-input-slot" value="@_endingWithinDays" @onchange="EndingChangedAsync">
+            <option value="7">7 days</option>
+            <option value="30">30 days</option>
+            <option value="90">90 days</option>
+          </select>
+        </div>
+      </div>
+      <button type="button" class="mud-button-root mud-button-outlined mud-button-primary mud-button-medium" @onclick="LoadAsync" disabled="@Busy">Refresh</button>
+      <button type="button" class="mud-button-root mud-button-filled mud-button-primary mud-button-medium" @onclick="OpenCreate" disabled="@Busy">New tenant</button>
+    </div>
+  </header>
+
+  <div class="tn-facts">
+    <span class="tn-chip">Tenants <strong>@_tenants.Count</strong></span>
+    <span class="tn-chip">Active <strong>@_tenants.Count(t => t.Status == TenantStatus.Active)</strong></span>
+    <span class="tn-chip">Suspended <strong>@_tenants.Count(t => t.Status == TenantStatus.Suspended)</strong></span>
+    <span class="tn-chip @(_attention > 0 ? "tn-chip-warning" : "")">Need attention <strong>@_attention</strong></span>
+  </div>
+
+  @if (Error is not null)
+  {
+    <p class="mud-typography mud-typography-body2 tn-error" role="alert">@Error</p>
+  }
+
+  @if (_form is not null)
+  {
+    <section class="mud-paper mud-elevation-2 tn-card">
+      <h2 class="mud-typography mud-typography-h6">@(_form.IsNew ? "New tenant" : $"Edit {_form.Id}")</h2>
+      <form class="tn-form" @onsubmit="SaveAsync" @onsubmit:preventDefault>
+        <div class="tn-grid">
+          <div class="mud-input-control">
+            <label class="mud-input-label" for="tn-id">Id</label>
+            <div class="mud-input-wrapper">
+              <input id="tn-id" class="mud-input-slot" @bind="_form.Id" disabled="@(!_form.IsNew)" required pattern="[a-z0-9][a-z0-9-]*" placeholder="contoso" />
+            </div>
+            <div class="mud-input-helper-text">Lower case letters, digits and dashes. It cannot change later.</div>
+          </div>
+          <div class="mud-input-control">
+            <label class="mud-input-label" for="tn-name">Name</label>
+            <div class="mud-input-wrapper">
+              <input id="tn-name" class="mud-input-slot" @bind="_form.Name" placeholder="Contoso Ltd" />
+            </div>
+          </div>
+          <div class="mud-input-control tn-wide">
+            <label class="mud-input-label" for="tn-hosts">Host names</label>
+            <div class="mud-input-wrapper">
+              <input id="tn-hosts" class="mud-input-slot" @bind="_form.Hosts" placeholder="contoso.localhost, contoso.example.com" />
+            </div>
+            <div class="mud-input-helper-text">Comma separated. Requests for these hosts resolve to the tenant.</div>
+          </div>
+          @if (_form.IsNew)
+          {
+            <div class="mud-input-control">
+              <label class="mud-input-label" for="tn-server">Database server</label>
+              <div class="mud-input-wrapper">
+                <input id="tn-server" class="mud-input-slot" @bind="_form.DatabaseServer" placeholder="tenant-data" />
+              </div>
+              <div class="mud-input-helper-text">Empty: the default server.</div>
+            </div>
+            <div class="mud-input-control">
+              <label class="mud-input-label" for="tn-db">Database name</label>
+              <div class="mud-input-wrapper">
+                <input id="tn-db" class="mud-input-slot" @bind="_form.DatabaseName" placeholder="tenant-contoso" />
+              </div>
+              <div class="mud-input-helper-text">Empty: named after the tenant.</div>
+            </div>
+          }
+        </div>
+        <div class="tn-row-actions">
+          <button type="submit" class="mud-button-root mud-button-filled mud-button-primary mud-button-medium" disabled="@Busy">@(_form.IsNew ? "Create" : "Save")</button>
+          <button type="button" class="mud-button-root mud-button-text mud-button-surface mud-button-medium" @onclick="() => _form = null">Cancel</button>
+        </div>
+      </form>
+    </section>
+  }
+
+  <section class="mud-paper mud-elevation-1 tn-card">
+    <MudTailDataTable @ref="_table" Columns="Columns" Actions="RowActions" OnAction="OnActionAsync" OnRowClick="OpenTenant"
+                      EmptyText="No tenants yet. Create one with New tenant." />
+  </section>
+</div>
+
+@code {
+  private sealed class TenantForm
+  {
+    public bool IsNew { get; init; }
+    public string Id { get; set; } = "";
+    public string? Name { get; set; }
+    public string? Hosts { get; set; }
+    public string? DatabaseServer { get; set; }
+    public string? DatabaseName { get; set; }
+  }
+
+  private static readonly IReadOnlyList<object> Columns =
+  [
+    new { key = "id", title = "Tenant" },
+    new { key = "name", title = "Name" },
+    new { key = "status", title = "Status", type = "enum", options = new[] { "Active", "Suspended" }, width = "120px" },
+    new { key = "hosts", title = "Hosts" },
+    new { key = "database", title = "Database" },
+    new { key = "plan", title = "Current plan" },
+    new { key = "lastDay", title = "Last day", type = "date" },
+    new { key = "daysLeft", title = "Days left", type = "number", width = "100px" },
+    new { key = "attention", title = "Needs attention", type = "boolean", format = "boolean" },
+  ];
+
+  private static readonly IReadOnlyList<object> RowActions =
+  [
+    new { id = "subscriptions", label = "Subscriptions" },
+    new { id = "edit-tenant", label = "Edit" }, // not "edit": MudTail reserves edit and delete for its own edit dialog
+    new { id = "activate", label = "Activate" },
+    new { id = "suspend", label = "Suspend", color = "error" },
+    new { id = "provision", label = "Repair database" },
+  ];
+
+  private MudTailDataTable? _table;
+  private List<TenantInfo> _tenants = [];
+  private Dictionary<string, TenantSubscriptionStatus> _status = new(StringComparer.OrdinalIgnoreCase);
+  private int _endingWithinDays = 30;
+  private int _attention;
+  private TenantForm? _form;
+
+  protected override async Task OnAfterRenderAsync(bool firstRender)
+  {
+    if (firstRender) await LoadAsync();
+  }
+
+  private async Task LoadAsync()
+  {
+    await RunAsync(async () =>
+    {
+      var client = Tenancy;
+      _tenants = (await client.ListTenantsAsync()).OrderBy(t => t.Id).ToList();
+      var report = await client.SubscriptionReportAsync(_endingWithinDays);
+      _status = report.ToDictionary(s => s.TenantId, StringComparer.OrdinalIgnoreCase);
+      _attention = report.Count(s => s.NeedsAttention);
+      if (_table is not null) await _table.SetDataAsync(_tenants.Select(ToRow).ToList());
+    });
+  }
+
+  private object ToRow(TenantInfo t)
+  {
+    _status.TryGetValue(t.Id, out var s);
+    return new
+    {
+      id = t.Id,
+      name = t.Name,
+      status = t.Status.ToString(),
+      hosts = t.Hosts.Count == 0 ? "-" : string.Join(", ", t.Hosts),
+      database = $"{t.DatabaseServer} / {t.DatabaseName}",
+      plan = s?.Current?.Plan ?? (s?.Current is null ? "none" : "-"),
+      lastDay = s?.EndsAt is { } ends ? Iso(LastDay(ends)) : null,
+      daysLeft = s?.DaysLeft,
+      attention = s?.NeedsAttention ?? false,
+    };
+  }
+
+  private async Task EndingChangedAsync(ChangeEventArgs e)
+  {
+    if (int.TryParse(e.Value?.ToString(), out var days)) _endingWithinDays = days;
+    await LoadAsync();
+  }
+
+  private void OpenCreate() => _form = new TenantForm { IsNew = true };
+
+  private void OpenTenant(string id) => Nav.NavigateTo($"tenants/{Uri.EscapeDataString(id)}");
+
+  private static IReadOnlyList<string> SplitHosts(string? hosts)
+      => (hosts ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+  private async Task SaveAsync()
+  {
+    if (_form is null) return;
+    var form = _form;
+
+    await RunAsync(async () =>
+    {
+      if (form.IsNew)
+      {
+        var created = await Tenancy.CreateTenantAsync(new CreateTenantRequest
+        {
+          Id = form.Id.Trim(),
+          Name = string.IsNullOrWhiteSpace(form.Name) ? null : form.Name.Trim(),
+          Hosts = SplitHosts(form.Hosts),
+          DatabaseServer = string.IsNullOrWhiteSpace(form.DatabaseServer) ? null : form.DatabaseServer.Trim(),
+          DatabaseName = string.IsNullOrWhiteSpace(form.DatabaseName) ? null : form.DatabaseName.Trim(),
+        });
+        await MudTail.ToastAsync($"Tenant {created.Id} created, with database {created.DatabaseName} on {created.DatabaseServer}.", "success");
+      }
+      else
+      {
+        await Tenancy.UpdateTenantAsync(form.Id, new UpdateTenantRequest
+        {
+          Name = string.IsNullOrWhiteSpace(form.Name) ? null : form.Name.Trim(),
+          Hosts = SplitHosts(form.Hosts),
+        });
+        await MudTail.ToastAsync($"Tenant {form.Id} saved.", "success");
+      }
+      _form = null;
+    }, then: LoadAsync);
+  }
+
+  private async Task OnActionAsync((string Action, string Key) e)
+  {
+    var id = e.Key;
+    switch (e.Action)
+    {
+      case "subscriptions":
+        OpenTenant(id);
+        break;
+
+      case "edit-tenant":
+        var tenant = _tenants.FirstOrDefault(t => t.Id == id);
+        if (tenant is null) return;
+        _form = new TenantForm { Id = tenant.Id, Name = tenant.Name, Hosts = string.Join(", ", tenant.Hosts) };
+        StateHasChanged();
+        break;
+
+      case "activate":
+        await RunAsync(async () =>
+        {
+          await Tenancy.ActivateTenantAsync(id);
+          await MudTail.ToastAsync($"Tenant {id} is active.", "success");
+        }, then: LoadAsync);
+        break;
+
+      case "suspend":
+        await RunAsync(async () =>
+        {
+          await Tenancy.SuspendTenantAsync(id);
+          await MudTail.ToastAsync($"Tenant {id} is suspended: its requests are refused until it is activated again.", "warning");
+        }, then: LoadAsync);
+        break;
+
+      case "provision":
+        await RunAsync(async () =>
+        {
+          var result = await Tenancy.ProvisionTenantAsync(id);
+          await MudTail.ToastAsync(result.Created
+              ? $"Database {result.DatabaseName} created on {result.DatabaseServer}."
+              : $"Database {result.DatabaseName} on {result.DatabaseServer} was already there; grants re-applied.", "success");
+        }, then: LoadAsync);
+        break;
+    }
+  }
+}

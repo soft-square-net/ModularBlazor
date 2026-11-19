@@ -23,6 +23,11 @@ builder.AddRuntimeModuleBroadcast("broker");
 // Authentication (JWT from the identity service; dev tokens via dotnet user-jwts), a fallback policy that requires a
 // signed-in caller, and permissions evaluated against per-tenant grants (IAccessScopes / IGrantStore for modules).
 builder.AddPlatformSecurity("broker");
+// Browser apps on another origin (the Blazor WebAssembly client calls the gateway from its own port): only the origins
+// in Cors:AllowedOrigins (none by default). The bearer token travels in a header, so no credentials (cookies) are allowed.
+var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
+    policy.WithOrigins(corsOrigins).AllowAnyHeader().AllowAnyMethod()));
 
 // Telemetry to the Aspire dashboard (or any OTLP collector) when an endpoint is configured.
 if (!string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]))
@@ -40,9 +45,10 @@ if (!string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOIN
 
 var app = builder.Build();
 
-// After routing (endpoint metadata): authenticate, resolve the tenant (header, host, token claim), then authorize
-// (grants are per tenant).
+// After routing (endpoint metadata): CORS (preflight requests are answered here, before authentication), then
+// authenticate, resolve the tenant (header, host, token claim), then authorize (grants are per tenant).
 app.UseRouting();
+app.UseCors();
 app.UsePlatformSecurity();
 
 if (ModularOpenApi.IsEnabled(app.Configuration, app.Environment))

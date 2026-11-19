@@ -57,6 +57,7 @@
   <Folder Name="/src/apps/" />
   <Folder Name="/src/apps/blazor/">
     <Project Path="src/apps/blazor/ModularBlazor.Client/ModularBlazor.Client.csproj" />
+    <Project Path="src/apps/blazor/ModularBlazor.BlzWebClient/ModularBlazor.BlzWebClient.csproj" />
     <Project Path="src/apps/blazor/ModularBlazor.Infrastructure/ModularBlazor.Infrastructure.csproj" Id="3712d96f-77e9-468d-8e44-ea93a1537de3" />
   </Folder>
   <Folder Name="/src/Aspire/">
@@ -77,6 +78,7 @@
     <Project Path="modules/client/Module.Auth/Module.Auth.csproj" />
     <Project Path="modules/client/Module.Dashboard/Module.Dashboard.csproj" />
     <Project Path="modules/client/Module.Reports/Module.Reports.csproj" />
+    <Project Path="modules/client/Module.Tenants/Module.Tenants.csproj" />
     <Project Path="modules/client/Module.ToDo/Module.ToDo.csproj" />
   </Folder>
   <Folder Name="/src/WebApi/">

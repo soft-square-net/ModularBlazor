@@ -1,0 +1,307 @@
+@page "/tenants/{Id}"
+@inherits TenancyPageBase
+
+@*
+  One tenant and its subscription periods (GET /api/tenancy/tenants/{id}/subscriptions): add a period, extend one
+  (its end only moves later), cancel one (kept, with the reason). Periods that are not cancelled never overlap.
+*@
+
+<PageTitle>Tenant @Id</PageTitle>
+
+<div class="mud-container tn-page">
+  <a href="tenants" class="mud-button-root mud-button-text mud-button-primary mud-button-small tn-back">&larr; All tenants</a>
+
+  <header class="tn-header">
+    <div>
+      <h1 class="mud-typography mud-typography-h4">@(_tenant?.Name ?? Id)</h1>
+      <p class="mud-typography mud-typography-body1 tn-muted">Tenant <code>@Id</code></p>
+    </div>
+    <div class="tn-actions">
+      @if (_tenant?.Status == TenantStatus.Suspended)
+      {
+        <button type="button" class="mud-button-root mud-button-filled mud-button-primary mud-button-medium" @onclick="ActivateAsync" disabled="@Busy">Activate</button>
+      }
+      else if (_tenant is not null)
+      {
+        <button type="button" class="mud-button-root mud-button-outlined mud-button-error mud-button-medium" @onclick="SuspendAsync" disabled="@Busy">Suspend</button>
+      }
+      <button type="button" class="mud-button-root mud-button-outlined mud-button-primary mud-button-medium" @onclick="LoadAsync" disabled="@Busy">Refresh</button>
+      <button type="button" class="mud-button-root mud-button-filled mud-button-primary mud-button-medium" @onclick="OpenNew" disabled="@(Busy || _tenant is null)">New subscription</button>
+    </div>
+  </header>
+
+  @if (_tenant is not null)
+  {
+    <div class="tn-facts">
+      <span class="tn-chip @(_tenant.Status == TenantStatus.Suspended ? "tn-chip-warning" : "")">Status <strong>@_tenant.Status</strong></span>
+      <span class="tn-chip">Hosts <strong>@(_tenant.Hosts.Count == 0 ? "-" : string.Join(", ", _tenant.Hosts))</strong></span>
+      <span class="tn-chip">Database <strong>@_tenant.DatabaseServer / @_tenant.DatabaseName</strong></span>
+      <span class="tn-chip @(Current is null ? "tn-chip-warning" : "")">
+        Current <strong>@(Current is null ? "none" : $"{Current.Plan ?? "subscription"} until {Iso(LastDay(Current.EndsAt))}")</strong>
+      </span>
+    </div>
+  }
+
+  @if (Error is not null)
+  {
+    <p class="mud-typography mud-typography-body2 tn-error" role="alert">@Error</p>
+  }
+
+  @if (_new is not null)
+  {
+    <section class="mud-paper mud-elevation-2 tn-card">
+      <h2 class="mud-typography mud-typography-h6">New subscription</h2>
+      <form class="tn-form" @onsubmit="AddAsync" @onsubmit:preventDefault>
+        <div class="tn-grid">
+          <div class="mud-input-control">
+            <label class="mud-input-label" for="sub-from">First day</label>
+            <div class="mud-input-wrapper">
+              <input id="sub-from" type="date" class="mud-input-slot" @bind="_new.From" required />
+            </div>
+          </div>
+          <div class="mud-input-control">
+            <label class="mud-input-label" for="sub-to">Last day</label>
+            <div class="mud-input-wrapper">
+              <input id="sub-to" type="date" class="mud-input-slot" @bind="_new.To" required />
+            </div>
+            <div class="mud-input-helper-text">Inclusive, UTC. Periods may not overlap.</div>
+          </div>
+          <div class="mud-input-control">
+            <label class="mud-input-label" for="sub-plan">Plan</label>
+            <div class="mud-input-wrapper">
+              <input id="sub-plan" class="mud-input-slot" @bind="_new.Plan" placeholder="standard" />
+            </div>
+          </div>
+          <div class="mud-input-control tn-wide">
+            <label class="mud-input-label" for="sub-notes">Notes</label>
+            <div class="mud-input-wrapper">
+              <input id="sub-notes" class="mud-input-slot" @bind="_new.Notes" placeholder="Order, contact, anything worth keeping" />
+            </div>
+          </div>
+        </div>
+        <div class="tn-row-actions">
+          <button type="submit" class="mud-button-root mud-button-filled mud-button-primary mud-button-medium" disabled="@Busy">Add</button>
+          <button type="button" class="mud-button-root mud-button-text mud-button-surface mud-button-medium" @onclick="() => _new = null">Cancel</button>
+        </div>
+      </form>
+    </section>
+  }
+
+  @if (_extend is not null)
+  {
+    <section class="mud-paper mud-elevation-2 tn-card">
+      <h2 class="mud-typography mud-typography-h6">Extend @(_extend.Plan ?? "subscription")</h2>
+      <form class="tn-form" @onsubmit="ExtendAsync" @onsubmit:preventDefault>
+        <div class="mud-input-control">
+          <label class="mud-input-label" for="ext-to">New last day</label>
+          <div class="mud-input-wrapper">
+            <input id="ext-to" type="date" class="mud-input-slot" @bind="_extendTo" required />
+          </div>
+          <div class="mud-input-helper-text">Now @Iso(LastDay(_extend.EndsAt)). The end can only move later.</div>
+        </div>
+        <div class="tn-row-actions">
+          <button type="submit" class="mud-button-root mud-button-filled mud-button-primary mud-button-medium" disabled="@Busy">Extend</button>
+          <button type="button" class="mud-button-root mud-button-text mud-button-surface mud-button-medium" @onclick="() => _extend = null">Cancel</button>
+        </div>
+      </form>
+    </section>
+  }
+
+  @if (_cancel is not null)
+  {
+    <section class="mud-paper mud-elevation-2 tn-card">
+      <h2 class="mud-typography mud-typography-h6">Cancel @(_cancel.Plan ?? "subscription") (@Iso(FirstDay(_cancel.StartsAt)) to @Iso(LastDay(_cancel.EndsAt)))</h2>
+      <p class="mud-typography mud-typography-body2 tn-muted">
+        The period stays in the history, marked cancelled. It does not suspend the tenant.
+      </p>
+      <form class="tn-form" @onsubmit="CancelAsync" @onsubmit:preventDefault>
+        <div class="mud-input-control">
+          <label class="mud-input-label" for="cancel-reason">Reason</label>
+          <div class="mud-input-wrapper">
+            <input id="cancel-reason" class="mud-input-slot" @bind="_cancelReason" placeholder="Optional" />
+          </div>
+        </div>
+        <div class="tn-row-actions">
+          <button type="submit" class="mud-button-root mud-button-filled mud-button-error mud-button-medium" disabled="@Busy">Cancel subscription</button>
+          <button type="button" class="mud-button-root mud-button-text mud-button-surface mud-button-medium" @onclick="() => _cancel = null">Keep it</button>
+        </div>
+      </form>
+    </section>
+  }
+
+  <section class="mud-paper mud-elevation-1 tn-card">
+    <h2 class="mud-typography mud-typography-h6">Subscriptions</h2>
+    <MudTailDataTable @ref="_table" Columns="Columns" Actions="RowActions" OnAction="OnActionAsync"
+                      EmptyText="No subscriptions yet. Add one with New subscription." />
+  </section>
+</div>
+
+@code {
+  [Parameter] public string Id { get; set; } = "";
+
+  private sealed class NewForm
+  {
+    public DateOnly From { get; set; }
+    public DateOnly To { get; set; }
+    public string? Plan { get; set; }
+    public string? Notes { get; set; }
+  }
+
+  private static readonly IReadOnlyList<object> Columns =
+  [
+    new { key = "plan", title = "Plan" },
+    new { key = "from", title = "First day", type = "date" },
+    new { key = "to", title = "Last day", type = "date" },
+    new { key = "days", title = "Days", type = "number", width = "90px" },
+    new { key = "state", title = "State", type = "enum", options = new[] { "Upcoming", "Current", "Ended", "Cancelled" } },
+    new { key = "createdBy", title = "Added by" },
+    new { key = "notes", title = "Notes" },
+  ];
+
+  private static readonly IReadOnlyList<object> RowActions =
+  [
+    new { id = "extend", label = "Extend" },
+    new { id = "cancel", label = "Cancel", color = "error" },
+  ];
+
+  private MudTailDataTable? _table;
+  private TenantInfo? _tenant;
+  private List<TenantSubscription> _subscriptions = [];
+  private NewForm? _new;
+  private TenantSubscription? _extend;
+  private DateOnly _extendTo;
+  private TenantSubscription? _cancel;
+  private string? _cancelReason;
+
+  private TenantSubscription? Current => _subscriptions.FirstOrDefault(s => s.State == SubscriptionState.Current);
+
+  protected override async Task OnAfterRenderAsync(bool firstRender)
+  {
+    if (firstRender) await LoadAsync();
+  }
+
+  private async Task LoadAsync()
+  {
+    await RunAsync(async () =>
+    {
+      var client = Tenancy;
+      _tenant = await client.GetTenantAsync(Id);
+      _subscriptions = (await client.ListSubscriptionsAsync(Id)).OrderByDescending(s => s.StartsAt).ToList();
+      if (_table is not null) await _table.SetDataAsync(_subscriptions.Select(ToRow).ToList());
+    });
+  }
+
+  private static object ToRow(TenantSubscription s) => new
+  {
+    id = s.Id.ToString(),
+    plan = s.Plan ?? "-",
+    from = Iso(FirstDay(s.StartsAt)),
+    to = Iso(LastDay(s.EndsAt)),
+    days = (int)Math.Round((s.EndsAt - s.StartsAt).TotalDays),
+    state = s.State.ToString(),
+    createdBy = s.CreatedBy ?? "-",
+    notes = s.State == SubscriptionState.Cancelled
+        ? $"Cancelled{(s.CancelledBy is null ? "" : $" by {s.CancelledBy}")}{(s.CancelReason is null ? "" : $": {s.CancelReason}")}"
+        : s.Notes ?? "",
+  };
+
+  /// <summary>Starts the day after the latest period that is not cancelled (or today), for one year.</summary>
+  private void OpenNew()
+  {
+    var latest = _subscriptions.Where(s => s.State != SubscriptionState.Cancelled).Select(s => LastDay(s.EndsAt)).DefaultIfEmpty(Today.AddDays(-1)).Max();
+    var from = latest < Today ? Today : latest.AddDays(1);
+    _new = new NewForm { From = from, To = from.AddYears(1).AddDays(-1) };
+    _extend = null;
+    _cancel = null;
+  }
+
+  private async Task AddAsync()
+  {
+    if (_new is null) return;
+    var form = _new;
+    await RunAsync(async () =>
+    {
+      var added = await Tenancy.AddSubscriptionAsync(Id, new NewSubscription
+      {
+        StartsAt = StartOf(form.From),
+        EndsAt = EndAfter(form.To),
+        Plan = string.IsNullOrWhiteSpace(form.Plan) ? null : form.Plan.Trim(),
+        Notes = string.IsNullOrWhiteSpace(form.Notes) ? null : form.Notes.Trim(),
+      });
+      await MudTail.ToastAsync($"Subscription added: {Iso(FirstDay(added.StartsAt))} to {Iso(LastDay(added.EndsAt))} ({added.State}).", "success");
+      _new = null;
+    }, then: LoadAsync);
+  }
+
+  private async Task ExtendAsync()
+  {
+    if (_extend is null) return;
+    var subscription = _extend;
+    await RunAsync(async () =>
+    {
+      var extended = await Tenancy.ExtendSubscriptionAsync(Id, subscription.Id, new ExtendSubscription { EndsAt = EndAfter(_extendTo) });
+      await MudTail.ToastAsync($"Extended to {Iso(LastDay(extended.EndsAt))}.", "success");
+      _extend = null;
+    }, then: LoadAsync);
+  }
+
+  private async Task CancelAsync()
+  {
+    if (_cancel is null) return;
+    var subscription = _cancel;
+    await RunAsync(async () =>
+    {
+      await Tenancy.CancelSubscriptionAsync(Id, subscription.Id, new CancelSubscription
+      {
+        Reason = string.IsNullOrWhiteSpace(_cancelReason) ? null : _cancelReason.Trim(),
+      });
+      await MudTail.ToastAsync("Subscription cancelled.", "success");
+      _cancel = null;
+    }, then: LoadAsync);
+  }
+
+  private async Task OnActionAsync((string Action, string Key) e)
+  {
+    var subscription = _subscriptions.FirstOrDefault(s => s.Id.ToString() == e.Key);
+    if (subscription is null) return;
+
+    if (subscription.State == SubscriptionState.Cancelled)
+    {
+      await MudTail.ToastAsync("This subscription is cancelled; add a new one instead.", "info");
+      return;
+    }
+
+    _new = null;
+    if (e.Action == "extend")
+    {
+      _cancel = null;
+      _extend = subscription;
+      _extendTo = LastDay(subscription.EndsAt).AddYears(1);
+    }
+    else if (e.Action == "cancel")
+    {
+      _extend = null;
+      _cancel = subscription;
+      _cancelReason = null;
+    }
+    StateHasChanged();
+  }
+
+  private async Task ActivateAsync()
+  {
+    await RunAsync(async () =>
+    {
+      _tenant = await Tenancy.ActivateTenantAsync(Id);
+      await MudTail.ToastAsync($"Tenant {Id} is active.", "success");
+    });
+  }
+
+  private async Task SuspendAsync()
+  {
+    await RunAsync(async () =>
+    {
+      _tenant = await Tenancy.SuspendTenantAsync(Id);
+      await MudTail.ToastAsync($"Tenant {Id} is suspended: its requests are refused until it is activated again.", "warning");
+    });
+  }
+}

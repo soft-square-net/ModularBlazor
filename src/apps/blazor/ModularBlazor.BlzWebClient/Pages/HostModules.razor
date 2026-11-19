@@ -1,0 +1,324 @@
+@page "/host-modules"
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using soft.square.net.ModularBlazor.Abstractions.Auth
+@using soft.square.net.WebApi.Client
+@inject HostModulesApi Api
+@inject ICurrentUserService Users
+@inject MudTailRuntime MudTail
+
+@*
+  Host (WebApi) module management through the YARP gateway, with the OpenIddict access token:
+  GET/POST /api/admin/modules, activate, deactivate, unload, settings, uninstall (WebApi.Client.ModulesClient).
+  Needs the platform permission platform.modules.manage, which the platform-admin role grants.
+*@
+
+<PageTitle>Host modules</PageTitle>
+
+<div class="mud-container blz-page">
+  <header class="blz-page-header">
+    <div>
+      <h1 class="mud-typography mud-typography-h4">Host modules</h1>
+      <p class="mud-typography mud-typography-body1">
+        Runtime modules of the WebApi pools behind the gateway. The catalog is shared by every pool, and each lifecycle
+        change is broadcast to every replica.
+      </p>
+    </div>
+    <div class="blz-page-actions">
+      <div class="mud-input-control blz-inline-control">
+        <label class="mud-input-label" for="pool">Pool</label>
+        <div class="mud-input-wrapper mud-input-wrapper--select mud-input-wrapper--dense">
+          <select id="pool" class="mud-input-slot" value="@_pool" @onchange="PoolChangedAsync" disabled="@(!_allowed)">
+            <option value="">Gateway (core pool)</option>
+            @foreach (var pool in Api.Pools)
+            {
+              <option value="@pool">@pool</option>
+            }
+          </select>
+        </div>
+      </div>
+      <button type="button" class="mud-button-root mud-button-outlined mud-button-primary mud-button-medium" @onclick="RefreshAsync" disabled="@(_busy || !_allowed)">
+        Refresh
+      </button>
+    </div>
+  </header>
+
+  @if (!_allowed)
+  {
+    <section class="mud-paper mud-elevation-1 blz-card">
+      <h2 class="mud-typography mud-typography-h6">Access denied</h2>
+      <p class="mud-typography mud-typography-body1">Managing host modules needs the <code>@ModuleManager.PlatformAdminRole</code> role.</p>
+    </section>
+  }
+  else
+  {
+    @if (_poolInfo is not null)
+    {
+      <div class="blz-facts">
+        <span class="blz-chip">Pool <strong>@_poolInfo.Pool</strong></span>
+        <span class="blz-chip">Role <strong>@_poolInfo.Role</strong></span>
+        <span class="blz-chip">Instance <strong>@_poolInfo.Instance</strong></span>
+        <span class="blz-chip">Enabled <strong>@(_poolInfo.EnabledModules.Count == 0 ? "all" : string.Join(", ", _poolInfo.EnabledModules))</strong></span>
+        @if (_unloading.Count > 0)
+        {
+          <span class="blz-chip blz-chip-warning">Unloading <strong>@string.Join(", ", _unloading)</strong></span>
+        }
+      </div>
+    }
+
+    @if (_error is not null)
+    {
+      <p class="mud-typography mud-typography-body2 blz-error" role="alert">@_error</p>
+    }
+
+    <section class="mud-paper mud-elevation-1 blz-card">
+      <h2 class="mud-typography mud-typography-h6">Install a module</h2>
+      <p class="mud-typography mud-typography-body2 blz-muted">
+        Upload a module package (.nupkg). It is installed inactive; activate it to load it and map its routes.
+      </p>
+      <div class="blz-install">
+        <label class="mud-button-root mud-button-outlined mud-button-surface mud-button-medium blz-file">
+          <InputFile OnChange="FileChosen" accept=".nupkg,.zip" />
+          <span>@(_file?.Name ?? "Choose a package…")</span>
+        </label>
+        <button type="button" class="mud-button-root mud-button-filled mud-button-primary mud-button-medium" @onclick="InstallAsync" disabled="@(_file is null || _busy)">
+          @if (_busy && _installing) { <span class="blz-spinner" aria-hidden="true"></span> }
+          Install
+        </button>
+      </div>
+    </section>
+
+    <section class="mud-paper mud-elevation-1 blz-card">
+      <MudTailDataTable @ref="_table" Columns="Columns" Actions="RowActions" OnAction="OnActionAsync" />
+    </section>
+
+    @if (_settingsFor is not null)
+    {
+      <section class="mud-paper mud-elevation-2 blz-card">
+        <h2 class="mud-typography mud-typography-h6">Settings of @_settingsFor</h2>
+        <p class="mud-typography mud-typography-body2 blz-muted">
+          One <code>key=value</code> per line. They become configuration section <code>Modules:&lt;name&gt;</code> the next time the module is activated.
+        </p>
+        <div class="mud-input-control">
+          <div class="mud-input-wrapper">
+            <textarea class="mud-input-slot blz-settings" rows="6" @bind="_settingsText"></textarea>
+          </div>
+        </div>
+        <div class="blz-row-actions">
+          <button type="button" class="mud-button-root mud-button-filled mud-button-primary mud-button-medium" @onclick="SaveSettingsAsync" disabled="@_busy">Save</button>
+          <button type="button" class="mud-button-root mud-button-text mud-button-surface mud-button-medium" @onclick="() => _settingsFor = null">Cancel</button>
+        </div>
+      </section>
+    }
+  }
+</div>
+
+@code {
+  private static readonly IReadOnlyList<object> Columns =
+  [
+    new { key = "id", title = "Module" },
+    new { key = "version", title = "Version", width = "100px" },
+    new { key = "desired", title = "Desired state", type = "enum", options = new[] { "Installed", "Active", "Inactive" } },
+    new { key = "loaded", title = "Loaded here", type = "boolean", format = "boolean" },
+    new { key = "enabledInPool", title = "Enabled in pool", type = "boolean", format = "boolean" },
+    new { key = "core", title = "Core", type = "boolean", format = "boolean" },
+    new { key = "routes", title = "Routes", type = "number", width = "90px" },
+    new { key = "notes", title = "Notes" },
+  ];
+
+  private static readonly IReadOnlyList<object> RowActions =
+  [
+    new { id = "activate", label = "Activate" },
+    new { id = "deactivate", label = "Deactivate" },
+    new { id = "unload", label = "Unload" },
+    new { id = "settings", label = "Settings" },
+    new { id = "uninstall", label = "Uninstall", color = "error" },
+  ];
+
+  private MudTailDataTable? _table;
+  private List<ModuleStatus> _modules = [];
+  private IReadOnlyList<string> _unloading = [];
+  private PoolInfo? _poolInfo;
+  private string _pool = "";
+  private bool _allowed;
+  private bool _busy;
+  private bool _installing;
+  private string? _error;
+  private IBrowserFile? _file;
+  private string? _settingsFor;
+  private string _settingsText = "";
+
+  /// <summary>Install uploads are kept in memory by the browser; the WebApi accepts packages up to this size.</summary>
+  private const long MaxPackageSize = 100 * 1024 * 1024;
+
+  protected override async Task OnInitializedAsync()
+  {
+    var user = await Users.GetUserInfoAsync();
+    _allowed = user?.IsInRole(ModuleManager.PlatformAdminRole) ?? false;
+  }
+
+  protected override async Task OnAfterRenderAsync(bool firstRender)
+  {
+    if (firstRender && _allowed) await RefreshAsync();
+  }
+
+  private ModulesClient Modules => Api.Modules(_pool);
+
+  private async Task PoolChangedAsync(ChangeEventArgs e)
+  {
+    _pool = e.Value?.ToString() ?? "";
+    await RefreshAsync();
+  }
+
+  private async Task RefreshAsync()
+  {
+    await RunAsync(async () =>
+    {
+      _poolInfo = await Api.Pool(_pool).GetAsync();
+      _modules = (await Modules.ListAsync()).OrderBy(m => m.Module.Id).ToList();
+      _unloading = await Modules.ListUnloadingAsync();
+      if (_table is not null) await _table.SetDataAsync(_modules.Select(ToRow).ToList());
+    });
+  }
+
+  private static object ToRow(ModuleStatus s) => new
+  {
+    id = s.Module.Id,
+    version = s.LoadedVersion is { } loaded && loaded != s.Module.Version ? $"{s.Module.Version} (loaded {loaded})" : s.Module.Version,
+    desired = s.Module.DesiredState?.ToString() ?? "-",
+    loaded = s.Loaded,
+    enabledInPool = s.EnabledInPool,
+    core = s.Module.Core ?? false,
+    routes = s.Routes.Count,
+    notes = string.Join("; ", new[]
+    {
+      s.RestartRequired == true ? "restart required" : null,
+      s.Module.HotUnload == false ? "no hot unload" : null,
+      s.HostedServices?.Any(h => h.Error is not null) == true ? "hosted service error" : null,
+    }.Where(n => n is not null)),
+  };
+
+  private void FileChosen(InputFileChangeEventArgs e) => _file = e.File;
+
+  private async Task InstallAsync()
+  {
+    if (_file is null) return;
+    _installing = true;
+    await RunAsync(async () =>
+    {
+      await using var stream = _file.OpenReadStream(MaxPackageSize);
+      var record = await Modules.InstallAsync(new FileParameter(stream, _file.Name, string.IsNullOrEmpty(_file.ContentType) ? "application/octet-stream" : _file.ContentType));
+      await MudTail.ToastAsync($"{record.Id} {record.Version} installed. Activate it to load it.", "success");
+      _file = null;
+    }, refresh: true);
+    _installing = false;
+  }
+
+  private async Task OnActionAsync((string Action, string Key) e)
+  {
+    var id = e.Key;
+    switch (e.Action)
+    {
+      case "activate":
+        await RunAsync(async () =>
+        {
+          var status = await Modules.ActivateAsync(id);
+          await MudTail.ToastAsync($"{id} activated{(status.Loaded ? $", {status.Routes.Count} route(s)" : "")}.", "success");
+        }, refresh: true);
+        break;
+
+      case "deactivate":
+        await RunAsync(async () =>
+        {
+          await Modules.DeactivateAsync(id);
+          await MudTail.ToastAsync($"{id} deactivated: its routes are gone, the code stays loaded.", "success");
+        }, refresh: true);
+        break;
+
+      case "unload":
+        await RunAsync(async () =>
+        {
+          var result = await Modules.UnloadAsync(id, deferred: false);
+          await MudTail.ToastAsync(result.Unloaded
+              ? $"{id} unloaded after {result.GcPasses} GC pass(es)."
+              : $"{id} is unloading; its memory is not released yet{(result.Note is null ? "" : $" ({result.Note})")}.",
+              result.Unloaded ? "success" : "warning");
+        }, refresh: true);
+        break;
+
+      case "uninstall":
+        await RunAsync(async () =>
+        {
+          var result = await Modules.UninstallAsync(id, deferred: false);
+          await MudTail.ToastAsync($"{id} uninstalled{(result.Unloaded ? "" : "; it finishes unloading in the background")}.", "success");
+        }, refresh: true);
+        break;
+
+      case "settings":
+        var module = _modules.FirstOrDefault(m => m.Module.Id == id)?.Module;
+        _settingsFor = id;
+        _settingsText = string.Join('\n', (module?.Settings ?? new Dictionary<string, string>()).Select(kv => $"{kv.Key}={kv.Value}"));
+        StateHasChanged();
+        break;
+    }
+  }
+
+  private async Task SaveSettingsAsync()
+  {
+    if (_settingsFor is null) return;
+    var settings = _settingsText
+        .Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+        .Select(line => line.Split('=', 2))
+        .Where(parts => parts[0].Length > 0)
+        .ToDictionary(parts => parts[0].Trim(), parts => parts.Length > 1 ? parts[1].Trim() : "");
+
+    await RunAsync(async () =>
+    {
+      await Modules.UpdateSettingsAsync(_settingsFor, settings);
+      await MudTail.ToastAsync($"Settings of {_settingsFor} saved.", "success");
+      _settingsFor = null;
+    }, refresh: true);
+  }
+
+  /// <summary>Runs one API call: busy flag, error message, and a fresh list afterwards when asked.</summary>
+  private async Task RunAsync(Func<Task> call, bool refresh = false)
+  {
+    _busy = true;
+    _error = null;
+    StateHasChanged();
+    try
+    {
+      await call();
+    }
+    catch (AccessTokenNotAvailableException ex)
+    {
+      ex.Redirect(); // the session ended: sign in again and come back
+      return;
+    }
+    catch (Exception ex)
+    {
+      _error = Describe(ex);
+      await MudTail.ToastAsync(_error, "error");
+    }
+    finally
+    {
+      _busy = false;
+    }
+
+    if (refresh) await RefreshAsync();
+    StateHasChanged();
+  }
+
+  private static string Describe(Exception ex) => ex switch
+  {
+    WebApiException<ProblemDetails> problem => $"{problem.StatusCode}: {problem.Result.Detail ?? problem.Result.Title ?? "request failed"}",
+    WebApiException api when api.StatusCode == 401 => "401: the gateway did not accept the access token. Sign in again.",
+    WebApiException api when api.StatusCode == 403 => "403: your account may not manage host modules (platform.modules.manage).",
+    WebApiException api => $"{api.StatusCode}: {FirstLine(api.Response) ?? FirstLine(api.Message)}",
+    HttpRequestException http => $"The gateway is not reachable ({http.Message}). Is the Aspire lab running, and does WebApi allow this origin (CORS)?",
+    _ => ex.Message,
+  };
+
+  private static string? FirstLine(string? text)
+      => string.IsNullOrWhiteSpace(text) ? null : text.Split('\n', 2)[0].Trim();
+}

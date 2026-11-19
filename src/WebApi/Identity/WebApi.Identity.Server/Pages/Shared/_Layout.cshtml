@@ -4,22 +4,39 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>@(ViewData["Title"] ?? "Sign in") · Modular Identity</title>
+    @* MudTail's stylesheet (src/MudTail/dist/mudtail.css, copied by the build when it exists): the same tokens and
+       components as the Blazor clients, so signing in looks like the app that sent you here. *@
+    <link rel="stylesheet" href="~/css/mudtail.css" asp-append-version="true" />
     <style>
-        :root { color-scheme: light dark; --fg: #1d2330; --bg: #f5f6f8; --card: #fff; --muted: #687083; --accent: #2f5bea; --err: #b42318; }
-        @@media (prefers-color-scheme: dark) { :root { --fg: #e7e9ee; --bg: #12151b; --card: #1b1f27; --muted: #9aa1b1; --accent: #7896ff; --err: #ff8a80; } }
-        body { margin: 0; font: 15px/1.5 system-ui, sans-serif; color: var(--fg); background: var(--bg); }
-        main { max-width: 400px; margin: 10vh auto; padding: 0 16px; }
-        .card { background: var(--card); border-radius: 10px; padding: 28px; box-shadow: 0 1px 3px rgb(0 0 0 / .12); }
-        h1 { font-size: 20px; margin: 0 0 18px; }
-        label { display: block; font-size: 13px; color: var(--muted); margin: 12px 0 4px; }
-        input[type=email], input[type=password], input[type=text] { width: 100%; box-sizing: border-box; padding: 9px 10px; border: 1px solid #8884; border-radius: 6px; background: transparent; color: inherit; font: inherit; }
-        button, .button { display: inline-block; margin-top: 18px; padding: 9px 16px; border: 0; border-radius: 6px; background: var(--accent); color: #fff; font: inherit; cursor: pointer; text-decoration: none; }
-        .list button { width: 100%; text-align: left; margin-top: 8px; }
-        .error { color: var(--err); margin: 8px 0; }
-        .muted { color: var(--muted); font-size: 13px; }
+        body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 16px; box-sizing: border-box;
+               background: var(--mud-palette-background); color: var(--mud-palette-text-primary);
+               font-family: var(--mud-typography-default-family, system-ui, sans-serif); }
+        .id-card { width: 100%; max-width: 420px; padding: 32px 28px; border-radius: 12px; box-sizing: border-box; }
+        .id-head { text-align: center; margin-bottom: 20px; }
+        .id-head h1 { margin: 12px 0 4px; }
+        .id-head p { margin: 0; color: var(--mud-palette-text-secondary); }
+        .id-logo { display: inline-grid; place-items: center; width: 48px; height: 48px; border-radius: 12px; font-weight: 700;
+                   color: var(--mud-palette-primary-contrast, #fff); background: var(--mud-palette-primary); }
+        .id-form { display: grid; gap: 4px; }
+        .id-block { width: 100%; justify-content: center; }
+        .id-stack { display: grid; gap: 10px; margin-top: 16px; }
+        .id-error { color: var(--mud-palette-error); margin: 4px 0 12px; }
+        .id-muted { color: var(--mud-palette-text-secondary); }
+        .id-row { display: flex; align-items: center; justify-content: space-between; margin: 4px 0 16px; }
+        .id-toggle { background: transparent; border: 0; cursor: pointer; color: var(--mud-palette-text-secondary); font: inherit; font-size: .8125rem; }
+        .id-tenant { justify-content: space-between; text-align: start; }
     </style>
+    @* Dark mode follows the system, like MudTail's own theme (data-theme on <html>). *@
+    <script>if (matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.setAttribute('data-theme', 'dark');</script>
 </head>
 <body>
-<main><div class="card">@RenderBody()</div></main>
+<main class="mud-paper mud-elevation-4 id-card">
+    <div class="id-head">
+        <span class="id-logo" aria-hidden="true">MB</span>
+        <h1 class="mud-typography mud-typography-h5">@(ViewData["Title"] ?? "Sign in")</h1>
+        <p class="mud-typography mud-typography-body2">Modular Identity</p>
+    </div>
+    @RenderBody()
+</main>
 </body>
 </html>

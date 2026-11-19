@@ -1,0 +1,153 @@
+@page "/"
+@using soft.square.net.ModularBlazor.Abstractions.Auth
+@using soft.square.net.Share.All
+@implements IDisposable
+@inject ModuleManager Modules
+@inject ActiveModuleService Active
+@inject ICurrentUserService Users
+@inject MudTailRuntime MudTail
+@inject NavigationManager Nav
+
+<PageTitle>Client modules</PageTitle>
+
+<div class="mud-container blz-page">
+  <header class="blz-page-header">
+    <div>
+      <h1 class="mud-typography mud-typography-h4">Client modules</h1>
+      @if (_user is not null)
+      {
+        <p class="mud-typography mud-typography-body1">
+          Signed in as <strong>@_user.Name</strong>@(_user.Tenant is null ? "" : $" ({_user.Tenant})").
+          Open a module from the menu, or load and unload it here, and watch its state change.
+        </p>
+      }
+      else
+      {
+        <p class="mud-typography mud-typography-body1">
+          The startup modules (layouts, theme) were loaded before this page rendered.
+          <a href="login">Sign in</a> to receive your module list; a module's code downloads when you first open it.
+        </p>
+      }
+    </div>
+    <div class="blz-page-actions">
+      <span class="blz-chip">@_rows.Count(r => r.State == "loaded") of @_rows.Count loaded</span>
+    </div>
+  </header>
+
+  <section class="mud-paper mud-elevation-1 blz-card">
+    <MudTailDataTable @ref="_table" Columns="Columns" Actions="RowActions" OnAction="OnActionAsync" />
+  </section>
+</div>
+
+@code {
+  private sealed record Row(string Id, string Name, string Version, string Kind, string Strategy, string Access, string Routes, string State);
+
+  private static readonly IReadOnlyList<object> Columns =
+  [
+    new { key = "id", title = "Module" },
+    new { key = "name", title = "Name" },
+    new { key = "version", title = "Version", width = "110px" },
+    new { key = "kind", title = "Kind", type = "enum", options = new[] { "Dll", "NuPkg" }, width = "110px" },
+    new { key = "strategy", title = "Strategy", type = "enum", options = new[] { "startup", "on navigation" } },
+    new { key = "access", title = "Access" },
+    new { key = "routes", title = "Routes" },
+    new { key = "state", title = "State", type = "enum", options = new[] { "loaded", "not loaded" } },
+  ];
+
+  private static readonly IReadOnlyList<object> RowActions =
+  [
+    new { id = "open", label = "Open" },
+    new { id = "load", label = "Load" },
+    new { id = "reload", label = "Reload" },
+    new { id = "unload", label = "Unload", color = "error" },
+  ];
+
+  private MudTailDataTable? _table;
+  private List<Row> _rows = [];
+  private UserInfo? _user;
+
+  protected override async Task OnInitializedAsync()
+  {
+    Modules.Changed += OnChanged;
+    Users.Changed += OnChanged;
+    _user = await Users.GetUserInfoAsync();
+    _rows = BuildRows();
+  }
+
+  protected override async Task OnAfterRenderAsync(bool firstRender)
+  {
+    if (firstRender && _table is not null) await _table.SetDataAsync(_rows);
+  }
+
+  private List<Row> BuildRows() => Modules.Catalog.Select(m => new Row(
+      m.Id,
+      m.Name,
+      m.Version,
+      m.Kind.ToString(),
+      m.LoadOnStartup ? "startup" : "on navigation",
+      m.RequiredRole is { } role ? $"role {role}" : m.RequiresAuth ? "signed in" : "everyone",
+      m.RoutePrefixes.Length == 0 ? "-" : string.Join(", ", m.RoutePrefixes.Select(p => "/" + p.Trim('/'))),
+      Modules.IsLoaded(m.Id) ? "loaded" : "not loaded")).ToList();
+
+  private void OnChanged() => _ = InvokeAsync(async () =>
+  {
+    _user = await Users.GetUserInfoAsync();
+    _rows = BuildRows();
+    if (_table is not null) await _table.SetDataAsync(_rows);
+    StateHasChanged();
+  });
+
+  private async Task OnActionAsync((string Action, string Key) e)
+  {
+    var module = Modules.GetDescriptor(e.Key);
+    if (module is null) return;
+
+    try
+    {
+      switch (e.Action)
+      {
+        case "open":
+          var prefix = module.RoutePrefixes.FirstOrDefault();
+          if (prefix is null) await MudTail.ToastAsync($"{module.Id} has no pages of its own.", "info");
+          else Nav.NavigateTo(prefix.Trim('/'));
+          break;
+
+        case "load":
+          if (Modules.IsLoaded(module.Id)) { await MudTail.ToastAsync($"{module.Id} is already loaded.", "info"); break; }
+          await Modules.EnsureLoadedAsync(module.Id);
+          await MudTail.ToastAsync($"{module.Id} loaded.", "success");
+          break;
+
+        case "reload":
+          await Modules.ReloadAsync(module.Id);
+          await MudTail.ToastAsync($"{module.Id} reloaded.", "success");
+          break;
+
+        case "unload":
+          if (module.LoadOnStartup)
+          {
+            // The startup layout provides MudTail and the shell for every page, this one included.
+            await MudTail.ToastAsync($"{module.Id} is a startup module and stays loaded for the session.", "warning");
+            break;
+          }
+          if (Modules.Unload(module.Id))
+          {
+            await Active.NavigateAsync(null); // its styles and scripts go with it
+            await MudTail.ToastAsync($"{module.Id} unloaded: its routes, styles and scripts are gone.", "success");
+          }
+          else await MudTail.ToastAsync($"{module.Id} is not loaded.", "info");
+          break;
+      }
+    }
+    catch (Exception ex)
+    {
+      await MudTail.ToastAsync($"{module.Id}: {ex.Message}", "error");
+    }
+  }
+
+  public void Dispose()
+  {
+    Modules.Changed -= OnChanged;
+    Users.Changed -= OnChanged;
+  }
+}

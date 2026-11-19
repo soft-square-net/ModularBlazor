@@ -1,0 +1,10 @@
+@inject ModuleManager Modules
+
+<LayoutView Layout="Modules.ResolveLayout(LayoutKey)">@ChildContent</LayoutView>
+
+@code {
+    /// <summary>Key of a registered layout; null uses the default layout.</summary>
+    [Parameter] public string? LayoutKey { get; set; }
+
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

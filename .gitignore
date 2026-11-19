@@ -28,3 +28,6 @@ artifacts/
 # node toolchains
 node_modules/
 /docs/astro-modular-blazor-docs/curved-chasm/yarn.lock
+# ModularBlazor.BlzWebClient: client modules are built into wwwroot/modules on every build.
+/src/apps/blazor/ModularBlazor.BlzWebClient/wwwroot/modules/*.dll
+/src/apps/blazor/ModularBlazor.BlzWebClient/wwwroot/modules/*.nupkg

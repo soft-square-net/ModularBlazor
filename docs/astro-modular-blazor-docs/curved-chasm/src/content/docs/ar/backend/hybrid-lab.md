@@ -36,6 +36,7 @@ dotnet run --project src/Aspire/Hybird --launch-profile http -- --Lab:Engines=sq
 | `tenant-data` | PostgreSQL: `TenantStore` (HybirdTenants: سجل المستأجرين والمنح، بالمخطط `platform`)، و`tenant-acme` و`tenant-globex` (قاعدة بيانات لكل مستأجر، ومخطط لكل وحدة فيها)، مع pgAdmin. وتتلقى النسخ `ConnectionStrings:TenantStore` والخادم نفسه كـ `ConnectionStrings:tenant-data`، الذي تسميه صفوف المستأجرين |
 | `tenant-sql` و`tenant-mysql` و`tenant-oracle` (`Lab:Engines`) | خوادم SQL Server وMySQL وOracle Database Free اختيارية للمستأجرين. وتتلقى النسخ `ConnectionStrings:<server>` و`DatabaseServers:<server>:Provider` |
 | `identity` (المنفذ 5090) | خدمة الهوية OpenIddict، بقاعدة البيانات `identity-db`. **في الفرع `claude/identity-service-da759e` فقط**؛ ولم تربط المجموعات بها بعد. انظر [المصادقة: التنفيذ](/ar/backend/auth-implementation/) |
+| `blzwebclient` (المنفذ 5070) | عميل Blazor WebAssembly ‏(`ModularBlazor.BlzWebClient`)، يبدأ بعد `identity` و`gateway`. يسجل الدخول عبر OpenIddict ويستدعي البوابة بالرمز؛ وتسمح كل مجموعة بأصله (`Cors__AllowedOrigins__0`). انظر [عميل Blazor لـ WebApi](/ar/guides/blazor-webapi-client/) |
 
 المجموعة هي N نسخة من المشروع نفسه؛ والإعدادات وحدها تختلف:
 
@@ -136,7 +137,7 @@ sales الأربع. والحل هو الفهرس المشترك مع بث `Modul
 
 ## ما لا يمثل محليا
 
-- شبكة CDN لملفات `_framework` في Blazor WebAssembly، والعميل نفسه (انظر `src/Aspire/Host`).
+- شبكة CDN لملفات `_framework` في Blazor WebAssembly: يقدم المختبر `blzwebclient` من خادم تطوير WebAssembly.
 - TLS الطرفي وجدار حماية التطبيقات.
 - فحص الرموز وتحديد المعدل في البوابة: لم يضبطا بعد. تفحص كل نسخة الرموز وتحدد المستأجر بنفسها؛ ولا تفعل البوابة سوى
   تمرير اسم المضيف.

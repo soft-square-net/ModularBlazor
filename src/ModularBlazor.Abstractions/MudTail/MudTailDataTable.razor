@@ -1,0 +1,126 @@
+@namespace soft.square.net.ModularBlazor.Abstractions.MudTail
+@using System.Text.Json
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.JSInterop
+@implements IAsyncDisposable
+@inject MudTailRuntime MudTail
+
+@*
+  MudTail's data table (search, column filters, sorting, paging, a menu of row actions) over rows from .NET.
+  Rendered by MudTail's runtime from the Layouts.Default module (moduleHost.get('Layouts.Default').create('datatable', ...)),
+  so the host's pages and every module's pages share one theme. The host registers MudTailRuntime; modules only use
+  this component (it lives in ModularBlazor.Abstractions, which the host provides).
+
+  <MudTailDataTable @ref="_table" Columns="Columns" Actions="Actions" OnAction="OnActionAsync" />
+  await _table.SetDataAsync(rows);    // rows: any objects serialised with camelCase names; Columns name their keys
+*@
+
+<div @ref="_host" class="mud-tail-datatable"></div>
+@if (_unavailable)
+{
+  <p class="mud-typography mud-typography-body2" style="color: var(--mud-palette-error)">
+    The table needs MudTail from the Layouts.Default module, which is not active. Check the module catalog and the browser console.
+  </p>
+}
+
+@code {
+  /// <summary>MudTail columns: { key, title, type ('string'|'number'|'date'|'boolean'|'enum'), format, width, options, ... }.</summary>
+  [Parameter, EditorRequired] public IReadOnlyList<object> Columns { get; set; } = [];
+
+  /// <summary>
+  /// Row actions: { id, label, icon?, color? }. Shown as a menu per row. The ids "edit" and "delete" are MudTail's own
+  /// (they open its edit dialog / delete the row in the browser) and never reach <see cref="OnAction"/>: use other ids.
+  /// </summary>
+  [Parameter] public IReadOnlyList<object> Actions { get; set; } = [];
+
+  /// <summary>The property that identifies a row; its value is the key passed to <see cref="OnAction"/>.</summary>
+  [Parameter] public string RowKey { get; set; } = "id";
+
+  [Parameter] public int PageSize { get; set; } = 10;
+
+  /// <summary>Compact rows.</summary>
+  [Parameter] public bool Dense { get; set; }
+
+  /// <summary>Shown when there are no rows.</summary>
+  [Parameter] public string? EmptyText { get; set; }
+
+  /// <summary>Raised for a row action: (action id, row key).</summary>
+  [Parameter] public EventCallback<(string Action, string Key)> OnAction { get; set; }
+
+  /// <summary>Raised when a row is clicked, with its key. Rows are clickable only when this has a handler.</summary>
+  [Parameter] public EventCallback<string> OnRowClick { get; set; }
+
+  private ElementReference _host;
+  private IJSObjectReference? _table;
+  private DotNetObjectReference<MudTailDataTable>? _self;
+  private object? _pendingRows;
+  private bool _unavailable;
+
+  protected override async Task OnAfterRenderAsync(bool firstRender)
+  {
+    if (!firstRender) return;
+
+    var runtime = await MudTail.GetAsync();
+    if (runtime is null)
+    {
+      _unavailable = true;
+      StateHasChanged();
+      return;
+    }
+
+    _self = DotNetObjectReference.Create(this);
+    var options = new Dictionary<string, object?>
+    {
+      ["columns"] = Columns,
+      ["data"] = _pendingRows ?? Array.Empty<object>(),
+      ["rowKey"] = RowKey,
+      ["actions"] = Actions,
+      ["actionsDisplay"] = "menu",
+      ["crud"] = "client",
+      ["pageSize"] = PageSize,
+      ["dense"] = Dense,
+      ["rowClick"] = OnRowClick.HasDelegate,
+    };
+    if (EmptyText is not null) options["emptyText"] = EmptyText;
+    _table = await runtime.InvokeAsync<IJSObjectReference>("create", "datatable", _host, options, _self);
+  }
+
+  /// <summary>Replaces the rows (before the table exists they are kept and used when it is created).</summary>
+  public async Task SetDataAsync(object rows)
+  {
+    _pendingRows = rows;
+    if (_table is not null) await _table.InvokeVoidAsync("setData", rows);
+  }
+
+  [JSInvokable]
+  public async Task OnMudEvent(string name, JsonElement payload)
+  {
+    if (payload.ValueKind != JsonValueKind.Object) return;
+
+    if (name == "action")
+    {
+      var action = payload.TryGetProperty("action", out var a) ? a.GetString() : null;
+      var key = payload.TryGetProperty("key", out var k) ? k.ToString() : null;
+      if (action is not null && key is not null) await OnAction.InvokeAsync((action, key));
+    }
+    else if (name == "rowclick" && payload.TryGetProperty(RowKey, out var rowKey))
+    {
+      await OnRowClick.InvokeAsync(rowKey.ToString());
+    }
+  }
+
+  public async ValueTask DisposeAsync()
+  {
+    try
+    {
+      if (_table is not null)
+      {
+        await _table.InvokeVoidAsync("dispose");
+        await _table.DisposeAsync();
+      }
+    }
+    catch (JSDisconnectedException) { }
+    catch (JSException) { /* the layout runtime may already have disposed every handle */ }
+    _self?.Dispose();
+  }
+}

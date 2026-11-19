@@ -77,6 +77,9 @@ if (engines.Contains("oracle"))
 // Not routed through the gateway: the issuer is one URL, and in production it gets its own host name.
 const int IdentityPort = 5090;
 const string IdentityIssuer = "http://localhost:5090/";
+// ModularBlazor.BlzWebClient's port: its redirect URIs and CORS origin are registered for it (see the client below).
+const int BlzWebClientPort = 5070;
+const string BlzWebClientOrigin = "http://localhost:5070";
 // Resource "identity-db" (names are unique across resources), database "identity", passed as ConnectionStrings:identity.
 var identityDb = tenantData.AddDatabase("identity-db", databaseName: "identity");
 var identity = builder.AddProject<Projects.WebApi_Identity_Server>("identity", launchProfileName: null)
@@ -150,24 +153,19 @@ var gateway = builder.AddYarp("gateway")
 foreach (var replica in core.Concat(sales).Concat(worker).Concat(workflow))
     gateway.WithReference(replica).WaitFor(replica);
 
-// soft.square.net.ModularBlazor.Client (Blazor WebAssembly served by nginx on 5000 http / 5001 https).
-// The modules folder is bind-mounted over the image's copy, so modules rebuilt locally (build-modules.*) show up
-// without rebuilding the image.
-var clientModules = Existing("..", "..", "apps", "blazor", "ModularBlazor.Client", "wwwroot", "modules");
-var clientCert = Existing("..", "..", "apps", "blazor", "ModularBlazor.Client", "aspnetapp.pfx");
-var certPassword = builder.AddParameter("my-cert-password", secret: true);
 
-builder
-    .AddDockerfile("client", "../../..", "src/apps/blazor/ModularBlazor.Client/Dockerfile")
-    .WithImage("client")
-    .WithImageTag("latest")
-    .WithHttpEndpoint(port: 5000, targetPort: 5000, name: "http")
-    .WithHttpsEndpoint(port: 5001, targetPort: 5001, name: "https")
+
+// soft.square.net.ModularBlazor.BlzWebClient: the Blazor WebAssembly client of the WebApi platform, served by the
+// WebAssembly dev server on a fixed port. The port is part of its identity: the identity service registers
+// http://localhost:5070/authentication/login-callback (and logout-callback) as redirect URIs of "blazor-client" and allows
+// the origin for CORS; the pools allow it too (Cors__AllowedOrigins in AddPool). The browser signs in at the identity
+// service (5090) and calls the gateway (5080) with the access token; wwwroot/appsettings.json holds both addresses,
+// because a WebAssembly app reads no server-side environment.
+builder.AddProject<Projects.ModularBlazor_BlzWebClient>("blzwebclient", launchProfileName: null)
+    .WithHttpEndpoint(port: BlzWebClientPort)
     .WithExternalHttpEndpoints()
-    .WithBuildArg("BUILD_MODULES", "false")
-    .WithBindMount(clientModules, "/usr/share/nginx/html/modules", isReadOnly: true)
-    .WithBindMount(clientCert, "/https/aspnetapp.pfx", isReadOnly: true)
-    .WithEnvironment("CERT_PASSWORD", certPassword)
+    .WithEnvironment("ASPNETCORE_ENVIRONMENT", "Development")
+    .WaitFor(identity)
     .WaitFor(gateway);
 
 builder.Build().Run();
@@ -193,6 +191,8 @@ IResourceBuilder<ProjectResource>[] AddPool(string name, string role, int replic
             // Tokens from the identity service: JwtBearer reads its discovery document and JWKS (http in the lab).
             .WithEnvironment("Auth__Authority", IdentityIssuer)
             .WithEnvironment("Auth__Audience", "modular-webapi")
+            // The Blazor WebAssembly client calls the gateway from its own origin; YARP passes the preflight through.
+            .WithEnvironment("Cors__AllowedOrigins__0", BlzWebClientOrigin)
             .WaitFor(identity)
             .WithHttpHealthCheck("/health");
 
@@ -207,10 +207,30 @@ static YarpCluster Cluster(IYarpConfigurationBuilder yarp, string name, IResourc
         .WithLoadBalancingPolicy("RoundRobin");
 
 
-string Existing(params string[] parts)
-{
-  var path = Path.GetFullPath(Path.Combine([builder.AppHostDirectory, .. parts]));
-  return File.Exists(path) || Directory.Exists(path)
-      ? path
-      : throw new FileNotFoundException($"Not found: {path}");
-}
+//string Existing(params string[] parts)
+//{
+//  var path = Path.GetFullPath(Path.Combine([builder.AppHostDirectory, .. parts]));
+//  return File.Exists(path) || Directory.Exists(path)
+//      ? path
+//      : throw new FileNotFoundException($"Not found: {path}");
+//}
+
+//// soft.square.net.ModularBlazor.Client (Blazor WebAssembly served by nginx on 5000 http / 5001 https).
+//// The modules folder is bind-mounted over the image's copy, so modules rebuilt locally (build-modules.*) show up
+//// without rebuilding the image.
+//var clientModules = Existing("..", "..", "apps", "blazor", "ModularBlazor.Client", "wwwroot", "modules");
+//var clientCert = Existing("..", "..", "apps", "blazor", "ModularBlazor.Client", "aspnetapp.pfx");
+//var certPassword = builder.AddParameter("my-cert-password", secret: true);
+
+//builder
+//    .AddDockerfile("client", "../../..", "src/apps/blazor/ModularBlazor.Client/Dockerfile")
+//    .WithImage("client")
+//    .WithImageTag("latest")
+//    .WithHttpEndpoint(port: 5000, targetPort: 5000, name: "http")
+//    .WithHttpsEndpoint(port: 5001, targetPort: 5001, name: "https")
+//    .WithExternalHttpEndpoints()
+//    .WithBuildArg("BUILD_MODULES", "false")
+//    .WithBindMount(clientModules, "/usr/share/nginx/html/modules", isReadOnly: true)
+//    .WithBindMount(clientCert, "/https/aspnetapp.pfx", isReadOnly: true)
+//    .WithEnvironment("CERT_PASSWORD", certPassword)
+//    .WaitFor(gateway);

@@ -857,7 +857,8 @@ with `openapi-fetch`.
 The old `src/ModularBlazor.Abstractions/Api/ApiClient.cs` was generated from the previous API
 (`http://localhost:5100/openapi/v1.json`) and does not cover the runtime modules. The hand-written `IModuleAdminApi`
 behind the Blazor "Module Management" page also calls the previous API (`/api/v1/modules/...`); the runtime lifecycle
-is in `WebApi.Client`'s `ModulesClient`.
+is in `WebApi.Client`'s `ModulesClient`, which the new Blazor client's **Host modules** page uses (see
+[The Blazor client for WebApi](/guides/blazor-webapi-client/#host-module-management)).
 
 ## Making it a core module instead
 

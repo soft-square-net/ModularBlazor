@@ -1,0 +1,53 @@
+@page "/authentication/{action}"
+@attribute [UseLayout("none")]
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+@*
+  The OpenID Connect round trips: login (redirect to the identity service), login-callback (code -> tokens),
+  logout and logout-callback. Shown in the same MudTail card as the sign-in page.
+*@
+
+<div class="blz-auth">
+  <div class="mud-paper mud-elevation-4 blz-auth-card">
+    <RemoteAuthenticatorView Action="@Action">
+      <LoggingIn><Status Text="Redirecting to the identity service…" /></LoggingIn>
+      <CompletingLoggingIn><Status Text="Completing sign-in…" /></CompletingLoggingIn>
+      <LogInFailed Context="error">
+        <h1 class="mud-typography mud-typography-h6">Sign-in failed</h1>
+        <p class="mud-typography mud-typography-body2 blz-error" role="alert">@error</p>
+        <a href="login" class="mud-button-root mud-button-filled mud-button-primary mud-button-medium blz-block">Try again</a>
+      </LogInFailed>
+      <LogOut><Status Text="Signing out…" /></LogOut>
+      <CompletingLogOut><Status Text="Completing sign-out…" /></CompletingLogOut>
+      <LogOutFailed Context="error">
+        <h1 class="mud-typography mud-typography-h6">Sign-out failed</h1>
+        <p class="mud-typography mud-typography-body2 blz-error" role="alert">@error</p>
+      </LogOutFailed>
+      <LogOutSucceeded>
+        <h1 class="mud-typography mud-typography-h6">You are signed out</h1>
+        <a href="login" class="mud-button-root mud-button-filled mud-button-primary mud-button-medium blz-block">Sign in again</a>
+      </LogOutSucceeded>
+    </RemoteAuthenticatorView>
+  </div>
+</div>
+
+@code {
+  [Parameter] public string? Action { get; set; }
+
+  private sealed class Status : ComponentBase
+  {
+    [Parameter] public string Text { get; set; } = "";
+
+    protected override void BuildRenderTree(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder)
+    {
+      builder.OpenElement(0, "p");
+      builder.AddAttribute(1, "class", "mud-typography mud-typography-body1 blz-status");
+      builder.OpenElement(2, "span");
+      builder.AddAttribute(3, "class", "blz-spinner");
+      builder.AddAttribute(4, "aria-hidden", "true");
+      builder.CloseElement();
+      builder.AddContent(5, Text);
+      builder.CloseElement();
+    }
+  }
+}

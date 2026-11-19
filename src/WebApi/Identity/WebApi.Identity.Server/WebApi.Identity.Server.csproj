@@ -23,4 +23,10 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.11.0" />
   </ItemGroup>
 
+  <!-- The sign-in pages use MudTail's stylesheet. wwwroot/css/mudtail.css is a committed copy, refreshed from
+       src/MudTail/dist when that has been built (npm run build in src/MudTail). -->
+  <Target Name="CopyMudTailCss" BeforeTargets="BeforeBuild" Condition="Exists('$(MSBuildProjectDirectory)/../../../MudTail/dist/mudtail.css')">
+    <Copy SourceFiles="$(MSBuildProjectDirectory)/../../../MudTail/dist/mudtail.css" DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/css" SkipUnchangedFiles="true" />
+  </Target>
+
 </Project>

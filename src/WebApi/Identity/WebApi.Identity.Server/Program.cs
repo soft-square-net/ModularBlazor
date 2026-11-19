@@ -137,6 +137,7 @@ var app = builder.Build();
 await IdentitySeeder.InitializeAsync(app.Services);
 
 app.UseStatusCodePages();
+app.UseStaticFiles(); // wwwroot/css/mudtail.css for the sign-in pages
 app.UseRouting();
 app.UseCors();
 app.UseAuthentication();

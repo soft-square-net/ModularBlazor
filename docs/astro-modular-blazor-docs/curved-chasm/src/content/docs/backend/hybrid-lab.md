@@ -44,6 +44,7 @@ dotnet run --project src/Aspire/Hybird --launch-profile http -- --Lab:Engines=sq
 | `tenant-data` | PostgreSQL: `TenantStore` (HybirdTenants: the tenant registry and grants, schema `platform`), `tenant-acme`, `tenant-globex` (one database per tenant, a schema per module in it), `elsa-db` (ElsaWorkflows, schema `elsa`), `identity-db`, plus pgAdmin. Replicas get `ConnectionStrings:TenantStore` and the server as `ConnectionStrings:tenant-data`, which tenant rows name |
 | `tenant-sql`, `tenant-mysql`, `tenant-oracle` (`Lab:Engines`) | Optional SQL Server, MySQL and Oracle Database Free servers for tenants. Replicas get `ConnectionStrings:<server>` and `DatabaseServers:<server>:Provider` |
 | `identity` (port 5090) | The OpenIddict identity service, with database `identity-db`. Every pool validates its tokens (`Auth__Authority`); clients include `elsa-workflows` (client credentials). See [Authentication: implementation](/backend/auth-implementation/#the-identity-service) |
+| `blzwebclient` (port 5070) | The Blazor WebAssembly client (`ModularBlazor.BlzWebClient`), started after `identity` and `gateway`. Signs in with OpenIddict and calls the gateway with the token; every pool allows its origin (`Cors__AllowedOrigins__0`). See [The Blazor client for WebApi](/guides/blazor-webapi-client/) |
 
 A pool is N replicas of the same project; only configuration differs:
 
@@ -147,7 +148,7 @@ broadcast described in [Runtime modules](/backend/runtime-modules/#pools-and-rep
 
 ## Not modelled locally
 
-- The CDN for the Blazor WebAssembly `_framework` files, and the client itself (see `src/Aspire/Host`).
+- The CDN for the Blazor WebAssembly `_framework` files: the lab serves `blzwebclient` from the WebAssembly dev server.
 - Edge TLS and the WAF.
 - Token checks and rate limiting at the gateway: not configured yet. Every replica checks tokens and resolves the
   tenant itself; the gateway only forwards the host name.
