@@ -1,5 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <!-- Published as a NuGet package: modules developed outside this repo compile against it. -->
+  <Import Project="../../../build/Platform.Packaging.props" />
+  <PropertyGroup>
+    <Description>ModularBlazor: shared data layer for runtime modules (TenantDbContext, EfRepository, tenant store, EF Core with the four providers). The host provides it at runtime.</Description>
+  </PropertyGroup>
+
   <!--
     Data layer shared by the WebApi host and every runtime module: EF Core + Npgsql, the TenantDbContext base class
     for module DbContexts, the tenant store (registry of tenants) and the per-tenant connection and migration helpers.

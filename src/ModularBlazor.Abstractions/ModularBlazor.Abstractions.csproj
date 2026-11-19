@@ -1,5 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor"><!-- Contracts shared by the host and every module. Keep it dependency-free. -->
 
+  <!-- Published as a NuGet package: modules developed outside this repo compile against it. -->
+  <Import Project="../../build/Platform.Packaging.props" />
+  <PropertyGroup>
+    <Description>ModularBlazor: contracts of the Blazor WASM host that client modules compile against (ClientModule attribute, MudTail components, HttpClientNames). The host provides it at runtime; never ship it in a module.</Description>
+  </PropertyGroup>
+
   <PropertyGroup>
     <AssemblyName>$(SoftSquarePrefix).ModularBlazor.Abstractions</AssemblyName>
     <RootNamespace>$(SoftSquarePrefix).ModularBlazor.Abstractions</RootNamespace>
@@ -9,5 +15,7 @@
     <SupportedPlatform Include="browser" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.*" PrivateAssets="all" />
     <ProjectReference Include="..\Share.All\Share.All.csproj" />
+    <!-- NSwag settings: a build input, not something a package consumer needs. -->
+    <Content Update="Api/nswag.json" Pack="false" />
   </ItemGroup>
 </Project>

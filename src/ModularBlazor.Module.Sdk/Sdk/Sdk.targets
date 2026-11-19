@@ -1,0 +1,47 @@
+<Project>
+
+  <!--
+    soft.square.net.ModularBlazor.Module.Sdk (see Sdk.props). The project kind and its references are decided here, at
+    the end of the project, so a ModuleLayer set in the project file counts and the Razor SDK has identified itself.
+  -->
+
+  <PropertyGroup>
+    <ModuleLayer Condition="'$(ModuleLayer)' == '' And '$(UsingMicrosoftNETSdkRazor)' == 'true'">Client</ModuleLayer>
+    <ModuleLayer Condition="'$(ModuleLayer)' == '' And $(MSBuildProjectName.EndsWith('.Domain'))">Domain</ModuleLayer>
+    <ModuleLayer Condition="'$(ModuleLayer)' == '' And $(MSBuildProjectName.EndsWith('.Application'))">Application</ModuleLayer>
+    <ModuleLayer Condition="'$(ModuleLayer)' == '' And $(MSBuildProjectName.EndsWith('.Infrastructure'))">Infrastructure</ModuleLayer>
+    <ModuleLayer Condition="'$(ModuleLayer)' == ''">Module</ModuleLayer>
+    <_ModuleUsesData Condition="'$(ModuleLayer)' == 'Infrastructure' Or ('$(ModuleLayer)' == 'Module' And '$(ModuleUsesData)' == 'true')">true</_ModuleUsesData>
+  </PropertyGroup>
+
+  <!-- Server: the contracts every layer above Domain compiles against. -->
+  <ItemGroup Condition="'$(ModuleLayer)' == 'Application' Or '$(ModuleLayer)' == 'Infrastructure' Or '$(ModuleLayer)' == 'Module'">
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="soft.square.net.WebApi.Contracts" Version="$(ModularBlazorPlatformVersion)" ExcludeAssets="$(HostSharedExclude)" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(ModuleLayer)' == 'Domain' Or '$(ModuleLayer)' == 'Application'">
+    <PackageReference Include="soft.square.net.WebApi.SharedKernel" Version="$(ModularBlazorPlatformVersion)" ExcludeAssets="$(HostSharedExclude)" />
+  </ItemGroup>
+
+  <!-- The entry assembly: endpoints (Carter) and, with data, the shared data layer and the EF Core design tools. -->
+  <ItemGroup Condition="'$(ModuleLayer)' == 'Infrastructure' Or '$(ModuleLayer)' == 'Module'">
+    <PackageReference Include="Carter" Version="$(ModuleCarterVersion)" ExcludeAssets="$(HostSharedExclude)" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(_ModuleUsesData)' == 'true'">
+    <PackageReference Include="soft.square.net.WebApi.Data" Version="$(ModularBlazorPlatformVersion)" ExcludeAssets="$(HostSharedExclude)" />
+    <!-- Design time only (dotnet ef migrations add, with EfDesignAssets=all). -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="$(ModuleEfCoreVersion)" PrivateAssets="all" ExcludeAssets="$(HostSharedExclude)" />
+  </ItemGroup>
+
+  <!-- Client: a Razor class library compiled against the Blazor host's contracts, which the host already loads. -->
+  <ItemGroup Condition="'$(ModuleLayer)' == 'Client'">
+    <SupportedPlatform Include="browser" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="$(ModuleAspNetCoreVersion)" PrivateAssets="all" />
+    <PackageReference Include="soft.square.net.ModularBlazor.Abstractions" Version="$(ModularBlazorPlatformVersion)" PrivateAssets="all" ExcludeAssets="runtime;native;build;buildTransitive;contentFiles" />
+  </ItemGroup>
+
+  <Import Project="$(MSBuildThisFileDirectory)ModuleAssets.targets" Condition="'$(ModuleLayer)' == 'Client'" />
+
+</Project>
