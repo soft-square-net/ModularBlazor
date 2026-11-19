@@ -1,0 +1,1149 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Client modules",
+    "description": "Core module: catalog of the Blazor client's modules (upload, settings, versions) and the per-user client manifest.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "paths": {
+    "/api/client-modules/manifest": {
+      "get": {
+        "tags": [
+          "Client modules"
+        ],
+        "summary": "The client modules the caller may use (anonymous: the public ones, such as layouts), startup modules first, with their dependencies. Sends an ETag; If-None-Match answers 304 when nothing changed.",
+        "operationId": "ClientModules_GetManifest",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientModuleManifest"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "Not Modified"
+          }
+        }
+      }
+    },
+    "/api/client-modules/modules": {
+      "get": {
+        "tags": [
+          "Client modules"
+        ],
+        "summary": "Every client module with its settings and versions.",
+        "operationId": "ClientModules_List",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ClientModuleRecord"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/client-modules/modules/{id}": {
+      "get": {
+        "tags": [
+          "Client modules"
+        ],
+        "operationId": "ClientModules_Get",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientModuleRecord"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Client modules"
+        ],
+        "summary": "Deletes the module and its files. 409 for core modules (disable them) and when other modules depend on it.",
+        "operationId": "ClientModules_Delete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/client-modules/uploads": {
+      "post": {
+        "tags": [
+          "Client modules"
+        ],
+        "summary": "Step 1: upload a .dll, .nupkg or .zip. It is checked (read as metadata, never run) and kept for an hour as a draft: id, version, detected settings, pages, layouts, warnings, and how it compares with what is installed.",
+        "operationId": "ClientModules_Upload",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "package"
+                ],
+                "type": "object",
+                "properties": {
+                  "package": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientModuleUpload"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload Too Large",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/client-modules/uploads/{token}": {
+      "get": {
+        "tags": [
+          "Client modules"
+        ],
+        "operationId": "ClientModules_GetUpload",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientModuleUpload"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Client modules"
+        ],
+        "operationId": "ClientModules_DiscardUpload",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/client-modules/uploads/{token}/install": {
+      "post": {
+        "tags": [
+          "Client modules"
+        ],
+        "summary": "Step 2: install the upload. A new module gets the settings sent (or the detected ones); an installed one keeps its settings unless others are sent. 409 when the version exists with other files (replace = true overwrites).",
+        "operationId": "ClientModules_Install",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InstallClientModule"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientModuleRecord"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/client-modules/modules/{id}/settings": {
+      "put": {
+        "tags": [
+          "Client modules"
+        ],
+        "summary": "Replaces the module's settings: who gets it, when it loads, routes, layout, dependencies, menu entries.",
+        "operationId": "ClientModules_UpdateSettings",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClientModuleSettings"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientModuleRecord"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/client-modules/modules/{id}/enable": {
+      "post": {
+        "tags": [
+          "Client modules"
+        ],
+        "operationId": "ClientModules_Enable",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientModuleRecord"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/client-modules/modules/{id}/disable": {
+      "post": {
+        "tags": [
+          "Client modules"
+        ],
+        "summary": "Leaves the module out of every manifest (clients drop it on their next manifest check). Files are kept.",
+        "operationId": "ClientModules_Disable",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientModuleRecord"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/client-modules/modules/{id}/versions/{version}/activate": {
+      "post": {
+        "tags": [
+          "Client modules"
+        ],
+        "summary": "Makes this installed version the one the manifest hands out (upgrade or rollback).",
+        "operationId": "ClientModules_ActivateVersion",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientModuleRecord"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/client-modules/modules/{id}/versions/{version}": {
+      "delete": {
+        "tags": [
+          "Client modules"
+        ],
+        "summary": "Deletes a version that is not the active one.",
+        "operationId": "ClientModules_DeleteVersion",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientModuleRecord"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ClientModuleDescriptor": {
+        "required": [
+          "id",
+          "name",
+          "version",
+          "kind",
+          "url",
+          "sha256",
+          "extraAssemblies",
+          "extraSha256",
+          "loadStrategy",
+          "loadOnStartup",
+          "hidden",
+          "requiresAuth",
+          "requiredRole",
+          "availableToRoles",
+          "routePrefixes",
+          "layout",
+          "dependencies",
+          "styles",
+          "scripts",
+          "nav"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string"
+          },
+          "extraAssemblies": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "extraSha256": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "loadStrategy": {
+            "$ref": "#/components/schemas/ClientModuleLoadStrategy"
+          },
+          "loadOnStartup": {
+            "type": "boolean"
+          },
+          "hidden": {
+            "type": "boolean"
+          },
+          "requiresAuth": {
+            "type": "boolean"
+          },
+          "requiredRole": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "availableToRoles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "routePrefixes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "layout": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "dependencies": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "styles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "scripts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "nav": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClientModuleNavItem"
+            }
+          }
+        }
+      },
+      "ClientModuleFile": {
+        "required": [
+          "name",
+          "sha256",
+          "size"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ClientModuleKind": {
+        "enum": [
+          "Dll",
+          "NuPkg"
+        ],
+        "type": "string"
+      },
+      "ClientModuleLoadStrategy": {
+        "enum": [
+          "Startup",
+          "Lazy",
+          "Preload"
+        ],
+        "type": "string"
+      },
+      "ClientModuleManifest": {
+        "required": [
+          "eTag",
+          "modules"
+        ],
+        "type": "object",
+        "properties": {
+          "eTag": {
+            "type": "string"
+          },
+          "modules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClientModuleDescriptor"
+            }
+          }
+        }
+      },
+      "ClientModuleNavItem": {
+        "required": [
+          "title",
+          "href"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32",
+            "default": 100
+          }
+        }
+      },
+      "ClientModuleRecord": {
+        "required": [
+          "id",
+          "activeVersion"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/ClientModuleSettings"
+          },
+          "core": {
+            "type": "boolean"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "activeVersion": {
+            "type": "string"
+          },
+          "versions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClientModuleVersion"
+            }
+          },
+          "installedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedBy": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "active": {
+            "$ref": "#/components/schemas/ClientModuleVersion"
+          }
+        }
+      },
+      "ClientModuleSettings": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "loadStrategy": {
+            "$ref": "#/components/schemas/ClientModuleLoadStrategy"
+          },
+          "hidden": {
+            "type": "boolean"
+          },
+          "requiresAuth": {
+            "type": "boolean"
+          },
+          "requiredRole": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "availableToRoles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "availableToTenants": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "layout": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "routePrefixes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "dependencies": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "styles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "scripts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "nav": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClientModuleNavItem"
+            }
+          }
+        }
+      },
+      "ClientModuleUpload": {
+        "required": [
+          "token",
+          "fileName",
+          "id",
+          "version",
+          "kind",
+          "detected"
+        ],
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "fileName": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ClientModuleKind"
+          },
+          "detected": {
+            "$ref": "#/components/schemas/ClientModuleSettings"
+          },
+          "current": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ClientModuleSettings"
+              }
+            ]
+          },
+          "currentVersion": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "isCore": {
+            "type": "boolean"
+          },
+          "versionExists": {
+            "type": "boolean"
+          },
+          "samePackage": {
+            "type": "boolean"
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClientModuleFile"
+            }
+          },
+          "routes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "layouts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ClientModuleVersion": {
+        "required": [
+          "version",
+          "kind",
+          "primary",
+          "packageHash",
+          "source"
+        ],
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ClientModuleKind"
+          },
+          "primary": {
+            "$ref": "#/components/schemas/ClientModuleFile"
+          },
+          "extraAssemblies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClientModuleFile"
+            }
+          },
+          "packageHash": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "uploadedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "uploadedBy": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "routes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "layouts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "InstallClientModule": {
+        "type": "object",
+        "properties": {
+          "settings": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ClientModuleSettings"
+              }
+            ]
+          },
+          "activate": {
+            "type": "boolean",
+            "default": true
+          },
+          "replace": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "OAuth2": {
+        "type": "oauth2",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "http://localhost:5090/connect/authorize",
+            "tokenUrl": "http://localhost:5090/connect/token",
+            "scopes": {
+              "openid": "User identity",
+              "profile": "User profile",
+              "email": "User email",
+              "api": "Access to Modular WebApi",
+              "offline_access": "Refresh token"
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "OAuth2": [
+        "openid",
+        "profile",
+        "email",
+        "api"
+      ]
+    }
+  ],
+  "tags": [
+    {
+      "name": "Client modules"
+    }
+  ]
+}
